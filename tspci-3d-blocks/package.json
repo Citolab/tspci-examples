@@ -20,15 +20,15 @@
     "@citolab/preact-store": "^1.0.0"
   },
   "devDependencies": {
-    "@citolab/tspci": "^1.2.4",
-    "@citolab/tspci-tao": "^1.0.1",
+    "@citolab/tspci": "^1.5.8",
+    "@citolab/tspci-tao": "^1.0.2",
     "autoprefixer": "10.4.7"
   },
   "scripts": {
     "dev": "set ROLLUP_WATCH=true && tspci --dev",
     "prod": "tspci",
     "watch": "tspci --watch",
-    "package-tao": "tspci -target tao",
+    "package-tao": "tspci --target tao",
     "package-questify": "tspci -target questify"
   }
 }

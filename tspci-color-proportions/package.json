@@ -15,8 +15,8 @@
     "@citolab/preact-store": "^1.0.0"
   },
   "devDependencies": {
-    "@citolab/tspci": "^1.0.0",
-    "@citolab/tspci-tao": "^1.0.0",
+    "@citolab/tspci": "^1.5.8",
+    "@citolab/tspci-tao": "^1.0.2",
     "autoprefixer": "10.4.7"
   },
   "scripts": {
