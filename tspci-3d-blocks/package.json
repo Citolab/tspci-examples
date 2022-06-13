@@ -3,23 +3,26 @@
   "typeIdentifier": "3dBlocks",
   "label": "3d-blocks",
   "short": "3d-blocks",
-  "score": [ "MATCH_CORRECT", "NONE" ],
+  "score": [
+    "MATCH_CORRECT",
+    "NONE"
+  ],
   "description": "recreate a building with 3d blocks",
   "version": "1.0.1",
   "source": "src/index.tsx",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
   "dependencies": {
-		"three": "^0.136.0",
-    "@types/three" :"^0.136.0",
-		"three-orbitcontrols": "^2.110.3",
+    "three": "^0.136.0",
+    "@types/three": "^0.136.0",
+    "three-orbitcontrols": "^2.110.3",
     "preact": "10.7.3",
     "@citolab/preact-store": "^1.0.0"
   },
   "devDependencies": {
     "@citolab/tspci": "^1.2.4",
-    "@citolab/tspci-tao": "^1.0.1"
-
+    "@citolab/tspci-tao": "^1.0.1",
+    "autoprefixer": "10.4.7"
   },
   "scripts": {
     "dev": "set ROLLUP_WATCH=true && tspci --dev",
