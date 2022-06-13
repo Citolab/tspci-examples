@@ -1,0 +1,27 @@
+{
+  "name": "@citolab/vanilla-js",
+  "description": "Vanilla js pci",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/types.d.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "@citolab/tspci": "^1.5.6",
+    "@citolab/tspci-tao": "^1.0.0"
+  },
+  "scripts": {
+    "tscpi": "tspci --help",
+    "dev": "tspci --dev",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --tao"
+  },
+  "source": "src/index.ts",
+
+  "//": "------- TAO specific properties -------",
+  
+  "typeidentifier": "HelloWorld",
+  "label": "Hello",
+  "short": "HW",
+  "score": [ "MATCH_CORRECT", "NONE" ]
+}

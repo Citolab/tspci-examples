@@ -1,0 +1,17 @@
+{
+  "name": "@citolab/hello-world",
+  "description": "Hello world pci",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "types": "dist/types.d.ts",
+  "dependencies": {},
+  "devDependencies": {
+    "@citolab/tspci": "^1.5.7",
+    "@citolab/tspci-tao": "^1.0.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "prod": "tspci"
+  },
+  "source": "src/index.ts"
+}
