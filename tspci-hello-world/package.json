@@ -6,8 +6,8 @@
   "types": "dist/types.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@citolab/tspci": "^1.5.8",
-    "@citolab/tspci-tao": "^1.0.2"
+    "@citolab/tspci": "^2.0.7",
+    "@citolab/tspci-tao": "^2.0.7"
   },
   "scripts": {
     "dev": "tspci --dev",
