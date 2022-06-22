@@ -1,6 +1,6 @@
 /* PCI with config and tailwind in shadowRoot */
 
-import { Configuration, IMSpci } from "@tspci/bundler"; // importing the interface for an IMSpci
+import { Configuration, IMSpci } from "@citolab/tspci"; // importing the interface for an IMSpci
 import * as ctx from "qtiCustomInteractionContext"; // the qtiCustomInteractionContext will be dynamicly imported in the player environment
 import style from "./assets/style.css"; // import and bundle this style file ( you can use tailwind and nested css )
 import procenten from "./assets/procenten.png"; // image types are bundled inside the js
