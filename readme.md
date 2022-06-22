@@ -43,6 +43,16 @@ PCI where the test-taker can color parts of a rectangle.
   <img src="./tspci-color-proportions/example.png" alt="example proportions">
 </p>
 
+## tspci-hauntedjs
+
+Example PCI using [haunted](https://github.com/matthewp/haunted) instead of preact.
+
+Simple PCI for finding the correct variable
+
+<p align="center">
+  <img src="./tspci-hauntedjs/example.png" alt="example haunted lib">
+</p>
+
 ## tspci-3d-blocks
 
 PCI where the test-taker has to build a blocks.
