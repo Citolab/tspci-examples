@@ -1,7 +1,7 @@
 import { Configuration, IMSpci } from "@citolab/tspci";
 import * as ctx from "qtiCustomInteractionContext";
 
-class Pci implements IMSpci<{}> {
+class Pci implements IMSpci<never> {
   typeIdentifier = "HelloWorld";
   shadowdom: ShadowRoot;
 

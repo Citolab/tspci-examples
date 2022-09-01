@@ -11,6 +11,7 @@
   },
   "scripts": {
     "dev": "tspci --dev",
+    "package-tao": "tspci --target tao",
     "prod": "tspci"
   },
   "source": "src/index.ts"
