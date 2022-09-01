@@ -7,14 +7,16 @@
   "dependencies": {},
   "devDependencies": {
     "@citolab/tspci": "^2.0.7",
-    "@citolab/tspci-tao": "^2.0.7"
+    "@citolab/tspci-tao": "^2.0.7",
+    "@citolab/tspci-qbci": "^2.0.4"
   },
   "scripts": {
     "tscpi": "tspci --help",
     "dev": "tspci --dev",
     "prod": "tspci",
     "watch": "tspci --watch",
-    "package-tao": "tspci --tao"
+    "package-tao": "tspci --tao",
+    "package-qb": "tspci --target qbci "
   },
   "source": "src/index.ts",
 

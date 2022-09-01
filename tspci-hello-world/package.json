@@ -1,5 +1,9 @@
 {
   "name": "@citolab/hello-world",
+  "typeIdentifier": "HelloWorld",
+  "score": [ "NONE", "MATCH_CORRECT" ],
+  "label": "Hello",
+  "short": "HW",
   "description": "Hello world pci",
   "version": "1.0.0",
   "main": "dist/index.js",
