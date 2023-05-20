@@ -5,22 +5,20 @@ import Interaction from "./interaction";
 import style from "./style.css";
 import { TAOpci } from "@citolab/tspci-tao";
 import { Configuration, IMSpci } from "@citolab/tspci";
-import { initStore, Store } from "@citolab/preact-store";
+import { Action, IStore, Store } from "@citolab/preact-store";
 
 import configProps from "./config.json";
-import { actions, StateModel, Vlak } from "./store";
+import { StateModel, Vlak, initStore } from "./store";
 type PropTypes = typeof configProps;
 
 type ResponseType = { color: string; percentage: number };
 
 class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "colorProportions";
-
-  store: Store<StateModel>;
-
-  private logActions: { type: string; payload: unknown }[] = []; // optional logActions
+  store: IStore<StateModel>;
   shadowdom: ShadowRoot; // implementation detail
-  public config: Configuration<PropTypes>;
+  config: Configuration<PropTypes>;
+  private initialState: StateModel = { vlakken: [] };
 
   constructor() {
     ctx && ctx.register(this);
@@ -30,10 +28,12 @@ class App implements IMSpci<PropTypes>, TAOpci {
     config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
     this.config = config;
 
-    const initState: StateModel = stateString ? JSON.parse(stateString).state : { vlakken: [] };
-    this.logActions = stateString ? JSON.parse(stateString).log : [];
-    this.store = initStore<StateModel>(actions, initState, (action) => this.logActions.push(action));
-
+    const restoredState = stateString ? JSON.parse(stateString) : null;
+    const logActions = stateString ? JSON.parse(stateString).log : null;
+    this.store = initStore(this.initialState );
+    if (restoredState || logActions) {
+      this.store.restoreState(restoredState, logActions);
+    }
     this.shadowdom = dom.attachShadow({ mode: "closed" });
     this.render();
 
@@ -45,11 +45,11 @@ class App implements IMSpci<PropTypes>, TAOpci {
     const css = document.createElement("style");
     css.innerHTML = style;
     this.shadowdom.appendChild(css);
-    render(<Interaction config={this.config.properties} dom={this.shadowdom} />, this.shadowdom);
+    render(<Interaction config={this.config.properties} dom={this.shadowdom} store={this.store} />, this.shadowdom);
   };
 
-  off = () => {}; // called when setting correct response in tao
-  on = (val) => {};
+  off = () => { }; // called when setting correct response in tao
+  on = (val) => { };
 
   trigger = (event: string, value: any) => {
     this.config.properties[event] = value;
@@ -99,8 +99,8 @@ class App implements IMSpci<PropTypes>, TAOpci {
   };
 
   resetResponse = () => {
-    this.store.cleanup();
-    this.store = initStore<StateModel>(actions, { vlakken: [] });
+    this.store.unsubscribeAll();
+    this.store.reset();
     this.render();
   };
 
@@ -139,10 +139,8 @@ class App implements IMSpci<PropTypes>, TAOpci {
           const absoluteSurface = totalCubes * (response.percentage / 100);
           possibleSolutions = this.getPossibleSolutionsForColor(response.color, absoluteSurface, possibleSolutions);
         }
-        this.store.cleanup();
-        this.store = initStore<StateModel>(actions, {
-          vlakken: possibleSolutions?.length > 0 ? possibleSolutions[0].vlakken || [] : [],
-        });
+        this.store.unsubscribeAll();
+        this.store = initStore(this.initialState);
         this.render();
       } catch {
         console.error(`couldn't retore state: ${response}`);
@@ -178,13 +176,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
   }
 
   oncompleted = () => {
-    this.store.cleanup();
+    this.store.unsubscribeAll();
   };
 
   getState = () =>
     JSON.stringify({
       state: this.store.getState(),
-      log: this.logActions,
+      log: this.store.getActions()
     });
 
   extractNumber(string: string): number {
