@@ -1,33 +1,29 @@
 {
   "name": "@citolab/tspci-3d-blocks",
-  "typeIdentifier": "3dBlocks",
-  "label": "3d-blocks",
-  "short": "3d-blocks",
-  "score": [
-    "MATCH_CORRECT",
-    "NONE"
-  ],
-  "description": "recreate a building with 3d blocks",
-  "version": "1.0.1",
   "source": "src/index.tsx",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
+  "description": "recreate a building with 3d blocks",
+  "private": true,
   "dependencies": {
+    "@citolab/preact-store": "2.3.4",
+    "preact": "10.6.4",
     "three": "^0.136.0",
-    "@types/three": "^0.136.0",
-    "three-orbitcontrols": "^2.110.3",
-    "preact": "10.7.3",
-    "@citolab/preact-store": "^2.0.7"
+    "three-orbitcontrols": "^2.110.3"
   },
   "devDependencies": {
-    "@citolab/tspci": "^2.0.7",
-    "@citolab/tspci-tao": "^2.0.7",
-    "autoprefixer": "10.4.7"
+    "@citolab/tspci": "2.3.4",
+    "@citolab/tspci-tao": "latest",
+    "@types/three": "^0.136.0",
+    "autoprefixer": "10.4.13"
   },
   "scripts": {
     "dev": "set ROLLUP_WATCH=true && tspci --dev",
     "prod": "tspci",
     "watch": "tspci --watch",
     "package-tao": "tspci --target tao"
+  },
+  "config": {
+    "typeIdentifier": "colorProportions"
   }
 }

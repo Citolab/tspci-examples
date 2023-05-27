@@ -6,8 +6,8 @@ import configProps from "./config.json";
 type PropTypes = typeof configProps;
 
 import { Configuration, IMSpci } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
-import { initStore, Store } from "@citolab/preact-store";
-import { actions, StateModel } from "./store";
+import { IStore } from "@citolab/preact-store";
+import { initStore, StateModel } from "./store";
 import { TAOpci } from "@citolab/tspci-tao";
 import { planeProjection, planesToScene, sort } from "./sort";
 
@@ -16,11 +16,11 @@ export type State = { cubes: { x: number; y: number; z: number }[] };
 class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "3dBlocks";
 
-  store: Store<StateModel>;
+  store: IStore<StateModel>;
   props: PropTypes;
   config: Configuration<PropTypes>;
   shadowdom: ShadowRoot;
-  private logActions: { type: string; payload: unknown }[] = []; // optional logActions
+  private initialState: StateModel = { cubes: [] };
 
   constructor() {
     ctx && ctx.register(this);
@@ -30,9 +30,12 @@ class App implements IMSpci<PropTypes>, TAOpci {
     config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
     this.config = config;
 
-    const initState = stateString ? JSON.parse(stateString).state : { cubes: [] };
-    this.logActions = stateString ? JSON.parse(stateString).log : [];
-    this.store = initStore<StateModel>(actions, initState, (action) => this.logActions.push(action));
+    const restoredState = stateString ? JSON.parse(stateString) : null;
+    const logActions = stateString ? JSON.parse(stateString).log : null;
+    this.store = initStore(this.initialState );
+    if (restoredState || logActions) {
+      this.store.restoreState(restoredState, logActions);
+    }
 
     this.shadowdom = dom.shadowRoot ? dom.shadowRoot : dom.attachShadow({ mode: "open" });
 
@@ -46,7 +49,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     const css = document.createElement("style");
     css.innerHTML = style;
     this.shadowdom.appendChild(css);
-    render(<Interaction config={this.config.properties} />, this.shadowdom);
+    render(<Interaction config={this.config.properties} store={this.store} />, this.shadowdom);
   };
 
   trigger = (event: string, value: any) => {
@@ -55,8 +58,8 @@ class App implements IMSpci<PropTypes>, TAOpci {
   };
 
   resetResponse = () => {
-    this.store.cleanup();
-    this.store = initStore<StateModel>(actions, { cubes: [] });
+    this.store.unsubscribeAll();
+    this.store.reset();
     this.render();
   };
 
@@ -74,9 +77,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     } catch {
       // ignore
     }
-    this.store.cleanup();
-    this.store = initStore<StateModel>(actions, { cubes: state });
-    this.render();
+    this.resetResponse();
   };
 
   off = () => {}; // called when setting correct response in tao
@@ -101,14 +102,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
   };
 
   oncompleted = () => {
-    this.shadowdom.host.innerHTML = ''
-    this.store.cleanup();
+    this.store.unsubscribeAll();
   };
 
   getState = () =>
     JSON.stringify({
       state: this.store.getState(),
-      log: this.logActions,
+      log: this.store.getActions()
     });
 }
 
