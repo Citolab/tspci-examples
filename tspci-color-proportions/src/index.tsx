@@ -4,7 +4,7 @@ import * as ctx from "qtiCustomInteractionContext";
 import Interaction from "./interaction";
 import style from "./style.css";
 import { TAOpci } from "@citolab/tspci-tao";
-import { Configuration, IMSpci } from "@citolab/tspci";
+import { Configuration, IMSpci, QtiVariableJSON } from "@citolab/tspci";
 import { Action, IStore, Store } from "@citolab/preact-store";
 
 import configProps from "./config.json";
@@ -30,7 +30,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
     const restoredState = stateString ? JSON.parse(stateString) : null;
     const logActions = stateString ? JSON.parse(stateString).log : null;
-    this.store = initStore(this.initialState );
+    this.store = initStore(this.initialState);
     if (restoredState || logActions) {
       this.store.restoreState(restoredState, logActions);
     }
@@ -91,6 +91,9 @@ class App implements IMSpci<PropTypes>, TAOpci {
       })),
       (v) => `${v.color}, percentage: ${this.round(v.percentage, 2)}`
     );
+    if (!response.find((r) => r.percentage)) {
+      return undefined;
+    }
     return {
       base: {
         string: JSON.stringify(response),
@@ -104,14 +107,14 @@ class App implements IMSpci<PropTypes>, TAOpci {
     this.render();
   };
 
-  setResponse = (response: any) => {
+  setResponse = (response: QtiVariableJSON) => {
     // construct a state base on the response.
     // this can be different from the state when the author constructed the correct answer because could be
     // serveral ways to come to same: color/percentage.
 
     if (response) {
       try {
-        const parsedResponse = JSON.parse(response?.base?.string) as ResponseType[];
+        const parsedResponse = JSON.parse(response?.base?.string.toString()) as ResponseType[];
         const ids: { id: string; surface: number }[] = [];
         this.shadowdom?.querySelectorAll("rect[data-name]").forEach((el) => {
           ids.push({ id: el.getAttribute("data-name"), surface: this.extractNumber(el.getAttribute("data-name")) });
@@ -139,11 +142,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
           const absoluteSurface = totalCubes * (response.percentage / 100);
           possibleSolutions = this.getPossibleSolutionsForColor(response.color, absoluteSurface, possibleSolutions);
         }
-        this.store.unsubscribeAll();
-        this.store = initStore(this.initialState);
-        this.render();
+        this.resetResponse();
+        if (possibleSolutions.length > 0) {
+          this.store.restoreState(possibleSolutions[0], []);
+        }
       } catch {
         console.error(`couldn't retore state: ${response}`);
+        this.resetResponse();
       }
     }
   };

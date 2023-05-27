@@ -1,37 +1,24 @@
-import { IAction } from "@citolab/preact-store";
+import { Store } from "@citolab/preact-store";
+import { Cube } from "./utils";
 
-export type ActionType = "ADD_ACTION" | "REMOVE_ACTION" | "SET_STATE";
-// export type RemoveActionType = "REMOVE_ACTION";
-
-export const actions = [
-  // {
-  //   type: "ADD_ACTION",
-  //   action: (currentState: StateModel, { x }: { x: number }) => {
-  //     const newState = { cubes: [...currentState.cubes, x] };
-  //     return newState;
-  //   },
-  // } as IAction<StateModel, { x: number }, ActionType>,
-
-  // {
-  //   type: "REMOVE_ACTION",
-  //   action: (currentState: StateModel, { x }: { x: number }) => {
-  //     const newState = { cubes: currentState.cubes.filter((val) => val !== x) };
-  //     return newState;
-  //   },
-  // } as IAction<StateModel, { x: number }, ActionType>,
-  {
-    type: "SET_STATE",
-    action: (currentState: StateModel, payload: [{x:number, y:number, z:number}]) => {
-      const newState = { cubes : [...payload] };
-      return newState;
-    },
-  } as IAction<StateModel, {x:number, y:number, z:number}[], ActionType>,
-];
+export type ActionType = "ADD_ACTION" | "REMOVE_ACTION" | "RESTORE_STATE";
 
 export type StateModel = {
-  cubes: {x:number, y:number, z:number}[];
+  cubes: Cube[];
 };
 
-//   setCompleteState(state, payload: [{x:number, y:number, z:number}]) {
-//     return { cubes : [...payload] }
-//   }
+export const initStore = (initialState: StateModel, restoreData?: {
+  state: StateModel;
+  actions: { type: string; payload: any; timestamp?: number }[];
+}) => {
+  const store = new Store<StateModel>(initialState, restoreData);
+  store.addReducer<Cube>("ADDED_CUBE", (state, payload) => {
+    const newCubes = [...state.cubes, payload];
+    return { ...state, cubes: newCubes };
+  });
+  store.addReducer<Cube>("REMOVED_CUBE", (state, payload) => {
+    const newCubes = state.cubes.filter((c) => !(c.x === payload.x && c.y === payload.y && c.z === payload.z));
+    return { ...state, cubes: newCubes };
+  });
+  return store;
+}

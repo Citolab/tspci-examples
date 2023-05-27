@@ -138,7 +138,6 @@ const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document 
           ))}
         </div>
       </div>
-      color: { JSON.stringify(state)}
     </div>
   );
 };

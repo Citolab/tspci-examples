@@ -5,13 +5,13 @@ import style from "./style.css";
 import configProps from "./config.json";
 type PropTypes = typeof configProps;
 
-import { Configuration, IMSpci } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
+import { Configuration, IMSpci, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
 import { IStore } from "@citolab/preact-store";
 import { initStore, StateModel } from "./store";
 import { TAOpci } from "@citolab/tspci-tao";
-import { planeProjection, planesToScene, sort } from "./sort";
+import { Cube, planeProjection, planesToScene, sort } from "./utils";
 
-export type State = { cubes: { x: number; y: number; z: number }[] };
+export type State = { cubes: Cube[] };
 
 class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "3dBlocks";
@@ -63,28 +63,30 @@ class App implements IMSpci<PropTypes>, TAOpci {
     this.render();
   };
 
-  setResponse = (response: any) => {
-    let state = [];
+  setResponse = (response: QtiVariableJSON) => {
     try {
       if (response.base && response.base.string) {
-        const planes = JSON.parse(response.base.string);
-        state = planesToScene(
+        const planes = JSON.parse(response.base.string.toString());
+        const cubes = planesToScene(
           { xPlane: planes.xPlane, yPlane: planes.yPlane, zPlane: planes.zPlane },
           +this.config.properties.cubePixelSize,
           +this.config.properties.gridDivisions
         );
+        this.resetResponse();
+        this.store.restoreState({ cubes }, []);
       }
     } catch {
       // ignore
+      this.resetResponse();
     }
-    this.resetResponse();
+
   };
 
   off = () => {}; // called when setting correct response in tao
   on = (val) => {};
 
   getResponse = () => {
-    if (this.store?.getState()) {
+    if (this.store?.getState() && this.store?.getState() !== this.initialState) {
       const size = +this.config.properties.cubePixelSize;
       const grid = +this.config.properties.gridDivisions;
       const cubes: { x: number; y: number; z: number }[] = this.store?.getState()?.cubes || [];

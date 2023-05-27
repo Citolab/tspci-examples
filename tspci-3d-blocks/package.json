@@ -6,14 +6,14 @@
   "description": "recreate a building with 3d blocks",
   "private": true,
   "dependencies": {
-    "@citolab/preact-store": "2.3.4",
+    "@citolab/preact-store": "^2.4.0-alpha.0",
     "preact": "10.6.4",
     "three": "^0.136.0",
     "three-orbitcontrols": "^2.110.3"
   },
   "devDependencies": {
-    "@citolab/tspci": "2.3.4",
-    "@citolab/tspci-tao": "latest",
+    "@citolab/tspci": "^2.4.0-alpha.0",
+    "@citolab/tspci-tao": "^2.4.0-alpha.0",
     "@types/three": "^0.136.0",
     "autoprefixer": "10.4.13"
   },
@@ -24,6 +24,12 @@
     "package-tao": "tspci --target tao"
   },
   "config": {
-    "typeIdentifier": "colorProportions"
+    "typeIdentifier": "3d-blocks",
+    "label": "3d blocks",
+    "score": [
+      "MATCH_CORRECT",
+      "NONE"
+    ],
+    "short": "blocks"
   }
 }
