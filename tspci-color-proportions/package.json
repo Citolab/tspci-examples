@@ -6,14 +6,15 @@
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
   "dependencies": {
-    "@citolab/preact-store": "^2.4.0-alpha.0",
+    "@citolab/preact-store": "^2.4.0",
     "@react-hook/mouse-position": "^4.1.3",
     "preact": "10.6.4"
   },
   "devDependencies": {
-    "@citolab/tspci": "^2.4.0-alpha.0",
-    "@citolab/tspci-tao": "^2.4.0-alpha.0",
-    "autoprefixer": "10.4.7"
+    "@citolab/tspci": "^2.4.0",
+    "@citolab/tspci-tao": "^2.4.0",
+    "autoprefixer": "10.4.7",
+    "archiver": "5.3.1"
   },
   "scripts": {
     "dev": "set ROLLUP_WATCH=true && tspci --dev",

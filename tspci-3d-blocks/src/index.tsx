@@ -14,7 +14,7 @@ import { Cube, planeProjection, planesToScene, sort } from "./utils";
 export type State = { cubes: Cube[] };
 
 class App implements IMSpci<PropTypes>, TAOpci {
-  typeIdentifier = "3dBlocks";
+  typeIdentifier = "blocks";
 
   store: IStore<StateModel>;
   props: PropTypes;
