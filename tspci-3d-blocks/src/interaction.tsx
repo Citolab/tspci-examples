@@ -26,13 +26,13 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
     });
     if (voxel) {
       // prevent a black box to appear when the page is loaded
-      window.requestAnimationFrame(() => {
+      setTimeout(() => {
         voxel.restoreObjects(state.cubes);
         store.subscribe(s => {
           voxel.restoreObjects(s.cubes);
         });
         voxel.onWindowResize()
-      });
+      }, 10);
 
     }
 
