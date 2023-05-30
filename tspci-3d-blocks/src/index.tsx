@@ -54,7 +54,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
   trigger = (event: string, value: any) => {
     this.config.properties[event] = value;
-    this.render();
+    window.requestAnimationFrame(() => this.render());
   };
 
   resetResponse = () => {
