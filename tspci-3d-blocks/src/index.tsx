@@ -34,7 +34,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     const logActions = stateString ? JSON.parse(stateString).log : null;
     this.store = initStore(this.initialState );
     if (restoredState || logActions) {
-      this.store.restoreState(restoredState, logActions);
+      this.store.restoreState(restoredState.state, logActions);
     }
 
     this.shadowdom = dom.shadowRoot ? dom.shadowRoot : dom.attachShadow({ mode: "open" });
