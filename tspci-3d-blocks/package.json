@@ -7,14 +7,14 @@
   "description": "recreate a building with 3d blocks",
   "private": true,
   "dependencies": {
-    "@citolab/preact-store": "^2.4.0",
+    "@citolab/preact-store": "^2.5.25",
     "preact": "10.6.4",
     "three": "^0.136.0",
     "three-orbitcontrols": "^2.110.3"
   },
   "devDependencies": {
-    "@citolab/tspci": "^2.4.0",
-    "@citolab/tspci-tao": "^2.4.0",
+    "@citolab/tspci": "^2.5.25",
+    "@citolab/tspci-tao": "^2.5.25",
     "@types/three": "^0.136.0",
     "archiver": "5.3.1",
     "autoprefixer": "10.4.13"

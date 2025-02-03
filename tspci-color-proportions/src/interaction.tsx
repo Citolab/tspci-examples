@@ -134,7 +134,7 @@ const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document 
                 }`}
               style={{ background: `${c}` }}
               onClick={() => setSelectedColor(c)}
-            />
+            ></div>
           ))}
         </div>
       </div>

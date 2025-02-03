@@ -4,12 +4,13 @@ import * as ctx from "qtiCustomInteractionContext";
 import Interaction from "./interaction";
 import style from "./style.css";
 import { TAOpci } from "@citolab/tspci-tao";
-import { Configuration, IMSpci, QtiVariableJSON } from "@citolab/tspci";
+import { IMSpci, QtiVariableJSON, QtiInteractionChangedDetail, ConfigProperties } from "@citolab/tspci";
 import { Action, IStore, Store } from "@citolab/preact-store";
 
 import configProps from "./config.json";
 import { StateModel, Vlak, initStore } from "./store";
 type PropTypes = typeof configProps;
+
 
 type ResponseType = { color: string; percentage: number };
 
@@ -17,14 +18,17 @@ class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "colorProportions";
   store: IStore<StateModel>;
   shadowdom: ShadowRoot; // implementation detail
-  config: Configuration<PropTypes>;
+  config: ConfigProperties<PropTypes>;
+
   private initialState: StateModel = { vlakken: [] };
 
   constructor() {
-    ctx && ctx.register(this);
+    if (ctx) {
+      ctx.register(this);
+    }
   }
 
-  getInstance = (dom: HTMLElement, config: Configuration<PropTypes>, stateString: string) => {
+  getInstance = (dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString: string) => {
     config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
     this.config = config;
 
@@ -35,6 +39,21 @@ class App implements IMSpci<PropTypes>, TAOpci {
       this.store.restoreState(restoredState, logActions);
     }
     this.shadowdom = dom.attachShadow({ mode: "closed" });
+    this.store.subscribe(state => {
+      const event: QtiInteractionChangedDetail = {
+        interaction: this,
+        responseIdentifier: this.config.responseIdentifier,
+        valid: true,
+        value: this.getResponse(),
+      };
+      // dispatch a custom event to notify the Delivery System that the interaction has changed
+      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
+        detail: event,
+      });
+      this.shadowdom.dispatchEvent(interactionChangedEvent);
+    });
+
+
     this.render();
 
     this.config.onready && this.config.onready(this);

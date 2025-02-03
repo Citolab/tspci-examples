@@ -6,8 +6,8 @@
   "types": "dist/types.d.ts",
   "dependencies": {},
   "devDependencies": {
-    "@citolab/tspci": "^2.4.0",
-    "@citolab/tspci-tao": "^2.4.0",
+    "@citolab/tspci": "^2.5.25",
+    "@citolab/tspci-tao": "^2.5.25",
     "@citolab/tspci-qbci": "^2.4.0-alpha.0"
   },
   "scripts": {
@@ -19,11 +19,12 @@
     "package-qb": "tspci --target qbci "
   },
   "source": "src/index.ts",
-
   "//": "------- TAO specific properties -------",
-  
   "typeidentifier": "HelloWorld",
   "label": "Hello",
   "short": "HW",
-  "score": [ "MATCH_CORRECT", "NONE" ]
+  "score": [
+    "MATCH_CORRECT",
+    "NONE"
+  ]
 }
