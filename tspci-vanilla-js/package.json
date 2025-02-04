@@ -4,11 +4,10 @@
   "version": "1.0.0",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
-  "dependencies": {},
   "devDependencies": {
-    "@citolab/tspci": "^2.5.25",
-    "@citolab/tspci-tao": "^2.5.25",
-    "@citolab/tspci-qbci": "^2.4.0-alpha.0"
+    "@citolab/tspci": "^2.6.2",
+    "@citolab/tspci-qbci": "^2.6.2",
+    "@citolab/tspci-tao": "^2.6.2"
   },
   "scripts": {
     "tscpi": "tspci --help",

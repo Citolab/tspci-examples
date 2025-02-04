@@ -5,7 +5,7 @@ import style from "./style.css";
 import configProps from "./config.json";
 type PropTypes = typeof configProps;
 
-import { Configuration, IMSpci, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
+import { ConfigProperties, IMSpci, QtiInteractionChangedDetail, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
 import { IStore } from "@citolab/preact-store";
 import { initStore, StateModel } from "./store";
 import { TAOpci } from "@citolab/tspci-tao";
@@ -18,7 +18,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
   store: IStore<StateModel>;
   props: PropTypes;
-  config: Configuration<PropTypes>;
+  config: ConfigProperties<PropTypes>;
   shadowdom: ShadowRoot;
   private initialState: StateModel = { cubes: [] };
 
@@ -26,13 +26,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
     ctx && ctx.register(this);
   }
 
-  getInstance = (dom: HTMLElement, config: Configuration<PropTypes>, stateString: string) => {
+  getInstance = (dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString: string) => {
     config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
     this.config = config;
 
     const restoredState = stateString ? JSON.parse(stateString) : null;
     const logActions = stateString ? JSON.parse(stateString).log : null;
-    this.store = initStore(this.initialState );
+    this.store = initStore(this.initialState);
     if (restoredState || logActions) {
       this.store.restoreState(restoredState.state, logActions);
     }
@@ -40,7 +40,19 @@ class App implements IMSpci<PropTypes>, TAOpci {
     this.shadowdom = dom.shadowRoot ? dom.shadowRoot : dom.attachShadow({ mode: "open" });
 
     this.render();
-
+    this.store.subscribe(() => {
+      const event: QtiInteractionChangedDetail = {
+        interaction: this,
+        responseIdentifier: this.config.responseIdentifier,
+        valid: true,
+        value: this.getResponse(),
+      };
+      // dispatch a custom event to notify the Delivery System that the interaction has changed
+      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
+        detail: event,
+      });
+      dom.dispatchEvent(interactionChangedEvent);
+    });
     config.onready && config.onready(this);
   };
 
@@ -82,8 +94,8 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
   };
 
-  off = () => {}; // called when setting correct response in tao
-  on = (val) => {};
+  off = () => { }; // called when setting correct response in tao
+  on = (val) => { };
 
   getResponse = () => {
     if (this.store?.getState() && this.store?.getState() !== this.initialState) {

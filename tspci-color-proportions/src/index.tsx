@@ -17,6 +17,7 @@ type ResponseType = { color: string; percentage: number };
 class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "colorProportions";
   store: IStore<StateModel>;
+  dom: HTMLElement;
   shadowdom: ShadowRoot; // implementation detail
   config: ConfigProperties<PropTypes>;
 
@@ -39,7 +40,8 @@ class App implements IMSpci<PropTypes>, TAOpci {
       this.store.restoreState(restoredState, logActions);
     }
     this.shadowdom = dom.attachShadow({ mode: "closed" });
-    this.store.subscribe(state => {
+
+    this.store.subscribe(() => {
       const event: QtiInteractionChangedDetail = {
         interaction: this,
         responseIdentifier: this.config.responseIdentifier,
@@ -50,7 +52,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
       const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
         detail: event,
       });
-      this.shadowdom.dispatchEvent(interactionChangedEvent);
+      dom.dispatchEvent(interactionChangedEvent);
     });
 
 

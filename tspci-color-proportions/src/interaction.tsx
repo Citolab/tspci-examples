@@ -130,9 +130,10 @@ const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document 
         <div className="bg-white rounded-full shadow-lg border border-gray-200 -mt-2 p-1 w-auto flex items-center justify-center space-x-1">
           {colors.map((c, idx) => (
             <div
-              className={` rounded-full border-4 w-10 h-10 ${c == selectedColor ? `border-opacity-70 border-gray-100 ` : `border-white`
+              key={idx}
+              className={`rounded-full border-4 w-10 h-10 ${c === selectedColor ? 'border-gray-100/70' : 'border-white'
                 }`}
-              style={{ background: `${c}` }}
+              style={{ background: c }}
               onClick={() => setSelectedColor(c)}
             ></div>
           ))}
