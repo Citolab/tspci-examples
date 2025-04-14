@@ -39,6 +39,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     if (restoredState || logActions) {
       this.store.restoreState(restoredState, logActions);
     }
+
     this.shadowdom = dom.attachShadow({ mode: "closed" });
 
     this.store.subscribe(() => {
@@ -54,10 +55,23 @@ class App implements IMSpci<PropTypes>, TAOpci {
       });
       dom.dispatchEvent(interactionChangedEvent);
     });
-
-
     this.render();
-
+    if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
+      const responseIdentifier = Object.keys(this.config.boundTo)[0];
+      const response = this.config.boundTo[responseIdentifier];
+      // check if any property in response at the lowest level has a value
+      // so { base: string: undefined } is not a value
+      // but { base: string: "value" } is a value
+      const hasValue = Object.values(response).some((value) => {
+        if (typeof value === "object") {
+          return Object.values(value).some((v) => v !== undefined);
+        }
+        return value !== undefined;
+      });
+      if (hasValue) {
+        this.setResponse(response);
+      }
+    }
     this.config.onready && this.config.onready(this);
   };
 
@@ -92,7 +106,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     const cubesPerColor: { surface: number; color: string; percentage: number }[] = [];
     currentState.vlakken.forEach(({ color, id }) => {
       const surface = this.extractNumber(id);
-      const matchingColorRow = cubesPerColor.find((c) => c.color === color);
+      const matchingColorRow = cubesPerColor.find((c) => c.color.trim().toLowerCase() === color.trim().toLowerCase());
       const percentage = totalCubes !== 0 ? (surface / totalCubes) * 100 : 0;
       if (matchingColorRow) {
         matchingColorRow.percentage = matchingColorRow.percentage + percentage;
@@ -107,7 +121,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
     const response: ResponseType[] = this.sort(
       cubesPerColor.map(({ color, percentage }) => ({
-        color,
+        color: color.trim().toLowerCase(),
         percentage,
       })),
       (v) => `${v.color}, percentage: ${this.round(v.percentage, 2)}`
@@ -161,14 +175,15 @@ class App implements IMSpci<PropTypes>, TAOpci {
         });
         for (const response of parsedResponse) {
           const absoluteSurface = totalCubes * (response.percentage / 100);
-          possibleSolutions = this.getPossibleSolutionsForColor(response.color, absoluteSurface, possibleSolutions);
+          possibleSolutions = this.getPossibleSolutionsForColor(
+            response.color.trim().toLowerCase(), absoluteSurface, possibleSolutions);
         }
         this.resetResponse();
         if (possibleSolutions.length > 0) {
           this.store.restoreState(possibleSolutions[0], []);
         }
       } catch {
-        console.error(`couldn't retore state: ${response}`);
+        console.error(`couldn't restore state: ${response}`);
         this.resetResponse();
       }
     }
@@ -179,6 +194,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     surfaceToFill: number,
     possibleSolutions: { vlakken: (Vlak & { surface: number })[]; surfaceToFill: number }[]
   ) {
+    color = color.trim().toLowerCase();
     const newPossibleSolutions: { vlakken: (Vlak & { surface: number })[]; surfaceToFill }[] = [];
     for (const previousSolution of possibleSolutions) {
       const possibleNewSolution = { ...previousSolution, surfaceToFill };

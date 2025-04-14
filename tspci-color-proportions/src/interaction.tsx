@@ -11,7 +11,7 @@ const svgString = decodeURIComponent(afbeelding).replace("data:image/svg+xml,", 
 
 const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document | ShadowRoot; store: IStore<StateModel> }) => {
   const { width, height } = config;
-  const colors = config.colors.split(",");
+  const colors = config.colors.split(",").map((c) => c.trim().toLowerCase());
 
   const [selectedColor, setSelectedColor] = useState<string>(colors[0]);
 

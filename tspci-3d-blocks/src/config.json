@@ -1,6 +1,6 @@
 {
   "gridDivisions" : "2",
-  "cubePixelSize" : "100",
-  "width": "600",
-  "height": "600"
+  "cubePixelSize" : "15",
+  "width": "300",
+  "height": "300"
 }
