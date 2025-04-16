@@ -10,7 +10,7 @@ type PropTypes = typeof configProps;
 
 export const Interaction = (props: { config: PropTypes, store: IStore<StateModel> }) => {
   const { config, store } = props;
-  
+
   let voxel: VoxelPainterClass;
 
   let dom: HTMLElement;
@@ -27,11 +27,11 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
     if (voxel) {
       // prevent a black box to appear when the page is loaded
       setTimeout(() => {
-        voxel.restoreObjects(state.cubes);
+        voxel?.restoreObjects(state.cubes);
         store.subscribe(s => {
-          voxel.restoreObjects(s.cubes);
+          voxel?.restoreObjects(s.cubes);
         });
-        voxel.onWindowResize()
+        voxel?.onWindowResize()
       }, 10);
 
     }
@@ -62,15 +62,15 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
 
   return (
     <>
-    <h1 className="text-red-500"></h1>
-    <div className="w-full h-full" ref={(node) => (dom = node as HTMLElement)}>
-      <img
-        className="hidden"
-        id="arrow-front"
-        width={100}
-        src="data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' preserveAspectRatio='xMidYMid meet' viewBox='261.8571428571428 254.1626632325672 162.22142818995894 146.3691395493506' width='200' height='200'%3E%3Cdefs%3E%3Ctext id='a1z4szAWH' x='224' y='340' font-size='74' font-family='Arial' font-weight='normal' font-style='normal' letter-spacing='0' alignment-baseline='before-edge' transform='matrix(1 0 0 1 42.85714285714266 -35.03511884375507)' style='line-height:100%25' xml:space='preserve' dominant-baseline='text-before-edge'%3E%3Ctspan x='224' dy='0em' alignment-baseline='before-edge' dominant-baseline='text-before-edge' text-anchor='start'%3Efront%3C/tspan%3E%3C/text%3E%3Cpath d='M361.75 292.53L345.54 292.53L345.54 326.2L340.59 326.2L340.59 292.53L322.19 292.53L332.08 273.84L341.97 255.16L351.86 273.84L361.75 292.53Z' id='c7lzESt7db'%3E%3C/path%3E%3C/defs%3E%3Cg%3E%3Cg id='c4VrQc8u2d'%3E%3Cuse xlink:href='%23a1z4szAWH' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3Cg%3E%3Cuse xlink:href='%23c7lzESt7db' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3C/g%3E%3C/svg%3E"
-      />
-    </div>
+      <h1 className="text-red-500"></h1>
+      <div className="w-full h-full" ref={(node) => (dom = node as HTMLElement)}>
+        <img
+          className="hidden"
+          id="arrow-front"
+          width={100}
+          src="data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' preserveAspectRatio='xMidYMid meet' viewBox='261.8571428571428 254.1626632325672 162.22142818995894 146.3691395493506' width='200' height='200'%3E%3Cdefs%3E%3Ctext id='a1z4szAWH' x='224' y='340' font-size='74' font-family='Arial' font-weight='normal' font-style='normal' letter-spacing='0' alignment-baseline='before-edge' transform='matrix(1 0 0 1 42.85714285714266 -35.03511884375507)' style='line-height:100%25' xml:space='preserve' dominant-baseline='text-before-edge'%3E%3Ctspan x='224' dy='0em' alignment-baseline='before-edge' dominant-baseline='text-before-edge' text-anchor='start'%3Efront%3C/tspan%3E%3C/text%3E%3Cpath d='M361.75 292.53L345.54 292.53L345.54 326.2L340.59 326.2L340.59 292.53L322.19 292.53L332.08 273.84L341.97 255.16L351.86 273.84L361.75 292.53Z' id='c7lzESt7db'%3E%3C/path%3E%3C/defs%3E%3Cg%3E%3Cg id='c4VrQc8u2d'%3E%3Cuse xlink:href='%23a1z4szAWH' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3Cg%3E%3Cuse xlink:href='%23c7lzESt7db' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3C/g%3E%3C/svg%3E"
+        />
+      </div>
     </>
   );
 };

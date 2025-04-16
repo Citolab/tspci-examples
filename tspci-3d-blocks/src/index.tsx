@@ -53,6 +53,22 @@ class App implements IMSpci<PropTypes>, TAOpci {
       });
       dom.dispatchEvent(interactionChangedEvent);
     });
+    if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
+      const responseIdentifier = Object.keys(this.config.boundTo)[0];
+      const response = this.config.boundTo[responseIdentifier];
+      // check if any property in response at the lowest level has a value
+      // so { base: string: undefined } is not a value
+      // but { base: string: "value" } is a value
+      const hasValue = Object.values(response).some((value) => {
+        if (typeof value === "object") {
+          return Object.values(value).some((v) => v !== undefined);
+        }
+        return value !== undefined;
+      });
+      if (hasValue) {
+        this.setResponse(response);
+      }
+    }
     config.onready && config.onready(this);
   };
 
