@@ -13,6 +13,29 @@ npm i
 npm run dev
 ```
 
+## Testing PCIs
+
+These PCIs can be tested in [qti.citolab.nl](https://qti.citolab.nl).
+
+### Using QTI3 export (direct import)
+
+The `package-qti3` script creates a zip file that can be directly imported into [qti.citolab.nl](https://qti.citolab.nl).
+
+``` sh
+npm run package-qti3
+```
+
+### Using TAO export
+
+You can also import PCIs into TAO first:
+
+1. Use the TAO export to import the PCI
+2. In TAO, go to **Settings → Portable Custom Interactions → Add** to register the PCI
+3. Create an item using the PCI
+4. Export the item as QTI 2.2
+
+When you import the QTI 2.2 package into [qti.citolab.nl](https://qti.citolab.nl), it will automatically upgrade the package and ensure the PCI works.
+
 ## tspci-hello-world
 
 There should alwas be a 'hello world' example. So here it is: the most basic example of an PCI.

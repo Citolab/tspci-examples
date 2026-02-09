@@ -1,21 +1,28 @@
 {
   "name": "@citolab/vanilla-js",
   "description": "Vanilla js pci",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
   "devDependencies": {
-    "@citolab/tspci": "^2.6.2",
-    "@citolab/tspci-qbci": "^2.6.2",
-    "@citolab/tspci-tao": "^2.6.2"
+    "@citolab/tspci": "2.7.1",
+    "@citolab/tspci-qbci": "2.7.1",
+    "@citolab/tspci-tao": "2.7.1",
+    "@citolab/tspci-qti3": "2.7.1"
   },
   "scripts": {
     "tscpi": "tspci --help",
     "dev": "tspci --dev",
     "prod": "tspci",
     "watch": "tspci --watch",
-    "package-tao": "tspci --tao",
-    "package-qb": "tspci --target qbci "
+    "package-tao": "tspci --target tao",
+    "package-qb": "tspci --target qbci",
+    "package-qti3": "tspci --target qti3"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "HelloWorld"
+    }
   },
   "source": "src/index.ts",
   "//": "------- TAO specific properties -------",
