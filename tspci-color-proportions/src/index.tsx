@@ -62,9 +62,9 @@ class App implements IMSpci<PropTypes>, TAOpci {
       // check if any property in response at the lowest level has a value
       // so { base: string: undefined } is not a value
       // but { base: string: "value" } is a value
-      const hasValue = Object.values(response).some((value) => {
+      const hasValue = response && Object.values(response).some((value) => {
         if (typeof value === "object") {
-          return Object.values(value).some((v) => v !== undefined);
+          return value && Object.values(value).some((v) => v !== undefined);
         }
         return value !== undefined;
       });

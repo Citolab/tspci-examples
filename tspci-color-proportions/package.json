@@ -6,14 +6,14 @@
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
   "dependencies": {
-    "@citolab/preact-store": "2.6.8",
+    "@citolab/preact-store": "2.9.12",
     "@react-hook/mouse-position": "^4.1.3",
     "preact": "10.28.2"
   },
   "devDependencies": {
-    "@citolab/tspci": "2.7.1",
-    "@citolab/tspci-tao": "2.7.1",
-    "@citolab/tspci-qti3": "2.7.1",
+    "@citolab/tspci": "2.9.12",
+    "@citolab/tspci-tao": "2.9.12",
+    "@citolab/tspci-qti3": "2.9.12",
     "@tailwindcss/postcss": "^4.1.18",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
