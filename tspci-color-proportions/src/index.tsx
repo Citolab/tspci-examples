@@ -149,7 +149,9 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
     if (response) {
       try {
-        const parsedResponse = JSON.parse(response?.base?.string.toString()) as ResponseType[];
+        const stateString = response?.base?.string?.toString();
+        if (!stateString) return;
+        const parsedResponse = JSON.parse(stateString) as ResponseType[];
         const ids: { id: string; surface: number }[] = [];
         this.shadowdom?.querySelectorAll("rect[data-name]").forEach((el) => {
           ids.push({ id: el.getAttribute("data-name"), surface: this.extractNumber(el.getAttribute("data-name")) });
