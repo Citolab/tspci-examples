@@ -1,6 +1,7 @@
 {
   "gridDivisions" : "2",
   "cubePixelSize" : "15",
+  "frontLabel": "front",
   "width": "300",
   "height": "300"
 }

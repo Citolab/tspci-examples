@@ -22,6 +22,7 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       height: config.height,
       gridDivisions: config.gridDivisions,
       cubePixelSize: config.cubePixelSize,
+      frontLabel: config.frontLabel,
       htmlElementToAppendTo: dom,
     });
     if (voxel) {
@@ -56,30 +57,71 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       }
     );
     return () => {
+      voxel?.destroy();
       voxel = null;
     };
-  }, []);
+  }, [
+    config.width,
+    config.height,
+    config.gridDivisions,
+    config.cubePixelSize,
+    config.frontLabel,
+  ]);
+
+  const frontArrowSvg = getFrontArrowSvg(config.frontLabel || "front");
 
   return (
     <>
       <h1 className="text-red-500"></h1>
-      <div className="w-full h-full" ref={(node) => (dom = node as HTMLElement)}>
+      <div className="w-full h-full" ref={(node) => { dom = node as HTMLElement; }}>
         <img
           className="hidden"
           id="arrow-front"
           width={100}
-          src="data:image/svg+xml,%3C%3Fxml version='1.0' encoding='UTF-8' standalone='no'%3F%3E%3Csvg version='1.1' xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' preserveAspectRatio='xMidYMid meet' viewBox='261.8571428571428 254.1626632325672 162.22142818995894 146.3691395493506' width='200' height='200'%3E%3Cdefs%3E%3Ctext id='a1z4szAWH' x='224' y='340' font-size='74' font-family='Arial' font-weight='normal' font-style='normal' letter-spacing='0' alignment-baseline='before-edge' transform='matrix(1 0 0 1 42.85714285714266 -35.03511884375507)' style='line-height:100%25' xml:space='preserve' dominant-baseline='text-before-edge'%3E%3Ctspan x='224' dy='0em' alignment-baseline='before-edge' dominant-baseline='text-before-edge' text-anchor='start'%3Efront%3C/tspan%3E%3C/text%3E%3Cpath d='M361.75 292.53L345.54 292.53L345.54 326.2L340.59 326.2L340.59 292.53L322.19 292.53L332.08 273.84L341.97 255.16L351.86 273.84L361.75 292.53Z' id='c7lzESt7db'%3E%3C/path%3E%3C/defs%3E%3Cg%3E%3Cg id='c4VrQc8u2d'%3E%3Cuse xlink:href='%23a1z4szAWH' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3Cg%3E%3Cuse xlink:href='%23c7lzESt7db' opacity='1' fill='%23000000' fill-opacity='1'%3E%3C/use%3E%3C/g%3E%3C/g%3E%3C/svg%3E"
+          src={frontArrowSvg}
         />
       </div>
     </>
   );
 };
 
+const getFrontArrowSvg = (label: string) => {
+  const safeLabel = escapeXml(label);
+  const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="261.8571428571428 254.1626632325672 162.22142818995894 146.3691395493506" width="200" height="200">
+  <defs>
+    <text id="front-label" x="224" y="340" font-size="74" font-family="Arial" font-weight="normal" font-style="normal" letter-spacing="0" alignment-baseline="before-edge" transform="matrix(1 0 0 1 42.85714285714266 -35.03511884375507)" style="line-height:100%" xml:space="preserve" dominant-baseline="text-before-edge">
+      <tspan x="224" dy="0em" alignment-baseline="before-edge" dominant-baseline="text-before-edge" text-anchor="start">${safeLabel}</tspan>
+    </text>
+    <path d="M361.75 292.53L345.54 292.53L345.54 326.2L340.59 326.2L340.59 292.53L322.19 292.53L332.08 273.84L341.97 255.16L351.86 273.84L361.75 292.53Z" id="front-arrow"></path>
+  </defs>
+  <g>
+    <g>
+      <use xlink:href="#front-label" opacity="1" fill="#000000" fill-opacity="1"></use>
+    </g>
+    <g>
+      <use xlink:href="#front-arrow" opacity="1" fill="#000000" fill-opacity="1"></use>
+    </g>
+  </g>
+</svg>`;
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+};
+
+const escapeXml = (value: string) =>
+  String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
+
 class VoxelPainterClass {
   private camera: THREE.PerspectiveCamera;
 
   private controls: OrbitControls;
   private target = new THREE.Vector3(0, 0, 0);
+  private framingObjects: THREE.Object3D[] = [];
+  private readonly framePadding = 1.35;
 
   private canvasWidth: number;
   private canvasHeight: number;
@@ -102,6 +144,10 @@ class VoxelPainterClass {
   private mouseMoveRotateActive = true;
   private isRotating = false;
   private arrowFront: CanvasImageSource;
+  private handleMouseMove: (e: MouseEvent) => void;
+  private handleMouseDown: (e: MouseEvent) => void;
+  private handleMouseUp: (e: MouseEvent) => void;
+  private handleResize?: () => void;
   domEl: any;
 
   constructor(props) {
@@ -120,15 +166,6 @@ class VoxelPainterClass {
     );
     this.camera.position.set(200, 600, 1000);
     this.camera.lookAt(this.target);
-    // move camera x pixels down (e.g. -75px) so it's not centered, but more in bottom of screen
-    this.camera.setViewOffset(
-      this.canvasWidth,
-      this.canvasHeight,
-      0,
-      -150,
-      this.canvasWidth,
-      this.canvasHeight
-    );
 
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xffffff);
@@ -211,6 +248,7 @@ class VoxelPainterClass {
     // gridHelper.applyMatrix4(new THREE.Matrix4().makeTranslation(cubeSideSize / 2, 0, cubeSideSize / 2));
 
     this.scene.add(gridHelper);
+    this.framingObjects.push(gridHelper);
 
     //
     this.raycaster = new THREE.Raycaster();
@@ -230,6 +268,7 @@ class VoxelPainterClass {
 
     this.scene.add(this.plane);
     this.objects.push(this.plane);
+    this.framingObjects.push(this.plane);
 
     // lights
     const ambientLight = new THREE.AmbientLight(0x606060);
@@ -243,6 +282,7 @@ class VoxelPainterClass {
     // label shown at the frontside of the grid for better reference when rotating
     this.labelMesh = this.getFrontsideLabel();
     this.scene.add(this.labelMesh);
+    this.framingObjects.push(this.labelMesh);
 
     // renderer
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -259,26 +299,19 @@ class VoxelPainterClass {
     this.controls.enableKeys = false;
     this.controls.enablePan = false;
     this.controls.enableZoom = false;
-    // this.controls.update();
+    this.updateCameraFrame();
 
-    this.domEl.addEventListener(
-      "mousemove",
-      (e) => this.onDocumentMouseMove(e),
-      false
-    );
-    this.domEl.addEventListener(
-      "mousedown",
-      (e) => this.onDocumentMouseDown(e),
-      false
-    );
-    this.domEl.addEventListener(
-      "mouseup",
-      (e) => this.onDocumentMouseUp(e),
-      false
-    );
+    this.handleMouseMove = (e) => this.onDocumentMouseMove(e);
+    this.handleMouseDown = (e) => this.onDocumentMouseDown(e);
+    this.handleMouseUp = (e) => this.onDocumentMouseUp(e);
+
+    this.domEl.addEventListener("mousemove", this.handleMouseMove, false);
+    this.domEl.addEventListener("mousedown", this.handleMouseDown, false);
+    this.domEl.addEventListener("mouseup", this.handleMouseUp, false);
 
     if (props.width && props.height) {
-      window.addEventListener("resize", () => this.onWindowResize(), false);
+      this.handleResize = () => this.onWindowResize();
+      window.addEventListener("resize", this.handleResize, false);
     }
 
     this.render();
@@ -288,17 +321,45 @@ class VoxelPainterClass {
     this.canvasWidth = this.domEl.clientWidth; // props && props.width ? props.width : window.innerWidth;
     this.canvasHeight = this.domEl.clientHeight;
     this.camera.aspect = this.canvasWidth / this.canvasHeight;
-    this.camera.setViewOffset(
-      this.canvasWidth,
-      this.canvasHeight,
-      0,
-      -150,
-      this.canvasWidth,
-      this.canvasHeight
-    );
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+    this.updateCameraFrame();
     this.render()
+  }
+
+  private updateCameraFrame() {
+    if (!this.framingObjects.length) {
+      return;
+    }
+
+    const bounds = new THREE.Box3();
+    this.framingObjects.forEach((object) => bounds.expandByObject(object));
+
+    const size = bounds.getSize(new THREE.Vector3());
+    const center = bounds.getCenter(new THREE.Vector3());
+    const maxSize = Math.max(size.x, size.y, size.z);
+    const halfFov = THREE.MathUtils.degToRad(this.camera.fov / 2);
+    const fitHeightDistance = maxSize / (2 * Math.tan(halfFov));
+    const fitWidthDistance = fitHeightDistance / this.camera.aspect;
+    const distance = this.framePadding * Math.max(fitHeightDistance, fitWidthDistance);
+
+    const direction = this.camera.position.clone().sub(this.controls?.target ?? this.target);
+    if (direction.lengthSq() === 0) {
+      direction.set(200, 600, 1000);
+    }
+    direction.normalize();
+
+    this.target.copy(center);
+    this.camera.position.copy(center).add(direction.multiplyScalar(distance));
+    this.camera.near = Math.max(0.1, distance / 100);
+    this.camera.far = Math.max(10000, distance * 20);
+    this.camera.lookAt(this.target);
+    this.camera.updateProjectionMatrix();
+
+    if (this.controls) {
+      this.controls.target.copy(center);
+      this.controls.update();
+    }
   }
 
   private onDocumentMouseMove(event) {
@@ -562,7 +623,8 @@ class VoxelPainterClass {
     geometry1.rotateX(-Math.PI / 2);
 
     const label = new THREE.Mesh(geometry1, material1);
-    const labelZ = (this.gridSize + height) / 2; //(this.gridSize / 2) + height;
+    const labelOffset = height * 0.25;
+    const labelZ = (this.gridSize / 2) + (height / 2) + labelOffset;
     label.position.set(0, 0, labelZ);
 
     return label;
@@ -604,6 +666,21 @@ class VoxelPainterClass {
       );
       if (sceneChildIndex != -1) this.scene.children.splice(sceneChildIndex, 1);
     });
+  }
+
+  public destroy() {
+    if (this.handleResize) {
+      window.removeEventListener("resize", this.handleResize, false);
+    }
+    this.domEl?.removeEventListener("mousemove", this.handleMouseMove, false);
+    this.domEl?.removeEventListener("mousedown", this.handleMouseDown, false);
+    this.domEl?.removeEventListener("mouseup", this.handleMouseUp, false);
+    this.controls?.dispose();
+    this.renderer?.dispose();
+    const canvas = this.renderer?.domElement;
+    if (canvas && canvas.parentNode) {
+      canvas.parentNode.removeChild(canvas);
+    }
   }
 
   private render() {
