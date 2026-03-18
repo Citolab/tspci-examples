@@ -27,7 +27,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
   }
 
   getInstance = (dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString: string) => {
-    config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
+    // Normalize incoming keys to camelCase — HTML attributes are lowercased, so e.g. "griddivisions" → "gridDivisions"
+    const normalizedIncoming = Object.keys(configProps).reduce((acc, key) => {
+      const match = Object.keys(config.properties || {}).find(k => k.toLowerCase() === key.toLowerCase());
+      if (match !== undefined) acc[key] = config.properties[match];
+      return acc;
+    }, {} as Record<string, string>);
+    config.properties = { ...configProps, ...normalizedIncoming }; // merge current props with incoming
     this.config = config;
 
     const restoredState = stateString ? JSON.parse(stateString) : null;
