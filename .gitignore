@@ -4,3 +4,4 @@ dist
 .yalc
 yalc.lock
 qti3-dist/
+.opencode

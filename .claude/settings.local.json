@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(yalc add:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm view:*)",
+      "Bash(npm install:*)"
+    ]
+  }
+}
