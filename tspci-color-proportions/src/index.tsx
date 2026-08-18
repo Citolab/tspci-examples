@@ -60,11 +60,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
       dom.dispatchEvent(interactionChangedEvent);
     });
     this.render();
-    if (this.config.status === "solution") {
-      // The item is in solution status: show the correct response instead of the
-      // candidate's, no need for the engine to push it in as if it were a response.
-      this.showCorrectResponse();
-    } else if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
+    if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
       const response = this.config.boundTo[responseIdentifier];
       // check if any property in response at the lowest level has a value
@@ -80,6 +76,14 @@ class App implements IMSpci<PropTypes>, TAOpci {
         this.setResponse(response);
       }
     }
+
+    // The item is in solution status and the engine passed a correct response along:
+    // show that on top of whatever was restored above. Both conditions have to hold,
+    // so an engine that does not implement this keeps the behaviour it always had.
+    if (this.config.status === "solution" && this.correctResponse) {
+      this.showCorrectResponse();
+    }
+
     this.config.onready && this.config.onready(this);
   };
 

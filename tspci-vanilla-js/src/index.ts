@@ -51,8 +51,10 @@ class App implements IMSpci<PropTypes> {
       this.interactionChanged();
     });
 
-    if (config.status === "solution") {
-      // The item is in solution status: show the correct response, not the candidate's.
+    // The item is in solution status and the engine passed a correct response along:
+    // show that instead of the restored state. Both conditions have to hold, so an
+    // engine that does not implement this keeps the behaviour it always had.
+    if (config.status === "solution" && this.correctResponse !== null) {
       this.showCorrectResponse();
     }
 
