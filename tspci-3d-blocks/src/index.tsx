@@ -21,6 +21,9 @@ class App implements IMSpci<PropTypes>, TAOpci {
   config: ConfigProperties<PropTypes>;
   shadowdom: ShadowRoot;
   private initialState: StateModel = { cubes: [] };
+  // The correct response the delivery engine handed us at getInstance time.
+  // See https://github.com/1EdTech/qti-project-management/issues/210
+  private correctResponse: QtiVariableJSON | null = null;
 
   constructor() {
     ctx && ctx.register(this);
@@ -35,6 +38,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     }, {} as Record<string, string>);
     config.properties = { ...configProps, ...normalizedIncoming }; // merge current props with incoming
     this.config = config;
+    this.correctResponse = this.correctResponseFromDeclaration(config.responseDeclaration);
 
     const restoredState = stateString ? JSON.parse(stateString) : null;
     const logActions = stateString ? JSON.parse(stateString).log : null;
@@ -59,7 +63,11 @@ class App implements IMSpci<PropTypes>, TAOpci {
       });
       dom.dispatchEvent(interactionChangedEvent);
     });
-    if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
+    if (this.config.status === "solution") {
+      // The item is in solution status: show the correct response instead of the
+      // candidate's, no need for the engine to push it in as if it were a response.
+      this.showCorrectResponse();
+    } else if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
       const response = this.config.boundTo[responseIdentifier];
       // check if any property in response at the lowest level has a value
@@ -76,6 +84,32 @@ class App implements IMSpci<PropTypes>, TAOpci {
       }
     }
     config.onready && config.onready(this);
+  };
+
+  /**
+   * Paints the correct response received at getInstance time. A delivery engine
+   * calls this when it moves an already running interaction into review.
+   */
+  showCorrectResponse = () => {
+    if (!this.correctResponse) return;
+    this.setResponse(this.correctResponse);
+  };
+
+  /**
+   * Reads the correct response out of the response declaration and shapes it like
+   * any other response value, so setResponse can render it.
+   */
+  private correctResponseFromDeclaration = (
+    declaration: ConfigProperties<PropTypes>["responseDeclaration"]
+  ): QtiVariableJSON | null => {
+    const value = declaration?.correctResponse?.value;
+    if (value === undefined || value === null) return null;
+    const baseType = declaration.baseType ?? "string";
+    return (
+      declaration.cardinality && declaration.cardinality !== "single"
+        ? { list: { [baseType]: value } }
+        : { base: { [baseType]: value } }
+    ) as QtiVariableJSON;
   };
 
   render = () => {

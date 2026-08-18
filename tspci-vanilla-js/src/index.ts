@@ -19,6 +19,9 @@ class App implements IMSpci<PropTypes> {
   state: string; // keep a reference to the state
   shadowdom: ShadowRoot | Element; // Not mandatory, but its wise to create a shadowroot
   dom: HTMLElement;
+  // The correct response the delivery engine handed us at getInstance time.
+  // See https://github.com/1EdTech/qti-project-management/issues/210
+  private correctResponse: string | null = null;
   constructor() {
     ctx && ctx.register(this); // we assume the qtiCustomInteractionContext is avaible due to the import above
   }
@@ -33,6 +36,9 @@ class App implements IMSpci<PropTypes> {
     config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
     this.config = config;
     this.state = state ? state : "";
+    // The engine passes the correct response along when the item declares one, so a
+    // PCI can show it itself when the item is in solution status.
+    this.correctResponse = (config.responseDeclaration?.correctResponse?.value as string) ?? null;
     if (!dom) {
       throw new Error("No dom element found");
     }
@@ -45,9 +51,27 @@ class App implements IMSpci<PropTypes> {
       this.interactionChanged();
     });
 
+    if (config.status === "solution") {
+      // The item is in solution status: show the correct response, not the candidate's.
+      this.showCorrectResponse();
+    }
+
     this.render();
 
     config.onready(this);
+  };
+
+  // Shows the correct response received at getInstance time. A delivery engine calls
+  // this when it moves an already running interaction into review.
+  showCorrectResponse = () => {
+    if (this.correctResponse === null) return;
+    // getResponse stringifies the state, so undo that to get the value back
+    try {
+      this.state = JSON.parse(this.correctResponse);
+    } catch {
+      this.state = this.correctResponse;
+    }
+    this.render();
   };
 
   private interactionChanged = () => {
