@@ -11,9 +11,9 @@
     "preact": "10.28.2"
   },
   "devDependencies": {
-    "@citolab/tspci": "2.9.12",
-    "@citolab/tspci-tao": "2.9.12",
-    "@citolab/tspci-qti3": "2.9.12",
+    "@citolab/tspci": "2.11.0",
+    "@citolab/tspci-tao": "2.11.0",
+    "@citolab/tspci-qti3": "2.11.0",
     "@tailwindcss/postcss": "^4.1.18",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
