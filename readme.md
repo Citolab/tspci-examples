@@ -39,8 +39,14 @@ When you import the QTI 2.2 package into [qti.citolab.nl](https://qti.citolab.nl
 ## SBOM
 
 Every production build writes a [CycloneDX](https://cyclonedx.org/) SBOM of the bundle to
-`dist/sbom.cdx.json`, and the export scripts copy it next to the package, for example
-`qti3-dist/qti3-pci-blocks_1.0.0.sbom.cdx.json`. No flag is needed, use `--no-sbom` to skip it.
+`dist/sbom.cdx.json`. An export puts it in the package as well, next to the bundle it describes: for
+`npm run package-qti3` that is `resources/pci/sbom.cdx.json`, listed as a file of the PCI resource in the
+manifest. That way it survives the import into an authoring system, which is exactly the party that
+needs it. A copy is also written next to the zip as `qti3-dist/qti3-pci-blocks_1.0.0.sbom.cdx.json`, for
+your own technical documentation.
+
+No flag is needed for any of this. Use `--no-include-sbom` to keep it out of the package, or `--no-sbom`
+to skip generating one.
 
 The SBOM is built from the bundler module graph, so it lists the packages whose code is actually in the
 delivered file. For `tspci-3d-blocks` that is three components:

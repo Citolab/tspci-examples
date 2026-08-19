@@ -13,9 +13,9 @@
     "three-orbitcontrols": "^2.110.3"
   },
   "devDependencies": {
-    "@citolab/tspci": "2.11.0",
-    "@citolab/tspci-tao": "2.11.0",
-    "@citolab/tspci-qti3": "2.11.0",
+    "@citolab/tspci": "2.12.0",
+    "@citolab/tspci-tao": "2.12.0",
+    "@citolab/tspci-qti3": "2.12.0",
     "@types/three": "^0.136.0",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.23"
