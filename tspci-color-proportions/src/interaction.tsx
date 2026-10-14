@@ -1,7 +1,7 @@
 import { useState, useRef, useMemo } from "preact/hooks";
 import useMouse from "@react-hook/mouse-position";
 import { useEffect } from "preact/hooks";
-import { StateModel } from "./store";
+import { Actions, StateModel } from "./store";
 import configProps from "./config.json";
 import { IStore, useStore } from "@citolab/preact-store";
 import type { PciProperties } from "@citolab/tspci";
@@ -26,7 +26,7 @@ export const Paper = ({ width, height, x = 0, y = 0 }: { width: number; height: 
   </g>
 );
 
-const Interaction = ({ config, partition, store }: { config: PropTypes; partition: Partition; store: IStore<StateModel> }) => {
+const Interaction = ({ config, partition, store }: { config: PropTypes; partition: Partition; store: IStore<StateModel, Actions> }) => {
   const { width, height } = config;
   const colors = config.colors.split(",").map((c) => c.trim().toLowerCase());
 
@@ -54,9 +54,9 @@ const Interaction = ({ config, partition, store }: { config: PropTypes; partitio
   const paint = (id: string) => {
     const current = store.getState().vlakken.find((v) => v.id === id);
     if (selectedColor === ERASER) {
-      if (current) store.dispatch<{ id: string }>({ type: "CLEAR_COLOR", payload: { id } });
+      if (current) store.dispatch({ type: "CLEAR_COLOR", payload: { id } });
     } else if (current?.color !== selectedColor) {
-      store.dispatch<{ id: string; color: string }>({ type: "SET_COLOR", payload: { id, color: selectedColor } });
+      store.dispatch({ type: "SET_COLOR", payload: { id, color: selectedColor } });
     }
   };
 

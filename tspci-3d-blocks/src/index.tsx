@@ -9,7 +9,7 @@ const defaults = configProps as unknown as PropTypes;
 
 import { ConfigProperties, IMSpci, PciProperties, QtiInteractionChangedDetail, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
 import { IStore } from "@citolab/preact-store";
-import { initStore, StateModel } from "./store";
+import { Actions, initStore, StateModel } from "./store";
 import { TAOpci } from "@citolab/tspci-tao";
 import { Cube, planeProjection, planesToScene, sort } from "./utils";
 
@@ -18,7 +18,7 @@ export type State = { cubes: Cube[] };
 class App implements IMSpci<PropTypes>, TAOpci {
   typeIdentifier = "blocks";
 
-  store: IStore<StateModel>;
+  store: IStore<StateModel, Actions>;
   props: PropTypes;
   config: ConfigProperties<PropTypes>;
   shadowdom: ShadowRoot;
@@ -52,19 +52,6 @@ class App implements IMSpci<PropTypes>, TAOpci {
     this.shadowdom = dom.shadowRoot ? dom.shadowRoot : dom.attachShadow({ mode: "open" });
 
     this.render();
-    this.store.subscribe(() => {
-      const event: QtiInteractionChangedDetail = {
-        interaction: this,
-        responseIdentifier: this.config.responseIdentifier,
-        valid: true,
-        value: this.getResponse(),
-      };
-      // dispatch a custom event to notify the Delivery System that the interaction has changed
-      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
-        detail: event,
-      });
-      dom.dispatchEvent(interactionChangedEvent);
-    });
     if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
       const response = this.config.boundTo[responseIdentifier];
@@ -88,6 +75,21 @@ class App implements IMSpci<PropTypes>, TAOpci {
     if (this.config.status === "solution" && this.correctResponse) {
       this.showCorrectResponse();
     }
+
+    // From here on, tell the Delivery System when the interaction changes (not for what it handed us above)
+    this.store.subscribe(() => {
+      const event: QtiInteractionChangedDetail = {
+        interaction: this,
+        responseIdentifier: this.config.responseIdentifier,
+        valid: true,
+        value: this.getResponse(),
+      };
+      // dispatch a custom event to notify the Delivery System that the interaction has changed
+      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
+        detail: event,
+      });
+      dom.dispatchEvent(interactionChangedEvent);
+    }, { immediate: false });
 
     config.onready && config.onready(this);
   };
@@ -131,10 +133,9 @@ class App implements IMSpci<PropTypes>, TAOpci {
     window.requestAnimationFrame(() => this.render());
   };
 
+  // the store tells the interaction (and the Delivery System) about the reset
   resetResponse = () => {
-    this.store.unsubscribeAll();
     this.store.reset();
-    this.render();
   };
 
   setResponse = (response: QtiVariableJSON) => {
@@ -146,7 +147,6 @@ class App implements IMSpci<PropTypes>, TAOpci {
           +this.config.properties.cubePixelSize,
           +this.config.properties.gridDivisions
         );
-        this.resetResponse();
         this.store.restoreState({ cubes }, []);
       }
     } catch {

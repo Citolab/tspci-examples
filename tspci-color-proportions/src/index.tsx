@@ -9,7 +9,7 @@ import { IMSpci, QtiVariableJSON, QtiInteractionChangedDetail, ConfigProperties,
 import { IStore } from "@citolab/preact-store";
 
 import configProps from "./config.json";
-import { StateModel, initStore } from "./store";
+import { Actions, StateModel, initStore } from "./store";
 import { LEGACY_IDS, Partition, assignColors, isDefaultPartition, parsePartition, percentage, regions, serializePartition } from "./partition";
 // config.json carries editor hints for authoring systems (AUTHORING.md); the build passes only the defaults
 type PropTypes = PciProperties<typeof configProps>;
@@ -19,7 +19,7 @@ type ResponseType = { color: string; percentage: number };
 
 class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes> {
   typeIdentifier = "colorProportions";
-  store: IStore<StateModel>;
+  store: IStore<StateModel, Actions>;
   dom: HTMLElement;
   shadowdom: ShadowRoot; // implementation detail
   config: ConfigProperties<PropTypes>;
@@ -55,19 +55,6 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
 
     this.shadowdom = dom.attachShadow({ mode: "closed" });
 
-    this.store.subscribe(() => {
-      const event: QtiInteractionChangedDetail = {
-        interaction: this,
-        responseIdentifier: this.config.responseIdentifier,
-        valid: true,
-        value: this.getResponse(),
-      };
-      // dispatch a custom event to notify the Delivery System that the interaction has changed
-      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
-        detail: event,
-      });
-      dom.dispatchEvent(interactionChangedEvent);
-    });
     this.render();
     if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
@@ -92,6 +79,21 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     if (this.config.status === "solution" && this.correctResponse) {
       this.showCorrectResponse();
     }
+
+    // From here on, tell the Delivery System when the interaction changes (not for what it handed us above)
+    this.store.subscribe(() => {
+      const event: QtiInteractionChangedDetail = {
+        interaction: this,
+        responseIdentifier: this.config.responseIdentifier,
+        valid: true,
+        value: this.getResponse(),
+      };
+      // dispatch a custom event to notify the Delivery System that the interaction has changed
+      const interactionChangedEvent = new CustomEvent("qti-interaction-changed", {
+        detail: event,
+      });
+      dom.dispatchEvent(interactionChangedEvent);
+    }, { immediate: false });
 
     this.config.onready && this.config.onready(this);
     return this;
@@ -204,10 +206,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     };
   };
 
+  // the store tells the interaction (and the Delivery System) about the reset
   resetResponse = () => {
-    this.store.unsubscribeAll();
     this.store.reset();
-    this.render();
   };
 
   setResponse = (response: QtiVariableJSON) => {
@@ -220,9 +221,10 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
         if (!stateString) return;
         const parsedResponse = JSON.parse(stateString) as ResponseType[];
         const vlakken = assignColors(regions(this.partition), parsedResponse);
-        this.resetResponse();
         if (vlakken) {
           this.store.restoreState({ vlakken }, []);
+        } else {
+          this.resetResponse();
         }
       } catch {
         console.error(`couldn't restore state: ${response}`);

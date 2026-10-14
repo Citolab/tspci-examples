@@ -1,7 +1,8 @@
 import { Store } from "@citolab/preact-store";
 import { Cube } from "./utils";
 
-export type ActionType = "ADD_ACTION" | "REMOVE_ACTION" | "RESTORE_STATE";
+/** The actions, as { type: payload }: dispatch and addReducer only accept these. */
+export type Actions = { ADDED_CUBE: Cube; REMOVED_CUBE: Cube };
 
 export type StateModel = {
   cubes: Cube[];
@@ -11,12 +12,12 @@ export const initStore = (initialState: StateModel, restoreData?: {
   state: StateModel;
   actions: { type: string; payload: any; timestamp?: number }[];
 }) => {
-  const store = new Store<StateModel>(initialState, restoreData);
-  store.addReducer<Cube>("ADDED_CUBE", (state, payload) => {
+  const store = new Store<StateModel, Actions>(initialState, restoreData);
+  store.addReducer("ADDED_CUBE", (state, payload) => {
     const newCubes = [...state.cubes, payload];
     return { ...state, cubes: newCubes };
   });
-  store.addReducer<Cube>("REMOVED_CUBE", (state, payload) => {
+  store.addReducer("REMOVED_CUBE", (state, payload) => {
     const newCubes = state.cubes.filter((c) => !(c.x === payload.x && c.y === payload.y && c.z === payload.z));
     return { ...state, cubes: newCubes };
   });

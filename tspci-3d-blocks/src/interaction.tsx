@@ -2,21 +2,19 @@ import { useEffect } from "preact/hooks";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { brickColor, createBaseplate, createBrickGeometry, DEFAULT_BRICK_COLORS, parseColors, plasticMaterial, srgb } from "./bricks";
-import { ActionType, StateModel } from "./store";
+import { Actions, StateModel } from "./store";
 import configProps from "./config.json";
 
-import { Action, IStore, useStore } from "@citolab/preact-store";
+import { IStore, Unsubscribe } from "@citolab/preact-store";
 import type { PciProperties } from "@citolab/tspci";
-import { Cube } from "./utils";
 type PropTypes = PciProperties<typeof configProps>;
 
-export const Interaction = (props: { config: PropTypes, store: IStore<StateModel> }) => {
+export const Interaction = (props: { config: PropTypes, store: IStore<StateModel, Actions> }) => {
   const { config, store } = props;
 
   let voxel: VoxelPainterClass;
 
   let dom: HTMLElement;
-  const state = useStore(store);
 
   useEffect(() => {
     voxel = new VoxelPainterClass({
@@ -30,17 +28,15 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       baseplateColor: config.baseplateColor,
       htmlElementToAppendTo: dom,
     });
-    if (voxel) {
-      // prevent a black box to appear when the page is loaded
-      setTimeout(() => {
-        voxel?.restoreObjects(state.cubes);
-        store.subscribe(s => {
-          voxel?.restoreObjects(s.cubes);
-        });
-        voxel?.onWindowResize()
-      }, 10);
-
-    }
+    let unsubscribe: Unsubscribe | undefined;
+    // prevent a black box to appear when the page is loaded
+    const timer = setTimeout(() => {
+      // subscribe calls us right away with the current cubes, and again on every change
+      unsubscribe = store.subscribe(s => {
+        voxel?.restoreObjects(s.cubes);
+      });
+      voxel?.onWindowResize()
+    }, 10);
 
     dom?.addEventListener(
       "onPositionsChanged",
@@ -54,14 +50,16 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
         const cubesToRemove = currentPositions.filter((c) => !newPositions.find((p) => c.x === p.x && c.y === p.y && c.z === p.z));
 
         cubesToAdd.forEach((c) => {
-          store.dispatch<Cube>({ type: "ADDED_CUBE", payload: { x: c.x, y: c.y, z: c.z } });
+          store.dispatch({ type: "ADDED_CUBE", payload: { x: c.x, y: c.y, z: c.z } });
         });
         cubesToRemove.forEach((c) => {
-          store.dispatch<Cube>({ type: "REMOVED_CUBE", payload: { x: c.x, y: c.y, z: c.z } });
+          store.dispatch({ type: "REMOVED_CUBE", payload: { x: c.x, y: c.y, z: c.z } });
         });
       }
     );
     return () => {
+      clearTimeout(timer);
+      unsubscribe?.();
       voxel?.destroy();
       voxel = null;
     };
