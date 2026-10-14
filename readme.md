@@ -5,7 +5,7 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 4 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+There are 3 examples in this repository that can give a head start while creating new Portable Custom Interactions.
 To run these examples go the to folder of the specific example and run:
 
 ``` sh
@@ -29,8 +29,8 @@ npm run package-qti3
 
 You can also import PCIs into TAO first:
 
-1. Use the TAO export to import the PCI
-2. In TAO, go to **Settings → Portable Custom Interactions → Add** to register the PCI
+1. Run `npm run package-tao`, which writes `dist/tao-pci-<typeIdentifier>_<version>.zip`
+2. In TAO, go to **Settings → Portable Custom Interactions → Add Interaction** and upload the zip
 3. Create an item using the PCI
 4. Export the item as QTI 2.2
 
@@ -38,25 +38,115 @@ When you import the QTI 2.2 package into [qti.citolab.nl](https://qti.citolab.nl
 
 ## Authoring systems
 
-Every example describes its settings and its response for authoring systems. The settings in `src/config.json` carry
-an editor and a label next to their default:
+An item author places a PCI in an item, sets it up (the settings) and decides what counts as a correct answer (the
+scoring). Every example describes both in two files it already has:
 
-```json
-"brickColorMode": {
-  "default": "mixed",
-  "editor": "enum",
-  "options": [
-    { "value": "mixed", "label": { "en": "Multiple colours", "nl": "Meerdere kleuren" } },
-    { "value": "single", "label": { "en": "One colour", "nl": "Eén kleur" } }
-  ]
+- **`src/config.json`, the settings.** A value is a plain default, or an object with a `default` and hints for the
+  author's form: an `editor`, a `label` (one string or one per language), `options`, `min`/`max`:
+
+  ```json
+  "brickColorMode": {
+    "default": "mixed",
+    "editor": "enum",
+    "label": { "en": "Brick colours", "nl": "Kleuren van de blokken" },
+    "options": [
+      { "value": "mixed", "label": { "en": "Multiple colours", "nl": "Meerdere kleuren" } },
+      { "value": "single", "label": { "en": "One colour", "nl": "Eén kleur" } }
+    ]
+  }
+  ```
+
+  The editors are `text`, `textarea`, `integer`, `number`, `boolean`, `enum`, `color`, `colorList`, `hidden` and
+  `pci` (the PCI edits the setting itself, see below). The bundle only gets the defaults.
+- **`package.json` `config.tspci`, the response and the scoring.** `response` declares what `getResponse()` returns
+  (`{ "cardinality": "single", "baseType": "integer" }`), `score` the scoring the PCI is made for (`MATCH_CORRECT`,
+  `CUSTOM`, `NONE`; the first is the default).
+
+| example | settings (editors) | response | scoring |
+| --- | --- | --- | --- |
+| tspci-vanilla-js | `text`, `textarea`, `integer`, `color` | `single` `integer` | `MATCH_CORRECT`, `NONE` |
+| tspci-color-proportions | `textarea`, `colorList`, `text`, `integer`, `pci` | `single` `string` | `MATCH_CORRECT`, `NONE` |
+| tspci-3d-blocks | `integer`, `text`, `enum`, `colorList`, `color` | `single` `string` | `MATCH_CORRECT`, `NONE` |
+
+How an authoring system uses this depends on the system.
+
+### TAO: what TAO supports
+
+TAO has no standard way for a PCI to describe its settings, so `npm run package-tao` builds the creator part of the
+TAO package (`imsPciCreator`) from the two files. This is what an author gets in TAO:
+
+- **A properties form per setting.** The label, the hint as a tooltip, and a control for the editor: a number field
+  with `min`/`max`, a checkbox, a dropdown for an `enum`, a colour picker for a `color`, a list of colour pickers for a
+  `colorList`. Every change goes to the PCI's `trigger`, so the interaction redraws straight away.
+
+  <p align="center">
+    <img src="https://raw.githubusercontent.com/Citolab/tspci/main/lib/tspci-tao/readme-images/properties.png" alt="the settings of tspci-3d-blocks in TAO's properties form" width="700">
+  </p>
+
+- **A "Configure…" button for `pci` settings.** tspci-color-proportions lets the author draw the shape to colour in
+  the PCI itself (`getAuthoringInstance`). TAO opens it in its own modal; **Done** writes the setting back.
+
+  <p align="center">
+    <img src="https://raw.githubusercontent.com/Citolab/tspci/main/lib/tspci-tao/readme-images/configure.png" alt="drawing the shape of tspci-color-proportions in TAO" width="700">
+  </p>
+
+- **Scoring by answering the PCI.** With `MATCH_CORRECT` the author switches the interaction to **Response** and
+  answers it: what `getResponse()` reports becomes the correct response, and TAO scores with a string comparison.
+  `CUSTOM` leaves the response processing to the author, and `NONE` is for a PCI that is not scored (a tool). This
+  is why every example reports the meaning of an answer and not the route to it: two builds with the same views give
+  the same response.
+
+  <p align="center">
+    <img src="https://raw.githubusercontent.com/Citolab/tspci/main/lib/tspci-tao/readme-images/score.png" alt="setting the correct response of tspci-3d-blocks in TAO" width="700">
+  </p>
+
+- **An icon** in the list of custom interactions, from `<typeIdentifier>.svg` next to `package.json`
+  (`blocks.svg`, `colorProportions.svg`).
+
+TAO's limits apply. The settings arrive in the PCI as text (`"200"`, `"true"`, `"#c91a09, #0055bf"`), and
+`MATCH_CORRECT` can only compare one value: no margins, no partial scores. See
+[@citolab/tspci-tao](https://github.com/Citolab/tspci/tree/main/lib/tspci-tao) for the details.
+
+### Other authoring systems: a proposal for sharing settings and scoring
+
+Other authoring systems have no PCI-specific package to read, so we propose a small descriptor that travels with the
+PCI. Every build writes `dist/authoring.json` from the same two files, and `npm run package-qti3` adds it to the
+package as `resources/pci/authoring.json`, listed in the manifest as a file of the PCI resource (like the SBOM). An
+authoring system that knows the file can build a typed form; one that does not just ignores it. This is a proposal
+(`"descriptorVersion": "0"`): qti-construction and the dev page (`npm run dev`) use it, and we'd like to hear from
+other authoring systems.
+
+```jsonc
+// tspci-3d-blocks/dist/authoring.json (generated, shortened)
+{
+  "descriptorVersion": "0",
+  "typeIdentifier": "blocks",
+  "version": "1.1.0",
+  "label": "3d blocks",
+  "properties": {
+    "brickColorMode": { "editor": "enum", "default": "mixed", "options": [{ "value": "mixed" }, { "value": "single" }] },
+    "baseplateColor": { "editor": "color", "default": "#4b9f4a" }
+  },
+  "response": { "cardinality": "single", "baseType": "string" },
+  "score": ["MATCH_CORRECT", "NONE"]
 }
 ```
 
-and `package.json` `config.tspci.response` declares what `getResponse()` returns. The build writes `dist/authoring.json`
-from both, and the qti3 package ships it next to the bundle; an authoring system such as qti-construction then shows
-the author a dropdown, colour pickers and number fields instead of plain text. The dev page (`npm run dev`) shows the
-same form. See [Authoring systems](https://github.com/Citolab/tspci/tree/main/lib/tspci#authoring-systems) in the
-tspci readme; every project made with `tspci init` explains it in `AUTHORING.md`.
+What we suggest an authoring system does with it:
+
+- **Settings.** Show a control per `editor` with its `label` in the author's language, and write the values as
+  `data-` attributes of the interaction, as text, just like TAO. A setting with `"editor": "pci"` gets a "Configure…"
+  button that runs the PCI's `getAuthoringInstance` in a sandboxed iframe (tspci `docs/authoring-mode.md`). Delivery
+  never calls it, so a PCI with an authoring mode still works everywhere.
+- **Response.** Declare the item's response variable from `response`, so a PCI that reports a number is scored as a
+  number (tspci-vanilla-js reports `{ "base": { "integer": 30 } }`). A PCI that reports several values uses
+  `"cardinality": "record"` with typed `fields`.
+- **Scoring.** Let the author answer the PCI in a preview: the reported response becomes the correct response, or one
+  of several accepted answers. Margins, such as a time window or an area, belong in the item's response processing,
+  which the authoring system writes, not in the PCI.
+
+See [Authoring systems](https://github.com/Citolab/tspci/tree/main/lib/tspci#authoring-systems) in the tspci readme;
+every project made with `tspci init` explains it in `AUTHORING.md`.
 
 These examples need tspci 2.13.0 or later (the authoring descriptor): older versions pass the editor hints to the PCI
 instead of the defaults.
@@ -105,12 +195,6 @@ disclosure policy and security contact. The other examples use the defaults, whi
 configuration at all. See the
 [@citolab/tspci readme](https://github.com/Citolab/tspci/tree/main/lib/tspci#sbom) for all options.
 
-## tspci-hello-world
-
-There should alwas be a 'hello world' example. So here it is: the most basic example of an PCI.
-
-- Displaying 'Hello world'
-
 ## tspci-vanilla-js
 
 A PCI without a framework: what percentage of the circle is coloured?
@@ -139,16 +223,6 @@ PCI where the test-taker can color parts of a rectangle.
 
 <p align="center">
   <img src="./tspci-color-proportions/example.png" alt="example proportions">
-</p>
-
-## tspci-hauntedjs
-
-Example PCI using [haunted](https://github.com/matthewp/haunted) instead of preact.
-
-Simple PCI for finding the correct variable
-
-<p align="center">
-  <img src="./tspci-hauntedjs/example.png" alt="example haunted lib">
 </p>
 
 ## tspci-3d-blocks
