@@ -15,6 +15,9 @@ export const initStore = (initialState: StateModel, restoreData?: {
     // replace color
     return { ...state, vlakken: state.vlakken.map((v) => (v.id === payload.id ? { ...v, color: payload.color } : v)) };
   });
+  // the eraser: the shape is white again (not coloured, so it is not in the response)
+  store.addReducer<{ id: string }>("CLEAR_COLOR", (state, payload) => ({ ...state, vlakken: state.vlakken.filter((v) => v.id !== payload.id) }));
+  store.addReducer("CLEAR_ALL", (state) => ({ ...state, vlakken: [] }));
   return store;
 }
 

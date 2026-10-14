@@ -1,24 +1,44 @@
-import { useState, useRef, useLayoutEffect, useCallback } from "preact/hooks";
+import { useState, useRef, useMemo } from "preact/hooks";
 import useMouse from "@react-hook/mouse-position";
 import { useEffect } from "preact/hooks";
-import afbeelding from "./verhoudingen.svg";
 import { StateModel } from "./store";
 import configProps from "./config.json";
-import { Action, IStore, useStore } from "@citolab/preact-store";
-type PropTypes = typeof configProps;
+import { IStore, useStore } from "@citolab/preact-store";
+import type { PciProperties } from "@citolab/tspci";
+import { GRID, Partition, borders, regionRuns, regions } from "./partition";
+type PropTypes = PciProperties<typeof configProps>;
 
-const svgString = decodeURIComponent(afbeelding).replace("data:image/svg+xml,", "");
+/** The eraser is a "colour" too: painting with it makes a shape white again. */
+const ERASER = "";
+/** Room around the shape, where the squared paper shows (drawing units). */
+const MARGIN = 64;
+const SQUARE = 32;
 
-const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document | ShadowRoot; store: IStore<StateModel> }) => {
+/** Squared paper: dashed lines every SQUARE units over the whole drawing. */
+export const Paper = ({ width, height, x = 0, y = 0 }: { width: number; height: number; x?: number; y?: number }) => (
+  <g fill="none" stroke="#dbe1e8" stroke-dasharray="3 3">
+    {Array.from({ length: Math.floor(width / SQUARE) + 1 }, (_, i) => (
+      <line key={`v${i}`} x1={x + i * SQUARE + 0.5} y1={y} x2={x + i * SQUARE + 0.5} y2={y + height} />
+    ))}
+    {Array.from({ length: Math.floor(height / SQUARE) + 1 }, (_, i) => (
+      <line key={`h${i}`} x1={x} y1={y + i * SQUARE + 0.5} x2={x + width} y2={y + i * SQUARE + 0.5} />
+    ))}
+  </g>
+);
+
+const Interaction = ({ config, partition, store }: { config: PropTypes; partition: Partition; store: IStore<StateModel> }) => {
   const { width, height } = config;
   const colors = config.colors.split(",").map((c) => c.trim().toLowerCase());
 
   const [selectedColor, setSelectedColor] = useState<string>(colors[0]);
 
   const svgContainer = useRef<HTMLDivElement>();
-  const paintables = useRef<Element[]>();
 
   const state = useStore(store);
+  const parts = useMemo(() => regions(partition), [partition]);
+  const lines = useMemo(() => borders(parts), [parts]);
+  const cellW = partition.width / GRID;
+  const cellH = partition.height / GRID;
 
   const mouse = useMouse(svgContainer, {
     fps: 60,
@@ -31,119 +51,96 @@ const Interaction = ({ config, dom, store }: { config: PropTypes; dom: Document 
     svgContainer.current.style.cursor = getCursor(scale, selectedColor);
   }, [selectedColor, mouse.isDown]);
 
-  const handleMouseDown = useCallback(() => {
-    const element = dom.elementFromPoint(mouse.clientX, mouse.clientY);
-    const ispaintable = paintables.current.find((p) => p == element);
-    if (ispaintable && element.getAttribute("fill") !== `${selectedColor}`) {
-      const vlakId = element.getAttribute("data-name");
-      store.dispatch<{ id: string; color: string }>({ type: 'SET_COLOR', payload: { id: vlakId, color: selectedColor } });
+  const paint = (id: string) => {
+    const current = store.getState().vlakken.find((v) => v.id === id);
+    if (selectedColor === ERASER) {
+      if (current) store.dispatch<{ id: string }>({ type: "CLEAR_COLOR", payload: { id } });
+    } else if (current?.color !== selectedColor) {
+      store.dispatch<{ id: string; color: string }>({ type: "SET_COLOR", payload: { id, color: selectedColor } });
     }
-  }, [mouse, selectedColor, paintables, store]);
+  };
 
-  useLayoutEffect(() => {
-    width && (svgContainer.current.firstElementChild as SVGElement).setAttribute("width", width);
-    height && (svgContainer.current.firstElementChild as SVGElement).setAttribute("height", height);
-    paintables.current = [...svgContainer.current.querySelectorAll("#giveColor rect")];
-  }, [svgContainer]);
+  const drawingWidth = partition.width + 2 * MARGIN;
+  const drawingHeight = partition.height + 2 * MARGIN;
 
   return (
-    <div className="flex flex-col h-full">
-      <h1 class="mx-auto my-4 text-gray-500">Color the squares with your mouse</h1>
+    <div className="inline-flex flex-col items-center gap-3 rounded-2xl border border-slate-200 bg-linear-to-b from-white to-slate-50 px-6 pt-5 pb-4 font-sans text-slate-800 shadow-[0_1px_2px_rgba(16,24,40,.04),0_8px_24px_rgba(16,24,40,.06)]">
+      {config.instruction && <p className="m-0 max-w-[36ch] text-center text-[15px] text-slate-600">{config.instruction}</p>}
       <div className="flex justify-center" ref={svgContainer}>
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 643.5 896.5"
-          onMouseDown={handleMouseDown}
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox={`0 0 ${drawingWidth} ${drawingHeight}`} width={width} height={height}
           preserveAspectRatio="xMidYMid meet">
-          <defs>
-            <clipPath id="a">
-              <rect width="643.5" height="896" fill="none" />
-            </clipPath>
-            <clipPath id="b">
-              <rect width="640" height="896.5" fill="none" />
-            </clipPath>
-          </defs>
-
-          <g transform="translate(0 .5)" clip-path="url(#a)" fill="none" stroke="#bcbcbc" stroke-dasharray="3 3">
-            <line data-name="Line 28" y2="896" transform="translate(.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(32.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(64.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(96.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(128.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(160.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(192.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(224.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(256.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(288.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(320.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(352.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(384.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(416.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(448.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(480.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(512.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(544.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(576.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(608.5)" />
-            <line data-name="Line 28" y2="896" transform="translate(640.5)" />
-          </g>
-          <g transform="translate(.5)" clip-path="url(#b)" fill="none" stroke="#bcbcbc" stroke-dasharray="3 3">
-            <line data-name="Line 29" x2="640" transform="translate(0 .5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 32.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 64.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 96.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 128.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 160.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 192.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 224.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 256.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 288.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 320.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 352.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 384.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 416.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 448.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 480.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 512.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 544.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 576.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 608.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 640.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 672.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 704.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 736.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 768.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 800.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 832.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 864.5)" />
-            <line data-name="Line 29" x2="640" transform="translate(0 896.5)" />
-          </g>
-          <g id="giveColor" transform="translate(.5 .5)" fill="#fff" stroke="#5c5c5c" stroke-width="3">
-            <rect data-name="192" width="512" height="384" transform="translate(64 64)" fill={state.vlakken.find(v => v.id === '192')?.color || '#fff'} />
-            <rect data-name="96" width="256" height="384" transform="translate(65 448)" fill={state.vlakken.find(v => v.id === '96')?.color || '#fff'} />
-            <rect data-name="48" width="256" height="192" transform="translate(320 448)" fill={state.vlakken.find(v => v.id === '48')?.color || '#fff'} />
-            <rect data-name="24" width="128" height="192" transform="translate(320 640)" fill={state.vlakken.find(v => v.id === '24')?.color || '#fff'} />
-            <rect data-name="12B" width="128" height="96" transform="translate(448 736)" fill={state.vlakken.find(v => v.id === '12B')?.color || '#fff'} />
-            <rect data-name="12A" width="128" height="96" transform="translate(448 640)" fill={state.vlakken.find(v => v.id === '12A')?.color || '#fff'} />
+          <Paper width={drawingWidth} height={drawingHeight} />
+          <g transform={`translate(${MARGIN} ${MARGIN})`}>
+            {parts.map((part, i) => {
+              const fill = state.vlakken.find((v) => v.id === part.id)?.color || "#fff";
+              return (
+                <g key={part.id} data-name={part.id} role="button" tabIndex={0} aria-label={`part ${i + 1}`} fill={fill} stroke={fill} stroke-width="1"
+                  onMouseDown={() => paint(part.id)}
+                  onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), paint(part.id))}
+                  className="outline-none focus-visible:[&>rect]:opacity-80">
+                  {regionRuns(part).map((run) => (
+                    <rect key={`${run.x},${run.y}`} x={run.x * cellW} y={run.y * cellH} width={run.w * cellW} height={cellH} />
+                  ))}
+                </g>
+              );
+            })}
+            <g fill="none" stroke="#334155" stroke-width="3" stroke-linecap="square" pointer-events="none">
+              {lines.map(([x1, y1, x2, y2]) => (
+                <line key={`${x1},${y1},${x2},${y2}`} x1={x1 * cellW} y1={y1 * cellH} x2={x2 * cellW} y2={y2 * cellH} />
+              ))}
+              <rect width={partition.width} height={partition.height} stroke-linejoin="round" />
+            </g>
           </g>
         </svg>
       </div>
-      <div className="flex justify-center">
-        <div className="bg-white rounded-full shadow-lg border border-gray-200 -mt-2 p-1 w-auto flex items-center justify-center space-x-1">
-          {colors.map((c, idx) => (
-            <div
-              key={idx}
-              className={`rounded-full border-4 w-10 h-10 ${c === selectedColor ? 'border-gray-100/70' : 'border-white'
-                }`}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-white p-1.5 shadow-sm" role="radiogroup" aria-label="colour">
+          {colors.map((c) => (
+            <button
+              key={c}
+              type="button"
+              role="radio"
+              aria-checked={c === selectedColor}
+              aria-label={c}
+              className={`h-9 w-9 cursor-pointer rounded-full border-2 border-white transition-transform ${
+                c === selectedColor ? "scale-110 ring-2 ring-slate-800 ring-offset-1" : "hover:scale-105"
+              }`}
               style={{ background: c }}
               onClick={() => setSelectedColor(c)}
-            ></div>
+            />
           ))}
+          <button
+            type="button"
+            role="radio"
+            aria-checked={selectedColor === ERASER}
+            aria-label="eraser"
+            title="eraser"
+            className={`grid h-9 w-9 cursor-pointer place-items-center rounded-full border-2 border-slate-300 bg-white text-slate-500 transition-transform ${
+              selectedColor === ERASER ? "scale-110 ring-2 ring-slate-800 ring-offset-1" : "hover:scale-105"
+            }`}
+            onClick={() => setSelectedColor(ERASER)}
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21" /><path d="M22 21H7" /><path d="m5 11 9 9" />
+            </svg>
+          </button>
         </div>
+        <button
+          type="button"
+          className="cursor-pointer rounded-full px-3 py-1.5 text-sm text-slate-500 hover:bg-slate-100 hover:text-slate-800 disabled:cursor-default disabled:opacity-40"
+          disabled={state.vlakken.length === 0}
+          onClick={() => store.dispatch({ type: "CLEAR_ALL", payload: null })}
+        >
+          {config.resetLabel}
+        </button>
       </div>
     </div>
   );
 };
 
 function getCursor(scale: number, selectedColor: string): string {
+  if (selectedColor === ERASER) selectedColor = "%23ffffff' stroke='%2394a3b8' stroke-width='2";
+  else selectedColor = selectedColor.replace("#", "%23");
   return (
     `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E` +
     `%3Ccircle id='Ellipse_10' cx='16' cy='16' r='16' fill='%23fff'/%3E` +

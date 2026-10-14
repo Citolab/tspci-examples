@@ -1,5 +1,35 @@
 {
-  "colors": "red, blue, green",
-  "width": "400",
-  "height": "400"
+  "instruction": {
+    "default": "Colour the shapes with your mouse.",
+    "editor": "textarea",
+    "label": { "en": "Instruction", "nl": "Instructie" }
+  },
+  "colors": {
+    "default": "#dc2626, #2563eb, #16a34a",
+    "editor": "colorList",
+    "label": { "en": "Colours to choose from", "nl": "Kleuren om uit te kiezen" }
+  },
+  "resetLabel": {
+    "default": "Start over",
+    "editor": "text",
+    "label": { "en": "Text of the reset button", "nl": "Tekst van de knop om opnieuw te beginnen" }
+  },
+  "width": {
+    "default": "360",
+    "editor": "integer",
+    "min": 200,
+    "label": { "en": "Width (px)", "nl": "Breedte (px)" }
+  },
+  "height": {
+    "default": "500",
+    "editor": "integer",
+    "min": 200,
+    "label": { "en": "Height (px)", "nl": "Hoogte (px)" }
+  },
+  "partition": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Shape to colour", "nl": "Vorm om te kleuren" },
+    "$comment": "JSON written by the authoring mode (partition.ts); empty: the standard shape"
+  }
 }

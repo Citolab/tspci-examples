@@ -2,24 +2,29 @@ import "preact/debug";
 import { render } from "preact";
 import * as ctx from "qtiCustomInteractionContext";
 import Interaction from "./interaction";
+import Authoring, { authoringProblems } from "./authoring";
 import style from "./style.css";
 import { TAOpci } from "@citolab/tspci-tao";
-import { IMSpci, QtiVariableJSON, QtiInteractionChangedDetail, ConfigProperties } from "@citolab/tspci";
-import { Action, IStore, Store } from "@citolab/preact-store";
+import { IMSpci, QtiVariableJSON, QtiInteractionChangedDetail, ConfigProperties, PciProperties, IMSpciAuthoringFactory, PciAuthoringConfiguration, PciAuthoringInstance } from "@citolab/tspci";
+import { IStore } from "@citolab/preact-store";
 
 import configProps from "./config.json";
-import { StateModel, Vlak, initStore } from "./store";
-type PropTypes = typeof configProps;
+import { StateModel, initStore } from "./store";
+import { LEGACY_IDS, Partition, assignColors, isDefaultPartition, parsePartition, percentage, regions, serializePartition } from "./partition";
+// config.json carries editor hints for authoring systems (AUTHORING.md); the build passes only the defaults
+type PropTypes = PciProperties<typeof configProps>;
 
 
 type ResponseType = { color: string; percentage: number };
 
-class App implements IMSpci<PropTypes>, TAOpci {
+class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes> {
   typeIdentifier = "colorProportions";
   store: IStore<StateModel>;
   dom: HTMLElement;
   shadowdom: ShadowRoot; // implementation detail
   config: ConfigProperties<PropTypes>;
+  /** data-partition: the shape the author drew; without it the shape this PCI always had. */
+  partition: Partition;
 
   private initialState: StateModel = { vlakken: [] };
   // The correct response the delivery engine handed us at getInstance time.
@@ -33,15 +38,19 @@ class App implements IMSpci<PropTypes>, TAOpci {
   }
 
   getInstance = (dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString: string) => {
-    config.properties = { ...configProps, ...config.properties }; // merge current props with incoming
+    config.properties = { ...(configProps as unknown as PropTypes), ...config.properties }; // defaults, then the item's
     this.config = config;
     this.correctResponse = this.correctResponseFromDeclaration(config.responseDeclaration);
 
-    const restoredState = stateString ? JSON.parse(stateString) : null;
-    const logActions = stateString ? JSON.parse(stateString).log : null;
+    this.partition = parsePartition(config.properties.partition);
+
+    const saved = stateString ? JSON.parse(stateString) : null;
     this.store = initStore(this.initialState);
-    if (restoredState || logActions) {
-      this.store.restoreState(restoredState, logActions);
+    if (saved) {
+      // getState() saves { state, log }; the parts of the default shape had other ids before it was a partition
+      const legacy = isDefaultPartition(this.partition) ? LEGACY_IDS : {};
+      const vlakken = (saved.state?.vlakken ?? []).map((v) => ({ ...v, id: legacy[v.id] ?? v.id }));
+      this.store.restoreState({ vlakken }, saved.log ?? []);
     }
 
     this.shadowdom = dom.attachShadow({ mode: "closed" });
@@ -66,11 +75,11 @@ class App implements IMSpci<PropTypes>, TAOpci {
       // check if any property in response at the lowest level has a value
       // so { base: string: undefined } is not a value
       // but { base: string: "value" } is a value
-      const hasValue = response && Object.values(response).some((value) => {
-        if (typeof value === "object") {
-          return value && Object.values(value).some((v) => v !== undefined);
+      const hasValue = !!response && Object.values(response).some((value) => {
+        if (value !== null && typeof value === "object") {
+          return Object.values(value).some((v) => v !== undefined && v !== null);
         }
-        return value !== undefined;
+        return value !== undefined && value !== null;
       });
       if (hasValue) {
         this.setResponse(response);
@@ -85,6 +94,7 @@ class App implements IMSpci<PropTypes>, TAOpci {
     }
 
     this.config.onready && this.config.onready(this);
+    return this;
   };
 
   /**
@@ -114,11 +124,40 @@ class App implements IMSpci<PropTypes>, TAOpci {
   };
 
   render = () => {
+    this.partition = parsePartition(this.config.properties.partition); // trigger() may have changed it
     render(null, this.shadowdom);
     const css = document.createElement("style");
     css.innerHTML = style;
     this.shadowdom.appendChild(css);
-    render(<Interaction config={this.config.properties} dom={this.shadowdom} store={this.store} />, this.shadowdom);
+    render(<Interaction config={this.config.properties} partition={this.partition} store={this.store} />, this.shadowdom);
+  };
+
+  /**
+   * Authoring mode: the author sizes the rectangle and draws the lines that split it; getConfig() gives
+   * data-partition. Only an authoring system calls this (AUTHORING.md, "Authoring mode"); delivery never does.
+   */
+  getAuthoringInstance = (dom: HTMLElement, config: PciAuthoringConfiguration<PropTypes>): PciAuthoringInstance => {
+    const properties = { ...(configProps as unknown as PropTypes), ...config.properties };
+    let partition = parsePartition(properties.partition);
+    const language = (config.language ?? "en").slice(0, 2);
+    const shadow = dom.attachShadow({ mode: "closed" });
+    const css = document.createElement("style");
+    css.innerHTML = style;
+    shadow.appendChild(css);
+    const host = document.createElement("div");
+    shadow.appendChild(host);
+    render(
+      <Authoring initial={partition} colors={properties.colors} language={language}
+        onChange={(next) => { partition = next; config.onchange?.(); }} />,
+      host
+    );
+    const instance: PciAuthoringInstance = {
+      getConfig: () => ({ partition: serializePartition(partition) }),
+      validate: () => authoringProblems(partition, language),
+      destroy: () => render(null, host),
+    };
+    config.onready?.(instance);
+    return instance;
   };
 
   off = () => { }; // called when setting correct response in tao
@@ -134,26 +173,17 @@ class App implements IMSpci<PropTypes>, TAOpci {
     // Therefor the response is returned as percentages.
     // This way it can be scored with a single correct answer.
     const currentState = this.store.getState();
-
-    const ids: { id: string; surface: number }[] = [];
-    this.shadowdom?.querySelectorAll("rect[data-name]").forEach((el) => {
-      ids.push({ id: el.getAttribute("data-name"), surface: this.extractNumber(el.getAttribute("data-name")) });
-    });
-    // the id contains the number of cubes
-    const totalCubes = this.sum(ids, (i) => i.surface);
-    const cubesPerColor: { surface: number; color: string; percentage: number }[] = [];
+    const parts = regions(this.partition);
+    const cubesPerColor: { color: string; percentage: number }[] = [];
     currentState.vlakken.forEach(({ color, id }) => {
-      const surface = this.extractNumber(id);
+      const part = parts.find((p) => p.id === id);
+      if (!part) return;
+      const share = percentage(part);
       const matchingColorRow = cubesPerColor.find((c) => c.color.trim().toLowerCase() === color.trim().toLowerCase());
-      const percentage = totalCubes !== 0 ? (surface / totalCubes) * 100 : 0;
       if (matchingColorRow) {
-        matchingColorRow.percentage = matchingColorRow.percentage + percentage;
+        matchingColorRow.percentage = matchingColorRow.percentage + share;
       } else {
-        cubesPerColor.push({
-          surface,
-          color,
-          percentage,
-        });
+        cubesPerColor.push({ color, percentage: share });
       }
     });
 
@@ -184,43 +214,15 @@ class App implements IMSpci<PropTypes>, TAOpci {
     // construct a state base on the response.
     // this can be different from the state when the author constructed the correct answer because could be
     // serveral ways to come to same: color/percentage.
-
     if (response) {
       try {
         const stateString = response?.base?.string?.toString();
         if (!stateString) return;
         const parsedResponse = JSON.parse(stateString) as ResponseType[];
-        const ids: { id: string; surface: number }[] = [];
-        this.shadowdom?.querySelectorAll("rect[data-name]").forEach((el) => {
-          ids.push({ id: el.getAttribute("data-name"), surface: this.extractNumber(el.getAttribute("data-name")) });
-        });
-        const sortedIds = this.sort(ids, (v) => v.surface, true);
-        const emptyVlakken: (Vlak & { surface: number })[] = sortedIds.map(({ id, surface }) => {
-          return { color: "", id, surface };
-        });
-        // now just try all options;
-        //const vlakkenWithPercentages =
-        const totalCubes = this.sum(ids, (i) => i.surface);
-        let possibleSolutions = emptyVlakken.map(() => {
-          return {
-            surfaceToFill: 0,
-            vlakken: emptyVlakken.map(({ id }) => {
-              return {
-                id,
-                color: "",
-                surface: this.extractNumber(id),
-              };
-            }),
-          };
-        });
-        for (const response of parsedResponse) {
-          const absoluteSurface = totalCubes * (response.percentage / 100);
-          possibleSolutions = this.getPossibleSolutionsForColor(
-            response.color.trim().toLowerCase(), absoluteSurface, possibleSolutions);
-        }
+        const vlakken = assignColors(regions(this.partition), parsedResponse);
         this.resetResponse();
-        if (possibleSolutions.length > 0) {
-          this.store.restoreState(possibleSolutions[0], []);
+        if (vlakken) {
+          this.store.restoreState({ vlakken }, []);
         }
       } catch {
         console.error(`couldn't restore state: ${response}`);
@@ -228,34 +230,6 @@ class App implements IMSpci<PropTypes>, TAOpci {
       }
     }
   };
-
-  getPossibleSolutionsForColor(
-    color: string,
-    surfaceToFill: number,
-    possibleSolutions: { vlakken: (Vlak & { surface: number })[]; surfaceToFill: number }[]
-  ) {
-    color = color.trim().toLowerCase();
-    const newPossibleSolutions: { vlakken: (Vlak & { surface: number })[]; surfaceToFill }[] = [];
-    for (const previousSolution of possibleSolutions) {
-      const possibleNewSolution = { ...previousSolution, surfaceToFill };
-      for (const { surface, id } of previousSolution.vlakken.filter(
-        (v) => v.surface <= possibleNewSolution.surfaceToFill && !v.color && v.surface <= surfaceToFill
-      )) {
-        const vlakToPaint = possibleNewSolution.vlakken.find((v) => !v.color && v.id === id && v.surface <= possibleNewSolution.surfaceToFill);
-        if (vlakToPaint) {
-          vlakToPaint.color = color;
-          possibleNewSolution.surfaceToFill -= surface;
-        }
-      }
-      newPossibleSolutions.push(possibleNewSolution);
-    }
-
-    return newPossibleSolutions
-      .filter((p) => p.vlakken.find((vlak) => vlak.color === color) && p.surfaceToFill === 0)
-      .map((vakken) => {
-        return vakken;
-      });
-  }
 
   oncompleted = () => {
     this.store.unsubscribeAll();
@@ -266,13 +240,6 @@ class App implements IMSpci<PropTypes>, TAOpci {
       state: this.store.getState(),
       log: this.store.getActions()
     });
-
-  extractNumber(string: string): number {
-    let numArray = string?.split("").map((item) => {
-      if (typeof +item === "number" && !isNaN(+item)) return +item;
-    });
-    return numArray ? +numArray.join("") : 0;
-  }
 
   sort<T, K>(list: T[], getKey: (item: T) => K, desc = false) {
     list.sort((a: T, b: T) => {
@@ -288,10 +255,6 @@ class App implements IMSpci<PropTypes>, TAOpci {
     });
     return list;
   }
-  sum<T>(list: T[], getKey: (item: T) => number) {
-    return list.map((v) => getKey(v)).reduce((partial_sum, a) => partial_sum + a, 0);
-  }
-
   round(value: any, decimals: number) {
     return parseFloat(parseFloat(value.toString()).toFixed(decimals));
   }
