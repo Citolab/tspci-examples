@@ -36,6 +36,31 @@ You can also import PCIs into TAO first:
 
 When you import the QTI 2.2 package into [qti.citolab.nl](https://qti.citolab.nl), it will automatically upgrade the package and ensure the PCI works.
 
+## Authoring systems
+
+Every example describes its settings and its response for authoring systems. The settings in `src/config.json` carry
+an editor and a label next to their default:
+
+```json
+"brickColorMode": {
+  "default": "mixed",
+  "editor": "enum",
+  "options": [
+    { "value": "mixed", "label": { "en": "Multiple colours", "nl": "Meerdere kleuren" } },
+    { "value": "single", "label": { "en": "One colour", "nl": "Eén kleur" } }
+  ]
+}
+```
+
+and `package.json` `config.tspci.response` declares what `getResponse()` returns. The build writes `dist/authoring.json`
+from both, and the qti3 package ships it next to the bundle; an authoring system such as qti-construction then shows
+the author a dropdown, colour pickers and number fields instead of plain text. The dev page (`npm run dev`) shows the
+same form. See [Authoring systems](https://github.com/Citolab/tspci/tree/main/lib/tspci#authoring-systems) in the
+tspci readme; every project made with `tspci init` explains it in `AUTHORING.md`.
+
+These examples need tspci 2.13.0 or later (the authoring descriptor): older versions pass the editor hints to the PCI
+instead of the defaults.
+
 ## SBOM
 
 Every production build writes a [CycloneDX](https://cyclonedx.org/) SBOM of the bundle to
@@ -88,10 +113,12 @@ There should alwas be a 'hello world' example. So here it is: the most basic exa
 
 ## tspci-vanilla-js
 
-Very basic implementation of a PCI where the test-taker can interact.
+A PCI without a framework: what percentage of the circle is coloured?
 
-- Texts and size can be configured
-- Image is bundled in output file
+- The pie is drawn from its settings (number of slices, coloured slices, colour, size), so one PCI makes many items;
+  the correct answer follows from them (3 of 10 → 30)
+- Reports the answer as a number (`{ base: { integer: 30 } }`), so an item scores it with `match_correct`
+- Plain CSS in the shadow root, no Tailwind
 
 <p align="center">
   <img src="./tspci-vanilla-js/example.png" alt="example vanilla js">
@@ -101,10 +128,14 @@ Very basic implementation of a PCI where the test-taker can interact.
 
 PCI where the test-taker can color parts of a rectangle.
 
-- Colors, size, scalable can be configured
+- Colours (a colour list), instruction, size and button text can be configured
+- An eraser and a "start over" button
+- Authoring mode: the item author draws the shape (a rectangle split by lines that snap to 1/4, 1/8 or 1/16) in the
+  PCI itself, via "Configure…" in an authoring system that supports it (`getAuthoringInstance`, see tspci
+  `docs/authoring-mode.md`). Without it, the PCI shows the shape it always had
 - Uses tailwind for styling
-- Item-author can provide the correct answer in TAO
-- Scores automatically based on proportions
+- Item-author can provide the correct answer by answering the PCI (TAO, qti-construction)
+- Scores automatically based on proportions: every colouring with the same proportions gives the same response
 
 <p align="center">
   <img src="./tspci-color-proportions/example.png" alt="example proportions">
@@ -122,13 +153,13 @@ Simple PCI for finding the correct variable
 
 ## tspci-3d-blocks
 
-PCI where the test-taker has to build a blocks.
+PCI where the test-taker builds with toy bricks on a baseplate.
 
-- gridDivisions and pixel size of boxes can be configured
-- Uses three.js orbitcontrols to render the 3d boxes and is bundled in the PCI output file. 
-- Uses tailwind for styling
-- Item-author can provide the correct answer in TAO
-- Scores automatically based on front, side and to view.
+- Grid size, brick size, the label at the front, the brick colours (multiple colours, or one) and the baseplate colour
+  can be configured; an authoring system shows a dropdown and colour pickers for them
+- Uses three.js (rounded bricks with studs, soft shadows, orbit controls), bundled in the PCI output file
+- Item-author can provide the correct answer by building it (TAO, qti-construction)
+- Scores automatically based on the front, side and top view: every build with the same views gives the same response
 
 <p align="center">
   <img src="./tspci-3d-blocks/example.png" alt="example proportions">

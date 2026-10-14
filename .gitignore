@@ -6,3 +6,4 @@ yalc.lock
 qti3-dist/
 ci-dist/
 .opencode
+.playwright-mcp/
