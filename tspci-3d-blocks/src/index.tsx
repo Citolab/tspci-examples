@@ -3,9 +3,11 @@ import * as ctx from "qtiCustomInteractionContext";
 import { Interaction } from "./interaction";
 import style from "./style.css";
 import configProps from "./config.json";
-type PropTypes = typeof configProps;
+// config.json carries editor hints for authoring systems (AUTHORING.md); the build passes only the defaults, as strings
+type PropTypes = PciProperties<typeof configProps>;
+const defaults = configProps as unknown as PropTypes;
 
-import { ConfigProperties, IMSpci, QtiInteractionChangedDetail, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
+import { ConfigProperties, IMSpci, PciProperties, QtiInteractionChangedDetail, QtiVariableJSON } from "@citolab/tspci"; // interfaces for IMS pci and extended TAO pcis
 import { IStore } from "@citolab/preact-store";
 import { initStore, StateModel } from "./store";
 import { TAOpci } from "@citolab/tspci-tao";
@@ -31,12 +33,12 @@ class App implements IMSpci<PropTypes>, TAOpci {
 
   getInstance = (dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString: string) => {
     // Normalize incoming keys to camelCase — HTML attributes are lowercased, so e.g. "griddivisions" → "gridDivisions"
-    const normalizedIncoming = Object.keys(configProps).reduce((acc, key) => {
+    const normalizedIncoming = Object.keys(defaults).reduce((acc, key) => {
       const match = Object.keys(config.properties || {}).find(k => k.toLowerCase() === key.toLowerCase());
       if (match !== undefined) acc[key] = config.properties[match];
       return acc;
     }, {} as Record<string, string>);
-    config.properties = { ...configProps, ...normalizedIncoming }; // merge current props with incoming
+    config.properties = { ...defaults, ...normalizedIncoming }; // merge current props with incoming
     this.config = config;
     this.correctResponse = this.correctResponseFromDeclaration(config.responseDeclaration);
 
@@ -67,13 +69,13 @@ class App implements IMSpci<PropTypes>, TAOpci {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
       const response = this.config.boundTo[responseIdentifier];
       // check if any property in response at the lowest level has a value
-      // so { base: string: undefined } is not a value
+      // so { base: string: undefined } is not a value, and neither is { base: null } (TAO's empty response)
       // but { base: string: "value" } is a value
-      const hasValue = Object.values(response).some((value) => {
-        if (typeof value === "object") {
-          return Object.values(value).some((v) => v !== undefined);
+      const hasValue = !!response && Object.values(response).some((value) => {
+        if (value !== null && typeof value === "object") {
+          return Object.values(value).some((v) => v !== undefined && v !== null);
         }
-        return value !== undefined;
+        return value !== undefined && value !== null;
       });
       if (hasValue) {
         this.setResponse(response);

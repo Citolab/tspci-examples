@@ -1,7 +1,51 @@
 {
-  "gridDivisions" : "2",
-  "cubePixelSize" : "15",
-  "frontLabel": "front",
-  "width": "300",
-  "height": "300"
+  "gridDivisions": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 6,
+    "label": { "en": "Grid size (cells per side)", "nl": "Rastergrootte (vakken per zijde)" }
+  },
+  "cubePixelSize": {
+    "default": "60",
+    "editor": "integer",
+    "min": 10,
+    "label": { "en": "Brick size", "nl": "Grootte van een blok" }
+  },
+  "frontLabel": {
+    "default": "front",
+    "editor": "text",
+    "label": { "en": "Label at the front", "nl": "Tekst bij de voorkant" }
+  },
+  "brickColorMode": {
+    "default": "mixed",
+    "editor": "enum",
+    "options": [
+      { "value": "mixed", "label": { "en": "Multiple colours", "nl": "Meerdere kleuren" } },
+      { "value": "single", "label": { "en": "One colour", "nl": "Eén kleur" } }
+    ],
+    "label": { "en": "Brick colours", "nl": "Kleuren van de blokken" }
+  },
+  "brickColors": {
+    "default": "#c91a09, #f2cd37, #0055bf, #237841, #fe8a18, #5aa5dc",
+    "editor": "colorList",
+    "label": { "en": "Colours (one colour: the first)", "nl": "Kleuren (één kleur: de eerste)" }
+  },
+  "baseplateColor": {
+    "default": "#4b9f4a",
+    "editor": "color",
+    "label": { "en": "Baseplate colour", "nl": "Kleur van de bouwplaat" }
+  },
+  "width": {
+    "default": "400",
+    "editor": "integer",
+    "min": 200,
+    "label": { "en": "Width (px)", "nl": "Breedte (px)" }
+  },
+  "height": {
+    "default": "400",
+    "editor": "integer",
+    "min": 200,
+    "label": { "en": "Height (px)", "nl": "Hoogte (px)" }
+  }
 }

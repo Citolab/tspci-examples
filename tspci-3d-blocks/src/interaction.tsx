@@ -1,12 +1,14 @@
 import { useEffect } from "preact/hooks";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { brickColor, createBaseplate, createBrickGeometry, DEFAULT_BRICK_COLORS, parseColors, plasticMaterial, srgb } from "./bricks";
 import { ActionType, StateModel } from "./store";
 import configProps from "./config.json";
 
 import { Action, IStore, useStore } from "@citolab/preact-store";
+import type { PciProperties } from "@citolab/tspci";
 import { Cube } from "./utils";
-type PropTypes = typeof configProps;
+type PropTypes = PciProperties<typeof configProps>;
 
 export const Interaction = (props: { config: PropTypes, store: IStore<StateModel> }) => {
   const { config, store } = props;
@@ -23,6 +25,9 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       gridDivisions: config.gridDivisions,
       cubePixelSize: config.cubePixelSize,
       frontLabel: config.frontLabel,
+      brickColorMode: config.brickColorMode,
+      brickColors: config.brickColors,
+      baseplateColor: config.baseplateColor,
       htmlElementToAppendTo: dom,
     });
     if (voxel) {
@@ -66,54 +71,21 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
     config.gridDivisions,
     config.cubePixelSize,
     config.frontLabel,
+    config.brickColorMode,
+    config.brickColors,
+    config.baseplateColor,
   ]);
-
-  const frontArrowSvg = getFrontArrowSvg(config.frontLabel || "front");
 
   return (
     <>
-      <h1 className="text-red-500"></h1>
-      <div className="w-full h-full" ref={(node) => { dom = node as HTMLElement; }}>
-        <img
-          className="hidden"
-          id="arrow-front"
-          width={100}
-          src={frontArrowSvg}
-        />
-      </div>
+      {/* The scene gets the configured size (shrinking on a narrow screen), so the camera has a fixed frame to fill. */}
+      <div
+        style={{ width: `${config.width}px`, maxWidth: "100%", height: `${config.height}px` }}
+        ref={(node) => { dom = node as HTMLElement; }}
+      />
     </>
   );
 };
-
-const getFrontArrowSvg = (label: string) => {
-  const safeLabel = escapeXml(label);
-  const svg = `<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" preserveAspectRatio="xMidYMid meet" viewBox="261.8571428571428 254.1626632325672 162.22142818995894 146.3691395493506" width="200" height="200">
-  <defs>
-    <text id="front-label" x="224" y="340" font-size="74" font-family="Arial" font-weight="normal" font-style="normal" letter-spacing="0" alignment-baseline="before-edge" transform="matrix(1 0 0 1 42.85714285714266 -35.03511884375507)" style="line-height:100%" xml:space="preserve" dominant-baseline="text-before-edge">
-      <tspan x="224" dy="0em" alignment-baseline="before-edge" dominant-baseline="text-before-edge" text-anchor="start">${safeLabel}</tspan>
-    </text>
-    <path d="M361.75 292.53L345.54 292.53L345.54 326.2L340.59 326.2L340.59 292.53L322.19 292.53L332.08 273.84L341.97 255.16L351.86 273.84L361.75 292.53Z" id="front-arrow"></path>
-  </defs>
-  <g>
-    <g>
-      <use xlink:href="#front-label" opacity="1" fill="#000000" fill-opacity="1"></use>
-    </g>
-    <g>
-      <use xlink:href="#front-arrow" opacity="1" fill="#000000" fill-opacity="1"></use>
-    </g>
-  </g>
-</svg>`;
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-};
-
-const escapeXml = (value: string) =>
-  String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&apos;");
 
 class VoxelPainterClass {
   private camera: THREE.PerspectiveCamera;
@@ -121,19 +93,21 @@ class VoxelPainterClass {
   private controls: OrbitControls;
   private target = new THREE.Vector3(0, 0, 0);
   private framingObjects: THREE.Object3D[] = [];
-  private readonly framePadding = 1.35;
+  private readonly framePadding = 1.3;
 
   private canvasWidth: number;
   private canvasHeight: number;
   private gridDivisions = 4;
   private gridSize = 400;
   private scene: THREE.Scene;
-  private cubeColor: string | number = 0x00b6dd;
-  private rollOverMaterial: THREE.MeshLambertMaterial;
-  private rollOverMesh: THREE.Mesh<THREE.BoxBufferGeometry, any>;
+  private rollOverMaterial: THREE.MeshStandardMaterial;
+  private rollOverMesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material>;
+  /** The box a click hits (invisible); the brick on it is what the candidate sees. */
   private cubeGeo: THREE.BoxBufferGeometry;
-  private cubeMaterial: THREE.MeshLambertMaterial;
-  private cubeMaterialSelected: THREE.MeshLambertMaterial;
+  private brickGeo: THREE.BufferGeometry;
+  private hitMaterial: THREE.MeshBasicMaterial;
+  private cubeMaterialSelected: THREE.MeshStandardMaterial;
+  private baseplate: THREE.Mesh;
   private raycaster: THREE.Raycaster;
   private mouse: THREE.Vector2;
   private plane: THREE.Mesh<THREE.PlaneBufferGeometry, THREE.MeshBasicMaterial>;
@@ -143,10 +117,14 @@ class VoxelPainterClass {
   private isMouseDown: boolean;
   private mouseMoveRotateActive = true;
   private isRotating = false;
-  private arrowFront: CanvasImageSource;
+  private frontLabel = "front";
+  private brickColorMode = "mixed";
+  private brickPalette = DEFAULT_BRICK_COLORS;
+  private baseplateColor = "#4b9f4a";
   private handleMouseMove: (e: MouseEvent) => void;
   private handleMouseDown: (e: MouseEvent) => void;
   private handleMouseUp: (e: MouseEvent) => void;
+  private handleMouseLeave: () => void;
   private handleResize?: () => void;
   domEl: any;
 
@@ -170,11 +148,15 @@ class VoxelPainterClass {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0xffffff);
 
-    this.arrowFront = this.domEl.querySelector(
-      "#arrow-front"
-    ) as CanvasImageSource;
-
     if (props) {
+      if (props.frontLabel) {
+        this.frontLabel = String(props.frontLabel);
+      }
+      this.brickColorMode = props.brickColorMode === "single" ? "single" : "mixed";
+      this.brickPalette = parseColors(props.brickColors);
+      if (props.baseplateColor && CSS.supports?.("color", props.baseplateColor) !== false) {
+        this.baseplateColor = String(props.baseplateColor);
+      }
       if (props.gridDivisions && props.cubePixelSize) {
         this.gridDivisions = props.gridDivisions;
         this.gridSize = props.gridDivisions * props.cubePixelSize;
@@ -183,101 +165,82 @@ class VoxelPainterClass {
 
     const cubeSideSize = this.gridSize / this.gridDivisions;
 
-    // materials
-    const cubeStandard = new THREE.MeshLambertMaterial({
-      color: this.cubeColor,
-      map: new THREE.TextureLoader().load(
-        this.getCubeTexture("square-1px.png")
-      ),
-    });
-    const cubeTransparent = new THREE.MeshLambertMaterial({
-      color: this.cubeColor,
-      opacity: 0.5,
-      transparent: true,
-      map: new THREE.TextureLoader().load(
-        this.getCubeTexture("square-1px.png")
-      ),
-    });
-    const cubeTransparentRed = new THREE.MeshLambertMaterial({
-      color: 0xff0000,
-      opacity: 0.5,
-      transparent: true,
-      map: new THREE.TextureLoader().load(
-        this.getCubeTexture("square-1px.png")
-      ),
-    });
+    // Looks: bricks, baseplate, light and shadow (bricks.ts). Placing and removing works on invisible boxes:
+    // the box faces (top = faces 4 and 5) are what isGoingToBePlacedOnTop reads, whatever a brick looks like.
+    this.scene.background = srgb(0xeef1f5);
+    this.hitMaterial = new THREE.MeshBasicMaterial({ visible: false });
+    this.cubeMaterialSelected = new THREE.MeshStandardMaterial({ color: srgb(0xff3b30), opacity: 0.55, transparent: true, roughness: 0.4 });
 
-    // roll-over helpers
-
-    const rollOverGeo = new THREE.BoxBufferGeometry(
-      cubeSideSize,
-      cubeSideSize,
-      cubeSideSize
-    );
-
+    this.cubeGeo = new THREE.BoxBufferGeometry(cubeSideSize, cubeSideSize, cubeSideSize);
+    this.brickGeo = createBrickGeometry(cubeSideSize);
     if (this.gridDivisions % 2 == 1) {
-      rollOverGeo.applyMatrix4(
-        new THREE.Matrix4().makeTranslation(0, cubeSideSize / 2, 0)
-      );
+      const up = new THREE.Matrix4().makeTranslation(0, cubeSideSize / 2, 0);
+      this.cubeGeo.applyMatrix4(up);
+      this.brickGeo.applyMatrix4(up);
     }
 
-    this.rollOverMaterial = cubeTransparent;
-    this.rollOverMesh = new THREE.Mesh(rollOverGeo, this.rollOverMaterial);
-    this.scene.add(this.rollOverMesh);
+    // roll-over helper: a see-through brick where the next one goes
+    this.rollOverMaterial = new THREE.MeshStandardMaterial({ color: 0xffffff, opacity: 0.45, transparent: true, roughness: 0.3, depthWrite: false });
+    this.rollOverMesh = new THREE.Mesh(this.brickGeo, this.rollOverMaterial);
+    // added on the first mouse move over the grid, so nothing floats there before the candidate points
 
-    // cubes
+    // the baseplate; faint lines on top mark the cells
+    this.baseplate = createBaseplate(this.gridSize, this.gridDivisions, this.baseplateColor);
+    this.scene.add(this.baseplate);
+    this.framingObjects.push(this.baseplate);
 
-    this.cubeGeo = new THREE.BoxBufferGeometry(
-      cubeSideSize,
-      cubeSideSize,
-      cubeSideSize
+    // the space a build can take (as high as the grid is wide): framed by the camera, so a stack stays in view
+    const buildVolume = new THREE.Mesh(
+      new THREE.BoxBufferGeometry(this.gridSize, this.gridSize, this.gridSize),
+      new THREE.MeshBasicMaterial({ visible: false })
     );
+    buildVolume.position.y = this.gridSize / 2;
+    this.scene.add(buildVolume);
+    this.framingObjects.push(buildVolume);
 
-    if (this.gridDivisions % 2 == 1) {
-      this.cubeGeo.applyMatrix4(
-        new THREE.Matrix4().makeTranslation(0, cubeSideSize / 2, 0)
-      );
-    }
-
-    this.cubeMaterial = cubeStandard;
-    this.cubeMaterialSelected = cubeTransparentRed;
-
-    // grid
-
-    const gridHelper = new THREE.GridHelper(this.gridSize, this.gridDivisions);
-    // gridHelper.applyMatrix4(new THREE.Matrix4().makeTranslation(cubeSideSize / 2, 0, cubeSideSize / 2));
-
+    const lineColor = srgb(this.baseplateColor).multiplyScalar(0.55); // a darker shade of the plate
+    const gridHelper = new THREE.GridHelper(this.gridSize, this.gridDivisions, lineColor, lineColor);
+    gridHelper.position.y = 0.4;
+    (gridHelper.material as THREE.Material).transparent = true;
+    (gridHelper.material as THREE.Material).opacity = 0.35;
     this.scene.add(gridHelper);
     this.framingObjects.push(gridHelper);
+
+    // a floor that only shows the shadow of the plate and the bricks
+    const floor = new THREE.Mesh(
+      new THREE.PlaneBufferGeometry(this.gridSize * 12, this.gridSize * 12),
+      new THREE.ShadowMaterial({ opacity: 0.16 })
+    );
+    floor.rotateX(-Math.PI / 2);
+    floor.position.y = -cubeSideSize * 0.12 - 0.5;
+    floor.receiveShadow = true;
+    this.scene.add(floor);
 
     //
     this.raycaster = new THREE.Raycaster();
     this.mouse = new THREE.Vector2();
 
-    // plane under grid
-    const geometry = new THREE.PlaneBufferGeometry(
-      this.gridSize,
-      this.gridSize
-    );
+    // plane under grid (what the mouse hits where there is no brick yet)
+    const geometry = new THREE.PlaneBufferGeometry(this.gridSize, this.gridSize);
     geometry.rotateX(-Math.PI / 2);
-    this.plane = new THREE.Mesh(
-      geometry,
-      new THREE.MeshBasicMaterial({ visible: false })
-    );
+    this.plane = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ visible: false }));
     this.plane.applyMatrix4(new THREE.Matrix4().makeTranslation(0, -1, 0));
 
     this.scene.add(this.plane);
     this.objects.push(this.plane);
     this.framingObjects.push(this.plane);
 
-    // lights
-    const ambientLight = new THREE.AmbientLight(0x606060);
-    this.scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff);
-    // directionalLight.position.set( 1, 0.75, 0.5 ).normalize();
-    directionalLight.position.set(0, 1, 0.75).normalize();
-    this.scene.add(directionalLight);
+    // lights: soft sky light, and a sun from the front left that casts the shadows
+    this.scene.add(new THREE.HemisphereLight(0xffffff, 0x9aa3ad, 0.6));
+    const sun = new THREE.DirectionalLight(0xffffff, 0.95);
+    sun.position.set(-0.7 * this.gridSize, 2.2 * this.gridSize, 1.3 * this.gridSize);
+    sun.castShadow = true;
+    sun.shadow.mapSize.set(2048, 2048);
+    const reach = this.gridSize * 1.6;
+    Object.assign(sun.shadow.camera, { left: -reach, right: reach, top: reach, bottom: -reach, near: 1, far: this.gridSize * 8 });
+    sun.shadow.bias = -0.0005;
+    sun.shadow.radius = 4;
+    this.scene.add(sun);
 
     // label shown at the frontside of the grid for better reference when rotating
     this.labelMesh = this.getFrontsideLabel();
@@ -288,6 +251,9 @@ class VoxelPainterClass {
     this.renderer = new THREE.WebGLRenderer({ antialias: true });
     this.renderer.setPixelRatio(window.devicePixelRatio);
     this.renderer.setSize(this.canvasWidth, this.canvasHeight);
+    this.renderer.outputEncoding = THREE.sRGBEncoding;
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     const canvas = this.renderer.domElement as HTMLCanvasElement;
     canvas.setAttribute("id", "voxelPainterCanvas");
@@ -308,6 +274,12 @@ class VoxelPainterClass {
     this.domEl.addEventListener("mousemove", this.handleMouseMove, false);
     this.domEl.addEventListener("mousedown", this.handleMouseDown, false);
     this.domEl.addEventListener("mouseup", this.handleMouseUp, false);
+    this.handleMouseLeave = () => {
+      this.hideCubeHelper();
+      this.resetCubesOpacity();
+      this.render();
+    };
+    this.domEl.addEventListener("mouseleave", this.handleMouseLeave, false);
 
     if (props.width && props.height) {
       this.handleResize = () => this.onWindowResize();
@@ -472,10 +444,22 @@ class VoxelPainterClass {
     }
   }
 
-  private addNewCube() {
-    const voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
+  /** A cube: the invisible box that clicks hit, carrying the brick the candidate sees. */
+  private createCube(position: THREE.Vector3) {
+    const cube = new THREE.Mesh(this.cubeGeo, this.hitMaterial);
+    cube.position.copy(position);
+    const material = plasticMaterial(brickColor(position, this.gridSize / this.gridDivisions, this.brickPalette, this.brickColorMode));
+    const brick = new THREE.Mesh(this.brickGeo, material);
+    brick.castShadow = true;
+    brick.receiveShadow = true;
+    brick.raycast = () => {}; // clicks are for the box
+    cube.add(brick);
+    cube.userData = { isCube: true, brick, material };
+    return cube;
+  }
 
-    voxel.position.copy(this.rollOverMesh.position);
+  private addNewCube() {
+    const voxel = this.createCube(this.rollOverMesh.position);
 
     if (!this.isOutsideGrid(voxel)) {
       this.scene.add(voxel);
@@ -552,101 +536,73 @@ class VoxelPainterClass {
   }
 
   private resetCubesOpacity() {
-    this.scene.children.forEach((element: THREE.Mesh) => {
+    this.scene.children.forEach((element) => {
       if (this.isCube(element)) {
-        element.material = this.cubeMaterial;
+        element.userData.brick.material = element.userData.material;
       }
     });
   }
 
+  /** Marks the brick a click would remove (red, see-through); the others get their own colour back. */
   private setCubeOpacity(uuid) {
-    this.scene.children.forEach((element: THREE.Mesh) => {
-      if (element.uuid == uuid) {
-        element.material = this.cubeMaterialSelected;
-      } else if (this.isCube(element)) {
-        element.material = this.cubeMaterial;
+    this.scene.children.forEach((element) => {
+      if (this.isCube(element)) {
+        element.userData.brick.material = element.uuid == uuid ? this.cubeMaterialSelected : element.userData.material;
       }
     });
   }
 
   private isCube(element) {
-    const gridId = this.plane.uuid;
-    const labelId = this.labelMesh.uuid;
-    const cubeHelperId = this.rollOverMesh.uuid;
-
-    return (
-      element.type.toLowerCase() == "mesh" &&
-      element.uuid != cubeHelperId &&
-      element.uuid != gridId &&
-      element.uuid != labelId
-    );
+    return element?.userData?.isCube === true;
   }
 
+  /**
+   * The arrow and the label in front of the grid ("front", or the configured frontLabel), so the candidate keeps
+   * their bearings while rotating. Drawn on a canvas: the font shrinks to fit any label, and the plane is scaled to
+   * the grid, so it never dwarfs the blocks (it is part of what the camera frames).
+   */
   private getFrontsideLabel() {
-    const svg_width = 200;
+    const canvas = document.createElement("canvas");
+    canvas.width = 512;
+    canvas.height = 256;
+    const context = canvas.getContext("2d");
+    const centerX = canvas.width / 2;
 
-    const height = svg_width;
-    const canvas1width = this.gridSize;
-    const canvas1height = height;
+    // arrow pointing at the grid
+    context.fillStyle = "#000000";
+    context.beginPath();
+    context.moveTo(centerX, 8);
+    context.lineTo(centerX + 34, 64);
+    context.lineTo(centerX + 10, 64);
+    context.lineTo(centerX + 10, 112);
+    context.lineTo(centerX - 10, 112);
+    context.lineTo(centerX - 10, 64);
+    context.lineTo(centerX - 34, 64);
+    context.closePath();
+    context.fill();
 
-    const canvas1 = document.createElement("canvas");
-    canvas1.width = canvas1width;
-    canvas1.height = canvas1height;
-
-    const x = canvas1.width / 2;
-
-    const context1 = canvas1.getContext("2d");
-
-    // -- set a text label --
-    // context1.font = "Bold 40px Arial";
-    // context1.fillStyle = "rgba(255,0,0,0.95)";
-    // context1.textAlign = "center";
-    // context1.fillText('voorkant', x, height);
-
-    // -- set a label with img/svg, make sure it's in the index.html --
-    context1.drawImage(this.arrowFront, x - svg_width / 2, 0);
-
-    // -- show the rectangular space reserved for this label --
-    // context1.fillRect(0, 0, canvas1width, canvas1height);
-
-    // canvas contents will be used for a texture
-    const texture1 = new THREE.Texture(canvas1);
-    texture1.needsUpdate = true;
-
-    const material1 = new THREE.MeshBasicMaterial({
-      map: texture1,
-      side: THREE.DoubleSide,
-    });
-    material1.transparent = true;
-
-    const geometry1 = new THREE.PlaneGeometry(canvas1width, canvas1height);
-    geometry1.rotateX(-Math.PI / 2);
-
-    const label = new THREE.Mesh(geometry1, material1);
-    const labelOffset = height * 0.25;
-    const labelZ = (this.gridSize / 2) + (height / 2) + labelOffset;
-    label.position.set(0, 0, labelZ);
-
-    return label;
-  }
-
-  private getCubeTexture(pngName: string = null) {
-    const square_1px =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF8WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTA2LTI2VDE0OjUzOjE2KzAyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wNi0yNlQxNTo1Mzo1OCswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMC0wNi0yNlQxNTo1Mzo1OCswMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDplMDI3NTUzZC01MGY2LTc5NDUtOWJmMi1iZTExNDQ5OGI4YmIiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDo3MGViZWRlZi1hZWYzLTYzNDEtYTAxZi1hNDI4MzU3Yjg5MGMiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo0NDhhODBkOC1hZWUyLWFkNDAtOTE1ZS04NTQ2MDgwYjFiMTYiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOjQ0OGE4MGQ4LWFlZTItYWQ0MC05MTVlLTg1NDYwODBiMWIxNiIgc3RFdnQ6d2hlbj0iMjAyMC0wNi0yNlQxNDo1MzoxNiswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDplMDI3NTUzZC01MGY2LTc5NDUtOWJmMi1iZTExNDQ5OGI4YmIiIHN0RXZ0OndoZW49IjIwMjAtMDYtMjZUMTU6NTM6NTgrMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4yIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz44whNcAAAAZ0lEQVRoge3PQQ3AMAzAwGT8OXcc1oc16Q6BPfNzOzPnnDrjo9196oZbBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGagZqBmoGaga49AJT1wN8ckHKHwAAAABJRU5ErkJggg==";
-    const square_thick =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAVklEQVRo3u3RsQ0AIAwDwYT9dzYlTIAUcd+l8ylV0t/1fSSZMbrP7DX9AwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACSXrQBS9IDcNBhO+QAAAAASUVORK5CYII=";
-    const square_thin =
-      "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAACXBIWXMAAAsTAAALEwEAmpwYAAAF8WlUWHRYTUw6Y29tLmFkb2JlLnhtcAAAAAAAPD94cGFja2V0IGJlZ2luPSLvu78iIGlkPSJXNU0wTXBDZWhpSHpyZVN6TlRjemtjOWQiPz4gPHg6eG1wbWV0YSB4bWxuczp4PSJhZG9iZTpuczptZXRhLyIgeDp4bXB0az0iQWRvYmUgWE1QIENvcmUgNi4wLWMwMDIgNzkuMTY0NDYwLCAyMDIwLzA1LzEyLTE2OjA0OjE3ICAgICAgICAiPiA8cmRmOlJERiB4bWxuczpyZGY9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkvMDIvMjItcmRmLXN5bnRheC1ucyMiPiA8cmRmOkRlc2NyaXB0aW9uIHJkZjphYm91dD0iIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgeG1sbnM6cGhvdG9zaG9wPSJodHRwOi8vbnMuYWRvYmUuY29tL3Bob3Rvc2hvcC8xLjAvIiB4bWxuczp4bXBNTT0iaHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wL21tLyIgeG1sbnM6c3RFdnQ9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9zVHlwZS9SZXNvdXJjZUV2ZW50IyIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgMjEuMiAoV2luZG93cykiIHhtcDpDcmVhdGVEYXRlPSIyMDIwLTA2LTI2VDE0OjUzOjE2KzAyOjAwIiB4bXA6TW9kaWZ5RGF0ZT0iMjAyMC0wNi0yNlQxNTo1MzoyMCswMjowMCIgeG1wOk1ldGFkYXRhRGF0ZT0iMjAyMC0wNi0yNlQxNTo1MzoyMCswMjowMCIgZGM6Zm9ybWF0PSJpbWFnZS9wbmciIHBob3Rvc2hvcDpDb2xvck1vZGU9IjMiIHBob3Rvc2hvcDpJQ0NQcm9maWxlPSJzUkdCIElFQzYxOTY2LTIuMSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDpjZGFhYmRjNy1hMWI0LTMwNGEtOTQ0ZS1lZmYxNjllNWJlYTYiIHhtcE1NOkRvY3VtZW50SUQ9ImFkb2JlOmRvY2lkOnBob3Rvc2hvcDpmMDhiNWEyOS0wYmY1LTRmNGMtOGZkMS0wMzNiZWFiNzhiNTMiIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDpkZDUzOWRmNy0zYjU2LWRiNDItOTFjMS01Mjk2NWU4YTVkZDkiPiA8eG1wTU06SGlzdG9yeT4gPHJkZjpTZXE+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJjcmVhdGVkIiBzdEV2dDppbnN0YW5jZUlEPSJ4bXAuaWlkOmRkNTM5ZGY3LTNiNTYtZGI0Mi05MWMxLTUyOTY1ZThhNWRkOSIgc3RFdnQ6d2hlbj0iMjAyMC0wNi0yNlQxNDo1MzoxNiswMjowMCIgc3RFdnQ6c29mdHdhcmVBZ2VudD0iQWRvYmUgUGhvdG9zaG9wIDIxLjIgKFdpbmRvd3MpIi8+IDxyZGY6bGkgc3RFdnQ6YWN0aW9uPSJzYXZlZCIgc3RFdnQ6aW5zdGFuY2VJRD0ieG1wLmlpZDpjZGFhYmRjNy1hMWI0LTMwNGEtOTQ0ZS1lZmYxNjllNWJlYTYiIHN0RXZ0OndoZW49IjIwMjAtMDYtMjZUMTU6NTM6MjArMDI6MDAiIHN0RXZ0OnNvZnR3YXJlQWdlbnQ9IkFkb2JlIFBob3Rvc2hvcCAyMS4yIChXaW5kb3dzKSIgc3RFdnQ6Y2hhbmdlZD0iLyIvPiA8L3JkZjpTZXE+IDwveG1wTU06SGlzdG9yeT4gPC9yZGY6RGVzY3JpcHRpb24+IDwvcmRmOlJERj4gPC94OnhtcG1ldGE+IDw/eHBhY2tldCBlbmQ9InIiPz6WaHW1AAAAZ0lEQVRoge3PoQGAQAwEwYT+e34EHYAYwY45ezsTa58559gfL+zuzFz6xlcFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAVoBWgFaAXk726mewN4gL/h6QAAAABJRU5ErkJggg==";
-
-    switch (pngName) {
-      case "square-thick.png":
-        return square_thick;
-      case "square_thin.png":
-        return square_thin;
-      default:
-      case "square-1px.png":
-        return square_1px;
+    // label, as large as fits
+    let fontSize = 104;
+    context.font = `${fontSize}px Arial, sans-serif`;
+    while (fontSize > 24 && context.measureText(this.frontLabel).width > canvas.width - 16) {
+      fontSize -= 4;
+      context.font = `${fontSize}px Arial, sans-serif`;
     }
+    context.textAlign = "center";
+    context.textBaseline = "top";
+    context.fillText(this.frontLabel, centerX, 128);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true });
+
+    const labelWidth = this.gridSize;
+    const labelHeight = labelWidth * (canvas.height / canvas.width);
+    const geometry = new THREE.PlaneGeometry(labelWidth, labelHeight);
+    geometry.rotateX(-Math.PI / 2);
+
+    const label = new THREE.Mesh(geometry, material);
+    label.position.set(0, 0, this.gridSize / 2 + labelHeight / 2 + this.gridSize * 0.05);
+    return label;
   }
 
   public clearObjects() {
@@ -675,6 +631,7 @@ class VoxelPainterClass {
     this.domEl?.removeEventListener("mousemove", this.handleMouseMove, false);
     this.domEl?.removeEventListener("mousedown", this.handleMouseDown, false);
     this.domEl?.removeEventListener("mouseup", this.handleMouseUp, false);
+    this.domEl?.removeEventListener("mouseleave", this.handleMouseLeave, false);
     this.controls?.dispose();
     this.renderer?.dispose();
     const canvas = this.renderer?.domElement;
@@ -724,7 +681,6 @@ class VoxelPainterClass {
     this.clearObjects();
 
     positionsArray.forEach((element) => {
-      const voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
 
       const isEvenGrid = this.gridDivisions % 2 == 0;
       const cubePixelSize = this.gridSize / this.gridDivisions;
@@ -740,7 +696,7 @@ class VoxelPainterClass {
         (this.gridDivisions * cubePixelSize) / 2 +
         correction;
 
-      voxel.position.set(coordsX, coordsY, coordsZ);
+      const voxel = this.createCube(new THREE.Vector3(coordsX, coordsY, coordsZ));
 
       this.scene.add(voxel);
       this.objects.push(voxel);
