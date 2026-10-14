@@ -1,4 +1,78 @@
+:host {
+  display: block;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: #1f2933;
+}
+
+.card {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 24px 28px;
+  border: 1px solid #e3e8ee;
+  border-radius: 16px;
+  background: linear-gradient(180deg, #ffffff 0%, #f7f9fb 100%);
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 8px 24px rgba(16, 24, 40, 0.06);
+}
 
 h1 {
-    color: red;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+}
+
+.question {
+  margin: 0;
+  max-width: 28ch;
+  text-align: center;
+  color: #52606d;
+}
+
+svg {
+  filter: drop-shadow(0 2px 3px rgba(16, 24, 40, 0.15));
+}
+
+.slice {
+  stroke: #ffffff;
+  stroke-width: 2;
+  transition: opacity 120ms;
+}
+
+.answer {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+input {
+  width: 4.5ch;
+  padding: 8px 10px;
+  font: inherit;
+  text-align: right;
+  border: 1.5px solid #cbd2d9;
+  border-radius: 10px;
+  background: #ffffff;
+  outline: none;
+  transition: border-color 120ms, box-shadow 120ms;
+  -moz-appearance: textfield;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+}
+input:invalid {
+  border-color: #e11d48;
+}
+input:disabled {
+  background: #f1f5f9;
+  color: #52606d;
 }

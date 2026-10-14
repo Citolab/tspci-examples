@@ -1,14 +1,14 @@
 {
   "name": "@citolab/vanilla-js",
   "description": "Vanilla js pci",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "types": "dist/types.d.ts",
   "devDependencies": {
-    "@citolab/tspci": "2.12.0",
-    "@citolab/tspci-qbci": "2.12.0",
-    "@citolab/tspci-tao": "2.12.0",
-    "@citolab/tspci-qti3": "2.12.0"
+    "@citolab/tspci": "2.13.0",
+    "@citolab/tspci-qbci": "2.13.0",
+    "@citolab/tspci-tao": "2.13.0",
+    "@citolab/tspci-qti3": "2.13.0"
   },
   "scripts": {
     "tscpi": "tspci --help",
@@ -21,16 +21,18 @@
   },
   "config": {
     "tspci": {
-      "typeIdentifier": "HelloWorld"
+      "typeIdentifier": "HelloWorld",
+      "label": "Percentages",
+      "response": {
+        "cardinality": "single",
+        "baseType": "integer"
+      },
+      "score": [
+        "MATCH_CORRECT",
+        "NONE"
+      ],
+      "short": "HW"
     }
   },
-  "source": "src/index.ts",
-  "//": "------- TAO specific properties -------",
-  "typeidentifier": "HelloWorld",
-  "label": "Hello",
-  "short": "HW",
-  "score": [
-    "MATCH_CORRECT",
-    "NONE"
-  ]
+  "source": "src/index.ts"
 }
