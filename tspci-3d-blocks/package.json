@@ -1,31 +1,59 @@
 {
-  "name": "@citolab/tspci-3d-blocks",
+  "name": "@citolab/pci-3d-blocks",
   "source": "src/index.tsx",
   "version": "1.1.0",
   "main": "dist/index.js",
-  "types": "dist/types.d.ts",
   "description": "recreate a building with 3d blocks",
-  "private": true,
-  "dependencies": {
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-3d-blocks"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "blocks.svg",
+    "example.png",
+    "README.md"
+  ],
+  "devDependencies": {
     "@citolab/preact-store": "2.14.0",
+    "@citolab/tspci": "2.14.0",
+    "@citolab/tspci-qti3": "2.14.0",
+    "@citolab/tspci-tao": "2.14.0",
+    "@types/three": "^0.136.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
     "preact": "10.28.2",
     "three": "^0.136.0",
     "three-orbitcontrols": "^2.110.3"
-  },
-  "devDependencies": {
-    "@citolab/tspci": "2.14.0",
-    "@citolab/tspci-tao": "2.14.0",
-    "@citolab/tspci-qti3": "2.14.0",
-    "@types/three": "^0.136.0",
-    "archiver": "7.0.1",
-    "autoprefixer": "10.4.23"
   },
   "scripts": {
     "dev": "set ROLLUP_WATCH=true && tspci --dev",
     "prod": "tspci",
     "watch": "tspci --watch",
     "package-tao": "tspci --target tao",
-    "package-qti3": "tspci --target qti3"
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao"
   },
   "config": {
     "tspci": {
