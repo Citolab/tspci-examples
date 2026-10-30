@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-3d-blocks",
   "source": "src/index.tsx",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "main": "dist/index.js",
   "description": "recreate a building with 3d blocks",
   "author": {
@@ -16,7 +16,11 @@
     "qti3",
     "pci",
     "portable-custom-interaction",
-    "tspci"
+    "tspci",
+    "math",
+    "geometry",
+    "spatial reasoning",
+    "3d"
   ],
   "publishConfig": {
     "access": "public"
@@ -59,6 +63,12 @@
     "tspci": {
       "typeIdentifier": "blocks",
       "label": "3d blocks",
+      "tags": [
+        "math",
+        "geometry",
+        "spatial reasoning",
+        "3d"
+      ],
       "score": [
         "MATCH_CORRECT",
         "NONE"
