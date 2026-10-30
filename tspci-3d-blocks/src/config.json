@@ -1,6 +1,6 @@
 {
   "gridDivisions": {
-    "default": "2",
+    "default": "5",
     "editor": "integer",
     "min": 1,
     "max": 6,
