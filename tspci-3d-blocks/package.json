@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-3d-blocks",
   "source": "src/index.tsx",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "main": "dist/index.js",
   "description": "recreate a building with 3d blocks",
   "author": {
