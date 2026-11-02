@@ -5,7 +5,7 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 3 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+There are 5 examples in this repository that can give a head start while creating new Portable Custom Interactions.
 To run these examples go the to folder of the specific example and run:
 
 ``` sh
@@ -67,6 +67,8 @@ scoring). Every example describes both in two files it already has:
 | tspci-vanilla-js | `text`, `textarea`, `integer`, `color` | `single` `integer` | `MATCH_CORRECT`, `NONE` |
 | tspci-color-proportions | `textarea`, `colorList`, `text`, `integer`, `pci` | `single` `string` | `MATCH_CORRECT`, `NONE` |
 | tspci-3d-blocks | `integer`, `text`, `enum`, `colorList`, `color` | `single` `string` | `MATCH_CORRECT`, `NONE` |
+| tspci-equal-expressions | `text`, `enum`, `pci`, `integer`, `boolean`; an image slot in the markup | `ordered` `float` | `NONE` (a tool) |
+| tspci-table-graph | `text`, `number`, `integer`, `boolean`, `enum` | `ordered` `float` | `NONE` (a tool) |
 
 How an authoring system uses this depends on the system.
 
@@ -238,3 +240,39 @@ PCI where the test-taker builds with toy bricks on a baseplate.
 <p align="center">
   <img src="./tspci-3d-blocks/example.png" alt="example proportions">
 </p>
+
+## tspci-equal-expressions
+
+PCI for trial and improvement: at which number do two expressions give the same result? A picture stands for the
+unknown number.
+
+- The picture: an apple, a pear or an ice cream, or the author's own image, in two ways. An authoring system with a
+  media bank puts an `<img>` in the interaction markup (a markup slot in `authoring.json`, qti-construction shows a
+  media picker for it); TAO and the others get "Upload own image…", the authoring mode, which shrinks the image and
+  stores it in the item as a `data:` URL
+- A table keeps every try with the results of both expressions; optionally a try with equal results is marked
+- Buttons and messages in English or Dutch (`data-language`)
+- A small expression parser instead of `eval`: `? × 12 + 3`, `:` and `÷`, brackets, powers
+- A tool (`"role": "tool"`): reports the numbers tried as an `ordered` `float` response; the answer goes in another
+  interaction
+
+<p align="center">
+  <img src="./tspci-equal-expressions/example.png" alt="example equal expressions" width="480">
+</p>
+
+## tspci-table-graph
+
+PCI in which the candidate adds numbers to a table and sees the results of two formulas in the table and in a graph,
+to find where the formulas meet.
+
+- The graph is plain SVG (no chart library): round ticks, colour-blind safe markers that also differ in shape, a guide
+  line for the selected row
+- Formulas, names, units, axes, start values and decimals can be configured; buttons and messages in English or Dutch
+- A tool (`"role": "tool"`): reports the numbers in the table as an `ordered` `float` response
+
+<p align="center">
+  <img src="./tspci-table-graph/example.png" alt="example table and graph" width="640">
+</p>
+
+Both are improved versions of PCIs made for the Dutch national assessment of mathematics (Peiling rekenen-wiskunde
+2022), where every step of the candidate is kept in the state's log.

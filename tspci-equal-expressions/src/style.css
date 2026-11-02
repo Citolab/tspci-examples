@@ -1,0 +1,10 @@
+@import "tailwindcss";
+
+@theme {
+  --animate-pop: pop 0.35s ease-out;
+  @keyframes pop {
+    from {
+      background-color: var(--color-sky-200);
+    }
+  }
+}

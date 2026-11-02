@@ -1,0 +1,88 @@
+{
+  "formula1Label": {
+    "default": "height of the oak",
+    "editor": "text",
+    "label": { "en": "Name of the first formula", "nl": "Naam van de eerste formule" }
+  },
+  "formula1": {
+    "default": "1.125 + x / 24",
+    "editor": "text",
+    "label": { "en": "First formula (x is the number the candidate types)", "nl": "Eerste formule (x is het getal dat de kandidaat typt)" }
+  },
+  "formula2Label": {
+    "default": "height of the pine",
+    "editor": "text",
+    "label": { "en": "Name of the second formula", "nl": "Naam van de tweede formule" }
+  },
+  "formula2": {
+    "default": "1.5 + x / 30",
+    "editor": "text",
+    "label": { "en": "Second formula", "nl": "Tweede formule" }
+  },
+  "xUnit": {
+    "default": "months",
+    "editor": "text",
+    "label": { "en": "Unit of x, above the first column", "nl": "Eenheid van x, boven de eerste kolom" }
+  },
+  "xLabel": {
+    "default": "number of months after planting",
+    "editor": "text",
+    "label": { "en": "Label of the horizontal axis", "nl": "Tekst bij de horizontale as" }
+  },
+  "xMin": {
+    "default": "0",
+    "editor": "number",
+    "label": { "en": "Horizontal axis from", "nl": "Horizontale as vanaf" }
+  },
+  "xMax": {
+    "default": "100",
+    "editor": "number",
+    "label": { "en": "Horizontal axis to (also the largest x the candidate can add)", "nl": "Horizontale as tot (ook de grootste x die de kandidaat kan toevoegen)" }
+  },
+  "yUnit": {
+    "default": "metres",
+    "editor": "text",
+    "label": { "en": "Unit of the results", "nl": "Eenheid van de uitkomsten" }
+  },
+  "yLabel": {
+    "default": "height in metres",
+    "editor": "text",
+    "label": { "en": "Label of the vertical axis", "nl": "Tekst bij de verticale as" }
+  },
+  "yMin": {
+    "default": "0",
+    "editor": "number",
+    "label": { "en": "Vertical axis from", "nl": "Verticale as vanaf" }
+  },
+  "yMax": {
+    "default": "6",
+    "editor": "number",
+    "label": { "en": "Vertical axis to", "nl": "Verticale as tot" }
+  },
+  "startValues": {
+    "default": "30, 40, 50",
+    "editor": "text",
+    "label": { "en": "Values in the table at the start (comma separated, may be empty)", "nl": "Waarden in de tabel bij de start (gescheiden door komma's, mag leeg)" }
+  },
+  "decimals": {
+    "default": "2",
+    "editor": "integer",
+    "min": 0,
+    "max": 6,
+    "label": { "en": "Decimals of the results", "nl": "Decimalen van de uitkomsten" }
+  },
+  "connectPoints": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Connect the points in the graph with lines", "nl": "De punten in de grafiek met lijnen verbinden" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the buttons and messages", "nl": "Taal van de knoppen en meldingen" }
+  }
+}

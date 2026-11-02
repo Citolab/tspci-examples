@@ -1,0 +1,69 @@
+{
+  "expression1": {
+    "default": "? × 12 + 3",
+    "editor": "text",
+    "label": {
+      "en": "First expression (? is the unknown number, e.g. ? × 12 + 3)",
+      "nl": "Eerste som (? is het onbekende getal, bijv. ? × 12 + 3)"
+    }
+  },
+  "expression2": {
+    "default": "? × 4 + 59",
+    "editor": "text",
+    "label": {
+      "en": "Second expression (? is the unknown number)",
+      "nl": "Tweede som (? is het onbekende getal)"
+    }
+  },
+  "image": {
+    "default": "apple",
+    "editor": "enum",
+    "options": [
+      { "value": "apple", "label": { "en": "Apple", "nl": "Appel" } },
+      { "value": "pear", "label": { "en": "Pear", "nl": "Peer" } },
+      { "value": "iceCream", "label": { "en": "Ice cream", "nl": "IJsje" } }
+    ],
+    "label": {
+      "en": "Image for the unknown number (an own image goes first)",
+      "nl": "Afbeelding voor het onbekende getal (een eigen afbeelding gaat voor)"
+    }
+  },
+  "customImage": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Own image", "nl": "Eigen afbeelding" },
+    "$comment": "a data: URL (or image URL) written by the authoring mode; shown instead of image. An <img> in the interaction markup goes before both"
+  },
+  "imageName": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Name of the image for screen readers (empty: apple, pear, ice cream or \"the unknown number\")",
+      "nl": "Naam van de afbeelding voor schermlezers (leeg: appel, peer, ijsje of \"het onbekende getal\")"
+    }
+  },
+  "columns": {
+    "default": "4",
+    "editor": "integer",
+    "min": 1,
+    "max": 10,
+    "label": { "en": "Empty columns in the table at the start", "nl": "Lege kolommen in de tabel bij de start" }
+  },
+  "highlightEqual": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Mark a try at which both expressions give the same result",
+      "nl": "Een poging markeren waarbij beide sommen dezelfde uitkomst geven"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the buttons and messages", "nl": "Taal van de knoppen en meldingen" }
+  }
+}

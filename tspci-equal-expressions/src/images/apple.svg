@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="skin" cx="36%" cy="38%" r="68%">
+      <stop offset="0" stop-color="#ff7a5c"/>
+      <stop offset=".45" stop-color="#e8322c"/>
+      <stop offset=".85" stop-color="#b8161f"/>
+      <stop offset="1" stop-color="#8f0f19"/>
+    </radialGradient>
+    <linearGradient id="leaf" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0" stop-color="#3f9a2f"/>
+      <stop offset="1" stop-color="#9edb63"/>
+    </linearGradient>
+    <linearGradient id="stem" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#5a3418"/>
+      <stop offset="1" stop-color="#8a5a2e"/>
+    </linearGradient>
+  </defs>
+  <ellipse cx="50" cy="95" rx="27" ry="3" fill="#0f172a" opacity=".12"/>
+  <path d="M50 31C43 25 33 23.5 25 27 14 32 10 45 12 58c2 14 10 27 20 32.5 5 2.8 10 2.6 14 .8 2.4-1 5.6-1 8 0 4 1.8 9 2 14-.8C78 85 86 72 88 58c2-13-2-26-13-31-8-3.5-18-2-25 4z" fill="url(#skin)"/>
+  <path d="M43 30.5c2.6 2.2 4.8 3 7 3s4.4-.8 7-3" fill="none" stroke="#7a0d16" stroke-opacity=".45" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M24 44c1.8-6 6.5-10 12-11.5" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="4.5" stroke-linecap="round"/>
+  <ellipse cx="22.5" cy="54" rx="2.6" ry="5" fill="#fff" opacity=".45" transform="rotate(12 22.5 54)"/>
+  <path d="M64 84c7-4 13-12 15-21" fill="none" stroke="#5c0a12" stroke-opacity=".25" stroke-width="4" stroke-linecap="round"/>
+  <path d="M50 32c0-8 1.5-15 5.5-21.5" fill="none" stroke="url(#stem)" stroke-width="4.2" stroke-linecap="round"/>
+  <path d="M54 19c5-9 15.5-12.5 27-9.5-4.5 10.5-16 14.5-27 9.5z" fill="url(#leaf)"/>
+  <path d="M56 18.4c7-3.5 14-6 22-7.7" fill="none" stroke="#2f7a22" stroke-width="1.3" stroke-linecap="round"/>
+</svg>
