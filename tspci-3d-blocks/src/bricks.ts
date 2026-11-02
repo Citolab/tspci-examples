@@ -51,15 +51,20 @@ export const brickColor = (position: THREE.Vector3, cellSize: number, palette: s
   return palette[index];
 };
 
-/** A cube-sized brick centred on the origin: a rounded body and 2 x 2 studs on top. */
+/**
+ * A cube-sized brick centred on the origin: a rounded body that fills the cell and 2 x 2 studs on top. The studs
+ * stick out above the cell, into the body of the brick stacked on it, so stacked bricks click together instead
+ * of resting on each other's studs.
+ */
 export function createBrickGeometry(cellSize: number): THREE.BufferGeometry {
   const gap = cellSize * 0.02; // a hairline between neighbouring bricks, so every brick reads as one
   const width = cellSize - gap * 2;
   const studHeight = cellSize * 0.12;
-  const bodyHeight = cellSize - studHeight - gap;
+  const seam = cellSize * 0.004; // keeps the bottom off the top below it (no z-fighting); the rounded edges show the seam
+  const bodyHeight = cellSize - seam;
 
   const body = new RoundedBoxGeometry(width, bodyHeight, width, 3, cellSize * 0.035);
-  body.translate(0, -cellSize / 2 + gap + bodyHeight / 2, 0);
+  body.translate(0, cellSize / 2 - bodyHeight / 2, 0);
 
   const parts: THREE.BufferGeometry[] = [body];
   const studRadius = cellSize * 0.15;
@@ -67,7 +72,7 @@ export function createBrickGeometry(cellSize: number): THREE.BufferGeometry {
   for (const dx of [-offset, offset]) {
     for (const dz of [-offset, offset]) {
       const stud = new THREE.CylinderGeometry(studRadius, studRadius, studHeight, 24);
-      stud.translate(dx, -cellSize / 2 + gap + bodyHeight + studHeight / 2, dz);
+      stud.translate(dx, cellSize / 2 + studHeight / 2, dz);
       parts.push(stud);
     }
   }
