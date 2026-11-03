@@ -1,0 +1,42 @@
+{
+  "prompt": {
+    "default": "Spin the spinner 10 or 100 times. Look at the relative frequencies: which colour comes up most often?",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the experiment", "nl": "Instructie boven het experiment" }
+  },
+  "mode": {
+    "default": "tool",
+    "editor": "enum",
+    "label": { "en": "Task for the candidate", "nl": "Opdracht voor de kandidaat" },
+    "options": [
+      { "value": "tool", "label": { "en": "Explore: the response is the experiment log (not scored)", "nl": "Verkennen: de response is het logboek van het experiment (niet gescoord)" } },
+      { "value": "design", "label": { "en": "Design a spinner or bag with given probabilities", "nl": "Een draaischijf of zak ontwerpen met gegeven kansen" } },
+      { "value": "tree", "label": { "en": "Fill in the probability tree of a two-step experiment", "nl": "De kansboom van een experiment in twee stappen invullen" } }
+    ]
+  },
+  "setup": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Experiment", "nl": "Experiment" },
+    "$comment": "JSON written by the authoring mode (chance.ts): the tool (dice, spinner, bag, coins) and its set-up, the targets of a design, the tree options and the margin; empty: the example of the mode"
+  },
+  "showTheory": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the probabilities next to the relative frequencies", "nl": "De kansen naast de relatieve frequenties tonen" }
+  },
+  "seed": {
+    "default": "",
+    "editor": "hidden",
+    "label": { "en": "Seed of the random numbers (empty: new per session)", "nl": "Startgetal van het toeval (leeg: nieuw per sessie)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (0.375)", "nl": "Engels (0.375)" } },
+      { "value": "nl", "label": { "en": "Dutch (0,375)", "nl": "Nederlands (0,375)" } }
+    ],
+    "label": { "en": "Language of the numbers and texts", "nl": "Taal van de getallen en teksten" }
+  }
+}

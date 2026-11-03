@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+/* the dots of "… is typing" */
+.mw-dot {
+  animation: mw-bounce 1s ease-in-out infinite;
+}
+@keyframes mw-bounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.5; }
+  30% { transform: translateY(-3px); opacity: 1; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mw-dot { animation: none; opacity: 0.8; }
+}

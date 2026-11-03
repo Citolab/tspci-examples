@@ -1,0 +1,98 @@
+{
+  "name": "@citolab/pci-math-entry",
+  "version": "1.0.0",
+  "description": "type a math formula, or fill in the gaps of one, with an on-screen toolbar and the MathLive virtual keyboard",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "Open Assessment Technologies SA (original mathEntryInteraction, Christophe Noël)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "math",
+    "formula",
+    "latex",
+    "mathlive"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-math-entry"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "mathEntry.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "mathlive": "0.111.1",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "node scripts/mathlive-fonts.mjs && tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "node scripts/mathlive-fonts.mjs && tspci",
+    "watch": "node scripts/mathlive-fonts.mjs && tspci --watch",
+    "package-tao": "node scripts/mathlive-fonts.mjs && tspci --target tao",
+    "package-qti3": "node scripts/mathlive-fonts.mjs && tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-math-entry npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-math-entry npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "mathEntry",
+      "label": "Math entry",
+      "tags": [
+        "math",
+        "formula"
+      ],
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "short": "mathEntry",
+      "response": {
+        "cardinality": "single",
+        "baseType": "string"
+      },
+      "authoring": {
+        "label": {
+          "en": "Write the expression with gaps…",
+          "nl": "Uitdrukking met open plekken maken…"
+        },
+        "width": 960,
+        "height": 560
+      }
+    }
+  }
+}

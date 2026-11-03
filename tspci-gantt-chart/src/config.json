@@ -1,0 +1,82 @@
+{
+  "prompt": {
+    "default": "Plan the project: drag on a row to mark when each task takes place.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the chart", "nl": "Instructie boven de planning" }
+  },
+  "tasks": {
+    "default": "Task #1;#F00\nTask #2;#0F0\nTask #3;#00f",
+    "editor": "textarea",
+    "label": { "en": "Tasks: one per line, as Task name;colour (e.g. #ffaa00)", "nl": "Taken: één per regel, als Naam van de taak;kleur (bijv. #ffaa00)" }
+  },
+  "period": {
+    "default": "30",
+    "editor": "integer",
+    "min": 1,
+    "max": 366,
+    "label": { "en": "Number of days", "nl": "Aantal dagen" }
+  },
+  "startDate": {
+    "default": "03/02/2026",
+    "editor": "text",
+    "label": { "en": "Start date (mm/dd/yyyy; empty: today)", "nl": "Begindatum (mm/dd/jjjj; leeg: vandaag)" }
+  },
+  "weekDays": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show week days", "nl": "Weekdagen tonen" }
+  },
+  "months": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show months", "nl": "Maanden tonen" }
+  },
+  "disableWeekends": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Don't use weekends", "nl": "Weekenden niet gebruiken" }
+  },
+  "useHours": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show hours", "nl": "Uren tonen" }
+  },
+  "useHalfHours": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show half hours", "nl": "Halve uren tonen" }
+  },
+  "showTimeRange": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show start and end time", "nl": "Begin- en eindtijd tonen" }
+  },
+  "dayStart": {
+    "default": "8",
+    "editor": "integer",
+    "min": 0,
+    "max": 23,
+    "label": { "en": "Start time (hours)", "nl": "Begintijd (uur)" }
+  },
+  "dayEnd": {
+    "default": "16",
+    "editor": "integer",
+    "min": 0,
+    "max": 23,
+    "label": { "en": "End time (hours, the last slot starts then)", "nl": "Eindtijd (uur, het laatste vak begint dan)" }
+  },
+  "weekNumHack": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Label days as weeks (\"Week 2\", hack)", "nl": "Dagen als weken benoemen (\"Week 2\", hack)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's texts", "nl": "Taal van de teksten van de PCI" }
+  }
+}

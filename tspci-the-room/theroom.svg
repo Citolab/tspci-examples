@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- SPDX-License-Identifier: GPL-3.0-only. Icon for tspci-the-room, Stichting Cito Instituut voor Toetsontwikkeling, 2026 -->
+  <path d="M32 8 6 21v24l26 13 26-13V21z" fill="#f1ece4" stroke="#334155" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M6 21v24l26 13V34z" fill="#e2dccf"/>
+  <path d="M32 34 6 21l26-13 26 13z" fill="#c9a77c" stroke="#334155" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M26 22l8 4 8-4-8-4z" fill="#9a6b43"/>
+  <path d="M26 22v4l8 4v-4zM34 26v4l8-4v-4z" fill="#6f4a2e"/>
+  <circle cx="34" cy="24" r="12" fill="none" stroke="#2563eb" stroke-width="2" transform="matrix(1 0 0 .5 0 12)"/>
+  <circle cx="34" cy="30" r="2.6" fill="#2563eb"/>
+</svg>

@@ -40,10 +40,10 @@
   "source": "src/index.tsx",
   "main": "dist/index.js",
   "devDependencies": {
-    "@citolab/preact-store": "2.14.0",
-    "@citolab/tspci": "2.15.0",
-    "@citolab/tspci-qti3": "2.14.0",
-    "@citolab/tspci-tao": "2.15.1",
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
     "@tailwindcss/postcss": "^4.1.18",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
@@ -51,12 +51,15 @@
     "tailwindcss": "^4.1.18"
   },
   "scripts": {
-    "dev": "set ROLLUP_WATCH=true && tspci --dev",
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
     "prod": "tspci",
     "watch": "tspci --watch",
     "package-tao": "tspci --target tao",
     "package-qti3": "tspci --target qti3",
-    "prepack": "npm run prod && npm run package-tao"
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-equal-expressions npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-equal-expressions npx vitest run --project=storybook"
   },
   "config": {
     "tspci": {
@@ -68,9 +71,8 @@
         "equations",
         "trial and improvement"
       ],
-      "role": "tool",
-      "score": [
-        "NONE"
+      "scoring": [
+        "none"
       ],
       "short": "equalExpressions",
       "markup": {

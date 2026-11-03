@@ -1,0 +1,262 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction above the instrument",
+      "nl": "Instructie boven het instrument"
+    },
+    "$comment": "empty: a question that fits the instrument and the task, in the candidate's language (in set mode with the value to set)"
+  },
+  "instrument": {
+    "default": "thermometer",
+    "editor": "pci",
+    "label": {
+      "en": "Instrument",
+      "nl": "Instrument"
+    },
+    "options": [
+      {
+        "value": "thermometer",
+        "label": {
+          "en": "Thermometer",
+          "nl": "Thermometer"
+        }
+      },
+      {
+        "value": "cylinder",
+        "label": {
+          "en": "Measuring cylinder",
+          "nl": "Maatcilinder"
+        }
+      },
+      {
+        "value": "meter",
+        "label": {
+          "en": "Voltmeter / ammeter",
+          "nl": "Volt- / stroommeter"
+        }
+      },
+      {
+        "value": "scale",
+        "label": {
+          "en": "Kitchen scale",
+          "nl": "Keukenweegschaal"
+        }
+      },
+      {
+        "value": "ruler",
+        "label": {
+          "en": "Ruler",
+          "nl": "Liniaal"
+        }
+      },
+      {
+        "value": "caliper",
+        "label": {
+          "en": "Vernier caliper",
+          "nl": "Schuifmaat"
+        }
+      },
+      {
+        "value": "clock",
+        "label": {
+          "en": "Clock",
+          "nl": "Klok"
+        }
+      },
+      {
+        "value": "stopwatch",
+        "label": {
+          "en": "Stopwatch",
+          "nl": "Stopwatch"
+        }
+      },
+      {
+        "value": "manometer",
+        "label": {
+          "en": "Pressure gauge",
+          "nl": "Bandenspanningsmeter"
+        }
+      }
+    ],
+    "$comment": "set in the authoring mode; or one of thermometer, cylinder, meter, scale, ruler, caliper, clock, stopwatch, manometer"
+  },
+  "mode": {
+    "default": "read",
+    "editor": "pci",
+    "label": {
+      "en": "Task",
+      "nl": "Opdracht"
+    },
+    "options": [
+      {
+        "value": "read",
+        "label": {
+          "en": "Read off: type the value",
+          "nl": "Aflezen: de waarde typen"
+        }
+      },
+      {
+        "value": "set",
+        "label": {
+          "en": "Set: drag to the value",
+          "nl": "Instellen: naar de waarde slepen"
+        }
+      },
+      {
+        "value": "range",
+        "label": {
+          "en": "Choose the range (meter)",
+          "nl": "Bereik kiezen (meter)"
+        }
+      }
+    ],
+    "$comment": "set in the authoring mode; or read, set or range (range only for a meter)"
+  },
+  "min": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Scale from (empty: the instrument's)",
+      "nl": "Schaal van (leeg: van het instrument)"
+    }
+  },
+  "max": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Scale to (empty: the instrument's)",
+      "nl": "Schaal tot (leeg: van het instrument)"
+    }
+  },
+  "major": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "A number at every …",
+      "nl": "Een getal bij elke …"
+    }
+  },
+  "minor": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Divisions between the numbers",
+      "nl": "Verdeling tussen de getallen"
+    }
+  },
+  "unit": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Unit (empty: the instrument's)",
+      "nl": "Eenheid (leeg: van het instrument)"
+    }
+  },
+  "value": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Value shown, to set or to expect",
+      "nl": "Waarde die het aangeeft, in te stellen of te verwachten"
+    },
+    "$comment": "read: what the instrument shows; set: the value to set; range: the value the candidate expects. A clock: minutes after 12 o'clock (635 is 10:35). Also the correct response (getCorrectResponse)"
+  },
+  "precision": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Reading precision (empty: one division)",
+      "nl": "Afleesnauwkeurigheid (leeg: één streepje)"
+    }
+  },
+  "ranges": {
+    "default": "3 15",
+    "editor": "pci",
+    "label": {
+      "en": "Meter: ranges",
+      "nl": "Meter: bereiken"
+    }
+  },
+  "range": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Meter: range plugged in (empty: the best)",
+      "nl": "Meter: ingeplugd bereik (leeg: het beste)"
+    }
+  },
+  "vernier": {
+    "default": "10",
+    "editor": "pci",
+    "label": {
+      "en": "Caliper: vernier",
+      "nl": "Schuifmaat: nonius"
+    },
+    "options": [
+      {
+        "value": "10",
+        "label": {
+          "en": "10 divisions (0.1 mm)",
+          "nl": "10 streepjes (0,1 mm)"
+        }
+      },
+      {
+        "value": "20",
+        "label": {
+          "en": "20 divisions (0.05 mm)",
+          "nl": "20 streepjes (0,05 mm)"
+        }
+      },
+      {
+        "value": "50",
+        "label": {
+          "en": "50 divisions (0.02 mm)",
+          "nl": "50 streepjes (0,02 mm)"
+        }
+      }
+    ]
+  },
+  "zoom": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Magnifier on hover and focus",
+      "nl": "Vergrootglas bij muis en focus"
+    }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "pci",
+    "label": {
+      "en": "Margin for the score (0: exact)",
+      "nl": "Marge voor de score (0: precies)"
+    },
+    "$comment": "only for the response processing the authoring mode writes; delivery does not use it"
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English (2.5)",
+          "nl": "Engels (2.5)"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch (2,5)",
+          "nl": "Nederlands (2,5)"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the texts and numbers",
+      "nl": "Taal van de teksten en getallen"
+    }
+  }
+}

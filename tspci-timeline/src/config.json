@@ -1,0 +1,34 @@
+{
+  "prompt": {
+    "default": "Drag each event to the year in which it happened. Up to 10 years off still counts.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the timeline", "nl": "Instructie boven de tijdbalk" }
+  },
+  "timeline": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Timeline", "nl": "Tijdbalk" },
+    "$comment": "JSON written by the authoring mode (timeline.ts): the axis (start, end, unit, snap), the mode (date, period, order), the margin, the scoring, the periods (\"tijdvakken\" or a list) and the events with their answers; empty: the example"
+  },
+  "showValue": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the year on a placed card (date mode)", "nl": "Jaar op een geplaatste kaart tonen (jaartalvraag)" }
+  },
+  "height": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "max": 1200,
+    "label": { "en": "Least height of the timeline (px; 0: as the cards need)", "nl": "Minimale hoogte van de tijdbalk (px; 0: zoveel als de kaarten nodig hebben)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

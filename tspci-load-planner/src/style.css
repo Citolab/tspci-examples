@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* a meter over its limit: striped, so it does not rely on colour alone */
+.lp-over {
+  background-image: repeating-linear-gradient(45deg, rgb(255 255 255 / 0.35) 0 4px, transparent 4px 8px);
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

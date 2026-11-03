@@ -1,0 +1,186 @@
+{
+  "name": "@citolab/pci-cross-section",
+  "version": "1.0.0-alpha.1",
+  "description": "cut a solid with a plane and see the cross-section: its true shape, side lengths and area; scorable against the author's target shape and size",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "cross-section",
+    "doorsnede",
+    "geometry",
+    "solids",
+    "3d",
+    "mathematics"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-cross-section"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "crossSection.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-cross-section npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-cross-section npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "crossSection",
+      "label": "Cross-section",
+      "tags": [
+        "geometry",
+        "solids",
+        "cross-section",
+        "3d"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "crossSection",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "Answer mode: the PCI checks the section against the author's target (data-target-shape, data-target-lengths, data-target-area). Tool mode (data-mode=\"tool\"): a JSON string, score NONE (README)",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: the checks that pass",
+              "nl": "Score: de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: the number of checks",
+              "nl": "Maximale score: het aantal checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "shapeOk": {
+            "baseType": "integer",
+            "label": {
+              "en": "Shape check: 1 passed, 0 not",
+              "nl": "Check vorm: 1 klopt, 0 niet"
+            }
+          },
+          "lengthsOk": {
+            "baseType": "integer",
+            "label": {
+              "en": "Lengths check: 1 passed, 0 not",
+              "nl": "Check lengtes: 1 klopt, 0 niet"
+            }
+          },
+          "areaOk": {
+            "baseType": "integer",
+            "label": {
+              "en": "Area check: 1 passed, 0 not",
+              "nl": "Check oppervlakte: 1 klopt, 0 niet"
+            }
+          },
+          "shape": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Shape: the most specific name (rectangle, regularHexagon, ellipse, …)",
+              "nl": "Vorm: de meest specifieke naam (rectangle, regularHexagon, ellipse, …)"
+            }
+          },
+          "kinds": {
+            "baseType": "string",
+            "label": {
+              "en": "Kinds: every name that fits, separated by spaces",
+              "nl": "Soorten: elke naam die past, met spaties ertussen"
+            }
+          },
+          "sides": {
+            "baseType": "integer",
+            "label": {
+              "en": "Number of straight sides",
+              "nl": "Aantal rechte zijden"
+            }
+          },
+          "area": {
+            "baseType": "float",
+            "label": {
+              "en": "Area in cm²",
+              "nl": "Oppervlakte in cm²"
+            },
+            "tolerance": "range"
+          },
+          "lengths": {
+            "baseType": "string",
+            "label": {
+              "en": "Side lengths in cm (a circle: diameter; an ellipse: axes)",
+              "nl": "Zijden in cm (cirkel: middellijn; ellips: assen)"
+            }
+          },
+          "plane": {
+            "baseType": "string",
+            "label": {
+              "en": "The plane: offset, tilt and turn (JSON)",
+              "nl": "Het vlak: verschuiving, helling en draaiing (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Set up the cross-section…",
+          "nl": "Doorsnede instellen…"
+        },
+        "width": 1100,
+        "height": 820
+      }
+    }
+  }
+}

@@ -17,4 +17,5 @@
     "esModuleInterop": true,
   },
   "include": ["**/*"],
+  "exclude": ["src/**/*.stories.ts", "node_modules", "dist"], // the stories run in the Storybook of the repository
 }

@@ -1,0 +1,280 @@
+{
+  "name": "@citolab/pci-message-writing",
+  "version": "1.0.0-alpha.1",
+  "description": "write in a realistic communication environment: reply to an email, chat in a class chat, post on a forum or social media; for a human rater, with optional checks the PCI scores",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "writing",
+    "email",
+    "chat",
+    "language",
+    "forum"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-message-writing"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "messageWriting.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-message-writing npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-message-writing npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "messageWriting",
+      "label": "Message writing",
+      "tags": [
+        "writing",
+        "email",
+        "chat",
+        "language",
+        "forum"
+      ],
+      "scoring": [
+        "human",
+        "custom"
+      ],
+      "short": "messageWriting",
+      "response": {
+        "cardinality": "record",
+        "$comment": "A human rater reads message; the PCI scores the author's checks (data-scenario); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the passed checks",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 1: 1 passed, 0 not",
+              "nl": "Check 1: 1 klopt, 0 niet"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 2: 1 passed, 0 not",
+              "nl": "Check 2: 1 klopt, 0 niet"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 3: 1 passed, 0 not",
+              "nl": "Check 3: 1 klopt, 0 niet"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 4: 1 passed, 0 not",
+              "nl": "Check 4: 1 klopt, 0 niet"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 5: 1 passed, 0 not",
+              "nl": "Check 5: 1 klopt, 0 niet"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 6: 1 passed, 0 not",
+              "nl": "Check 6: 1 klopt, 0 niet"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 7: 1 passed, 0 not",
+              "nl": "Check 7: 1 klopt, 0 niet"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 8: 1 passed, 0 not",
+              "nl": "Check 8: 1 klopt, 0 niet"
+            }
+          },
+          "environment": {
+            "baseType": "string",
+            "label": {
+              "en": "Environment: email, chat or post",
+              "nl": "Omgeving: email, chat of post"
+            }
+          },
+          "message": {
+            "baseType": "string",
+            "label": {
+              "en": "Message: the whole message as plain text, for a rater",
+              "nl": "Bericht: het hele bericht als platte tekst, voor een beoordelaar"
+            }
+          },
+          "text": {
+            "baseType": "string",
+            "label": {
+              "en": "Text: what the candidate wrote (the body, the chat replies or the post)",
+              "nl": "Tekst: wat de kandidaat schreef (de mail, de chatberichten of het bericht)"
+            }
+          },
+          "html": {
+            "baseType": "string",
+            "label": {
+              "en": "HTML: the text with its formatting",
+              "nl": "HTML: de tekst met opmaak"
+            }
+          },
+          "subject": {
+            "baseType": "string",
+            "label": {
+              "en": "Subject",
+              "nl": "Onderwerp"
+            }
+          },
+          "to": {
+            "baseType": "string",
+            "label": {
+              "en": "To: the addresses, comma separated",
+              "nl": "Aan: de adressen, met komma's"
+            }
+          },
+          "cc": {
+            "baseType": "string",
+            "label": {
+              "en": "Cc: the addresses, comma separated",
+              "nl": "Cc: de adressen, met komma's"
+            }
+          },
+          "attachments": {
+            "baseType": "string",
+            "label": {
+              "en": "Attachments: the file names, comma separated",
+              "nl": "Bijlagen: de bestandsnamen, met komma's"
+            }
+          },
+          "transcript": {
+            "baseType": "string",
+            "label": {
+              "en": "Transcript: the whole chat (JSON)",
+              "nl": "Transcript: de hele chat (JSON)"
+            }
+          },
+          "draft": {
+            "baseType": "string",
+            "label": {
+              "en": "Draft: chat text typed but not sent",
+              "nl": "Concept: getypte chattekst die niet is verstuurd"
+            }
+          },
+          "sent": {
+            "baseType": "integer",
+            "label": {
+              "en": "Sent: 1 when sent or posted",
+              "nl": "Verstuurd: 1 als verstuurd of geplaatst"
+            }
+          },
+          "words": {
+            "baseType": "integer",
+            "label": {
+              "en": "Words",
+              "nl": "Woorden"
+            }
+          },
+          "chars": {
+            "baseType": "integer",
+            "label": {
+              "en": "Characters",
+              "nl": "Tekens"
+            }
+          },
+          "seconds": {
+            "baseType": "integer",
+            "label": {
+              "en": "Seconds: time spent writing",
+              "nl": "Seconden: tijd besteed aan schrijven"
+            }
+          },
+          "spellcheck": {
+            "baseType": "integer",
+            "label": {
+              "en": "Spellcheck: 1 when it was on",
+              "nl": "Spellingcontrole: 1 als die aan stond"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Write the scenario…",
+          "nl": "Scenario maken…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}

@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* the sliders: a clear thumb and track, also in forced colours */
+.cs-range {
+  accent-color: var(--color-sky-700);
+  height: 1.5rem;
+}
+.cs-range:focus-visible {
+  outline: 2px solid var(--color-sky-600);
+  outline-offset: 2px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .cross-section * { transition: none !important; animation: none !important; }
+}

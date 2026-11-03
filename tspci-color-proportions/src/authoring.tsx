@@ -154,6 +154,14 @@ const Authoring = ({ initial, colors, language, onChange }: {
     }
   };
 
+  /** The width or height the author typed, on the paper's squares and within the limits. */
+  const resize = (side: "width" | "height", input: HTMLInputElement) => {
+    const n = Math.round(Number(input.value) / SIZE.step) * SIZE.step;
+    const value = Number.isFinite(n) ? Math.min(SIZE.max, Math.max(SIZE.min, n)) : partition[side];
+    input.value = String(value); // also when it stays the same: show the size that counts
+    if (value !== partition[side]) commit({ ...partition, [side]: value });
+  };
+
   // While resizing, the drawing keeps the frame it had, so it does not zoom under the pointer.
   const frame = drag?.kind === "resize" ? drag.frame : { width: partition.width, height: partition.height };
   const viewWidth = Math.max(frame.width, partition.width) + 2 * MARGIN;
@@ -175,10 +183,10 @@ const Authoring = ({ initial, colors, language, onChange }: {
             <span className="text-xs text-slate-500">{t[side]}</span>
             <input type="number" className="w-24 rounded-md border border-slate-300 px-2 py-1" min={SIZE.min} max={SIZE.max} step={SIZE.step}
               value={partition[side]} data-testid={side}
-              onChange={(e) => {
-                const n = Math.round(Number((e.target as HTMLInputElement).value) / SIZE.step) * SIZE.step;
-                if (Number.isFinite(n) && n !== partition[side]) commit({ ...partition, [side]: Math.min(SIZE.max, Math.max(SIZE.min, n)) });
-              }} />
+              // when the author is done typing, not on every key: preact/compat (bundled for useMouse) makes onChange
+              // fire on input, and rounding "3" of "300" would replace it
+              onBlur={(e) => resize(side, e.currentTarget)}
+              onKeyDown={(e) => e.key === "Enter" && resize(side, e.currentTarget)} />
           </label>
         ))}
         <div className="ml-auto flex flex-wrap gap-2">

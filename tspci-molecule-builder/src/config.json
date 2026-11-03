@@ -1,0 +1,67 @@
+{
+  "prompt": {
+    "default": "Build a water molecule. Give every atom the right number of bonds.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the builder", "nl": "Instructie boven de bouwdoos" }
+  },
+  "molecule": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Molecule", "nl": "Molecuul" },
+    "$comment": "JSON written by the authoring mode (molecule.ts): the elements in the palette, the correct molecule as SMILES and the checks for PCI scoring; empty: the example (water)"
+  },
+  "scoring": {
+    "default": "match",
+    "editor": "enum",
+    "label": { "en": "Scoring", "nl": "Scoren" },
+    "options": [
+      { "value": "match", "label": { "en": "The item compares formula:SMILES with the correct response (string)", "nl": "Het item vergelijkt formule:SMILES met het goede antwoord (string)" } },
+      { "value": "pci", "label": { "en": "PCI checks: the PCI scores the author's checks (record with score)", "nl": "Checks van de PCI: de PCI scoort de checks van de auteur (record met score)" } }
+    ]
+  },
+  "showFormula": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the molecular formula", "nl": "Molecuulformule tonen" }
+  },
+  "showValence": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the free bonds per atom", "nl": "Vrije bindingen per atoom tonen" }
+  },
+  "formulaOrder": {
+    "default": "common",
+    "editor": "enum",
+    "label": { "en": "Order of the formula shown", "nl": "Volgorde van de getoonde formule" },
+    "options": [
+      { "value": "common", "label": { "en": "As pupils learn it: NH₃, HCl, H₂O, H₂SO₄ (carbon compounds in Hill order)", "nl": "Zoals leerlingen het leren: NH₃, HCl, H₂O, H₂SO₄ (koolstofverbindingen in Hill-volgorde)" } },
+      { "value": "hill", "label": { "en": "Hill order: H₃N, ClH, H₂O, H₂O₄S", "nl": "Hill-volgorde: H₃N, ClH, H₂O, H₂O₄S" } }
+    ],
+    "$comment": "Only what the candidate sees; the response and the checks always use Hill order"
+  },
+  "view": {
+    "default": "3d",
+    "editor": "enum",
+    "label": { "en": "View at the start", "nl": "Weergave bij de start" },
+    "options": [
+      { "value": "3d", "label": { "en": "3D model", "nl": "3D-model" } },
+      { "value": "2d", "label": { "en": "Structural formula", "nl": "Structuurformule" } }
+    ]
+  },
+  "maxAtoms": {
+    "default": "24",
+    "editor": "integer",
+    "min": 2,
+    "max": 60,
+    "label": { "en": "Atoms at most", "nl": "Maximaal aantal atomen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

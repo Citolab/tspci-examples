@@ -1,0 +1,81 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question above the model (empty: the model's example question)", "nl": "Vraag boven het model (leeg: de voorbeeldvraag van het model)" }
+  },
+  "model": {
+    "default": "eye",
+    "editor": "enum",
+    "options": [
+      { "value": "eye", "label": { "en": "Eye", "nl": "Oog" } },
+      { "value": "flower", "label": { "en": "Flower", "nl": "Bloem" } },
+      { "value": "cell", "label": { "en": "Plant cell", "nl": "Plantencel" } },
+      { "value": "bike", "label": { "en": "Bicycle", "nl": "Fiets" } }
+    ],
+    "label": { "en": "Built-in model (schematic)", "nl": "Ingebouwd model (schematisch)" }
+  },
+  "gltf": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Own model: URL of a glTF file (.glb/.gltf; its named meshes are the parts)", "nl": "Eigen model: URL van een glTF-bestand (.glb/.gltf; de meshes met een naam zijn de delen)" }
+  },
+  "mode": {
+    "default": "click",
+    "editor": "enum",
+    "options": [
+      { "value": "click", "label": { "en": "Click parts", "nl": "Delen aanklikken" } },
+      { "value": "label", "label": { "en": "Put labels on parts", "nl": "Labels bij delen zetten" } }
+    ],
+    "label": { "en": "What the candidate does", "nl": "Wat de kandidaat doet" }
+  },
+  "cardinality": {
+    "default": "single",
+    "editor": "enum",
+    "options": [
+      { "value": "single", "label": { "en": "One part", "nl": "Eén deel" } },
+      { "value": "multiple", "label": { "en": "One or more parts", "nl": "Eén of meer delen" } }
+    ],
+    "label": { "en": "Click mode: how many parts", "nl": "Aanklikken: hoeveel delen" }
+  },
+  "maxChoices": {
+    "default": "0",
+    "editor": "integer",
+    "label": { "en": "Click mode, more parts: at most (0: no limit)", "nl": "Aanklikken, meer delen: hoogstens (0: geen grens)" }
+  },
+  "setup": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Parts, labels and the correct answer", "nl": "Delen, labels en het goede antwoord" },
+    "$comment": "JSON written by the authoring mode (hotspot.ts): parts (names, can be chosen), labels (text, the part they belong on) and the correct parts; empty: every part, the model's names and example answer"
+  },
+  "showNames": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Click mode: show the names of the parts (gives away the answer to 'click the lens')", "nl": "Aanklikken: namen van de delen tonen (verraadt het antwoord op 'klik de lens aan')" }
+  },
+  "explode": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Slider to pull the parts apart", "nl": "Schuif om de delen uit elkaar te halen" }
+  },
+  "cutaway": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Slider to cut the model open", "nl": "Schuif om het model open te snijden" }
+  },
+  "visibility": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show and hide parts", "nl": "Delen tonen en verbergen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

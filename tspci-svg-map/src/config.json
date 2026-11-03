@@ -1,0 +1,68 @@
+{
+  "prompt": {
+    "default": "Draw a route from home to the station that passes the school and the library.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the map", "nl": "Instructie boven de kaart" }
+  },
+  "backdrop": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Map (SVG)", "nl": "Kaart (SVG)" },
+    "$comment": "The SVG text of the map, with a layer of paths the candidate can follow; empty: the example map"
+  },
+  "poi": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Points of interest", "nl": "Plaatsen" },
+    "$comment": "JSON: name → point number, e.g. {\"start\":125,\"end\":342}; \"start\" is where the route begins. Empty: none (the example map has its own)"
+  },
+  "pathlayer": {
+    "default": "path",
+    "editor": "text",
+    "label": { "en": "Id of the path layer in the SVG", "nl": "Id van de laag met paden in de SVG" }
+  },
+  "dotresolution": {
+    "default": "5",
+    "editor": "integer",
+    "min": 1,
+    "max": 100,
+    "label": { "en": "Distance between points (SVG units)", "nl": "Afstand tussen de punten (SVG-eenheden)" }
+  },
+  "showpoi": {
+    "default": "markers",
+    "editor": "enum",
+    "label": { "en": "Points of interest on the map", "nl": "Plaatsen op de kaart" },
+    "options": [
+      { "value": "markers", "label": { "en": "Markers", "nl": "Markeringen" } },
+      { "value": "labels", "label": { "en": "Markers with their names", "nl": "Markeringen met hun naam" } },
+      { "value": "none", "label": { "en": "Hidden (only for scoring)", "nl": "Verborgen (alleen voor de score)" } }
+    ]
+  },
+  "requiredpoi": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Points of interest the route must pass", "nl": "Plaatsen waar de route langs moet" },
+    "$comment": "Names from data-poi, comma separated; the route must pass all of them. Empty, with no end and not shortest: no score"
+  },
+  "endpoi": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Point of interest the route must end at", "nl": "Plaats waar de route moet eindigen" },
+    "$comment": "A name from data-poi; empty: the route may end anywhere"
+  },
+  "shortest": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "The route must be a shortest one", "nl": "De route moet een kortste zijn" },
+    "$comment": "No longer than the shortest way from the start, past the required points (any order), to the end"
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the buttons and messages", "nl": "Taal van de knoppen en meldingen" }
+  }
+}

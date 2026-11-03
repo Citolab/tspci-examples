@@ -1,0 +1,116 @@
+{
+  "statements": {
+    "default": "Homework helps me understand the lessons\nI would rather work together than alone\nI learn most from explanations by the teacher\nMarks motivate me to work harder\nI like to choose my own topics\nSchool prepares me well for later\nI learn more outside school than in it\nMaking mistakes helps me learn\nI need a quiet place to concentrate\nComputers make learning easier\nTests show what I really know\nI like subjects with clear right answers\nThe teacher should decide what we learn\nI learn best by doing things myself\nFeedback from classmates is useful\nI often find school work too easy",
+    "editor": "textarea",
+    "label": {
+      "en": "Statements (the Q-set), one per line (statement:explanation adds a tooltip)",
+      "nl": "Stellingen (de Q-set), één per regel (stelling:uitleg geeft een tooltip)"
+    },
+    "$comment": "the part after the first colon is shown as an explanation, not in the response; the response gives a value per statement in this order"
+  },
+  "distribution": {
+    "default": "1,2,3,4,3,2,1",
+    "editor": "text",
+    "label": {
+      "en": "Places per column, from the lowest value to the highest, separated by commas",
+      "nl": "Plekken per kolom, van de laagste waarde naar de hoogste, gescheiden door komma's"
+    },
+    "$comment": "the forced (quasi-normal) distribution; the places should add up to the number of statements"
+  },
+  "values": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Value of each column, lowest first, separated by commas (empty: around 0, such as -3 to +3)",
+      "nl": "Waarde van elke kolom, de laagste eerst, gescheiden door komma's (leeg: rond 0, zoals -3 tot +3)"
+    }
+  },
+  "orientation": {
+    "default": "horizontal",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "horizontal",
+        "label": {
+          "en": "Horizontal: columns from left (lowest) to right (highest)",
+          "nl": "Horizontaal: kolommen van links (laagste) naar rechts (hoogste)"
+        }
+      },
+      {
+        "value": "vertical",
+        "label": {
+          "en": "Vertical: rows from top (highest) to bottom (lowest)",
+          "nl": "Verticaal: rijen van boven (hoogste) naar onder (laagste)"
+        }
+      }
+    ],
+    "label": {
+      "en": "Layout of the grid",
+      "nl": "Indeling van het raster"
+    }
+  },
+  "lowLabel": {
+    "default": "Most disagree",
+    "editor": "text",
+    "label": {
+      "en": "Label of the lowest end of the scale",
+      "nl": "Label van het laagste uiteinde van de schaal"
+    }
+  },
+  "highLabel": {
+    "default": "Most agree",
+    "editor": "text",
+    "label": {
+      "en": "Label of the highest end of the scale",
+      "nl": "Label van het hoogste uiteinde van de schaal"
+    }
+  },
+  "presort": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Pre-sort: first sort the cards one by one into three piles",
+      "nl": "Voorsortering: kaarten eerst één voor één over drie stapels verdelen"
+    }
+  },
+  "presortLabels": {
+    "default": "Disagree, Neutral, Agree",
+    "editor": "text",
+    "label": {
+      "en": "Names of the three pre-sort piles, low to high, separated by commas",
+      "nl": "Namen van de drie stapels van de voorsortering, laag naar hoog, gescheiden door komma's"
+    }
+  },
+  "randomOrder": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Shuffle the cards for each candidate",
+      "nl": "Kaarten per kandidaat schudden"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the instructions and screen reader texts",
+      "nl": "Taal van de aanwijzingen en schermlezerteksten"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "prompt": {
+    "default": "You work for a home care team. Plan this week's tasks for Anna (nurse) and Bas (care assistant). Read the notes on the cards: they tell you the rules. Nobody works more than 8 hours a day, and after 4 hours of work there is a break of at least 30 minutes.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the agenda", "nl": "Instructie boven de agenda" }
+  },
+  "planner": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Agenda, tasks and checks", "nl": "Agenda, taken en checks" },
+    "$comment": "JSON written by the authoring mode (planner.ts): days, times, opening hours, resources, fixed blocks, tasks, the example solution and the checks; empty: the example"
+  },
+  "feedback": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show conflicts while planning (overlaps, outside opening hours)", "nl": "Botsingen tonen tijdens het plannen (overlap, buiten openingstijden)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

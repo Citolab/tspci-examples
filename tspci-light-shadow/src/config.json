@@ -1,0 +1,51 @@
+{
+  "prompt": {
+    "default": "Move the lamp so that the shadow of the figure on the screen is twice as tall as the figure itself.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the scene", "nl": "Instructie boven de opstelling" }
+  },
+  "scene": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Scene", "nl": "Opstelling" },
+    "$comment": "JSON written by the authoring mode (optics.ts): the screen, the lamps, the object, what moves, the targets with margins and a solution; empty: the example"
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "options": [
+      { "value": "answer", "label": { "en": "Answer: the targets are scored", "nl": "Antwoord: de doelen worden gescoord" } },
+      { "value": "tool", "label": { "en": "Tool: explore, not scored", "nl": "Gereedschap: onderzoeken, geen score" } }
+    ],
+    "label": { "en": "Use", "nl": "Gebruik" }
+  },
+  "view": {
+    "default": "both",
+    "editor": "enum",
+    "options": [
+      { "value": "both", "label": { "en": "3D and the 2D drawing", "nl": "3D en de 2D-tekening" } },
+      { "value": "3d", "label": { "en": "3D only", "nl": "Alleen 3D" } },
+      { "value": "2d", "label": { "en": "2D drawing only", "nl": "Alleen de 2D-tekening" } }
+    ],
+    "label": { "en": "Views", "nl": "Weergaven" }
+  },
+  "showRays": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the light rays past the edges of the object", "nl": "Lichtstralen langs de randen van het voorwerp tonen" }
+  },
+  "showMeasurements": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the measured shadow (otherwise: read it off the ruler)", "nl": "De gemeten schaduw tonen (anders: aflezen op de liniaal)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

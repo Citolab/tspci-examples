@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* the form keeps its own font sizes inside a delivery system's styles */
+:host {
+  display: block;
+}
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

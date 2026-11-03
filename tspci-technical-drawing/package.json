@@ -1,0 +1,99 @@
+{
+  "name": "@citolab/pci-technical-drawing",
+  "version": "1.0.0-alpha.1",
+  "description": "read and make technical drawings: a workpiece in 3D and its views in European projection, with visible and hidden lines, centre lines and dimensions; fill in dimensions, complete a view, name a view or choose the workpiece",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "technical-drawing",
+    "orthographic-projection",
+    "engineering",
+    "3d"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-technical-drawing"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "technicalDrawing.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-technical-drawing npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-technical-drawing npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "technicalDrawing",
+      "label": "Technical drawing",
+      "tags": [
+        "technical drawing",
+        "projection",
+        "engineering",
+        "3d"
+      ],
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "short": "technicalDrawing",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "ordered",
+        "baseType": "float",
+        "$comment": "Dimensions and read (data-task): the numbers in order, floats in mm, match correct. data-scoring=\"pci\": a record (score, maxscore, correct, value1..8, values). View and model: single identifier (front/top/left, A..D). Complete: a record (score, maxscore, correct, visibleOk, hiddenOk, noExtra, lines), CUSTOM (README)"
+      },
+      "authoring": {
+        "label": {
+          "en": "Build the workpiece…",
+          "nl": "Werkstuk maken…"
+        },
+        "width": 1100,
+        "height": 800
+      }
+    }
+  }
+}

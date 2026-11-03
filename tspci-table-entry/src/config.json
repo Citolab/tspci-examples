@@ -1,0 +1,69 @@
+{
+  "prompt": {
+    "default": "A ball is dropped from a height of 20 m. After t seconds its height is h = 20 − 4.9 × t² metres. Fill in the table; round to one decimal.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the table", "nl": "Instructie boven de tabel" }
+  },
+  "table": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Table", "nl": "Tabel" },
+    "$comment": "JSON written by the authoring mode (table.ts): columns, rows of cells (a given text, or an input with its expected value and tolerance) and the headers; empty: the example table"
+  },
+  "inputMode": {
+    "default": "number",
+    "editor": "enum",
+    "label": { "en": "The candidate types", "nl": "De kandidaat typt" },
+    "options": [
+      { "value": "number", "label": { "en": "A number (digits and one decimal comma or point)", "nl": "Een getal (cijfers en één decimale komma of punt)" } },
+      { "value": "text", "label": { "en": "Any text", "nl": "Willekeurige tekst" } }
+    ]
+  },
+  "maxCharacters": {
+    "default": "6",
+    "editor": "integer",
+    "min": 0,
+    "max": 100,
+    "label": { "en": "Characters per cell at most (0: no limit)", "nl": "Maximaal aantal tekens per cel (0: geen grens)" }
+  },
+  "decimals": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Decimals at most (empty: any; 0: whole numbers)", "nl": "Maximaal aantal decimalen (leeg: elk aantal; 0: hele getallen)" }
+  },
+  "allowNegative": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Allow negative numbers", "nl": "Negatieve getallen toestaan" }
+  },
+  "scoring": {
+    "default": "list",
+    "editor": "enum",
+    "label": { "en": "Scoring", "nl": "Scoren" },
+    "options": [
+      { "value": "list", "label": { "en": "The item scores the values (ordered list of strings)", "nl": "Het item scoort de waarden (geordende lijst strings)" } },
+      { "value": "pci", "label": { "en": "The PCI scores them, with tolerances (record with score)", "nl": "De PCI scoort ze, met marges (record met score)" } }
+    ]
+  },
+  "maxScore": {
+    "default": "2",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Points (PCI scoring)", "nl": "Punten (scoren door de PCI)" }
+  },
+  "penalty": {
+    "default": "1",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Points off per missing or wrong value (PCI scoring)", "nl": "Punten aftrek per ontbrekende of foute waarde (scoren door de PCI)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (1.5)", "nl": "Engels (1.5)" } },
+      { "value": "nl", "label": { "en": "Dutch (1,5)", "nl": "Nederlands (1,5)" } }
+    ],
+    "label": { "en": "Language of the numbers and texts", "nl": "Taal van de getallen en teksten" }
+  }
+}

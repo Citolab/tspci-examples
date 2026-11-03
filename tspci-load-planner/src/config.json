@@ -1,0 +1,41 @@
+{
+  "prompt": {
+    "default": "Load the van for the delivery round: three addresses, the first one is unloaded first. Keep the centre of gravity near the middle, put nothing on fragile boxes and respect “this side up”.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the load plan", "nl": "Instructie boven het laadplan" }
+  },
+  "plan": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Load plan", "nl": "Laadplan" },
+    "$comment": "JSON written by the authoring mode (plan.ts): the cargo space, the boxes, the checks, the least support and the example solution; empty: the example"
+  },
+  "view": {
+    "default": "3d",
+    "editor": "enum",
+    "options": [
+      { "value": "3d", "label": { "en": "3D view with top and side view", "nl": "3D-weergave met boven- en zijaanzicht" } },
+      { "value": "2d", "label": { "en": "Only the top and side view", "nl": "Alleen boven- en zijaanzicht" } }
+    ],
+    "label": { "en": "Views", "nl": "Weergaven" }
+  },
+  "showMetrics": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show volume, weight, centre of gravity and axle loads", "nl": "Volume, gewicht, zwaartepunt en asbelasting tonen" }
+  },
+  "showChecks": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the checks live (gives the answer away; for practice)", "nl": "Checks live tonen (verraadt het antwoord; om te oefenen)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

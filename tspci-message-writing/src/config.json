@@ -1,0 +1,65 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Task (empty: the task in the scenario)", "nl": "Opdracht (leeg: de opdracht in het scenario)" }
+  },
+  "environment": {
+    "default": "email",
+    "editor": "enum",
+    "options": [
+      { "value": "email", "label": { "en": "Email", "nl": "E-mail" } },
+      { "value": "chat", "label": { "en": "Chat app", "nl": "Chat-app" } },
+      { "value": "post", "label": { "en": "Forum or social-media post", "nl": "Forum- of social-mediabericht" } }
+    ],
+    "label": { "en": "Environment", "nl": "Omgeving" }
+  },
+  "scenario": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Scenario", "nl": "Scenario" },
+    "$comment": "JSON written by the authoring mode (message.ts): the candidate, the contacts, the inbox, the chat script, the forum thread, and per environment the task, limits, checks and a model answer; empty: the example"
+  },
+  "writingLanguage": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } },
+      { "value": "de", "label": { "en": "German", "nl": "Duits" } },
+      { "value": "fr", "label": { "en": "French", "nl": "Frans" } }
+    ],
+    "label": { "en": "Language the candidate writes in (spellcheck, greetings)", "nl": "Taal waarin de kandidaat schrijft (spellingcontrole, aanheffen)" }
+  },
+  "spellcheck": {
+    "default": "toggle",
+    "editor": "enum",
+    "options": [
+      { "value": "off", "label": { "en": "Off", "nl": "Uit" } },
+      { "value": "toggle", "label": { "en": "The candidate can switch it on", "nl": "De kandidaat kan hem aanzetten" } },
+      { "value": "on", "label": { "en": "Always on", "nl": "Altijd aan" } }
+    ],
+    "label": { "en": "The browser's spellcheck", "nl": "Spellingcontrole van de browser" }
+  },
+  "showWordCount": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the word and character count", "nl": "Aantal woorden en tekens tonen" }
+  },
+  "chatDelay": {
+    "default": "1200",
+    "editor": "integer",
+    "min": 0,
+    "max": 10000,
+    "label": { "en": "Chat: milliseconds before each scripted message", "nl": "Chat: milliseconden voor elk gescript bericht" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the screens (buttons, labels)", "nl": "Taal van de schermen (knoppen, labels)" }
+  }
+}

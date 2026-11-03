@@ -1,0 +1,58 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the map (empty: the example's)", "nl": "Instructie boven de kaart (leeg: die van het voorbeeld)" }
+  },
+  "terrain": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Terrain", "nl": "Terrein" },
+    "$comment": "JSON written by the authoring mode (terrain.ts): size in metres, base height, tilt, seed and bumps, hills and ridges/valleys; empty: the example"
+  },
+  "tasks": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Tasks", "nl": "Opdrachten" },
+    "$comment": "JSON list written by the authoring mode (terrain.ts): profile, point, height and river tasks with their points and margins; empty: the example"
+  },
+  "interval": {
+    "default": "10",
+    "editor": "number",
+    "label": { "en": "Contour interval (m)", "nl": "Hoogteverschil tussen de hoogtelijnen (m)" }
+  },
+  "tints": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Colours for the heights, with a legend", "nl": "Kleuren voor de hoogtes, met legenda" }
+  },
+  "contourLabels": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Heights on the contour lines", "nl": "Hoogtes bij de hoogtelijnen" }
+  },
+  "show3d": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "3D relief model next to the map", "nl": "3D-reliëfmodel naast de kaart" }
+  },
+  "exaggeration": {
+    "default": "3",
+    "editor": "number",
+    "label": { "en": "Vertical exaggeration of the 3D model at the start (1 to 6)", "nl": "Overdrijving van de hoogte in het 3D-model bij de start (1 tot 6)" }
+  },
+  "showHeight": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the height under the pointer (gives the heights away)", "nl": "Hoogte onder de aanwijzer tonen (verraadt de hoogtes)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

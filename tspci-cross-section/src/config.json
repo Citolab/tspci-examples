@@ -1,0 +1,421 @@
+{
+  "prompt": {
+    "default": "Cut the cube with a plane so that the cross-section is a regular hexagon.",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction above the solid",
+      "nl": "Instructie boven de ruimtefiguur"
+    }
+  },
+  "solid": {
+    "default": "cube",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "cube",
+        "label": {
+          "en": "Cube",
+          "nl": "Kubus"
+        }
+      },
+      {
+        "value": "box",
+        "label": {
+          "en": "Box (cuboid)",
+          "nl": "Balk"
+        }
+      },
+      {
+        "value": "prism",
+        "label": {
+          "en": "Prism (regular base)",
+          "nl": "Prisma (regelmatig grondvlak)"
+        }
+      },
+      {
+        "value": "pyramid",
+        "label": {
+          "en": "Pyramid (regular base)",
+          "nl": "Piramide (regelmatig grondvlak)"
+        }
+      },
+      {
+        "value": "cylinder",
+        "label": {
+          "en": "Cylinder",
+          "nl": "Cilinder"
+        }
+      },
+      {
+        "value": "cone",
+        "label": {
+          "en": "Cone",
+          "nl": "Kegel"
+        }
+      },
+      {
+        "value": "sphere",
+        "label": {
+          "en": "Sphere",
+          "nl": "Bol"
+        }
+      }
+    ],
+    "label": {
+      "en": "Solid",
+      "nl": "Ruimtefiguur"
+    }
+  },
+  "dimensions": {
+    "default": "6",
+    "editor": "text",
+    "label": {
+      "en": "Dimensions in cm: cube edge; box length width height; prism/pyramid side height; cylinder/cone radius height; sphere radius",
+      "nl": "Afmetingen in cm: kubus ribbe; balk lengte breedte hoogte; prisma/piramide zijde hoogte; cilinder/kegel straal hoogte; bol straal"
+    }
+  },
+  "baseSides": {
+    "default": "4",
+    "editor": "integer",
+    "min": 3,
+    "max": 8,
+    "label": {
+      "en": "Sides of the base of a prism or pyramid",
+      "nl": "Zijden van het grondvlak van een prisma of piramide"
+    }
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "answer",
+        "label": {
+          "en": "Answer: the section is scored against the target",
+          "nl": "Antwoord: de doorsnede wordt gescoord tegen het doel"
+        }
+      },
+      {
+        "value": "tool",
+        "label": {
+          "en": "Tool: explore, not scored",
+          "nl": "Hulpmiddel: verkennen, niet gescoord"
+        }
+      }
+    ],
+    "label": {
+      "en": "Mode",
+      "nl": "Modus"
+    }
+  },
+  "controls": {
+    "default": "move tilt turn handles points hide",
+    "editor": "text",
+    "label": {
+      "en": "Controls the candidate gets: move tilt turn handles points hide (empty: the plane is fixed)",
+      "nl": "Bediening voor de kandidaat: move tilt turn handles points hide (leeg: het vlak ligt vast)"
+    }
+  },
+  "plane": {
+    "default": "0 0 0",
+    "editor": "text",
+    "label": {
+      "en": "Start plane: offset (cm) tilt (°) turn (°)",
+      "nl": "Beginvlak: verschuiving (cm) helling (°) draaiing (°)"
+    }
+  },
+  "solutionPlane": {
+    "default": "0 54.7356 45",
+    "editor": "pci",
+    "label": {
+      "en": "A plane that answers the question (shown as the solution)",
+      "nl": "Een vlak dat de vraag beantwoordt (getoond als oplossing)"
+    },
+    "$comment": "offset tilt turn; set in the authoring mode, which also writes the solid, the controls and the target"
+  },
+  "targetShape": {
+    "default": "regularHexagon",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "",
+        "label": {
+          "en": "No target",
+          "nl": "Geen doel"
+        }
+      },
+      {
+        "value": "triangle",
+        "label": {
+          "en": "Triangle",
+          "nl": "Driehoek"
+        }
+      },
+      {
+        "value": "equilateralTriangle",
+        "label": {
+          "en": "Equilateral triangle",
+          "nl": "Gelijkzijdige driehoek"
+        }
+      },
+      {
+        "value": "isoscelesTriangle",
+        "label": {
+          "en": "Isosceles triangle",
+          "nl": "Gelijkbenige driehoek"
+        }
+      },
+      {
+        "value": "rightTriangle",
+        "label": {
+          "en": "Right triangle",
+          "nl": "Rechthoekige driehoek"
+        }
+      },
+      {
+        "value": "quadrilateral",
+        "label": {
+          "en": "Quadrilateral",
+          "nl": "Vierhoek"
+        }
+      },
+      {
+        "value": "trapezium",
+        "label": {
+          "en": "Trapezium",
+          "nl": "Trapezium"
+        }
+      },
+      {
+        "value": "isoscelesTrapezium",
+        "label": {
+          "en": "Isosceles trapezium",
+          "nl": "Gelijkbenig trapezium"
+        }
+      },
+      {
+        "value": "kite",
+        "label": {
+          "en": "Kite",
+          "nl": "Vlieger"
+        }
+      },
+      {
+        "value": "parallelogram",
+        "label": {
+          "en": "Parallelogram",
+          "nl": "Parallellogram"
+        }
+      },
+      {
+        "value": "rhombus",
+        "label": {
+          "en": "Rhombus",
+          "nl": "Ruit"
+        }
+      },
+      {
+        "value": "rectangle",
+        "label": {
+          "en": "Rectangle",
+          "nl": "Rechthoek"
+        }
+      },
+      {
+        "value": "square",
+        "label": {
+          "en": "Square",
+          "nl": "Vierkant"
+        }
+      },
+      {
+        "value": "pentagon",
+        "label": {
+          "en": "Pentagon",
+          "nl": "Vijfhoek"
+        }
+      },
+      {
+        "value": "regularPentagon",
+        "label": {
+          "en": "Regular pentagon",
+          "nl": "Regelmatige vijfhoek"
+        }
+      },
+      {
+        "value": "hexagon",
+        "label": {
+          "en": "Hexagon",
+          "nl": "Zeshoek"
+        }
+      },
+      {
+        "value": "regularHexagon",
+        "label": {
+          "en": "Regular hexagon",
+          "nl": "Regelmatige zeshoek"
+        }
+      },
+      {
+        "value": "heptagon",
+        "label": {
+          "en": "Heptagon",
+          "nl": "Zevenhoek"
+        }
+      },
+      {
+        "value": "octagon",
+        "label": {
+          "en": "Octagon",
+          "nl": "Achthoek"
+        }
+      },
+      {
+        "value": "circle",
+        "label": {
+          "en": "Circle",
+          "nl": "Cirkel"
+        }
+      },
+      {
+        "value": "ellipse",
+        "label": {
+          "en": "Ellipse",
+          "nl": "Ellips"
+        }
+      },
+      {
+        "value": "ellipseSegment",
+        "label": {
+          "en": "Part of an ellipse",
+          "nl": "Deel van een ellips"
+        }
+      },
+      {
+        "value": "parabolaSegment",
+        "label": {
+          "en": "Parabolic segment",
+          "nl": "Paraboolsegment"
+        }
+      },
+      {
+        "value": "hyperbolaSegment",
+        "label": {
+          "en": "Hyperbolic segment",
+          "nl": "Hyperboolsegment"
+        }
+      },
+      {
+        "value": "curved",
+        "label": {
+          "en": "Any shape with a curved side",
+          "nl": "Elke vorm met een gebogen zijde"
+        }
+      }
+    ],
+    "label": {
+      "en": "Target: the shape of the cross-section",
+      "nl": "Doel: de vorm van de doorsnede"
+    }
+  },
+  "exactShape": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Only exactly this shape (a square is then no rectangle)",
+      "nl": "Alleen precies deze vorm (een vierkant is dan geen rechthoek)"
+    }
+  },
+  "targetLengths": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Target: side lengths in cm, e.g. 4 6 (empty: any size)",
+      "nl": "Doel: zijden in cm, bijvoorbeeld 4 6 (leeg: elke maat)"
+    }
+  },
+  "targetArea": {
+    "default": "",
+    "editor": "number",
+    "label": {
+      "en": "Target: area in cm² (empty: any)",
+      "nl": "Doel: oppervlakte in cm² (leeg: elke)"
+    }
+  },
+  "margin": {
+    "default": "0.2",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Margin for the lengths, in cm",
+      "nl": "Marge voor de lengtes, in cm"
+    }
+  },
+  "areaMargin": {
+    "default": "0.5",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Margin for the area, in cm²",
+      "nl": "Marge voor de oppervlakte, in cm²"
+    }
+  },
+  "tolerance": {
+    "default": "2",
+    "editor": "number",
+    "min": 0,
+    "max": 20,
+    "label": {
+      "en": "Naming tolerance: equal sides within %, right and parallel within degrees",
+      "nl": "Tolerantie voor de naam: gelijke zijden binnen %, recht en evenwijdig binnen graden"
+    }
+  },
+  "showName": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Show the name of the shape",
+      "nl": "De naam van de vorm tonen"
+    }
+  },
+  "showMeasures": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Show side lengths and area",
+      "nl": "Zijden en oppervlakte tonen"
+    }
+  },
+  "showLabels": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Letters at the corners (ABCD EFGH)",
+      "nl": "Letters bij de hoekpunten (ABCD EFGH)"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the texts",
+      "nl": "Taal van de teksten"
+    }
+  }
+}

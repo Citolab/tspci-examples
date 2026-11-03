@@ -1,0 +1,109 @@
+{
+  "name": "@citolab/pci-text-gap-match",
+  "version": "1.0.0",
+  "description": "drag text labels onto drop zones on an image (a port of openPCI textgapmatch)",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "OpenPCI, Aarhus University and Aalborg University: Elias J.T. Hansen, Anna Rusmann, Jeppe Bundsgaard (https://github.com/openPCI/openPCIs)"
+  ],
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "gap match",
+    "drag and drop",
+    "labelling"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-text-gap-match"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "textGapMatch.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-text-gap-match npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-text-gap-match npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "textGapMatch",
+      "label": "Text gap match",
+      "tags": [
+        "gap match",
+        "drag and drop",
+        "labelling"
+      ],
+      "scoring": [
+        "match_correct",
+        "human"
+      ],
+      "short": "textGapMatch",
+      "markup": {
+        "image": {
+          "editor": "media",
+          "accept": [
+            "image/*"
+          ],
+          "element": "img",
+          "label": {
+            "en": "Image with the drop zones (instead of the uploaded one)",
+            "nl": "Afbeelding met de plekken (in plaats van de geüploade)"
+          }
+        }
+      },
+      "response": {
+        "cardinality": "single",
+        "baseType": "string"
+      },
+      "authoring": {
+        "label": {
+          "en": "Image and drop zones…",
+          "nl": "Afbeelding en plekken…"
+        },
+        "width": 960,
+        "height": 720
+      }
+    }
+  }
+}

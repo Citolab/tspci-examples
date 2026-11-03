@@ -135,7 +135,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
   };
 
   /**
-   * Authoring mode: the author sizes the rectangle and draws the lines that split it; getConfig() gives
+   * Authoring mode: the author sizes the rectangle and draws the lines that split it; getProperties() gives
    * data-partition. Only an authoring system calls this (AUTHORING.md, "Authoring mode"); delivery never does.
    */
   getAuthoringInstance = (dom: HTMLElement, config: PciAuthoringConfiguration<PropTypes>): PciAuthoringInstance => {
@@ -154,9 +154,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       host
     );
     const instance: PciAuthoringInstance = {
-      getConfig: () => ({ partition: serializePartition(partition) }),
+      getProperties: () => ({ partition: serializePartition(partition) }),
       validate: () => authoringProblems(partition, language),
-      destroy: () => render(null, host),
+      oncompleted: () => render(null, host),
     };
     config.onready?.(instance);
     return instance;

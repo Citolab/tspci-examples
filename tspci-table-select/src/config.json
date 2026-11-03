@@ -1,0 +1,31 @@
+{
+  "prompt": {
+    "default": "Select the train that arrives before 10:00.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the table", "nl": "Instructie boven de tabel" }
+  },
+  "selectionMode": {
+    "default": "row",
+    "editor": "enum",
+    "label": { "en": "The candidate selects", "nl": "De kandidaat selecteert" },
+    "options": [
+      { "value": "row", "label": { "en": "A row", "nl": "Een rij" } },
+      { "value": "cell", "label": { "en": "A cell", "nl": "Een cel" } }
+    ]
+  },
+  "table": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Table", "nl": "Tabel" },
+    "$comment": "JSON written by the authoring mode (table.ts): the columns, the rows and whether the first column holds row headers; empty: the example timetable"
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts for screen readers", "nl": "Taal van de teksten voor schermlezers" }
+  }
+}

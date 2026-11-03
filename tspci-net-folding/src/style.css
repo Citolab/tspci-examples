@@ -1,0 +1,40 @@
+@import "tailwindcss";
+
+/* a closed circuit (data-show-current): the parts with current glow, lamps and LEDs light up */
+.cb-live {
+  color: var(--color-amber-600);
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--color-amber-400) 70%, transparent));
+  animation: cb-pulse 1.6s ease-in-out infinite;
+}
+.cb-lit circle {
+  fill: color-mix(in oklab, var(--color-yellow-300) 75%, transparent);
+}
+.cb-lit-led .cb-body {
+  fill: var(--color-rose-500);
+  fill-opacity: 0.8;
+}
+@keyframes cb-pulse {
+  50% { filter: drop-shadow(0 0 5px var(--color-amber-400)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cb-live { animation: none; }
+}
+
+/* the faces to choose or fill in, and the grid: a clear focus ring (SVG has no outline of its own) */
+.nf-pick:focus-visible polygon {
+  stroke: var(--color-sky-600);
+  stroke-width: 4;
+}
+.nf-pick:hover polygon {
+  filter: brightness(0.97);
+}
+.nf-grid:focus-visible {
+  box-shadow: 0 0 0 2px var(--color-sky-600);
+}
+.nf-grid:not(:focus-visible) + * .nf-cursor,
+.nf-cursor {
+  transition: x 120ms, y 120ms;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nf-cursor { transition: none; }
+}

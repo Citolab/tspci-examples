@@ -1,0 +1,54 @@
+{
+  "prompt": {
+    "default": "Set the date on which the sun is overhead at noon at the Tropic of Capricorn.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the interaction", "nl": "Instructie boven de interactie" }
+  },
+  "setup": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Task", "nl": "Opdracht" },
+    "$comment": "JSON written by the authoring mode (setup.ts): the places, what the candidate controls, the start, the targets with margins and a solution; empty: the example"
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "options": [
+      { "value": "answer", "label": { "en": "Answer: the targets are scored", "nl": "Antwoord: de doelen worden gescoord" } },
+      { "value": "tool", "label": { "en": "Tool: explore, not scored", "nl": "Gereedschap: onderzoeken, geen score" } }
+    ],
+    "label": { "en": "Use", "nl": "Gebruik" }
+  },
+  "timeBase": {
+    "default": "utc",
+    "editor": "enum",
+    "options": [
+      { "value": "utc", "label": { "en": "UTC (world time)", "nl": "UTC (wereldtijd)" } },
+      { "value": "local", "label": { "en": "Local time by longitude (UTC + longitude/15)", "nl": "Plaatselijke tijd naar lengtegraad (UTC + lengte/15)" } }
+    ],
+    "label": { "en": "The time the candidate sets", "nl": "De tijd die de kandidaat instelt" }
+  },
+  "view": {
+    "default": "both",
+    "editor": "enum",
+    "options": [
+      { "value": "both", "label": { "en": "3D Sun and Earth, and the sky", "nl": "3D zon en aarde, en de hemel" } },
+      { "value": "2d", "label": { "en": "The Earth from the side (2D), and the sky", "nl": "De aarde van opzij (2D), en de hemel" } }
+    ],
+    "label": { "en": "Views", "nl": "Weergaven" }
+  },
+  "showInfo": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the sun's values (height, sunrise, sunset, day length)", "nl": "De waarden van de zon tonen (hoogte, opkomst, ondergang, daglengte)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

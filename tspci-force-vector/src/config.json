@@ -1,0 +1,117 @@
+{
+  "prompt": {
+    "default": "A lamp that weighs 30 N hangs from the ceiling. Draw the force of gravity on the lamp, starting at point P.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the drawing", "nl": "Instructie boven de tekening" }
+  },
+  "background": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Picture (URL or inline SVG)", "nl": "Afbeelding (URL of SVG)" },
+    "$comment": "a URL (https:, data: or relative to the item) or SVG markup (<svg …>); it fills the drawing. Empty: the example, a lamp hanging from the ceiling"
+  },
+  "width": {
+    "default": "560",
+    "editor": "integer",
+    "min": 200,
+    "max": 1200,
+    "label": { "en": "Width of the drawing (px)", "nl": "Breedte van de tekening (px)" }
+  },
+  "height": {
+    "default": "400",
+    "editor": "integer",
+    "min": 150,
+    "max": 1000,
+    "label": { "en": "Height of the drawing (px)", "nl": "Hoogte van de tekening (px)" }
+  },
+  "pixelsPerCm": {
+    "default": "40",
+    "editor": "number",
+    "min": 10,
+    "max": 200,
+    "label": { "en": "Pixels per cm on the drawing", "nl": "Pixels per cm op de tekening" }
+  },
+  "newtonPerCm": {
+    "default": "10",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Force scale: newton per cm", "nl": "Krachtenschaal: newton per cm" }
+  },
+  "showScale": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the force scale (1 cm ≙ … N)", "nl": "Krachtenschaal tonen (1 cm ≙ … N)" }
+  },
+  "showLabel": {
+    "default": "both",
+    "editor": "enum",
+    "label": { "en": "Size of the arrow shown while drawing", "nl": "Grootte van de pijl tonen tijdens het tekenen" },
+    "options": [
+      { "value": "both", "label": { "en": "In newton and cm", "nl": "In newton en cm" } },
+      { "value": "newton", "label": { "en": "In newton", "nl": "In newton" } },
+      { "value": "cm", "label": { "en": "In cm", "nl": "In cm" } },
+      { "value": "none", "label": { "en": "Not shown (the candidate measures)", "nl": "Niet (de kandidaat meet zelf)" } }
+    ]
+  },
+  "decimals": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "max": 3,
+    "label": { "en": "Decimals of the force (N)", "nl": "Decimalen van de kracht (N)" }
+  },
+  "angleSnap": {
+    "default": "1",
+    "editor": "enum",
+    "label": { "en": "Snap the direction to", "nl": "Richting vastklikken op" },
+    "options": [
+      { "value": "0", "label": { "en": "Off", "nl": "Uit" } },
+      { "value": "1", "label": { "en": "Whole degrees", "nl": "Hele graden" } },
+      { "value": "5", "label": { "en": "5°", "nl": "5°" } },
+      { "value": "15", "label": { "en": "15°", "nl": "15°" } },
+      { "value": "45", "label": { "en": "45°", "nl": "45°" } }
+    ]
+  },
+  "lengthStep": {
+    "default": "0.1",
+    "editor": "enum",
+    "label": { "en": "Snap the length to", "nl": "Lengte vastklikken op" },
+    "options": [
+      { "value": "0", "label": { "en": "Off", "nl": "Uit" } },
+      { "value": "0.1", "label": { "en": "0.1 cm (mm)", "nl": "0,1 cm (mm)" } },
+      { "value": "0.5", "label": { "en": "0.5 cm", "nl": "0,5 cm" } },
+      { "value": "1", "label": { "en": "1 cm", "nl": "1 cm" } }
+    ]
+  },
+  "ruler": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Ruler to measure with", "nl": "Meetlat om mee te meten" }
+  },
+  "grid": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show a cm grid", "nl": "Centimeterraster tonen" }
+  },
+  "arrows": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Arrows to draw", "nl": "Te tekenen pijlen" },
+    "$comment": "JSON written by the authoring mode: [{ label, start: [x, y] in cm or null for a free start, point }]; empty: the example's arrow from P"
+  },
+  "answer": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Correct arrows and tolerances", "nl": "Goede pijlen en marges" },
+    "$comment": "JSON written by the authoring mode: { vectors: [[x, y, angle, length]], tolerance: { start, angle, length } }; only for getCorrectResponse and the response processing, delivery does not need it"
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (2.5 cm)", "nl": "Engels (2.5 cm)" } },
+      { "value": "nl", "label": { "en": "Dutch (2,5 cm)", "nl": "Nederlands (2,5 cm)" } }
+    ],
+    "label": { "en": "Language of the texts and numbers", "nl": "Taal van de teksten en getallen" }
+  }
+}

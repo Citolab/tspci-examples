@@ -1,0 +1,57 @@
+{
+  "prompt": {
+    "default": "How much do you agree with this statement?",
+    "editor": "textarea",
+    "label": { "en": "Question above the scale", "nl": "Vraag boven de schaal" },
+    "$comment": "also the accessible name of the radio group; the original kept it in the markup (.prompt)"
+  },
+  "level": {
+    "default": "5",
+    "editor": "integer",
+    "min": 2,
+    "max": 10,
+    "label": { "en": "Number of levels (scale size)", "nl": "Aantal niveaus (schaalgrootte)" }
+  },
+  "labelMin": {
+    "default": "min",
+    "editor": "text",
+    "label": { "en": "Label at the low end", "nl": "Tekst bij de lage kant" },
+    "$comment": "label-min in the original"
+  },
+  "labelMax": {
+    "default": "max",
+    "editor": "text",
+    "label": { "en": "Label at the high end", "nl": "Tekst bij de hoge kant" },
+    "$comment": "label-max in the original"
+  },
+  "style": {
+    "default": "radio",
+    "editor": "enum",
+    "options": [
+      { "value": "radio", "label": { "en": "Radio buttons", "nl": "Keuzerondjes" } },
+      { "value": "stars", "label": { "en": "Stars", "nl": "Sterren" } },
+      { "value": "smileys", "label": { "en": "Smileys", "nl": "Smileys" } },
+      { "value": "buttons", "label": { "en": "Numbered buttons", "nl": "Genummerde knoppen" } }
+    ],
+    "label": { "en": "Style of the choices", "nl": "Stijl van de keuzes" }
+  },
+  "icons": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show icons at each end", "nl": "Pictogrammen aan beide kanten tonen" }
+  },
+  "numbers": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show numbers above the choices", "nl": "Nummers boven de keuzes tonen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts for screen readers", "nl": "Taal van de teksten voor schermlezers" }
+  }
+}

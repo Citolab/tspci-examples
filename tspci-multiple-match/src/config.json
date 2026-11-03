@@ -1,0 +1,75 @@
+{
+  "topics": {
+    "default": "group1:Group 1\ngroup2:Group 2\ngroup3:Group 3",
+    "editor": "textarea",
+    "label": {
+      "en": "Topics (column groups), one per line: name:Topic or name:Topic:Description",
+      "nl": "Onderwerpen (kolomgroepen), één per regel: naam:Onderwerp of naam:Onderwerp:Toelichting"
+    }
+  },
+  "categories": {
+    "default": "4:Strongly agree\n3:Agree\n2:Disagree\n1:Strongly disagree",
+    "editor": "textarea",
+    "label": {
+      "en": "Categories (the answer options under every topic), one per line: value:Category",
+      "nl": "Categorieën (de antwoordopties onder elk onderwerp), één per regel: waarde:Categorie"
+    }
+  },
+  "items": {
+    "default": "item1:Item 1\nitem2:Item 2\nitem3:Item 3",
+    "editor": "textarea",
+    "label": {
+      "en": "Items (rows), one per line: name:Item",
+      "nl": "Items (rijen), één per regel: naam:Item"
+    }
+  },
+  "multiple": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Multiple selections: more than one category per topic and item",
+      "nl": "Meerdere keuzes: meer dan één categorie per onderwerp en item"
+    }
+  },
+  "topicsubset": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "label": {
+      "en": "Number of topics shown (0: all topics)",
+      "nl": "Aantal getoonde onderwerpen (0: alle onderwerpen)"
+    }
+  },
+  "randomizetopics": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Randomize the order of the topics", "nl": "Volgorde van de onderwerpen husselen" }
+  },
+  "reusetopics": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Reuse the order and selection of topics of the first item that uses this PCI",
+      "nl": "Volgorde en selectie van onderwerpen van het eerste item met deze PCI hergebruiken"
+    }
+  },
+  "randomizecategories": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Randomize the order of the categories", "nl": "Volgorde van de categorieën husselen" }
+  },
+  "randomizeitems": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Randomize the order of the items", "nl": "Volgorde van de items husselen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts for screen readers", "nl": "Taal van de teksten voor schermlezers" }
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "prompt": {
+    "default": "What do the groceries cost in total? Calculate it in the sheet and put the total in cell D6.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the sheet", "nl": "Instructie boven het werkblad" }
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "label": { "en": "Use of the sheet", "nl": "Gebruik van het werkblad" },
+    "options": [
+      { "value": "answer", "label": { "en": "The answer goes in a cell (scored)", "nl": "Het antwoord komt in een cel (gescoord)" } },
+      { "value": "tool", "label": { "en": "A tool (the answer goes in another interaction)", "nl": "Een hulpmiddel (het antwoord komt in een andere interactie)" } }
+    ]
+  },
+  "sheet": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Sheet", "nl": "Werkblad" },
+    "$comment": "JSON written by the authoring mode (sheet.ts): size, column widths, the cells (input, locked, bold, fill) and the answer cell; empty: the example sheet"
+  },
+  "showFormulaBar": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the formula bar", "nl": "Formulebalk tonen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (1.5; =SUM(A1,B1))", "nl": "Engels (1.5; =SUM(A1,B1))" } },
+      { "value": "nl", "label": { "en": "Dutch (1,5; =SOM(A1;B1))", "nl": "Nederlands (1,5; =SOM(A1;B1))" } }
+    ],
+    "label": { "en": "Language of the sheet and its texts", "nl": "Taal van het werkblad en de teksten" }
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "prompt": {
+    "default": "Make a lunch with at most 2500 kJ, at least 15 g of protein and at most 2 g of salt, with products from at least three groups of the Schijf van Vijf.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the products", "nl": "Instructie boven de producten" }
+  },
+  "mode": {
+    "default": "compose",
+    "editor": "enum",
+    "label": { "en": "Task", "nl": "Taak" },
+    "options": [
+      { "value": "compose", "label": { "en": "Compose a meal, scored by the checks (record, CUSTOM)", "nl": "Een maaltijd samenstellen, gescoord met de checks (record, CUSTOM)" } },
+      { "value": "select", "label": { "en": "Choose a product (identifier, MATCH_CORRECT)", "nl": "Een product kiezen (identifier, MATCH_CORRECT)" } },
+      { "value": "tool", "label": { "en": "A calculator next to another interaction (not scored)", "nl": "Een rekenhulp naast een andere interactie (niet gescoord)" } }
+    ]
+  },
+  "plan": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Products, reference intakes and checks", "nl": "Producten, referentie-innames en checks" },
+    "$comment": "JSON written by the authoring mode (nutrition.ts): products with their values per 100 g, the target group, the checks, the model answer and the select answer; empty: the example"
+  },
+  "amountUnit": {
+    "default": "both",
+    "editor": "enum",
+    "label": { "en": "The candidate enters amounts in", "nl": "De kandidaat geeft hoeveelheden op in" },
+    "options": [
+      { "value": "both", "label": { "en": "Grams or portions", "nl": "Gram of porties" } },
+      { "value": "grams", "label": { "en": "Grams", "nl": "Gram" } },
+      { "value": "portions", "label": { "en": "Portions", "nl": "Porties" } }
+    ]
+  },
+  "showTotals": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the running totals of the meal", "nl": "Lopende totalen van de maaltijd tonen" }
+  },
+  "showBars": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Bars against the reference intakes", "nl": "Balken ten opzichte van de referentie-innames" }
+  },
+  "showPortion": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Labels: a column per portion with % of the reference intake", "nl": "Etiketten: een kolom per portie met % van de referentie-inname" }
+  },
+  "showExtras": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Vitamins and minerals (when the products have them)", "nl": "Vitamines en mineralen (als de producten ze hebben)" }
+  },
+  "labelsOpen": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "All labels open at the start (always in the choose task)", "nl": "Alle etiketten open bij de start (bij de keuzetaak altijd)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (1.5 g)", "nl": "Engels (1.5 g)" } },
+      { "value": "nl", "label": { "en": "Dutch (1,5 g)", "nl": "Nederlands (1,5 g)" } }
+    ],
+    "label": { "en": "Language of the texts and the numbers", "nl": "Taal van de teksten en de getallen" }
+  }
+}

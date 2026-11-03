@@ -1,0 +1,148 @@
+{
+  "name": "@citolab/pci-html-template",
+  "version": "1.0.0",
+  "description": "an interaction made of the author's own HTML: every input marked with data-response is part of the response",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "Martin Nicholson (original html-template-interaction-pci, https://github.com/oatymart/html-template-interaction-pci)",
+    "Open Assessment Technologies SA (copyright holder named in the original source files)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "html",
+    "template",
+    "form"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-html-template"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "htmlTemplate.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-html-template npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-html-template npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "htmlTemplate",
+      "label": "HTML template",
+      "tags": [
+        "html",
+        "template",
+        "form"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "htmlTemplate",
+      "response": {
+        "cardinality": "record",
+        "$comment": "One field per name of a data-response element in the author's HTML, in document order; these are the fields of the example template",
+        "fields": {
+          "capital": {
+            "baseType": "string",
+            "label": {
+              "en": "Capital",
+              "nl": "Hoofdstad"
+            }
+          },
+          "sea": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Sea",
+              "nl": "Zee"
+            }
+          },
+          "official_language": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Official language",
+              "nl": "Officiële taal"
+            }
+          },
+          "border_be": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Borders Belgium",
+              "nl": "Grenst aan België"
+            }
+          },
+          "border_de": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Borders Germany",
+              "nl": "Grenst aan Duitsland"
+            }
+          },
+          "border_fr": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Borders France",
+              "nl": "Grenst aan Frankrijk"
+            }
+          },
+          "dikes": {
+            "baseType": "string",
+            "label": {
+              "en": "Why dikes",
+              "nl": "Waarom dijken"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Edit the HTML…",
+          "nl": "HTML bewerken…"
+        },
+        "width": 1100,
+        "height": 720
+      }
+    }
+  }
+}

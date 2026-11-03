@@ -1,0 +1,143 @@
+{
+  "prompt": {
+    "default": "Choose the power of the speaker and move the listener. How loud is the sound where the listener stands?",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie" }
+  },
+  "mode": {
+    "default": "tool",
+    "editor": "enum",
+    "label": { "en": "Use of the simulation", "nl": "Gebruik van de simulatie" },
+    "options": [
+      { "value": "tool", "label": { "en": "A tool (the answer goes in another interaction; response: what the candidate tried)", "nl": "Een hulpmiddel (het antwoord komt in een andere interactie; antwoord: wat de kandidaat probeerde)" } },
+      { "value": "answer", "label": { "en": "The value the candidate sets is the answer (scored)", "nl": "De waarde die de kandidaat instelt is het antwoord (gescoord)" } }
+    ]
+  },
+  "control": {
+    "default": "both",
+    "editor": "enum",
+    "label": { "en": "Tool: what the candidate can change", "nl": "Hulpmiddel: wat de kandidaat kan veranderen" },
+    "options": [
+      { "value": "both", "label": { "en": "Power and distance", "nl": "Vermogen en afstand" } },
+      { "value": "distance", "label": { "en": "Only the distance", "nl": "Alleen de afstand" } },
+      { "value": "power", "label": { "en": "Only the power", "nl": "Alleen het vermogen" } }
+    ]
+  },
+  "answer": {
+    "default": "distance",
+    "editor": "enum",
+    "label": { "en": "Answer: the quantity the candidate sets (the other stays at its setting)", "nl": "Antwoord: de grootheid die de kandidaat instelt (de andere blijft op de instelling)" },
+    "options": [
+      { "value": "distance", "label": { "en": "Distance", "nl": "Afstand" } },
+      { "value": "power", "label": { "en": "Power", "nl": "Vermogen" } }
+    ]
+  },
+  "targetLevel": {
+    "default": "",
+    "editor": "number",
+    "label": { "en": "Target level in dB (marked on the meter; gives the correct response in answer mode)", "nl": "Doelniveau in dB (op de meter; geeft het goede antwoord in antwoordmodus)" },
+    "$comment": "empty: no target. Answer mode: the correct response is the distance (or power) that gives this level, as the slider can set it"
+  },
+  "powerInput": {
+    "default": "select",
+    "editor": "enum",
+    "label": { "en": "Power: choose from a list or with a slider", "nl": "Vermogen: kiezen uit een lijst of met een schuif" },
+    "options": [
+      { "value": "select", "label": { "en": "A list of powers", "nl": "Een lijst met vermogens" } },
+      { "value": "slider", "label": { "en": "A slider", "nl": "Een schuif" } }
+    ]
+  },
+  "powers": {
+    "default": "25;50;100",
+    "editor": "text",
+    "label": { "en": "Powers in the list (separated by ;)", "nl": "Vermogens in de lijst (gescheiden door ;)" }
+  },
+  "powerMin": { "default": "1", "editor": "number", "label": { "en": "Power slider: minimum", "nl": "Vermogensschuif: minimum" } },
+  "powerMax": { "default": "100", "editor": "number", "label": { "en": "Power slider: maximum", "nl": "Vermogensschuif: maximum" } },
+  "powerStep": { "default": "1", "editor": "number", "label": { "en": "Power slider: step", "nl": "Vermogensschuif: stap" } },
+  "power": {
+    "default": "25",
+    "editor": "number",
+    "label": { "en": "Power at the start (and when the candidate cannot change it)", "nl": "Vermogen bij de start (en als de kandidaat het niet kan veranderen)" }
+  },
+  "powerUnit": {
+    "default": "W",
+    "editor": "enum",
+    "label": { "en": "Unit of power", "nl": "Eenheid van vermogen" },
+    "options": [{ "value": "mW" }, { "value": "W" }, { "value": "kW" }]
+  },
+  "distanceMin": { "default": "10", "editor": "number", "label": { "en": "Distance slider: minimum (more than 0)", "nl": "Afstandsschuif: minimum (meer dan 0)" } },
+  "distanceMax": { "default": "1000", "editor": "number", "label": { "en": "Distance slider: maximum", "nl": "Afstandsschuif: maximum" } },
+  "distanceStep": { "default": "10", "editor": "number", "label": { "en": "Distance slider: step", "nl": "Afstandsschuif: stap" } },
+  "distance": {
+    "default": "100",
+    "editor": "number",
+    "label": { "en": "Distance at the start (and when the candidate cannot change it)", "nl": "Afstand bij de start (en als de kandidaat hem niet kan veranderen)" }
+  },
+  "distanceUnit": {
+    "default": "m",
+    "editor": "enum",
+    "label": { "en": "Unit of distance", "nl": "Eenheid van afstand" },
+    "options": [{ "value": "cm" }, { "value": "m" }, { "value": "km" }]
+  },
+  "decimals": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Decimals of the sound level (0 to 4)", "nl": "Decimalen van de geluidssterkte (0 tot 4)" }
+  },
+  "referenceIntensity": {
+    "default": "1e-12",
+    "editor": "enum",
+    "label": { "en": "Threshold of hearing I0 (W/m²)", "nl": "Gehoordrempel I0 (W/m²)" },
+    "options": [
+      { "value": "1e-12", "label": { "en": "1·10⁻¹² (standard)", "nl": "1·10⁻¹² (standaard)" } },
+      { "value": "1.2e-12", "label": { "en": "1.2·10⁻¹² (as in the 2025 vmbo exam simulation: 0.8 dB lower)", "nl": "1,2·10⁻¹² (zoals de simulatie in het vmbo-examen 2025: 0,8 dB lager)" } }
+    ]
+  },
+  "showReferences": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show levels for comparison (conversation, pain threshold, …)", "nl": "Niveaus ter vergelijking tonen (gesprek, pijngrens, …)" }
+  },
+  "references": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Levels for comparison: name = dB, separated by ; (empty: a standard list)", "nl": "Niveaus ter vergelijking: naam = dB, gescheiden door ; (leeg: een standaardlijst)" }
+  },
+  "source": {
+    "default": "speaker",
+    "editor": "enum",
+    "label": { "en": "Picture of the source", "nl": "Afbeelding van de bron" },
+    "options": [
+      { "value": "speaker", "label": { "en": "Speaker", "nl": "Luidspreker" } },
+      { "value": "walrus", "label": { "en": "Walrus", "nl": "Walrus" } },
+      { "value": "whale", "label": { "en": "Whale", "nl": "Walvis" } },
+      { "value": "bird", "label": { "en": "Bird", "nl": "Vogel" } },
+      { "value": "dog", "label": { "en": "Dog", "nl": "Hond" } },
+      { "value": "siren", "label": { "en": "Siren", "nl": "Sirene" } }
+    ]
+  },
+  "sourceName": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Name of the source (empty: the name of the picture)", "nl": "Naam van de bron (leeg: de naam van de afbeelding)" }
+  },
+  "view": {
+    "default": "3d",
+    "editor": "enum",
+    "label": { "en": "Picture", "nl": "Afbeelding" },
+    "options": [
+      { "value": "3d", "label": { "en": "3D (2D without WebGL)", "nl": "3D (2D zonder WebGL)" } },
+      { "value": "2d", "label": { "en": "2D", "nl": "2D" } }
+    ]
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (58.0 dB)", "nl": "Engels (58.0 dB)" } },
+      { "value": "nl", "label": { "en": "Dutch (58,0 dB)", "nl": "Nederlands (58,0 dB)" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten" }
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "name": "@citolab/pci-text-marker",
+  "version": "1.0.0-alpha.1",
+  "description": "mark words and sentences in a source text with named marker categories; the PCI scores the marks against the author key with a tolerance",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "reading",
+    "text-marking",
+    "highlight",
+    "language"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-text-marker"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "textMarker.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-text-marker npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-text-marker npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "textMarker",
+      "label": "Text marker",
+      "tags": [
+        "reading",
+        "language",
+        "text",
+        "marking",
+        "highlight"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "textMarker",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the marks against the author key (data-key, data-scoring); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points for the marked spans, minus the penalties",
+              "nl": "Score: punten voor de gemarkeerde stukken, min de aftrek"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all correct spans",
+              "nl": "Maximale score: punten van alle goede stukken"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every span is marked correctly and nothing else",
+              "nl": "Goed: 1 als elk stuk goed gemarkeerd is en verder niets"
+            }
+          },
+          "extra": {
+            "baseType": "integer",
+            "label": {
+              "en": "Extra: marks that match no correct span",
+              "nl": "Extra: markeringen die bij geen goed stuk horen"
+            }
+          },
+          "target1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 1: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 1: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 2: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 2: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 3: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 3: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 4: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 4: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 5: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 5: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 6: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 6: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 7: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 7: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 8: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 8: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 9: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 9: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "target10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Span 10: 2 correct, 1 partly, 0 missed",
+              "nl": "Stuk 10: 2 goed, 1 deels, 0 gemist"
+            }
+          },
+          "marks": {
+            "baseType": "string",
+            "label": {
+              "en": "Marks: word ranges with their category, \"12-18:a 40-44:b\"",
+              "nl": "Markeringen: woordbereiken met hun categorie, \"12-18:a 40-44:b\""
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Text, categories and key…",
+          "nl": "Tekst, categorieën en sleutel…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}

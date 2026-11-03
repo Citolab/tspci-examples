@@ -1,0 +1,88 @@
+{
+  "name": "@citolab/pci-likert",
+  "version": "1.0.0",
+  "description": "a Likert scale: the candidate picks one of 2 to 10 levels between two labels",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "Open Assessment Technologies SA (original likertScoreInteraction)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "likert",
+    "survey",
+    "rating scale"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-likert"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "likert.svg",
+    "example.png",
+    "LICENSE",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-likert npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-likert npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "likert",
+      "label": "Likert scale",
+      "tags": [
+        "likert",
+        "survey",
+        "rating scale"
+      ],
+      "scoring": [
+        "human",
+        "custom"
+      ],
+      "short": "likert",
+      "response": {
+        "cardinality": "single",
+        "baseType": "integer"
+      }
+    }
+  }
+}

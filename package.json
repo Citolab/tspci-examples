@@ -1,5 +1,29 @@
 {
+  "name": "tspci-examples",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "test": "vitest run --project=storybook",
+    "test:watch": "vitest --project=storybook",
+    "typecheck": "tsc -p tsconfig.json",
+    "deploy-storybook": "firebase deploy --only hosting:storybook"
+  },
   "dependencies": {
     "tailwindcss": "^4.1.18"
+  },
+  "devDependencies": {
+    "@storybook/addon-vitest": "^10.6.5",
+    "@storybook/html-vite": "^10.6.5",
+    "@types/node": "^26.6.6",
+    "@vitest/browser-playwright": "^5.1.0",
+    "playwright": "^1.64.1",
+    "postcss": "^8.5.32",
+    "preact": "^10.28.2",
+    "storybook": "^10.6.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.5",
+    "vitest": "^5.1.0"
   }
 }

@@ -1,0 +1,99 @@
+{
+  "name": "@citolab/pci-svg-map",
+  "version": "1.0.0",
+  "description": "draw a route on a map: the candidate follows the roads of an SVG map from point to point",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "Elias J.T. Hansen (OpenPCI)",
+    "Anna Rusmann <andr@hum.aau.dk> (OpenPCI, Aalborg University)",
+    "Jeppe Bundsgaard <jebu@edu.au.dk> (OpenPCI, Aarhus University)"
+  ],
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "map",
+    "route",
+    "svg"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-svg-map"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "svgMap.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-svg-map npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-svg-map npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "svgMap",
+      "label": "SVG map",
+      "tags": [
+        "map",
+        "route",
+        "svg"
+      ],
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "short": "svgMap",
+      "response": {
+        "cardinality": "single",
+        "baseType": "string"
+      },
+      "authoring": {
+        "label": {
+          "en": "Map and points of interest…",
+          "nl": "Kaart en plaatsen…"
+        },
+        "width": 960,
+        "height": 720
+      }
+    }
+  }
+}

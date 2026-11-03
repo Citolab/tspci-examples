@@ -1,0 +1,108 @@
+{
+  "prompt": {
+    "default": "Place point A at 2.75 and point B at −1¼ on the number line.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the number line", "nl": "Instructie boven de getallenlijn" }
+  },
+  "mode": {
+    "default": "points",
+    "editor": "enum",
+    "label": { "en": "What the candidate does", "nl": "Wat de kandidaat doet" },
+    "options": [
+      { "value": "points", "label": { "en": "Place points", "nl": "Punten plaatsen" } },
+      { "value": "interval", "label": { "en": "Mark an interval", "nl": "Interval aangeven" } },
+      { "value": "jumps", "label": { "en": "Draw jumps (addition and subtraction)", "nl": "Sprongen tekenen (optellen en aftrekken)" } },
+      { "value": "read", "label": { "en": "Read off values", "nl": "Getallen aflezen" } }
+    ]
+  },
+  "min": {
+    "default": "-3",
+    "editor": "pci",
+    "label": { "en": "Start of the line", "nl": "Begin van de lijn" },
+    "$comment": "a number: -3, 2.5, -1 1/4"
+  },
+  "max": {
+    "default": "8",
+    "editor": "pci",
+    "label": { "en": "End of the line", "nl": "Eind van de lijn" }
+  },
+  "tickStep": {
+    "default": "1/4",
+    "editor": "pci",
+    "label": { "en": "Distance between ticks", "nl": "Afstand tussen streepjes" },
+    "$comment": "a number or a fraction: 1, 0.5, 1/4, 1/3"
+  },
+  "labelStep": {
+    "default": "1",
+    "editor": "pci",
+    "label": { "en": "A number at every", "nl": "Een getal bij elke" },
+    "$comment": "a multiple of the tick distance; 0: only at the ends; empty: at every tick"
+  },
+  "numberFormat": {
+    "default": "mixed",
+    "editor": "pci",
+    "label": { "en": "Numbers as", "nl": "Getallen als" },
+    "$comment": "decimal (2.75), fraction (11/4) or mixed (2 3/4)"
+  },
+  "hiddenLabels": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Hidden numbers", "nl": "Verborgen getallen" },
+    "$comment": "the labelled ticks whose number the candidate does not see, separated by semicolons: 2; 5 1/2"
+  },
+  "task": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Points, interval, jumps and the correct answer", "nl": "Punten, interval, sprongen en het goede antwoord" },
+    "$comment": "JSON written by the authoring mode (numberline.ts Task): points, interval, jumps, read, tolerance; empty: the example"
+  },
+  "snap": {
+    "default": "tick",
+    "editor": "enum",
+    "label": { "en": "Points snap to", "nl": "Punten klikken vast op" },
+    "options": [
+      { "value": "tick", "label": { "en": "The ticks", "nl": "De streepjes" } },
+      { "value": "half", "label": { "en": "Half ticks", "nl": "Halve streepjes" } },
+      { "value": "tenth", "label": { "en": "A tenth of a tick (nearly free)", "nl": "Een tiende streepje (bijna vrij)" } }
+    ]
+  },
+  "orientation": {
+    "default": "horizontal",
+    "editor": "enum",
+    "label": { "en": "Direction of the line", "nl": "Richting van de lijn" },
+    "options": [
+      { "value": "horizontal", "label": { "en": "Horizontal", "nl": "Horizontaal" } },
+      { "value": "vertical", "label": { "en": "Vertical (like a thermometer)", "nl": "Verticaal (zoals een thermometer)" } }
+    ]
+  },
+  "length": {
+    "default": "640",
+    "editor": "integer",
+    "min": 240,
+    "max": 1200,
+    "label": { "en": "Length of the line (px)", "nl": "Lengte van de lijn (px)" }
+  },
+  "showValues": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the values of what the candidate places (gives the answer away)", "nl": "Getallen tonen van wat de kandidaat plaatst (verraadt het antwoord)" }
+  },
+  "scoring": {
+    "default": "qti",
+    "editor": "enum",
+    "label": { "en": "Scoring", "nl": "Scoren" },
+    "options": [
+      { "value": "qti", "label": { "en": "Response processing (the values)", "nl": "Response processing (de getallen)" } },
+      { "value": "pci", "label": { "en": "By the PCI (a record with the score)", "nl": "Door de PCI (een record met de score)" } }
+    ]
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (2.75)", "nl": "Engels (2.75)" } },
+      { "value": "nl", "label": { "en": "Dutch (2,75)", "nl": "Nederlands (2,75)" } }
+    ],
+    "label": { "en": "Language of the texts and numbers", "nl": "Taal van de teksten en getallen" }
+  }
+}

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- SPDX-License-Identifier: GPL-3.0-only; Voxelcraft icon, Stichting Cito Instituut voor Toetsontwikkeling, 2026 -->
+  <g stroke="#1e293b" stroke-width="1.5" stroke-linejoin="round">
+    <path d="M20 30 32 23l12 7-12 7z" fill="#fca5a5"/><path d="M20 30v14l12 7V37z" fill="#dc2626"/><path d="M44 30v14l-12 7V37z" fill="#991b1b"/>
+    <path d="M8 37 20 30l12 7-12 7z" fill="#93c5fd"/><path d="M8 37v14l12 7V44z" fill="#2563eb"/><path d="M32 37v14l-12 7V44z" fill="#1e40af"/>
+    <path d="M20 16 32 9l12 7-12 7z" fill="#fde68a"/><path d="M20 16v14l12 7V23z" fill="#eab308"/><path d="M44 16v14l-12 7V23z" fill="#a16207"/>
+  </g>
+</svg>

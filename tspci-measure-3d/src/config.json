@@ -1,0 +1,124 @@
+{
+  "prompt": {
+    "default": "A ladder leans against a wall. How long is the ladder? Measure it and give your answer in metres, to 2 decimals.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the scene", "nl": "Instructie boven de scène" },
+    "$comment": "the example's instruction is translated with data-language"
+  },
+  "scene": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Scene", "nl": "Scène" },
+    "$comment": "JSON written by the authoring mode: { objects: [{ id, type, name, size, position, rotation, measurable }], names: { pointId: name } }; empty: the example (a ladder against a wall and a crate)"
+  },
+  "target": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "What the candidate measures", "nl": "Wat de kandidaat meet" },
+    "$comment": "JSON written by the authoring mode: { kind: length, points: [id, id] }, { kind: angle, points: [id, vertex id, id] }, { kind: area, face: id } or { kind: volume, object: id }; empty with the example scene: the ladder"
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "options": [
+      { "value": "answer", "label": { "en": "Answer: the candidate types the value", "nl": "Antwoord: de kandidaat typt de waarde" } },
+      { "value": "tool", "label": { "en": "Tool: the answer goes elsewhere in the item", "nl": "Hulpmiddel: het antwoord staat elders in het item" } }
+    ],
+    "label": { "en": "Mode", "nl": "Modus" }
+  },
+  "tools": {
+    "default": "tape,protractor,area",
+    "editor": "text",
+    "label": { "en": "Tools (tape, protractor, area; comma separated)", "nl": "Gereedschap (tape, protractor, area; met komma's)" }
+  },
+  "reading": {
+    "default": "exact",
+    "editor": "enum",
+    "options": [
+      { "value": "exact", "label": { "en": "Exact values", "nl": "Exacte waarden" } },
+      { "value": "ruler", "label": { "en": "Ruler: between two tick marks, the candidate rounds", "nl": "Liniaal: tussen twee streepjes, de kandidaat rondt af" } }
+    ],
+    "label": { "en": "Reading of the tools", "nl": "Aflezen van het gereedschap" }
+  },
+  "decimals": {
+    "default": "2",
+    "editor": "integer",
+    "min": 0,
+    "max": 4,
+    "label": { "en": "Decimals of exact values", "nl": "Decimalen van exacte waarden" }
+  },
+  "tickStep": {
+    "default": "0.1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Ruler: a tick mark every (in the unit)", "nl": "Liniaal: een streepje per (in de eenheid)" }
+  },
+  "angleStep": {
+    "default": "5",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Ruler: protractor tick every (degrees)", "nl": "Liniaal: streepje gradenboog per (graden)" }
+  },
+  "unit": {
+    "default": "m",
+    "editor": "text",
+    "label": { "en": "Unit of length", "nl": "Lengte-eenheid" }
+  },
+  "scale": {
+    "default": "1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Scale: 1 unit of the scene is … (in the unit)", "nl": "Schaal: 1 eenheid van de scène is … (in de eenheid)" }
+  },
+  "toolScale": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "The tools apply the scale (off: they read units, the candidate converts)", "nl": "Het gereedschap rekent de schaal om (uit: het leest eenheden, de kandidaat rekent om)" }
+  },
+  "showScale": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the scale", "nl": "Schaal tonen" }
+  },
+  "margin": {
+    "default": "0.05",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Margin: how far off still counts as correct", "nl": "Marge: hoeveel ernaast nog goed is" }
+  },
+  "scoring": {
+    "default": "margin",
+    "editor": "enum",
+    "options": [
+      { "value": "margin", "label": { "en": "Response processing: the value within the margin", "nl": "Responsverwerking: de waarde binnen de marge" } },
+      { "value": "pci", "label": { "en": "PCI: a record with score (CUSTOM)", "nl": "PCI: een record met score (CUSTOM)" } }
+    ],
+    "label": { "en": "Scoring (answer mode)", "nl": "Scoren (antwoordmodus)" }
+  },
+  "requireMeasurement": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "PCI scoring: the right measurement must have been made", "nl": "PCI-score: de juiste meting moet gedaan zijn" }
+  },
+  "showPointLabels": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the names of the vertices", "nl": "Namen van de hoekpunten tonen" }
+  },
+  "height": {
+    "default": "420",
+    "editor": "integer",
+    "min": 240,
+    "max": 900,
+    "label": { "en": "Height of the scene (pixels)", "nl": "Hoogte van de scène (pixels)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

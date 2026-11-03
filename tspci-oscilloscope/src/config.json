@@ -1,0 +1,153 @@
+{
+  "prompt": {
+    "default": "The amplifier makes the signal three times as strong; the frequency stays the same. Set the amplified signal on the screen.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the screen", "nl": "Instructie boven het scherm" }
+  },
+  "waveform": {
+    "default": "sine",
+    "editor": "enum",
+    "label": { "en": "Waveform", "nl": "Golfvorm" },
+    "options": [
+      { "value": "sine", "label": { "en": "Sine", "nl": "Sinus" } },
+      { "value": "square", "label": { "en": "Square", "nl": "Blok" } },
+      { "value": "triangle", "label": { "en": "Triangle", "nl": "Driehoek" } }
+    ]
+  },
+  "gridColumns": {
+    "default": "10",
+    "editor": "integer",
+    "min": 2,
+    "max": 20,
+    "label": { "en": "Divisions across (time)", "nl": "Hokjes horizontaal (tijd)" }
+  },
+  "gridRows": {
+    "default": "8",
+    "editor": "integer",
+    "min": 2,
+    "max": 16,
+    "label": { "en": "Divisions up (voltage)", "nl": "Hokjes verticaal (spanning)" }
+  },
+  "frequencyUnit": {
+    "default": "vibrations",
+    "editor": "enum",
+    "label": { "en": "Frequency as", "nl": "Frequentie als" },
+    "options": [
+      { "value": "vibrations", "label": { "en": "Vibrations on the screen", "nl": "Trillingen op het scherm" } },
+      { "value": "hertz", "label": { "en": "Hertz (with the time base)", "nl": "Hertz (met de tijdbasis)" } }
+    ]
+  },
+  "amplitudeUnit": {
+    "default": "divisions",
+    "editor": "enum",
+    "label": { "en": "Amplitude as", "nl": "Amplitude als" },
+    "options": [
+      { "value": "divisions", "label": { "en": "Divisions", "nl": "Hokjes" } },
+      { "value": "volts", "label": { "en": "Volts (with volts/div)", "nl": "Volt (met volt/hokje)" } }
+    ]
+  },
+  "timePerDiv": {
+    "default": "1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Time base (ms/div)", "nl": "Tijdbasis (ms/hokje)" }
+  },
+  "voltsPerDiv": {
+    "default": "1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Volts/div", "nl": "Volt/hokje" }
+  },
+  "showScale": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the time base and volts/div", "nl": "Tijdbasis en volt/hokje tonen" }
+  },
+  "showReference": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the reference signal", "nl": "Referentiesignaal tonen" }
+  },
+  "referenceFrequency": {
+    "default": "4.2",
+    "editor": "pci",
+    "label": { "en": "Reference signal: frequency", "nl": "Referentiesignaal: frequentie" },
+    "$comment": "in the frequency unit; set in the authoring mode, or as a number"
+  },
+  "referenceAmplitude": {
+    "default": "1",
+    "editor": "pci",
+    "label": { "en": "Reference signal: amplitude", "nl": "Referentiesignaal: amplitude" }
+  },
+  "startFrequency": {
+    "default": "2",
+    "editor": "pci",
+    "label": { "en": "Candidate's signal at the start: frequency", "nl": "Signaal van de kandidaat bij de start: frequentie" }
+  },
+  "startAmplitude": {
+    "default": "2",
+    "editor": "pci",
+    "label": { "en": "Candidate's signal at the start: amplitude", "nl": "Signaal van de kandidaat bij de start: amplitude" }
+  },
+  "correctFrequency": {
+    "default": "4.2",
+    "editor": "pci",
+    "label": { "en": "Correct setting: frequency (empty: none)", "nl": "Goede instelling: frequentie (leeg: geen)" }
+  },
+  "correctAmplitude": {
+    "default": "3",
+    "editor": "pci",
+    "label": { "en": "Correct setting: amplitude (empty: none)", "nl": "Goede instelling: amplitude (leeg: geen)" }
+  },
+  "frequencyMin": {
+    "default": "0.5",
+    "editor": "number",
+    "label": { "en": "Frequency knob: lowest", "nl": "Frequentieknop: laagste" }
+  },
+  "frequencyMax": {
+    "default": "8",
+    "editor": "number",
+    "label": { "en": "Frequency knob: highest", "nl": "Frequentieknop: hoogste" }
+  },
+  "frequencyStep": {
+    "default": "0.1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Frequency knob: step", "nl": "Frequentieknop: stap" }
+  },
+  "amplitudeMin": {
+    "default": "0.2",
+    "editor": "number",
+    "label": { "en": "Amplitude knob: lowest", "nl": "Amplitudeknop: laagste" }
+  },
+  "amplitudeMax": {
+    "default": "4",
+    "editor": "number",
+    "label": { "en": "Amplitude knob: highest", "nl": "Amplitudeknop: hoogste" }
+  },
+  "amplitudeStep": {
+    "default": "0.1",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Amplitude knob: step", "nl": "Amplitudeknop: stap" }
+  },
+  "showValues": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the values at the knobs (off: read the screen)", "nl": "Waarden bij de knoppen tonen (uit: aflezen op het scherm)" }
+  },
+  "animate": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Running beam (never with reduced motion)", "nl": "Lopende lichtstip (nooit bij beperkte beweging)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts and numbers", "nl": "Taal van de teksten en getallen" }
+  }
+}

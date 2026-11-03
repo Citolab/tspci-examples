@@ -1,0 +1,277 @@
+{
+  "name": "@citolab/pci-sun-earth",
+  "version": "1.0.0-alpha.1",
+  "description": "Sun, Earth and the seasons: a tilted Earth around the Sun in 3D and the sun's path in the sky of a place; set the date, the time and the place, scored with margins",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "sun",
+    "earth",
+    "seasons",
+    "day-length",
+    "solar-position",
+    "geography",
+    "physics",
+    "three"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-sun-earth"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "sunEarth.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-sun-earth npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-sun-earth npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "sunEarth",
+      "label": "Sun, Earth and seasons",
+      "tags": [
+        "sun",
+        "earth",
+        "seasons",
+        "geography",
+        "physics",
+        "3d"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "sunEarth",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The date, time and place the candidate set and what the PCI computes for them; in answer mode also the author's targets (data-setup) evaluated; README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the targets met",
+              "nl": "Score: punten van de doelen die gehaald zijn"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all targets",
+              "nl": "Maximale score: punten van alle doelen"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every target is met",
+              "nl": "Goed: 1 als elk doel gehaald is"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Target 1: 1 met, 0 not",
+              "nl": "Doel 1: 1 gehaald, 0 niet"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Target 2: 1 met, 0 not",
+              "nl": "Doel 2: 1 gehaald, 0 niet"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Target 3: 1 met, 0 not",
+              "nl": "Doel 3: 1 gehaald, 0 niet"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Target 4: 1 met, 0 not",
+              "nl": "Doel 4: 1 gehaald, 0 niet"
+            }
+          },
+          "day": {
+            "baseType": "integer",
+            "label": {
+              "en": "Day of the year (1 to 365)",
+              "nl": "Dag van het jaar (1 tot 365)"
+            }
+          },
+          "time": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Time, UTC (hours, 4.5 is 04:30)",
+              "nl": "Tijd, UTC (uren, 4,5 is 04:30)"
+            }
+          },
+          "localTime": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Local time by longitude, UTC + longitude/15 (hours)",
+              "nl": "Plaatselijke tijd naar lengtegraad, UTC + lengte/15 (uren)"
+            }
+          },
+          "solarTime": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Solar time at the place, 12 is noon (hours)",
+              "nl": "Zonnetijd op de plaats, 12 is de middag (uren)"
+            }
+          },
+          "place": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Place (its identifier)",
+              "nl": "Plaats (de identifier)"
+            }
+          },
+          "latitude": {
+            "baseType": "float",
+            "label": {
+              "en": "Latitude of the place (°, north positive)",
+              "nl": "Breedtegraad van de plaats (°, noord positief)"
+            }
+          },
+          "longitude": {
+            "baseType": "float",
+            "label": {
+              "en": "Longitude of the place (°, east positive)",
+              "nl": "Lengtegraad van de plaats (°, oost positief)"
+            }
+          },
+          "declination": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Declination: latitude where the sun is overhead at noon (°)",
+              "nl": "Declinatie: breedte waar de zon 's middags loodrecht staat (°)"
+            }
+          },
+          "subsolarLongitude": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Longitude where it is noon now (°)",
+              "nl": "Lengtegraad waar het nu middag is (°)"
+            }
+          },
+          "sunElevation": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Height of the sun now at the place (°)",
+              "nl": "Zonshoogte nu op de plaats (°)"
+            }
+          },
+          "sunAzimuth": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Direction of the sun now, from north clockwise (°)",
+              "nl": "Richting van de zon nu, vanaf noord met de klok mee (°)"
+            }
+          },
+          "noonElevation": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Height of the sun at noon at the place (°)",
+              "nl": "Zonshoogte 's middags op de plaats (°)"
+            }
+          },
+          "dayLength": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Day length at the place (hours)",
+              "nl": "Daglengte op de plaats (uren)"
+            }
+          },
+          "sunrise": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Sunrise, UTC (hours); missing without one",
+              "nl": "Zonsopkomst, UTC (uren); ontbreekt zonder"
+            }
+          },
+          "sunset": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Sunset, UTC (hours); missing without one",
+              "nl": "Zonsondergang, UTC (uren); ontbreekt zonder"
+            }
+          },
+          "tried": {
+            "baseType": "string",
+            "label": {
+              "en": "Tool mode: every setting the candidate stopped at (JSON)",
+              "nl": "Gereedschap: elke stand waar de kandidaat stopte (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Set up the task…",
+          "nl": "Opdracht maken…"
+        },
+        "width": 1100,
+        "height": 800
+      }
+    }
+  }
+}

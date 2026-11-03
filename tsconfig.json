@@ -1,0 +1,20 @@
+// The Storybook of all examples (.storybook) and the stories of each PCI; a PCI builds with its own tsconfig.json
+{
+  "compilerOptions": {
+    "lib": ["es2022", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "target": "es2022",
+    "strict": false,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "allowImportingTsExtensions": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "types": ["node"]
+  },
+  "include": [".storybook/**/*.ts", "tspci-*/src/**/*.stories.ts", "tspci-*/global.d.ts", "vitest.config.ts"]
+}

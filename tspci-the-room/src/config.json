@@ -1,0 +1,65 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the room (empty: the exercise's own)", "nl": "Instructie boven de kamer (leeg: die van de opdracht)" }
+  },
+  "exercise": {
+    "default": "restaurant",
+    "editor": "textarea",
+    "label": { "en": "Exercise: a built-in name, an exercise file (with a game URL) or the exercise as JSON", "nl": "Opdracht: een ingebouwde naam, een opdrachtbestand (met een game-URL) of de opdracht als JSON" },
+    "$comment": "restaurant (built in); museum.json with data-gameurl: a glTF exercise of the original; or JSON { room, assets, objects, rules } (README)"
+  },
+  "gameurl": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Game URL (folder with exercises/ of the original, for glTF exercises)", "nl": "Game-URL (map met exercises/ van het origineel, voor glTF-opdrachten)" }
+  },
+  "scoringRules": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Scoring rules (JSON list; empty: the exercise's own)", "nl": "Scoringsregels (JSON-lijst; leeg: die van de opdracht)" },
+    "$comment": "[{ \"name\": \"tables_at_wall\", \"object\": \"tablefortwo\", \"nearWall\": true }, …]; checks: inZone, nearWall, snapped, noOverlap, connected, closerTo/than, zoneClear, count (README)"
+  },
+  "rotationStep": {
+    "default": "90",
+    "editor": "enum",
+    "label": { "en": "Turn in steps of", "nl": "Draaien in stappen van" },
+    "options": [
+      { "value": "90", "label": { "en": "90° (as the original)", "nl": "90° (zoals het origineel)" } },
+      { "value": "45", "label": { "en": "45°", "nl": "45°" } },
+      { "value": "15", "label": { "en": "15°", "nl": "15°" } }
+    ]
+  },
+  "gridSize": {
+    "default": "0.25",
+    "editor": "enum",
+    "label": { "en": "Snap to a grid of", "nl": "Uitlijnen op een raster van" },
+    "options": [
+      { "value": "0", "label": { "en": "No grid (as the original)", "nl": "Geen raster (zoals het origineel)" } },
+      { "value": "0.1", "label": { "en": "10 cm", "nl": "10 cm" } },
+      { "value": "0.25", "label": { "en": "25 cm", "nl": "25 cm" } },
+      { "value": "0.5", "label": { "en": "50 cm", "nl": "50 cm" } }
+    ]
+  },
+  "showZones": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the scoring zones (to check an exercise)", "nl": "Scoringszones tonen (om een opdracht te controleren)" }
+  },
+  "height": {
+    "default": "480",
+    "editor": "integer",
+    "min": 280,
+    "label": { "en": "Height of the room (px)", "nl": "Hoogte van de kamer (px)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

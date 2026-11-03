@@ -1,0 +1,32 @@
+{
+  "prompt": {
+    "default": "Choose the parts one by one, in an order that works: some parts need others first. Click a part in the 3D view, or use the list.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the product", "nl": "Instructie boven het product" }
+  },
+  "assembly": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Product, order rules, task and scoring", "nl": "Product, volgorderegels, opdracht en score" },
+    "$comment": "JSON written by the authoring mode (assembly.ts): the parts with their shapes, positions and prerequisites, the task, the feedback, the scoring and the correct order; empty: the example of data-example"
+  },
+  "example": {
+    "default": "cabinet",
+    "editor": "enum",
+    "options": [
+      { "value": "cabinet", "label": { "en": "Small cabinet", "nl": "Kastje" } },
+      { "value": "hub", "label": { "en": "Bicycle wheel hub", "nl": "Fietsnaaf" } },
+      { "value": "plug", "label": { "en": "Mains plug", "nl": "Stekker" } }
+    ],
+    "label": { "en": "Example product (without a product of your own)", "nl": "Voorbeeldproduct (zonder eigen product)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

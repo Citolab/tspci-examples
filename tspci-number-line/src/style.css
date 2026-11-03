@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+/* the handles on the line: sliders with their own focus ring (an outline does not follow an SVG shape) */
+.nl-handle { outline: none; cursor: grab; }
+.nl-handle:active { cursor: grabbing; }
+.nl-ring { opacity: 0; }
+.nl-handle:focus-visible .nl-ring { opacity: 1; }
+.nl-hit { cursor: crosshair; }
+.nl-chip { cursor: grab; }
+/* the authoring mode: a number is a button that hides it */
+.nl-toggle { cursor: pointer; outline: none; }
+.nl-toggle:focus-visible text { text-decoration: underline; }
+.nl-hidden text { text-decoration: line-through; }
+/* a point that lands on the line pops in */
+.nl-handle { animation: nl-pop 0.18s ease-out; transform-box: fill-box; transform-origin: center; }
+@keyframes nl-pop { from { opacity: 0.4; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .nl-handle { animation: none; }
+}

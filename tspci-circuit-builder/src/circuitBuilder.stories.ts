@@ -1,0 +1,393 @@
+import type { Meta, StoryObj } from "@storybook/html-vite";
+import { expect, userEvent, waitFor } from "storybook/test";
+import { afterPaint, lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, type AuthoringArgs, type MountedPci, type PciArgs } from "../../.storybook/tspci";
+import pci from "./index";
+
+const meta = {
+  title: "Circuit builder",
+  render: (args) => mountPci(pci, args),
+} satisfies Meta<PciArgs>;
+export default meta;
+type Story = StoryObj<PciArgs>;
+
+type Canvas = MountedPci["canvas"];
+type Record = { record: { name: string; base: { integer?: number; string?: string } | null }[] } | undefined;
+
+/** A field of the record response. */
+const field = (response: unknown, name: string) => (response as Record)?.record.find((f) => f.name === name)?.base;
+/** The cell in row and column (1-based), as a screen reader names it. */
+const cell = (canvas: Canvas, row: number, column: number) => canvas.getByRole("gridcell", { name: new RegExp(`^Row ${row}, column ${column}:`) });
+const part = (canvas: Canvas, row: number, column: number) => cell(canvas, row, column).getAttribute("data-part");
+
+/**
+ * Drags from one element to another with pointer events, as a mouse or a finger does (user-event has no drag that
+ * moves over the page with coordinates).
+ */
+const drag = async (from: Element, to: Element) => {
+  const a = from.getBoundingClientRect(), b = to.getBoundingClientRect();
+  const at = (r: DOMRect, dx = 0) => ({ clientX: r.left + r.width / 2 + dx, clientY: r.top + r.height / 2, bubbles: true, composed: true, pointerId: 1, button: 0, isPrimary: true });
+  from.dispatchEvent(new PointerEvent("pointerdown", at(a)));
+  from.dispatchEvent(new PointerEvent("pointermove", at(a, 20)));
+  to.dispatchEvent(new PointerEvent("pointermove", at(b)));
+  to.dispatchEvent(new PointerEvent("pointerup", at(b)));
+  await afterPaint();
+};
+
+/** The example's solution without the buzzer and its two wires: the candidate is nearly done. */
+const NEARLY = [
+  { type: "wire", x: 1, y: 1, rotation: 90 }, { type: "wire", x: 1, y: 3, rotation: 90 }, { type: "switch", x: 3, y: 0, rotation: 0 },
+  { type: "tee", x: 4, y: 0, rotation: 180 }, { type: "corner", x: 5, y: 0, rotation: 270 }, { type: "led", x: 4, y: 2, rotation: 90 },
+  { type: "wire", x: 4, y: 1, rotation: 90 }, { type: "wire", x: 4, y: 3, rotation: 90 }, { type: "wire", x: 3, y: 4, rotation: 0 },
+  { type: "tee", x: 4, y: 4, rotation: 0 }, { type: "corner", x: 5, y: 4, rotation: 0 },
+];
+const boardResponse = (parts: unknown[]) => ({ record: [{ name: "board", base: { string: JSON.stringify({ parts }) } }] });
+const TOPOLOGY = "buzzer(1-2) dcSource(1>3) led(2>1) switch(2-3)";
+
+export const Default: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getByText(/^Complete the circuit diagram/)).toBeInTheDocument();
+    expect(canvas.getByRole("grid", { name: /^Circuit board: Complete the circuit/ })).toBeInTheDocument();
+    expect(canvas.getAllByRole("gridcell")).toHaveLength(35);
+    // the preset: a DC source with wires, locked
+    expect(cell(canvas, 3, 2)).toHaveAccessibleName("Row 3, column 2: DC source, turned 90°, locked, 2 open ends");
+    expect(cell(canvas, 3, 2)).toHaveAttribute("aria-readonly", "true");
+    expect(canvas.getByText("6 open ends")).toBeInTheDocument();
+    // the palette, with how many are left
+    expect(canvas.getByRole("button", { name: "Switch, 1 left" })).toBeEnabled();
+    expect(canvas.getByRole("button", { name: "Wire" })).toBeEnabled();
+    expect(pci.getResponse()).toBeUndefined();
+  },
+};
+
+export const PlaceWithTheMouse: Story = {
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+
+    await step("drag a switch from the palette onto the board", async () => {
+      await drag(canvas.getByRole("button", { name: "Switch, 1 left" }), cell(canvas, 1, 4));
+      expect(part(canvas, 1, 4)).toBe("switch@0");
+      expect(canvas.getByRole("status")).toHaveTextContent("Switch placed in row 1, column 4.");
+      expect(canvas.getByRole("button", { name: "Switch, none left" })).toBeDisabled();
+      expect(field(await lastChange(mounted), "board")?.string).toContain('"switch"');
+    });
+
+    await step("choose the LED, then a cell; rotate it with the button", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "LED, 1 left" }));
+      expect(canvas.getByRole("button", { name: "LED, 1 left" })).toHaveAttribute("aria-pressed", "true");
+      await userEvent.click(cell(canvas, 3, 5));
+      expect(part(canvas, 3, 5)).toBe("led@0");
+      await userEvent.click(canvas.getByRole("button", { name: "Rotate" }));
+      expect(part(canvas, 3, 5)).toBe("led@90");
+    });
+
+    await step("a double click rotates", async () => {
+      await userEvent.dblClick(cell(canvas, 1, 4));
+      expect(part(canvas, 1, 4)).toBe("switch@90");
+    });
+
+    await step("drag a part to move it; drag it off the board to remove it", async () => {
+      await drag(cell(canvas, 3, 5), cell(canvas, 3, 6));
+      expect(part(canvas, 3, 6)).toBe("led@90");
+      expect(part(canvas, 3, 5)).toBeNull();
+      await drag(cell(canvas, 3, 6), canvas.getByText(/^Complete the circuit diagram/));
+      expect(part(canvas, 3, 6)).toBeNull();
+      expect(canvas.getByRole("status")).toHaveTextContent("LED removed.");
+    });
+
+    await step("undo brings it back; a locked part does not move", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Undo" }));
+      expect(part(canvas, 3, 6)).toBe("led@90");
+      await drag(cell(canvas, 3, 2), cell(canvas, 3, 1));
+      expect(part(canvas, 3, 2)).toBe("dcSource@90");
+      expect(part(canvas, 3, 1)).toBeNull();
+    });
+
+    await step("delete with the button, start again", async () => {
+      await userEvent.click(cell(canvas, 3, 6));
+      await userEvent.click(canvas.getByRole("button", { name: "Delete" }));
+      expect(part(canvas, 3, 6)).toBeNull();
+      await userEvent.click(canvas.getByRole("button", { name: "Start again" }));
+      expect(part(canvas, 1, 4)).toBeNull();
+      expect(pci.getResponse()).toBeUndefined();
+    });
+  },
+};
+
+export const Keyboard: Story = {
+  play: async ({ canvasElement, step }) => {
+    const { canvas } = await openPci(canvasElement);
+    const grid = canvas.getByRole("grid");
+
+    await step("choose a part, go to a cell with the arrow keys, Enter places it", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Lamp, 1 left" }));
+      grid.focus();
+      expect(grid).toHaveAttribute("aria-activedescendant", "board-cell-0-0");
+      await userEvent.keyboard("{ArrowRight}{ArrowRight}{ArrowRight}{ArrowDown}{Enter}");
+      expect(grid).toHaveAttribute("aria-activedescendant", "board-cell-3-1");
+      expect(part(canvas, 2, 4)).toBe("lamp@0");
+      expect(canvas.getByRole("status")).toHaveTextContent("Lamp placed in row 2, column 4.");
+    });
+
+    await step("R rotates, Shift + arrow moves, Delete removes, Ctrl+Z undoes", async () => {
+      await userEvent.keyboard("r");
+      expect(cell(canvas, 2, 4)).toHaveAccessibleName("Row 2, column 4: Lamp, turned 90°, 2 open ends");
+      await userEvent.keyboard("{Shift>}{ArrowRight}{/Shift}");
+      expect(part(canvas, 2, 5)).toBe("lamp@90");
+      expect(part(canvas, 2, 4)).toBeNull();
+      await userEvent.keyboard("{Delete}");
+      expect(part(canvas, 2, 5)).toBeNull();
+      await userEvent.keyboard("{Control>}z{/Control}");
+      expect(part(canvas, 2, 5)).toBe("lamp@90");
+    });
+
+    await step("a locked part stays", async () => {
+      await userEvent.click(cell(canvas, 3, 2));
+      await userEvent.keyboard("{Delete}r");
+      expect(part(canvas, 3, 2)).toBe("dcSource@90");
+      expect(canvas.getByRole("status")).toHaveTextContent("This part is part of the question: you cannot change it.");
+    });
+
+    await step("help", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Help" }));
+      expect(canvas.getByText(/the arrow keys move over the board/)).toBeInTheDocument();
+    });
+  },
+};
+
+export const Scoring: Story = {
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+
+    await step("nearly done: the buzzer and two wires are missing", async () => {
+      pci.setResponse(boardResponse(NEARLY));
+      await waitFor(() => expect(part(canvas, 3, 5)).toBe("led@90"));
+      const r = pci.getResponse();
+      // contains the parts ✗, switch in series ✓, LED ∥ buzzer ✗, LED forward ✓, closed ✗
+      expect([1, 2, 3, 4, 5].map((i) => field(r, `check${i}`)?.integer)).toEqual([0, 1, 0, 1, 0]);
+      expect(field(r, "score")).toEqual({ integer: 2 });
+      expect(field(r, "maxscore")).toEqual({ integer: 5 });
+      expect(canvas.getByText("2 open ends")).toBeInTheDocument();
+    });
+
+    await step("the buzzer and the wires complete it", async () => {
+      const grid = canvas.getByRole("grid");
+      await userEvent.click(canvas.getByRole("button", { name: "Wire" }));
+      await userEvent.click(cell(canvas, 2, 6));
+      await userEvent.click(cell(canvas, 4, 6));
+      await userEvent.keyboard("r");
+      await userEvent.click(cell(canvas, 2, 6));
+      await userEvent.keyboard("r");
+      await userEvent.click(canvas.getByRole("button", { name: "Buzzer, 1 left" }));
+      grid.focus();
+      await userEvent.keyboard("{ArrowDown}{Enter}r");
+      expect(part(canvas, 3, 6)).toBe("buzzer@90");
+      expect(canvas.queryByText(/open ends?$/)).toBeNull();
+      const r = await lastChange(mounted);
+      expect(field(r, "score")).toEqual({ integer: 5 });
+      expect(field(r, "correct")).toEqual({ integer: 1 });
+      expect(field(r, "topology")).toEqual({ string: TOPOLOGY });
+      expect(JSON.parse(field(r, "board")!.string!).parts).toHaveLength(19);
+    });
+
+    await step("the LED the wrong way round: only the polarity check fails", async () => {
+      await userEvent.click(cell(canvas, 3, 5));
+      await userEvent.keyboard("rr");
+      const r = pci.getResponse();
+      expect(field(r, "check4")).toEqual({ integer: 0 });
+      expect(field(r, "score")).toEqual({ integer: 4 });
+      expect(field(r, "correct")).toEqual({ integer: 0 });
+    });
+  },
+};
+
+export const Dutch: Story = {
+  args: { properties: { language: "nl", prompt: "Maak de schakeling af." } },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getByRole("gridcell", { name: "Rij 3, kolom 2: Gelijkspanningsbron, 90° gedraaid, vast, 2 losse einden" })).toHaveAttribute("aria-readonly", "true");
+    expect(canvas.getByText("6 losse einden")).toBeInTheDocument();
+    await userEvent.click(canvas.getByRole("button", { name: "Zoemer, nog 1" }));
+    expect(canvas.getByRole("status")).toHaveTextContent("Zoemer gekozen");
+    await userEvent.click(canvas.getByRole("gridcell", { name: /^Rij 1, kolom 5:/ }));
+    expect(canvas.getByRole("status")).toHaveTextContent("Zoemer geplaatst in rij 1, kolom 5.");
+    expect(canvas.getByRole("button", { name: "Draaien" })).toBeEnabled();
+    // the response does not depend on the language
+    expect(field(pci.getResponse(), "board")?.string).toContain('"buzzer"');
+  },
+};
+
+/** The preset in the original exam interaction's format, limits in the palette, two checks, the current shown. */
+const ownCircuit = JSON.stringify({
+  columns: 4, rows: 3,
+  preset: [{ gridx: 0, gridy: 1, id: "gelijkspanningsbron", rotation: 90 }],
+  palette: "lamp:1 wire corner",
+  checks: [{ type: "parts", count: { lamp: 1 } }, { type: "closed", points: 2 }],
+});
+const loop = [
+  { type: "corner", x: 0, y: 0, rotation: 180 }, { type: "wire", x: 1, y: 0 }, { type: "corner", x: 2, y: 0, rotation: 270 },
+  { type: "lamp", x: 2, y: 1, rotation: 90 }, { type: "corner", x: 0, y: 2, rotation: 90 }, { type: "wire", x: 1, y: 2 }, { type: "corner", x: 2, y: 2, rotation: 0 },
+];
+
+export const OwnCircuit: Story = {
+  args: { properties: { circuit: ownCircuit, prompt: "Make the lamp burn.", showcurrent: "true", showopenends: "false" } },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getAllByRole("gridcell")).toHaveLength(12);
+    expect(cell(canvas, 2, 1)).toHaveAccessibleName("Row 2, column 1: DC source, turned 90°, locked");
+    expect(canvas.queryByText(/open ends/)).toBeNull();
+    expect(canvas.queryByRole("button", { name: /^Switch/ })).toBeNull();
+    await drag(canvas.getByRole("button", { name: "Lamp, 1 left" }), cell(canvas, 1, 4));
+    expect(canvas.getByRole("button", { name: "Lamp, none left" })).toBeDisabled();
+    pci.setResponse(boardResponse(loop));
+    await waitFor(() => expect(canvas.getByText("Closed circuit")).toBeInTheDocument());
+    const r = pci.getResponse();
+    expect(field(r, "score")).toEqual({ integer: 3 });
+    expect(field(r, "maxscore")).toEqual({ integer: 3 });
+    expect(field(r, "topology")).toEqual({ string: "dcSource(1>2) lamp(1-2)" });
+  },
+};
+
+export const RestoresState: Story = {
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement);
+    await userEvent.click(first.canvas.getByRole("button", { name: "LED, 1 left" }));
+    await userEvent.click(cell(first.canvas, 3, 5));
+    await userEvent.keyboard("r");
+    const state = first.pci.getState();
+    expect(JSON.parse(state).state).toEqual({ parts: [{ type: "led", x: 4, y: 2, rotation: 90 }] });
+
+    const second = await remountPci(canvasElement, pci, { state });
+    expect(part(second.canvas, 3, 5)).toBe("led@90");
+    expect(second.pci.getResponse()).toEqual(first.pci.getResponse());
+    expect(second.changes).toHaveLength(0);
+  },
+};
+
+export const BoundResponse: Story = {
+  args: { boundTo: { RESPONSE: boardResponse(NEARLY) } },
+  play: async ({ canvasElement, step }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    await step("the bound response is on the board", async () => {
+      await waitFor(() => expect(part(canvas, 3, 5)).toBe("led@90"));
+      expect(field(pci.getResponse(), "score")).toEqual({ integer: 2 });
+    });
+    await step("resetResponse: the board as the item starts", async () => {
+      pci.resetResponse();
+      await waitFor(() => expect(part(canvas, 3, 5)).toBeNull());
+      expect(pci.getResponse()).toBeUndefined();
+    });
+  },
+};
+
+export const Solution: Story = {
+  args: { status: "solution", state: JSON.stringify({ state: { parts: [{ type: "lamp", x: 3, y: 2, rotation: 0 }] }, log: [] }) },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    // the author's solution replaces the candidate's work; nothing to change
+    await waitFor(() => expect(part(canvas, 3, 6)).toBe("buzzer@90"));
+    expect(part(canvas, 3, 4)).toBeNull();
+    expect(canvas.queryByRole("button", { name: /^LED/ })).toBeNull();
+    expect(canvas.getByRole("grid")).toHaveAttribute("aria-readonly", "true");
+    expect(field(pci.getResponse(), "correct")).toEqual({ integer: 1 });
+  },
+};
+
+export const SolutionFromTheDeclaration: Story = {
+  args: {
+    status: "solution",
+    responseDeclaration: { cardinality: "record", correctResponse: { value: [{ fieldIdentifier: "board", value: JSON.stringify({ parts: NEARLY }) }] } },
+  },
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    await waitFor(() => expect(part(canvas, 3, 5)).toBe("led@90"));
+    expect(part(canvas, 3, 6)).toBeNull();
+  },
+};
+
+/** Two interactions of this type on one page: each has its own board and response. */
+export const TwoInstances: Story = {
+  render: (args) => {
+    const page = document.createElement("div");
+    for (const id of ["first", "second"]) {
+      const slot = document.createElement("div");
+      slot.dataset.slot = id;
+      slot.appendChild(mountPci(pci, args));
+      page.appendChild(slot);
+    }
+    return page;
+  },
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement.querySelector<HTMLElement>("[data-slot=first]")!);
+    const second = await openPci(canvasElement.querySelector<HTMLElement>("[data-slot=second]")!);
+    expect(first.pci).not.toBe(second.pci);
+    await userEvent.click(first.canvas.getByRole("button", { name: "Lamp, 1 left" }));
+    await userEvent.click(cell(first.canvas, 1, 5));
+    await userEvent.click(second.canvas.getByRole("button", { name: "Resistor, 1 left" }));
+    await userEvent.click(cell(second.canvas, 2, 5));
+    expect(part(first.canvas, 1, 5)).toBe("lamp@0");
+    expect(part(first.canvas, 2, 5)).toBeNull();
+    expect(part(second.canvas, 2, 5)).toBe("resistor@0");
+    expect(field(first.pci.getResponse(), "topology")?.string).toContain("lamp");
+    expect(field(second.pci.getResponse(), "topology")?.string).not.toContain("lamp");
+    expect(first.changes).toHaveLength(1);
+    expect(second.changes).toHaveLength(1);
+  },
+};
+
+// --- Authoring mode: what an authoring system shows the item author (getAuthoringInstance)
+
+/** The authoring mode, as an authoring system shows it after "Build the circuit…". */
+export const AuthoringMode: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+  play: async ({ canvasElement, step }) => {
+    const { instance, canvas, changes } = await openAuthoring(canvasElement);
+    const circuit = () => JSON.parse(instance.getProperties().circuit!);
+
+    await step("starts from the example; its solution scores 5 of 5", async () => {
+      expect(canvas.getByTestId("summary")).toHaveTextContent("The solution scores 5 of 5.");
+      expect(instance.validate!()).toEqual([]);
+      expect(circuit().preset).toHaveLength(5);
+    });
+
+    await step("a part placed on the board is locked; the author can unlock it", async () => {
+      await drag(canvas.getByRole("button", { name: "Lamp" }), cell(canvas, 3, 7));
+      expect(circuit().preset).toContainEqual({ type: "lamp", x: 6, y: 2, rotation: 0, locked: true });
+      await userEvent.click(cell(canvas, 3, 7));
+      await userEvent.click(canvas.getByRole("checkbox", { name: /^Locked/ }));
+      expect(circuit().preset).toContainEqual({ type: "lamp", x: 6, y: 2, rotation: 0 });
+      expect(changes.length).toBeGreaterThan(0);
+    });
+
+    await step("the solution the wrong way round is a problem", async () => {
+      await userEvent.click(canvas.getByRole("tab", { name: "Solution" }));
+      await userEvent.click(cell(canvas, 3, 5));
+      await userEvent.keyboard("rr");
+      expect(instance.validate!()).toEqual(["The solution does not pass check 4."]);
+      await userEvent.keyboard("rr");
+      expect(instance.validate!()).toEqual([]);
+    });
+
+    await step("the palette: a number per part, or as many as the candidate likes", async () => {
+      await userEvent.click(canvas.getByRole("tab", { name: "Palette" }));
+      await userEvent.click(canvas.getByRole("checkbox", { name: "In the palette: Diode" }));
+      await userEvent.type(canvas.getByRole("spinbutton", { name: "How many: Diode" }), "2");
+      expect(circuit().palette).toContain("diode:2");
+      await userEvent.click(canvas.getByRole("button", { name: "Wires only" }));
+      expect(instance.validate!()).toContain("The solution uses LED, which is not in the palette.");
+      await userEvent.click(canvas.getByRole("button", { name: "All parts" }));
+    });
+
+    await step("the checks: add one that compares with the solution", async () => {
+      await userEvent.click(canvas.getByRole("tab", { name: "Checks" }));
+      await userEvent.click(canvas.getByRole("button", { name: "+ Add a check" }));
+      await userEvent.selectOptions(canvas.getByTestId("check-5-type"), "Same circuit as the solution");
+      expect(circuit().checks[5]).toEqual({ type: "solution", points: 1 });
+      expect(canvas.getByTestId("topology")).toHaveTextContent(TOPOLOGY);
+      expect(canvas.getByTestId("summary")).toHaveTextContent("The solution scores 6 of 6.");
+    });
+  },
+};

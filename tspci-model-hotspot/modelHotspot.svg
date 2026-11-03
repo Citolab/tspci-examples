@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <title>3D model hotspot</title>
+  <rect width="64" height="64" rx="14" fill="#f1f5f9"/>
+  <circle cx="30" cy="34" r="19" fill="#f1ece2" stroke="#334155" stroke-width="2"/>
+  <path d="M30 15a19 19 0 0 1 0 38" fill="#df7a62" opacity="0.85"/>
+  <circle cx="30" cy="34" r="19" fill="none" stroke="#334155" stroke-width="2"/>
+  <ellipse cx="14" cy="34" rx="4" ry="9" fill="#9fd3ee" stroke="#334155" stroke-width="1.5"/>
+  <ellipse cx="19" cy="34" rx="3.5" ry="7" fill="#f2dc8c" stroke="#0b4f8a" stroke-width="3"/>
+  <path d="M41 12 l14 0 0 10 -10 0 -4 4 z" fill="#0b4f8a"/>
+  <text x="48" y="20" font-family="system-ui, sans-serif" font-size="9" font-weight="700" fill="#fff" text-anchor="middle">B</text>
+  <path d="M22 30 L42 22" stroke="#0b4f8a" stroke-width="1.5" stroke-dasharray="2 2"/>
+</svg>

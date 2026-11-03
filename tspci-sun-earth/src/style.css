@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+.se-view3d canvas {
+  cursor: grab;
+}
+/* no animation of its own; the buttons only fade their background when motion is welcome */
+@media (prefers-reduced-motion: no-preference) {
+  .sun-earth button {
+    transition: background-color 120ms ease, box-shadow 120ms ease;
+  }
+}

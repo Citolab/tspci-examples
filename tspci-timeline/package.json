@@ -1,0 +1,404 @@
+{
+  "name": "@citolab/pci-timeline",
+  "version": "1.0.0-alpha.1",
+  "description": "place events on a timeline (tijdbalk): at a date with a margin, in a period (the ten Dutch tijdvakken or your own), or in the right order; years BC/AD, zoom and pan",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "timeline",
+    "tijdbalk",
+    "tijdvakken",
+    "history",
+    "social-studies"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-timeline"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "timeline.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-timeline npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-timeline npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "timeline",
+      "label": "Timeline",
+      "tags": [
+        "history",
+        "timeline",
+        "social studies",
+        "periods"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "timeline",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the placements against data-timeline; the year fields can be scored with a margin in the response processing (README)",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the events that are right (pairs in the right order in order mode)",
+              "nl": "Score: punten van de gebeurtenissen die goed staan (paren in de goede volgorde bij volgorde)"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score",
+              "nl": "Maximale score"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every event is right",
+              "nl": "Goed: 1 als alle gebeurtenissen goed staan"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 1 right: 1 or 0",
+              "nl": "Gebeurtenis 1 goed: 1 of 0"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 2 right: 1 or 0",
+              "nl": "Gebeurtenis 2 goed: 1 of 0"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 3 right: 1 or 0",
+              "nl": "Gebeurtenis 3 goed: 1 of 0"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 4 right: 1 or 0",
+              "nl": "Gebeurtenis 4 goed: 1 of 0"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 5 right: 1 or 0",
+              "nl": "Gebeurtenis 5 goed: 1 of 0"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 6 right: 1 or 0",
+              "nl": "Gebeurtenis 6 goed: 1 of 0"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 7 right: 1 or 0",
+              "nl": "Gebeurtenis 7 goed: 1 of 0"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 8 right: 1 or 0",
+              "nl": "Gebeurtenis 8 goed: 1 of 0"
+            }
+          },
+          "check9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 9 right: 1 or 0",
+              "nl": "Gebeurtenis 9 goed: 1 of 0"
+            }
+          },
+          "check10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 10 right: 1 or 0",
+              "nl": "Gebeurtenis 10 goed: 1 of 0"
+            }
+          },
+          "check11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 11 right: 1 or 0",
+              "nl": "Gebeurtenis 11 goed: 1 of 0"
+            }
+          },
+          "check12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Event 12 right: 1 or 0",
+              "nl": "Gebeurtenis 12 goed: 1 of 0"
+            }
+          },
+          "year1": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 1 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 1 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year2": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 2 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 2 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year3": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 3 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 3 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year4": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 4 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 4 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year5": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 5 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 5 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year6": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 6 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 6 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year7": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 7 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 7 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year8": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 8 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 8 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year9": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 9 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 9 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year10": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 10 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 10 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year11": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 11 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 11 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "year12": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Year of event 12 (BC negative, no year 0)",
+              "nl": "Jaar van gebeurtenis 12 (v.Chr. negatief, geen jaar 0)"
+            }
+          },
+          "period1": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 1",
+              "nl": "Tijdvak van gebeurtenis 1"
+            }
+          },
+          "period2": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 2",
+              "nl": "Tijdvak van gebeurtenis 2"
+            }
+          },
+          "period3": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 3",
+              "nl": "Tijdvak van gebeurtenis 3"
+            }
+          },
+          "period4": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 4",
+              "nl": "Tijdvak van gebeurtenis 4"
+            }
+          },
+          "period5": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 5",
+              "nl": "Tijdvak van gebeurtenis 5"
+            }
+          },
+          "period6": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 6",
+              "nl": "Tijdvak van gebeurtenis 6"
+            }
+          },
+          "period7": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 7",
+              "nl": "Tijdvak van gebeurtenis 7"
+            }
+          },
+          "period8": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 8",
+              "nl": "Tijdvak van gebeurtenis 8"
+            }
+          },
+          "period9": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 9",
+              "nl": "Tijdvak van gebeurtenis 9"
+            }
+          },
+          "period10": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 10",
+              "nl": "Tijdvak van gebeurtenis 10"
+            }
+          },
+          "period11": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 11",
+              "nl": "Tijdvak van gebeurtenis 11"
+            }
+          },
+          "period12": {
+            "baseType": "identifier",
+            "label": {
+              "en": "Period of event 12",
+              "nl": "Tijdvak van gebeurtenis 12"
+            }
+          },
+          "order": {
+            "baseType": "string",
+            "label": {
+              "en": "Order: the event ids from early to late",
+              "nl": "Volgorde: de ids van de gebeurtenissen van vroeg naar laat"
+            }
+          },
+          "pairs": {
+            "baseType": "integer",
+            "label": {
+              "en": "Pairs in the right order (order mode)",
+              "nl": "Paren in de goede volgorde (volgorde)"
+            }
+          },
+          "placements": {
+            "baseType": "string",
+            "label": {
+              "en": "Placements: every event with its year or period (JSON)",
+              "nl": "Plaatsing: elke gebeurtenis met jaar of tijdvak (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Make the timeline…",
+          "nl": "Tijdbalk maken…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}

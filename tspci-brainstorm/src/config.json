@@ -1,0 +1,40 @@
+{
+  "nickname": {
+    "default": "You",
+    "editor": "text",
+    "label": { "en": "Test-taker nickname (e.g. 'Me' or 'You')", "nl": "Naam van de kandidaat in de chat (bijv. 'Ik' of 'Jij')" }
+  },
+  "messages": {
+    "default": "10;Anne;red;Message in red after 10 seconds\n15;Lars;green;Message in green after 15 seconds\n16;Igor;#00a8a7;Message in color #00a8a7 after 16 seconds",
+    "editor": "textarea",
+    "label": {
+      "en": "'Bot' input: one message per line, as seconds before shown;name;colour;message, e.g. 3;Amy;red;I think it is a good idea!",
+      "nl": "Berichten van de 'bots': één per regel, als seconden tot het bericht;naam;kleur;bericht, bijv. 3;Amy;red;Goed idee!"
+    }
+  },
+  "timeLimit": {
+    "default": "60",
+    "editor": "integer",
+    "min": 1,
+    "label": { "en": "Time limit (seconds)", "nl": "Tijdslimiet (seconden)" }
+  },
+  "startText": {
+    "default": "Click here when you are ready to brainstorm",
+    "editor": "text",
+    "label": { "en": "Start message (empty: start right away)", "nl": "Startbericht (leeg: meteen beginnen)" }
+  },
+  "endText": {
+    "default": "Time is up. Go to next task.",
+    "editor": "text",
+    "label": { "en": "Time is out-message", "nl": "Bericht als de tijd om is" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the chat's own texts", "nl": "Taal van de eigen teksten van de chat" }
+  }
+}

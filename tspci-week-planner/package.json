@@ -1,0 +1,216 @@
+{
+  "name": "@citolab/pci-week-planner",
+  "version": "1.0.0-alpha.1",
+  "description": "plan tasks in a week agenda of days, time slots and resources (people, rooms, vehicles); the PCI checks the author's rules (order, days, hours, breaks, overlaps, opening hours)",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "planning",
+    "schedule",
+    "agenda",
+    "roster",
+    "vocational"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-week-planner"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "weekPlanner.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-week-planner npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-week-planner npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "weekPlanner",
+      "label": "Week planner",
+      "tags": [
+        "planning",
+        "schedule",
+        "agenda",
+        "roster"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "weekPlanner",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI evaluates the author's checks (data-planner); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the passed checks",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 1: 1 passed, 0 not",
+              "nl": "Check 1: 1 klopt, 0 niet"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 2: 1 passed, 0 not",
+              "nl": "Check 2: 1 klopt, 0 niet"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 3: 1 passed, 0 not",
+              "nl": "Check 3: 1 klopt, 0 niet"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 4: 1 passed, 0 not",
+              "nl": "Check 4: 1 klopt, 0 niet"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 5: 1 passed, 0 not",
+              "nl": "Check 5: 1 klopt, 0 niet"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 6: 1 passed, 0 not",
+              "nl": "Check 6: 1 klopt, 0 niet"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 7: 1 passed, 0 not",
+              "nl": "Check 7: 1 klopt, 0 niet"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 8: 1 passed, 0 not",
+              "nl": "Check 8: 1 klopt, 0 niet"
+            }
+          },
+          "check9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 9: 1 passed, 0 not",
+              "nl": "Check 9: 1 klopt, 0 niet"
+            }
+          },
+          "check10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 10: 1 passed, 0 not",
+              "nl": "Check 10: 1 klopt, 0 niet"
+            }
+          },
+          "check11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 11: 1 passed, 0 not",
+              "nl": "Check 11: 1 klopt, 0 niet"
+            }
+          },
+          "check12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 12: 1 passed, 0 not",
+              "nl": "Check 12: 1 klopt, 0 niet"
+            }
+          },
+          "planned": {
+            "baseType": "integer",
+            "label": {
+              "en": "Planned: the number of tasks in the agenda",
+              "nl": "Gepland: het aantal taken in de agenda"
+            }
+          },
+          "schedule": {
+            "baseType": "string",
+            "label": {
+              "en": "Schedule: every planned task with its day, start, end and resource (JSON)",
+              "nl": "Planning: elke geplande taak met dag, begin, eind en uitvoerder (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Make the agenda…",
+          "nl": "Agenda maken…"
+        },
+        "width": 1100,
+        "height": 800
+      }
+    }
+  }
+}

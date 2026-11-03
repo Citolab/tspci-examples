@@ -1,0 +1,55 @@
+{
+  "strings": {
+    "default": "Flower\nLeaf\nStem\nRoot\nSeed",
+    "editor": "textarea",
+    "label": { "en": "Labels, one per line", "nl": "Labels, één per regel" }
+  },
+  "backdrop": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Image", "nl": "Afbeelding" },
+    "$comment": "an image URL or a data: URL, written by the authoring mode; empty: the example plant. An <img> in the interaction markup goes first"
+  },
+  "dropzones": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Drop zones", "nl": "Plekken" },
+    "$comment": "JSON written by the authoring mode, as the original: [[x, y, width, height, id], …] in % of the image; empty: the zones of the example"
+  },
+  "imageDescription": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Description of the image for screen readers", "nl": "Beschrijving van de afbeelding voor schermlezers" }
+  },
+  "infiniteTexts": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Labels can be used more than once", "nl": "Labels kunnen vaker gebruikt worden" }
+  },
+  "maxDropped": {
+    "default": "1",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Labels per drop zone (0: no maximum)", "nl": "Labels per plek (0: geen maximum)" }
+  },
+  "numbering": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Number the labels in a drop zone", "nl": "Labels op een plek nummeren" }
+  },
+  "droppedStyle": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Extra CSS for labels in a drop zone", "nl": "Extra CSS voor labels op een plek" },
+    "$comment": "as the original: declarations such as \"color: #b91c1c; font-size: 18px\""
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts for screen readers", "nl": "Taal van de teksten voor schermlezers" }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "name": "@citolab/pci-measure-3d",
+  "version": "1.0.0-alpha.1",
+  "description": "measure in a 3D scene: lengths, angles and areas of a box, a ramp, a roof, a tank, stairs and a ladder, with a measuring tape, a protractor and an area tool",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "3d",
+    "measuring",
+    "geometry",
+    "pythagoras",
+    "math"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-measure-3d"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "measure3d.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-measure-3d npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-measure-3d npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "measure3d",
+      "label": "Measure in 3D",
+      "tags": [
+        "3d",
+        "measuring",
+        "geometry",
+        "math"
+      ],
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "short": "measure3d",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "single",
+        "baseType": "float",
+        "tolerance": "range",
+        "$comment": "Answer mode (data-mode=\"answer\"): the value the candidate typed, a float, scored with a margin (qti-equal tolerance). With data-scoring=\"pci\" a record (score, maxscore, correct, measured, value, measurements): CUSTOM. Tool mode: the measurements made, as a JSON string: declare the response string and score NONE (README)"
+      },
+      "authoring": {
+        "label": {
+          "en": "Compose the scene…",
+          "nl": "Scène samenstellen…"
+        },
+        "width": 1100,
+        "height": 800
+      }
+    }
+  }
+}

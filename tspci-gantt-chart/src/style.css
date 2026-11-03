@@ -1,0 +1,9 @@
+/* SPDX-License-Identifier: GPL-3.0-only
+   Based on https://github.com/openPCI/openPCIs/tree/master/ganttchart, © OpenPCI (Aarhus University and Aalborg
+   University: Elias J.T. Hansen, Anna Rusmann, Jeppe Bundsgaard)
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+@import "tailwindcss";
+
+.gantt-off {
+  background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgb(148 163 184 / 0.25) 4px 6px);
+}

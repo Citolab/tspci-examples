@@ -1,0 +1,95 @@
+@import "tailwindcss";
+
+/* Marker colours: Okabe–Ito hues (colour-blind safe), a light fill behind the text and a dark line (4.5:1 on white) */
+.tm-c-yellow { --tm-fill: #f8e27a; --tm-line: #6b5900; }
+.tm-c-blue { --tm-fill: #bddcf3; --tm-line: #00578a; }
+.tm-c-orange { --tm-fill: #f6cd85; --tm-line: #854f00; }
+.tm-c-purple { --tm-fill: #efc6de; --tm-line: #883866; }
+.tm-c-green { --tm-fill: #a6dfca; --tm-line: #005e45; }
+.tm-c-red { --tm-fill: #f5c1a8; --tm-line: #9c3c00; }
+
+/* the source text: a reading measure, room between the lines for underlines and labels */
+.tm-text {
+  max-width: 68ch;
+  padding: 1rem 1.25rem;
+  border: 1px solid var(--color-slate-200);
+  border-radius: 0.75rem;
+  background: #fff;
+  font-size: 1.0625rem;
+  line-height: 1.85;
+  color: var(--color-slate-900);
+  overflow-wrap: break-word;
+  text-align: start;
+  cursor: text;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+  font-kerning: normal;
+  text-rendering: optimizeLegibility;
+}
+.tm-text:focus { outline: none; }
+.tm-text:focus-visible { box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-sky-600) 45%, transparent); }
+.tm-p { margin: 0 0 0.85em; }
+.tm-p:last-child { margin-bottom: 0; }
+.tm-w { border-radius: 2px; }
+.tm-readonly { cursor: default; }
+
+/* marks: every pattern differs in shape, not only in colour */
+.tm-m { -webkit-box-decoration-break: clone; box-decoration-break: clone; }
+.tm-highlight { background-color: var(--tm-fill); }
+/* lines as backgrounds, so they run on under spaces and repeat on every line of a mark */
+.tm-underline, .tm-double, .tm-dotted { background-repeat: no-repeat; background-position: 0 100%; padding-bottom: 2px; }
+.tm-underline { background-image: linear-gradient(var(--tm-line), var(--tm-line)); background-size: 100% 3px; }
+.tm-double {
+  background-image: linear-gradient(var(--tm-line), var(--tm-line)), linear-gradient(var(--tm-line), var(--tm-line));
+  background-size: 100% 2px, 100% 2px;
+  background-position: 0 100%, 0 calc(100% - 4px);
+  padding-bottom: 3px;
+}
+.tm-dotted {
+  background-image: linear-gradient(to right, var(--tm-line) 0 3px, transparent 3px 6px);
+  background-size: 6px 3px;
+  background-repeat: repeat-x;
+}
+.tm-stripes {
+  background-image: repeating-linear-gradient(-45deg, var(--tm-fill) 0 4px, color-mix(in oklab, var(--tm-fill) 35%, #fff) 4px 8px);
+}
+.tm-box { border-block: 2px solid var(--tm-line); padding-block: 1px; }
+.tm-box.tm-first { border-inline-start: 2px solid var(--tm-line); padding-inline-start: 2px; border-start-start-radius: 4px; border-end-start-radius: 4px; }
+.tm-box.tm-last { border-inline-end: 2px solid var(--tm-line); padding-inline-end: 2px; border-start-end-radius: 4px; border-end-end-radius: 4px; }
+.tm-highlight.tm-first, .tm-stripes.tm-first { border-start-start-radius: 4px; border-end-start-radius: 4px; padding-inline-start: 1px; }
+.tm-highlight.tm-last, .tm-stripes.tm-last { border-start-end-radius: 4px; border-end-end-radius: 4px; padding-inline-end: 1px; }
+
+/* the label at the start of a mark */
+.tm-tag {
+  display: inline-block;
+  min-width: 1.15em;
+  margin-inline-end: 2px;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: var(--tm-line);
+  color: #fff;
+  font: 700 10px/1.45 ui-sans-serif, system-ui, sans-serif;
+  text-align: center;
+  vertical-align: 0.45em;
+  letter-spacing: 0.02em;
+}
+
+/* the selection (not yet marked) and the word cursor */
+.tm-sel {
+  box-shadow: inset 0 -1.25em 0 color-mix(in oklab, var(--color-sky-600) 22%, transparent);
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.tm-text:focus .tm-cursor {
+  outline: 2px solid var(--color-sky-800);
+  outline-offset: 1px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .tm-w { transition: background-color 120ms ease, box-shadow 120ms ease; }
+}
+@media (forced-colors: active) {
+  .tm-highlight, .tm-stripes { outline: 1px solid CanvasText; }
+  .tm-sel { outline: 1px dashed Highlight; }
+}

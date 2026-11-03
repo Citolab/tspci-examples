@@ -1,0 +1,9 @@
+/* SPDX-License-Identifier: GPL-3.0-only
+   Based on https://github.com/openPCI/openPCIs/tree/master/voxelcraft, © OpenPCI (Aarhus University and Aalborg
+   University: Elias J.T. Hansen, Anna Rusmann, Jeppe Bundsgaard)
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+@import "tailwindcss";
+
+:host {
+  display: block;
+}

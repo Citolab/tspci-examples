@@ -1,0 +1,87 @@
+{
+  "prompt": {
+    "default": "Mark the sentence in which the writer gives their main argument, and the words that signal a contrast.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the text", "nl": "Instructie boven de tekst" }
+  },
+  "text": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Source text", "nl": "Brontekst" },
+    "$comment": "paragraphs separated by an empty line, **bold**, *italic*; empty: the example (with its categories and key)"
+  },
+  "categories": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Marker categories", "nl": "Markeercategorieën" },
+    "$comment": "JSON [{id, name, short, color, pattern}] or names per line (name | pattern | colour); empty: one category"
+  },
+  "key": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Correct marks", "nl": "Goede markeringen" },
+    "$comment": "word ranges with their category, as the response: \"69-69:b 93-110:a\"; words count from 0"
+  },
+  "scoring": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Scoring rules", "nl": "Scoreregels" },
+    "$comment": "JSON {tolerance, rule: overlap|all|exact, minOverlap, points, partial, penalty}; empty: the defaults"
+  },
+  "snap": {
+    "default": "word",
+    "editor": "enum",
+    "options": [
+      { "value": "word", "label": { "en": "Whole words", "nl": "Hele woorden" } },
+      { "value": "sentence", "label": { "en": "Whole sentences", "nl": "Hele zinnen" } }
+    ],
+    "label": { "en": "Marks snap to", "nl": "Markeringen springen naar" }
+  },
+  "maxMarks": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Maximum number of marks (0: no limit)", "nl": "Maximum aantal markeringen (0: geen grens)" }
+  },
+  "maxLength": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Maximum words per mark (0: no limit)", "nl": "Maximum aantal woorden per markering (0: geen grens)" }
+  },
+  "showLabels": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the category label at the start of each mark", "nl": "Label van de categorie aan het begin van elke markering" }
+  },
+  "textLanguage": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Language of the source text (de, fr, ar…; empty: the language below)", "nl": "Taal van de brontekst (de, fr, ar…; leeg: de taal hieronder)" }
+  },
+  "direction": {
+    "default": "auto",
+    "editor": "enum",
+    "options": [
+      { "value": "auto", "label": { "en": "From the text", "nl": "Uit de tekst" } },
+      { "value": "ltr", "label": { "en": "Left to right", "nl": "Links naar rechts" } },
+      { "value": "rtl", "label": { "en": "Right to left", "nl": "Rechts naar links" } }
+    ],
+    "label": { "en": "Direction of the text", "nl": "Richting van de tekst" }
+  },
+  "height": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "label": { "en": "Maximum height of the text in px; it scrolls (0: no limit)", "nl": "Maximale hoogte van de tekst in px; hij scrollt (0: geen grens)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

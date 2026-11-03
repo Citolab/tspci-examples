@@ -1,0 +1,52 @@
+{
+  "prompt": {
+    "default": "Make a drawing.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the canvas", "nl": "Instructie boven het tekenvlak" }
+  },
+  "colors": {
+    "default": "#000000, #444444, #999999, #dddddd, #e83e8c, #dc3545, #fd7e14, #ffc107, #28a745, #20c997, #6f42c1, #007bff, #ffffff",
+    "editor": "colorList",
+    "label": { "en": "Colours", "nl": "Kleuren" }
+  },
+  "defaultColor": {
+    "default": "#000000",
+    "editor": "color",
+    "label": { "en": "Colour at the start", "nl": "Kleur bij de start" }
+  },
+  "strokes": {
+    "default": "1, 2, 4, 8, 16, 24",
+    "editor": "text",
+    "label": { "en": "Brush sizes in px (comma separated)", "nl": "Penseeldiktes in px (gescheiden door komma's)" }
+  },
+  "defaultStroke": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 100,
+    "label": { "en": "Brush size at the start", "nl": "Penseeldikte bij de start" }
+  },
+  "width": {
+    "default": "800",
+    "editor": "integer",
+    "min": 100,
+    "max": 2000,
+    "label": { "en": "Canvas width (px)", "nl": "Breedte van het tekenvlak (px)" }
+  },
+  "height": {
+    "default": "600",
+    "editor": "integer",
+    "min": 100,
+    "max": 2000,
+    "label": { "en": "Canvas height (px)", "nl": "Hoogte van het tekenvlak (px)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the toolbar", "nl": "Taal van de werkbalk" }
+  }
+}

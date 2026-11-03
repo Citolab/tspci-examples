@@ -1,0 +1,88 @@
+{
+  "name": "@citolab/pci-gantt-chart",
+  "version": "1.0.0",
+  "description": "plan tasks on a timeline: drag and resize the bars of a Gantt chart (a port of the openPCI Gantt chart)",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "OpenPCI, Aarhus University and Aalborg University: Elias J.T. Hansen, Anna Rusmann, Jeppe Bundsgaard (https://github.com/openPCI/openPCIs)"
+  ],
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "gantt",
+    "planning",
+    "timeline"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-gantt-chart"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "ganttChart.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-gantt-chart npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-gantt-chart npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "ganttChart",
+      "label": "Gantt chart",
+      "tags": [
+        "gantt",
+        "planning",
+        "timeline"
+      ],
+      "scoring": [
+        "match_correct",
+        "human"
+      ],
+      "short": "ganttChart",
+      "response": {
+        "cardinality": "single",
+        "baseType": "string"
+      }
+    }
+  }
+}

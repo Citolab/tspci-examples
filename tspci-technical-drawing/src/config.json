@@ -1,0 +1,67 @@
+{
+  "prompt": {
+    "default": "The drawing shows a workpiece in European projection. Fill in the missing dimensions in mm.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the drawing", "nl": "Instructie boven de tekening" }
+  },
+  "task": {
+    "default": "dimensions",
+    "editor": "enum",
+    "options": [
+      { "value": "dimensions", "label": { "en": "Fill in missing dimensions", "nl": "Ontbrekende maten invullen" } },
+      { "value": "read", "label": { "en": "Read the drawing (questions)", "nl": "Tekening lezen (vragen)" } },
+      { "value": "complete", "label": { "en": "Complete a view (draw lines)", "nl": "Aanzicht aanvullen (lijnen tekenen)" } },
+      { "value": "view", "label": { "en": "Which view is this?", "nl": "Welk aanzicht is dit?" } },
+      { "value": "model", "label": { "en": "Which workpiece is drawn?", "nl": "Welk werkstuk is getekend?" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
+  "drawing": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Workpiece and task", "nl": "Werkstuk en opdracht" },
+    "$comment": "JSON written by the authoring mode (task.ts): the features of the workpiece, which dimensions are shown, hidden or asked, the questions, the view to complete and its grid, the view to name, the other workpieces; empty: the example"
+  },
+  "showModel": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the 3D model (always for the view and workpiece questions)", "nl": "3D-model tonen (altijd bij de vragen over aanzicht en werkstuk)" }
+  },
+  "showLabels": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Names under the views", "nl": "Namen onder de aanzichten" }
+  },
+  "modelView": {
+    "default": "3d",
+    "editor": "enum",
+    "options": [
+      { "value": "3d", "label": { "en": "3D (a picture in SVG without WebGL)", "nl": "3D (een afbeelding in SVG zonder WebGL)" } },
+      { "value": "2d", "label": { "en": "Always the SVG picture", "nl": "Altijd de SVG-afbeelding" } }
+    ],
+    "label": { "en": "Model picture", "nl": "Afbeelding van het model" }
+  },
+  "scoring": {
+    "default": "match",
+    "editor": "enum",
+    "options": [
+      { "value": "match", "label": { "en": "Numbers: an ordered list of floats (match correct)", "nl": "Getallen: een geordende lijst floats (match correct)" } },
+      { "value": "pci", "label": { "en": "Numbers: the PCI scores each value (record)", "nl": "Getallen: de PCI scoort elke waarde (record)" } }
+    ],
+    "label": { "en": "Scoring of the numbers", "nl": "Scoren van de getallen" }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "label": { "en": "Margin in mm (PCI scoring)", "nl": "Marge in mm (scoren door de PCI)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

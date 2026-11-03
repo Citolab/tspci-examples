@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+/* the 3D view: grab to turn, a pointer over a part (scene3d.ts sets it) */
+.asm-view canvas {
+  cursor: grab;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .asm button {
+    transition: background-color 120ms ease, box-shadow 120ms ease;
+  }
+  .asm-bar {
+    transition: width 240ms ease;
+  }
+}

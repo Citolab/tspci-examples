@@ -7,3 +7,6 @@ qti3-dist/
 ci-dist/
 .opencode
 .playwright-mcp/
+storybook-static/
+__screenshots__/
+.firebase/

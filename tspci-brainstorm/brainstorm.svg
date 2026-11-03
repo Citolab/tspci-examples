@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+  <!-- SPDX-License-Identifier: GPL-3.0-only; icon for the port of https://github.com/openPCI/openPCIs/tree/master/brainstorm -->
+  <path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h13A2.5 2.5 0 0 1 22 6.5v7a2.5 2.5 0 0 1-2.5 2.5H11l-4.5 3.5V16A2.5 2.5 0 0 1 4 13.5z" fill="#fff" stroke="#334155" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M12 19.5a2.5 2.5 0 0 0 2.5 2.5H21l4.5 3.5V22a2.5 2.5 0 0 0 2.5-2.5v-7a2.5 2.5 0 0 0-2.5-2.5H24" fill="none" stroke="#0284c7" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M12 19.5V18h12.5V10H26a2 2 0 0 1 2 2v7.5a2 2 0 0 1-2 2h-1v3l-3.8-3H14.5A2.5 2.5 0 0 1 12 19.5z" fill="#e0f2fe"/>
+  <circle cx="9" cy="10" r="1.3" fill="#334155"/><circle cx="13" cy="10" r="1.3" fill="#334155"/><circle cx="17" cy="10" r="1.3" fill="#334155"/>
+</svg>

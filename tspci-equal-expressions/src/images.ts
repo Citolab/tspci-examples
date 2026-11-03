@@ -2,6 +2,7 @@ import apple from "./images/apple.svg";
 import pear from "./images/pear.svg";
 import iceCream from "./images/ice-cream.svg";
 import { Texts } from "./texts";
+import { slot } from "@citolab/tspci/media";
 
 /** The images an author can choose from (data-image); the bundler inlines them as data: URLs. */
 export const PRESETS = { apple, pear, iceCream };
@@ -9,9 +10,13 @@ export type Preset = keyof typeof PRESETS;
 
 export type ImageChoice = { src: string; name: string };
 
-/** An <img> in qti-interaction-markup: an authoring system with a media bank puts the author's image there. */
+/**
+ * The <img> of the image slot in qti-interaction-markup: an authoring system with a media bank puts the author's image
+ * there, marked data-pci-slot="image" (the PCI authoring profile); an <img> without the mark, as in an item written by
+ * hand, also works.
+ */
 export const imageFromMarkup = (dom: HTMLElement): ImageChoice | null => {
-  const img = dom.querySelector("img");
+  const img = (slot("image", dom) as HTMLImageElement | null) ?? dom.querySelector("img");
   return img?.getAttribute("src") ? { src: img.src, name: img.alt } : null;
 };
 

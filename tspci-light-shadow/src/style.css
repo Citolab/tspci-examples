@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+/* the penumbra: hatched, so it does not rest on colour alone (the drawing uses an SVG pattern of the same look) */
+.ls-hatch {
+  background-color: var(--color-slate-300);
+  background-image: repeating-linear-gradient(45deg, var(--color-slate-700) 0 1.2px, transparent 1.2px 3px);
+}
+.ls-view3d canvas {
+  cursor: default;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .light-shadow button {
+    transition: background-color 120ms ease, box-shadow 120ms ease;
+  }
+}

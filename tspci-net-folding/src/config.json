@@ -1,0 +1,32 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the net (empty: a question that fits the task)", "nl": "Instructie boven de uitslag (leeg: een vraag die bij de opdracht past)" }
+  },
+  "puzzle": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Task and nets", "nl": "Opdracht en uitslagen" },
+    "$comment": "JSON written by the authoring mode (net.ts): mode, solid, box size, grid, label kind, the nets, the face asked about, the empty faces and the shown corner; empty: build a net of a cube"
+  },
+  "showFold": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Let the candidate fold the net in 3D", "nl": "Kandidaat mag de uitslag in 3D vouwen" }
+  },
+  "showResult": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Say whether the folded net closes (gives the answer away when building)", "nl": "Zeggen of de gevouwen uitslag sluit (verraadt het antwoord bij bouwen)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

@@ -1,0 +1,32 @@
+{
+  "prompt": {
+    "default": "Complete the circuit diagram: a switch in series with the source, and an LED and a buzzer parallel to each other. Drag the symbols and wires onto the board.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the board", "nl": "Instructie boven het bord" }
+  },
+  "circuit": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Circuit", "nl": "Schakeling" },
+    "$comment": "JSON written by the authoring mode (circuit.ts): grid size, preset parts (locked or not), the palette, the solution and the checks; empty: the example"
+  },
+  "showOpenEnds": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Mark open wire ends", "nl": "Losse draadeinden markeren" }
+  },
+  "showCurrent": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Light up a closed circuit (gives away whether it is closed)", "nl": "Gesloten stroomkring laten oplichten (verraadt of hij gesloten is)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

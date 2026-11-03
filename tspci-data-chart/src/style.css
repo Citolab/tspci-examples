@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/* The chart (view.tsx): SVG parts Tailwind has no classes for. */
+.dc text { font-family: inherit; }
+.dc-label { font-size: 13px; fill: #1e293b; }
+.dc-tick { font-size: 12px; fill: #64748b; font-variant-numeric: tabular-nums; }
+.dc-axis { font-size: 12px; fill: #475569; font-weight: 600; }
+.dc-values text { font-size: 12px; font-weight: 600; font-variant-numeric: tabular-nums; pointer-events: none; }
+.dc-grid line { stroke: #e2e8f0; stroke-width: 1; }
+.dc-axis-line line { stroke: #64748b; stroke-width: 1.25; }
+.dc-line { fill: none; stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+
+.dc-mark { outline: none; transition: opacity 160ms ease, filter 160ms ease; }
+.dc-dim .dc-mark:not(.dc-active) { opacity: 0.55; }
+.dc-mark.dc-active { filter: brightness(1.08) saturate(1.1); }
+.dc-ring-selected { fill: none; stroke: #0f172a; stroke-width: 3; }
+.dc-ring-focus { fill: none; stroke: #2563eb; stroke-width: 2.5; }
+path.dc-ring-focus { stroke-width: 3; }
+
+.dc-tip { transition: transform 120ms ease-out; animation: dc-fade 140ms ease-out; }
+
+/* growing in on the first render; never again (the marks keep their key) */
+.dc-grow-x, .dc-grow--x, .dc-grow-y, .dc-grow--y { transform-box: fill-box; }
+.dc-grow-x { transform-origin: left center; animation: dc-grow-x 520ms cubic-bezier(.2, .7, .2, 1) both; }
+.dc-grow--x { transform-origin: right center; animation: dc-grow-x 520ms cubic-bezier(.2, .7, .2, 1) both; }
+.dc-grow-y { transform-origin: center bottom; animation: dc-grow-y 520ms cubic-bezier(.2, .7, .2, 1) both; }
+.dc-grow--y { transform-origin: center top; animation: dc-grow-y 520ms cubic-bezier(.2, .7, .2, 1) both; }
+.dc-grow-pie { animation: dc-pop 480ms cubic-bezier(.2, .7, .2, 1) both; }
+.dc-grow-point { animation: dc-fade 400ms 300ms ease-out both; }
+.dc-line { stroke-dasharray: 1; stroke-dashoffset: 0; animation: dc-draw 700ms ease-out both; }
+.dc-badge { animation: dc-fade 160ms ease-out; }
+
+@keyframes dc-grow-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes dc-grow-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
+@keyframes dc-pop { from { transform: scale(0.6); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@keyframes dc-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dc-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .dc-mark, .dc-tip, .dc-line, .dc-badge, .dc-grow-pie, .dc-grow-point,
+  .dc-grow-x, .dc-grow--x, .dc-grow-y, .dc-grow--y { animation: none; transition: none; }
+}

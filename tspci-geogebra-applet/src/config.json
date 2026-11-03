@@ -1,0 +1,108 @@
+{
+  "materialId": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "GeoGebra material id (geogebra.org/m/…)", "nl": "Id van een GeoGebra-materiaal (geogebra.org/m/…)" },
+    "$comment": "Used when there is no authored applet (ggbBase64); empty: an empty app"
+  },
+  "ggbBase64": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Applet", "nl": "Applet" },
+    "$comment": "The applet the author built in the authoring mode, as a base64 .ggb file"
+  },
+  "appName": {
+    "default": "classic",
+    "editor": "enum",
+    "label": { "en": "GeoGebra app", "nl": "GeoGebra-app" },
+    "options": [
+      { "value": "classic", "label": { "en": "Classic", "nl": "Classic" } },
+      { "value": "graphing", "label": { "en": "Graphing calculator", "nl": "Grafische rekenmachine" } },
+      { "value": "geometry", "label": { "en": "Geometry", "nl": "Meetkunde" } },
+      { "value": "3d", "label": { "en": "3D calculator", "nl": "3D-rekenmachine" } },
+      { "value": "suite", "label": { "en": "Calculator suite", "nl": "Rekenmachine-suite" } },
+      { "value": "scientific", "label": { "en": "Scientific calculator", "nl": "Wetenschappelijke rekenmachine" } },
+      { "value": "evaluator", "label": { "en": "Equation editor", "nl": "Formule-editor" } },
+      { "value": "notes", "label": { "en": "Notes", "nl": "Notities" } }
+    ]
+  },
+  "width": {
+    "default": "800",
+    "editor": "integer",
+    "min": 200,
+    "max": 2000,
+    "label": { "en": "Width (px)", "nl": "Breedte (px)" }
+  },
+  "height": {
+    "default": "600",
+    "editor": "integer",
+    "min": 150,
+    "max": 2000,
+    "label": { "en": "Height (px)", "nl": "Hoogte (px)" }
+  },
+  "appLanguage": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Language of GeoGebra (en, nl, de, …)", "nl": "Taal van GeoGebra (en, nl, de, …)" },
+    "$comment": "ISO 639-1; empty: the language setting below"
+  },
+  "showToolBar": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Toolbar", "nl": "Gereedschapsbalk" }
+  },
+  "showMenuBar": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Menu", "nl": "Menu" }
+  },
+  "showAlgebraInput": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Input bar", "nl": "Invoerbalk" }
+  },
+  "allowStyleBar": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Style bar", "nl": "Stijlbalk" }
+  },
+  "enableRightClick": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Right-click menu and properties", "nl": "Rechtsklikmenu en eigenschappen" }
+  },
+  "enableUndoRedo": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Undo and redo", "nl": "Ongedaan maken en opnieuw" }
+  },
+  "showZoomButtons": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Zoom buttons", "nl": "Zoomknoppen" }
+  },
+  "enableShiftDragZoom": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Move and zoom the view (drag, wheel)", "nl": "Weergave verschuiven en zoomen (slepen, wieltje)" }
+  },
+  "showFullscreenButton": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Fullscreen button", "nl": "Knop volledig scherm" }
+  },
+  "saveApplet": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Include the candidate's applet in the response", "nl": "Applet van de kandidaat in het antwoord opnemen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts around the applet", "nl": "Taal van de teksten rond de applet" }
+  }
+}

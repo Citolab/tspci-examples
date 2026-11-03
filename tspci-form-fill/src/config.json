@@ -1,0 +1,54 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the form (optional)", "nl": "Instructie boven het formulier (optioneel)" }
+  },
+  "form": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Form", "nl": "Formulier" },
+    "$comment": "JSON written by the authoring mode (form.ts): title, situation, sections with fields, the checks per field and the solution; empty: the example"
+  },
+  "example": {
+    "default": "waybill",
+    "editor": "enum",
+    "options": [
+      { "value": "waybill", "label": { "en": "Parcel waybill", "nl": "Vrachtbrief pakket" } },
+      { "value": "transfer", "label": { "en": "Bank transfer", "nl": "Overboeking" } }
+    ],
+    "label": { "en": "Example form (without a form of your own)", "nl": "Voorbeeldformulier (zonder eigen formulier)" }
+  },
+  "theme": {
+    "default": "paper",
+    "editor": "enum",
+    "options": [
+      { "value": "paper", "label": { "en": "Paper form", "nl": "Papieren formulier" } },
+      { "value": "web", "label": { "en": "Online form", "nl": "Online formulier" } }
+    ],
+    "label": { "en": "Look", "nl": "Uiterlijk" }
+  },
+  "columns": {
+    "default": "2",
+    "editor": "enum",
+    "options": [
+      { "value": "1", "label": { "en": "1 column", "nl": "1 kolom" } },
+      { "value": "2", "label": { "en": "2 columns", "nl": "2 kolommen" } }
+    ],
+    "label": { "en": "Layout", "nl": "Indeling" }
+  },
+  "validation": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Validation messages (online form only)", "nl": "Validatiemeldingen (alleen online formulier)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

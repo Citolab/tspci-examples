@@ -1,0 +1,56 @@
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+/* the labels over the 3D scene: point names and measurement values, placed by scene3d.ts */
+.m3d-viewport {
+  cursor: grab;
+}
+.m3d-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.m3d-point,
+.m3d-measure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  transition: opacity 0.15s;
+}
+.m3d-point {
+  font-size: 12px;
+  font-weight: 700;
+  color: #0f172a;
+  text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff;
+}
+.m3d-measure {
+  font-size: 12px;
+  font-weight: 600;
+  color: #0f172a;
+  background: rgb(255 255 255 / 0.94);
+  border: 2px solid var(--c, #334155);
+  border-radius: 9999px;
+  padding: 1px 8px;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.2);
+  font-variant-numeric: tabular-nums;
+}
+.m3d-solution {
+  border-style: dashed;
+}
+@media (prefers-reduced-motion: reduce) {
+  .m3d-point,
+  .m3d-measure {
+    transition: none;
+  }
+}
+@media (forced-colors: active) {
+  .m3d-measure {
+    border-color: CanvasText;
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["es2017", "dom", "dom.iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "removeComments": true,
+    "sourceMap": true,
+    "strict": false,
+    "target": "es6",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+  },
+  "include": ["**/*"],
+  "exclude": ["src/**/*.stories.ts", "node_modules", "dist"], // the stories run in the Storybook of the repository
+}

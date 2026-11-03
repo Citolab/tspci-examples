@@ -1,0 +1,131 @@
+{
+  "prompt": {
+    "default": "Point at the bars to see the percentages. Click the part of a bar that shows 29%.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the chart", "nl": "Instructie boven de grafiek" }
+  },
+  "title": {
+    "default": "How students travel to school, by age group",
+    "editor": "text",
+    "label": { "en": "Title of the chart", "nl": "Titel van de grafiek" }
+  },
+  "mode": {
+    "default": "select",
+    "editor": "enum",
+    "label": { "en": "Use of the chart", "nl": "Gebruik van de grafiek" },
+    "options": [
+      { "value": "select", "label": { "en": "The candidate clicks the answer in the chart (scored)", "nl": "De kandidaat klikt het antwoord aan in de grafiek (gescoord)" } },
+      { "value": "tool", "label": { "en": "A tool (the answer goes in another interaction)", "nl": "Een hulpmiddel (het antwoord komt in een andere interactie)" } }
+    ]
+  },
+  "maxChoices": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Parts the candidate may choose (0: no limit)", "nl": "Delen die de kandidaat mag kiezen (0: geen grens)" }
+  },
+  "data": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Data", "nl": "Gegevens" },
+    "$comment": "JSON written by the authoring mode (chart.ts): series (name, colour), categories (label, values) and the correct segments; empty: the example data"
+  },
+  "chartType": {
+    "default": "bar",
+    "editor": "enum",
+    "label": { "en": "Chart", "nl": "Grafiek" },
+    "options": [
+      { "value": "bar", "label": { "en": "Bar chart", "nl": "Staafdiagram" } },
+      { "value": "line", "label": { "en": "Line chart", "nl": "Lijndiagram" } },
+      { "value": "pie", "label": { "en": "Pie chart (one per category)", "nl": "Cirkeldiagram (één per categorie)" } }
+    ]
+  },
+  "orientation": {
+    "default": "horizontal",
+    "editor": "enum",
+    "label": { "en": "Bars", "nl": "Staven" },
+    "options": [
+      { "value": "horizontal", "label": { "en": "Horizontal", "nl": "Liggend" } },
+      { "value": "vertical", "label": { "en": "Vertical (columns)", "nl": "Staand (kolommen)" } }
+    ]
+  },
+  "layout": {
+    "default": "stacked",
+    "editor": "enum",
+    "label": { "en": "Series in a bar chart", "nl": "Reeksen in een staafdiagram" },
+    "options": [
+      { "value": "grouped", "label": { "en": "Side by side", "nl": "Naast elkaar" } },
+      { "value": "stacked", "label": { "en": "Stacked", "nl": "Gestapeld" } },
+      { "value": "percent", "label": { "en": "Stacked to 100%", "nl": "Gestapeld tot 100%" } }
+    ]
+  },
+  "showValues": {
+    "default": "focus",
+    "editor": "enum",
+    "label": { "en": "Show the numbers", "nl": "Getallen tonen" },
+    "options": [
+      { "value": "focus", "label": { "en": "Only when pointed at or focused", "nl": "Alleen bij aanwijzen of focus" } },
+      { "value": "always", "label": { "en": "Always, in the chart", "nl": "Altijd, in de grafiek" } },
+      { "value": "never", "label": { "en": "Never", "nl": "Nooit" } }
+    ]
+  },
+  "unit": {
+    "default": "%",
+    "editor": "text",
+    "label": { "en": "Unit (%, €, kWh, …)", "nl": "Eenheid (%, €, kWh, …)" }
+  },
+  "valueAxisLabel": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Label of the value axis", "nl": "Label van de waarde-as" }
+  },
+  "categoryAxisLabel": {
+    "default": "Age (years)",
+    "editor": "text",
+    "label": { "en": "Label of the category axis", "nl": "Label van de categorie-as" }
+  },
+  "min": {
+    "default": "",
+    "editor": "number",
+    "label": { "en": "Lowest value on the axis (empty: automatic)", "nl": "Laagste waarde op de as (leeg: automatisch)" }
+  },
+  "max": {
+    "default": "",
+    "editor": "number",
+    "label": { "en": "Highest value on the axis (empty: automatic)", "nl": "Hoogste waarde op de as (leeg: automatisch)" }
+  },
+  "gridlines": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Gridlines", "nl": "Rasterlijnen" }
+  },
+  "legend": {
+    "default": "top",
+    "editor": "enum",
+    "label": { "en": "Legend", "nl": "Legenda" },
+    "options": [
+      { "value": "top", "label": { "en": "Above the chart", "nl": "Boven de grafiek" } },
+      { "value": "right", "label": { "en": "Right of the chart", "nl": "Rechts van de grafiek" } },
+      { "value": "bottom", "label": { "en": "Below the chart", "nl": "Onder de grafiek" } },
+      { "value": "none", "label": { "en": "None", "nl": "Geen" } }
+    ]
+  },
+  "source": {
+    "default": "made-up data",
+    "editor": "text",
+    "label": { "en": "Source (below the chart)", "nl": "Bron (onder de grafiek)" }
+  },
+  "width": {
+    "default": "640",
+    "editor": "integer",
+    "label": { "en": "Width of the chart (px)", "nl": "Breedte van de grafiek (px)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (1.5)", "nl": "Engels (1.5)" } },
+      { "value": "nl", "label": { "en": "Dutch (1,5)", "nl": "Nederlands (1,5)" } }
+    ],
+    "label": { "en": "Language of the numbers and the texts", "nl": "Taal van de getallen en de teksten" }
+  }
+}

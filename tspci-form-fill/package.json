@@ -1,0 +1,463 @@
+{
+  "name": "@citolab/pci-form-fill",
+  "version": "1.0.0-alpha.1",
+  "description": "fill in a realistic paper or online form (a waybill, a bank transfer, an order form) from given information; the PCI checks every field against the author's checks",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "form",
+    "form-filling",
+    "economics",
+    "language-skills",
+    "vmbo"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-form-fill"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "formFill.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-form-fill npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-form-fill npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "formFill",
+      "label": "Form fill",
+      "tags": [
+        "form",
+        "economics",
+        "language",
+        "care",
+        "logistics"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "formFill",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI evaluates the author's checks per field (data-form); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the passed checks",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 1: 1 passed, 0 not",
+              "nl": "Check 1: 1 klopt, 0 niet"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 2: 1 passed, 0 not",
+              "nl": "Check 2: 1 klopt, 0 niet"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 3: 1 passed, 0 not",
+              "nl": "Check 3: 1 klopt, 0 niet"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 4: 1 passed, 0 not",
+              "nl": "Check 4: 1 klopt, 0 niet"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 5: 1 passed, 0 not",
+              "nl": "Check 5: 1 klopt, 0 niet"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 6: 1 passed, 0 not",
+              "nl": "Check 6: 1 klopt, 0 niet"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 7: 1 passed, 0 not",
+              "nl": "Check 7: 1 klopt, 0 niet"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 8: 1 passed, 0 not",
+              "nl": "Check 8: 1 klopt, 0 niet"
+            }
+          },
+          "check9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 9: 1 passed, 0 not",
+              "nl": "Check 9: 1 klopt, 0 niet"
+            }
+          },
+          "check10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 10: 1 passed, 0 not",
+              "nl": "Check 10: 1 klopt, 0 niet"
+            }
+          },
+          "check11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 11: 1 passed, 0 not",
+              "nl": "Check 11: 1 klopt, 0 niet"
+            }
+          },
+          "check12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 12: 1 passed, 0 not",
+              "nl": "Check 12: 1 klopt, 0 niet"
+            }
+          },
+          "check13": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 13: 1 passed, 0 not",
+              "nl": "Check 13: 1 klopt, 0 niet"
+            }
+          },
+          "check14": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 14: 1 passed, 0 not",
+              "nl": "Check 14: 1 klopt, 0 niet"
+            }
+          },
+          "check15": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 15: 1 passed, 0 not",
+              "nl": "Check 15: 1 klopt, 0 niet"
+            }
+          },
+          "check16": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 16: 1 passed, 0 not",
+              "nl": "Check 16: 1 klopt, 0 niet"
+            }
+          },
+          "check17": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 17: 1 passed, 0 not",
+              "nl": "Check 17: 1 klopt, 0 niet"
+            }
+          },
+          "check18": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 18: 1 passed, 0 not",
+              "nl": "Check 18: 1 klopt, 0 niet"
+            }
+          },
+          "check19": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 19: 1 passed, 0 not",
+              "nl": "Check 19: 1 klopt, 0 niet"
+            }
+          },
+          "check20": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 20: 1 passed, 0 not",
+              "nl": "Check 20: 1 klopt, 0 niet"
+            }
+          },
+          "check21": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 21: 1 passed, 0 not",
+              "nl": "Check 21: 1 klopt, 0 niet"
+            }
+          },
+          "check22": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 22: 1 passed, 0 not",
+              "nl": "Check 22: 1 klopt, 0 niet"
+            }
+          },
+          "check23": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 23: 1 passed, 0 not",
+              "nl": "Check 23: 1 klopt, 0 niet"
+            }
+          },
+          "check24": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 24: 1 passed, 0 not",
+              "nl": "Check 24: 1 klopt, 0 niet"
+            }
+          },
+          "value1": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 1: what the candidate filled in field 1 (normalised)",
+              "nl": "Waarde 1: wat de kandidaat in veld 1 invulde (genormaliseerd)"
+            }
+          },
+          "value2": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 2: what the candidate filled in field 2 (normalised)",
+              "nl": "Waarde 2: wat de kandidaat in veld 2 invulde (genormaliseerd)"
+            }
+          },
+          "value3": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 3: what the candidate filled in field 3 (normalised)",
+              "nl": "Waarde 3: wat de kandidaat in veld 3 invulde (genormaliseerd)"
+            }
+          },
+          "value4": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 4: what the candidate filled in field 4 (normalised)",
+              "nl": "Waarde 4: wat de kandidaat in veld 4 invulde (genormaliseerd)"
+            }
+          },
+          "value5": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 5: what the candidate filled in field 5 (normalised)",
+              "nl": "Waarde 5: wat de kandidaat in veld 5 invulde (genormaliseerd)"
+            }
+          },
+          "value6": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 6: what the candidate filled in field 6 (normalised)",
+              "nl": "Waarde 6: wat de kandidaat in veld 6 invulde (genormaliseerd)"
+            }
+          },
+          "value7": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 7: what the candidate filled in field 7 (normalised)",
+              "nl": "Waarde 7: wat de kandidaat in veld 7 invulde (genormaliseerd)"
+            }
+          },
+          "value8": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 8: what the candidate filled in field 8 (normalised)",
+              "nl": "Waarde 8: wat de kandidaat in veld 8 invulde (genormaliseerd)"
+            }
+          },
+          "value9": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 9: what the candidate filled in field 9 (normalised)",
+              "nl": "Waarde 9: wat de kandidaat in veld 9 invulde (genormaliseerd)"
+            }
+          },
+          "value10": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 10: what the candidate filled in field 10 (normalised)",
+              "nl": "Waarde 10: wat de kandidaat in veld 10 invulde (genormaliseerd)"
+            }
+          },
+          "value11": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 11: what the candidate filled in field 11 (normalised)",
+              "nl": "Waarde 11: wat de kandidaat in veld 11 invulde (genormaliseerd)"
+            }
+          },
+          "value12": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 12: what the candidate filled in field 12 (normalised)",
+              "nl": "Waarde 12: wat de kandidaat in veld 12 invulde (genormaliseerd)"
+            }
+          },
+          "value13": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 13: what the candidate filled in field 13 (normalised)",
+              "nl": "Waarde 13: wat de kandidaat in veld 13 invulde (genormaliseerd)"
+            }
+          },
+          "value14": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 14: what the candidate filled in field 14 (normalised)",
+              "nl": "Waarde 14: wat de kandidaat in veld 14 invulde (genormaliseerd)"
+            }
+          },
+          "value15": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 15: what the candidate filled in field 15 (normalised)",
+              "nl": "Waarde 15: wat de kandidaat in veld 15 invulde (genormaliseerd)"
+            }
+          },
+          "value16": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 16: what the candidate filled in field 16 (normalised)",
+              "nl": "Waarde 16: wat de kandidaat in veld 16 invulde (genormaliseerd)"
+            }
+          },
+          "value17": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 17: what the candidate filled in field 17 (normalised)",
+              "nl": "Waarde 17: wat de kandidaat in veld 17 invulde (genormaliseerd)"
+            }
+          },
+          "value18": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 18: what the candidate filled in field 18 (normalised)",
+              "nl": "Waarde 18: wat de kandidaat in veld 18 invulde (genormaliseerd)"
+            }
+          },
+          "value19": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 19: what the candidate filled in field 19 (normalised)",
+              "nl": "Waarde 19: wat de kandidaat in veld 19 invulde (genormaliseerd)"
+            }
+          },
+          "value20": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 20: what the candidate filled in field 20 (normalised)",
+              "nl": "Waarde 20: wat de kandidaat in veld 20 invulde (genormaliseerd)"
+            }
+          },
+          "value21": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 21: what the candidate filled in field 21 (normalised)",
+              "nl": "Waarde 21: wat de kandidaat in veld 21 invulde (genormaliseerd)"
+            }
+          },
+          "value22": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 22: what the candidate filled in field 22 (normalised)",
+              "nl": "Waarde 22: wat de kandidaat in veld 22 invulde (genormaliseerd)"
+            }
+          },
+          "value23": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 23: what the candidate filled in field 23 (normalised)",
+              "nl": "Waarde 23: wat de kandidaat in veld 23 invulde (genormaliseerd)"
+            }
+          },
+          "value24": {
+            "baseType": "string",
+            "label": {
+              "en": "Value 24: what the candidate filled in field 24 (normalised)",
+              "nl": "Waarde 24: wat de kandidaat in veld 24 invulde (genormaliseerd)"
+            }
+          },
+          "values": {
+            "baseType": "string",
+            "label": {
+              "en": "Values: every field by its id (JSON)",
+              "nl": "Waarden: elk veld met zijn id (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Build the form…",
+          "nl": "Formulier maken…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}

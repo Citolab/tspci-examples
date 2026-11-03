@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400" viewBox="0 0 640 400">
+  <!-- SPDX-License-Identifier: GPL-3.0-only. Example image for tspci-text-gap-match, Stichting Cito Instituut voor Toetsontwikkeling, 2026 -->
+  <rect width="640" height="300" fill="#f0f9ff"/>
+  <rect y="300" width="640" height="100" fill="#e7d3b5"/>
+  <path d="M0 300h640" stroke="#a16207" stroke-width="2"/>
+  <g fill="none" stroke="#92400e" stroke-width="4" stroke-linecap="round">
+    <path d="M320 300c0 20-6 36-18 52M320 300c2 22 10 40 26 56M320 304c-14 12-34 20-56 24M320 306c16 10 36 16 60 18M302 352c-6 10-16 16-26 18M346 356c4 10 2 18-4 26"/>
+  </g>
+  <path d="M320 300V122" stroke="#15803d" stroke-width="8" stroke-linecap="round"/>
+  <path d="M318 226c-30-6-58-6-76-22 26-14 58-8 76 22z" fill="#22c55e" stroke="#15803d" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M322 252c28-8 56-6 76 10-24 16-58 12-76-10z" fill="#22c55e" stroke="#15803d" stroke-width="3" stroke-linejoin="round"/>
+  <g fill="#f472b6" stroke="#be185d" stroke-width="2">
+    <circle cx="320" cy="76" r="20"/><circle cx="345" cy="94" r="20"/><circle cx="335" cy="124" r="20"/>
+    <circle cx="305" cy="124" r="20"/><circle cx="295" cy="94" r="20"/>
+  </g>
+  <circle cx="320" cy="102" r="15" fill="#facc15" stroke="#ca8a04" stroke-width="2"/>
+  <g stroke="#334155" stroke-width="2" stroke-dasharray="5 4" fill="none">
+    <path d="M190 92H290"/>
+    <path d="M190 212H250"/>
+    <path d="M450 172H326"/>
+    <path d="M450 352H352"/>
+  </g>
+  <g fill="#334155"><circle cx="290" cy="92" r="4"/><circle cx="250" cy="212" r="4"/><circle cx="326" cy="172" r="4"/><circle cx="352" cy="352" r="4"/></g>
+</svg>

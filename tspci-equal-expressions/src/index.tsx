@@ -96,7 +96,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
   };
 
   /**
-   * Authoring mode: the author uploads an own image for the unknown number; getConfig() gives data-custom-image.
+   * Authoring mode: the author uploads an own image for the unknown number; getProperties() gives data-custom-image.
    * Only an authoring system calls this (AUTHORING.md, "Authoring mode"); delivery never does.
    */
   getAuthoringInstance = (dom: HTMLElement, config: PciAuthoringConfiguration<PropTypes>): PciAuthoringInstance => {
@@ -116,9 +116,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       host
     );
     const instance: PciAuthoringInstance = {
-      getConfig: () => ({ customImage }),
+      getProperties: () => ({ customImage }),
       validate: () => [],
-      destroy: () => render(null, host),
+      oncompleted: () => render(null, host),
     };
     config.onready?.(instance);
     return instance;

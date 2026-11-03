@@ -1,0 +1,517 @@
+{
+  "name": "@citolab/pci-chance-tools",
+  "version": "1.0.0-alpha.1",
+  "description": "probability experiments with dice, a spinner, a bag of balls and coins: run trials, design a spinner or bag for a given probability, or fill in a probability tree",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "probability",
+    "chance",
+    "dice",
+    "spinner",
+    "probability-tree",
+    "statistics"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-chance-tools"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "chanceTools.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-chance-tools npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-chance-tools npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "chanceTools",
+      "label": "Chance tools",
+      "tags": [
+        "probability",
+        "chance",
+        "dice",
+        "spinner",
+        "statistics"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "chanceTools",
+      "response": {
+        "cardinality": "record",
+        "$comment": "Design and tree mode: this record, scored by the PCI (CUSTOM). Tool mode (score NONE): a single string, the experiment log as JSON; declare the response single/string (README)",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the checks that pass",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "target1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: target 1, 1 met, 0 not",
+              "nl": "Ontwerp: doel 1, 1 gehaald, 0 niet"
+            }
+          },
+          "probability1": {
+            "baseType": "string",
+            "label": {
+              "en": "Design: the probability of the outcome of target 1, in lowest terms (3/8)",
+              "nl": "Ontwerp: de kans op de uitkomst van doel 1, vereenvoudigd (3/8)"
+            }
+          },
+          "value1": {
+            "baseType": "float",
+            "label": {
+              "en": "Design: the probability of target 1 as a number",
+              "nl": "Ontwerp: de kans van doel 1 als getal"
+            },
+            "tolerance": "range"
+          },
+          "target2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: target 2, 1 met, 0 not",
+              "nl": "Ontwerp: doel 2, 1 gehaald, 0 niet"
+            }
+          },
+          "probability2": {
+            "baseType": "string",
+            "label": {
+              "en": "Design: the probability of the outcome of target 2, in lowest terms (3/8)",
+              "nl": "Ontwerp: de kans op de uitkomst van doel 2, vereenvoudigd (3/8)"
+            }
+          },
+          "value2": {
+            "baseType": "float",
+            "label": {
+              "en": "Design: the probability of target 2 as a number",
+              "nl": "Ontwerp: de kans van doel 2 als getal"
+            },
+            "tolerance": "range"
+          },
+          "target3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: target 3, 1 met, 0 not",
+              "nl": "Ontwerp: doel 3, 1 gehaald, 0 niet"
+            }
+          },
+          "probability3": {
+            "baseType": "string",
+            "label": {
+              "en": "Design: the probability of the outcome of target 3, in lowest terms (3/8)",
+              "nl": "Ontwerp: de kans op de uitkomst van doel 3, vereenvoudigd (3/8)"
+            }
+          },
+          "value3": {
+            "baseType": "float",
+            "label": {
+              "en": "Design: the probability of target 3 as a number",
+              "nl": "Ontwerp: de kans van doel 3 als getal"
+            },
+            "tolerance": "range"
+          },
+          "target4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: target 4, 1 met, 0 not",
+              "nl": "Ontwerp: doel 4, 1 gehaald, 0 niet"
+            }
+          },
+          "probability4": {
+            "baseType": "string",
+            "label": {
+              "en": "Design: the probability of the outcome of target 4, in lowest terms (3/8)",
+              "nl": "Ontwerp: de kans op de uitkomst van doel 4, vereenvoudigd (3/8)"
+            }
+          },
+          "value4": {
+            "baseType": "float",
+            "label": {
+              "en": "Design: the probability of target 4 as a number",
+              "nl": "Ontwerp: de kans van doel 4 als getal"
+            },
+            "tolerance": "range"
+          },
+          "size": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: the number of sectors or balls",
+              "nl": "Ontwerp: het aantal vakken of knikkers"
+            }
+          },
+          "sizeCheck": {
+            "baseType": "integer",
+            "label": {
+              "en": "Design: 1 with exactly the size asked for",
+              "nl": "Ontwerp: 1 bij precies het gevraagde aantal"
+            }
+          },
+          "branch1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 1, 1 right, 0 not",
+              "nl": "Boom: tak 1, 1 goed, 0 niet"
+            }
+          },
+          "branch2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 2, 1 right, 0 not",
+              "nl": "Boom: tak 2, 1 goed, 0 niet"
+            }
+          },
+          "branch3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 3, 1 right, 0 not",
+              "nl": "Boom: tak 3, 1 goed, 0 niet"
+            }
+          },
+          "branch4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 4, 1 right, 0 not",
+              "nl": "Boom: tak 4, 1 goed, 0 niet"
+            }
+          },
+          "branch5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 5, 1 right, 0 not",
+              "nl": "Boom: tak 5, 1 goed, 0 niet"
+            }
+          },
+          "branch6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 6, 1 right, 0 not",
+              "nl": "Boom: tak 6, 1 goed, 0 niet"
+            }
+          },
+          "branch7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 7, 1 right, 0 not",
+              "nl": "Boom: tak 7, 1 goed, 0 niet"
+            }
+          },
+          "branch8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 8, 1 right, 0 not",
+              "nl": "Boom: tak 8, 1 goed, 0 niet"
+            }
+          },
+          "branch9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 9, 1 right, 0 not",
+              "nl": "Boom: tak 9, 1 goed, 0 niet"
+            }
+          },
+          "branch10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 10, 1 right, 0 not",
+              "nl": "Boom: tak 10, 1 goed, 0 niet"
+            }
+          },
+          "branch11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 11, 1 right, 0 not",
+              "nl": "Boom: tak 11, 1 goed, 0 niet"
+            }
+          },
+          "branch12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 12, 1 right, 0 not",
+              "nl": "Boom: tak 12, 1 goed, 0 niet"
+            }
+          },
+          "branch13": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 13, 1 right, 0 not",
+              "nl": "Boom: tak 13, 1 goed, 0 niet"
+            }
+          },
+          "branch14": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 14, 1 right, 0 not",
+              "nl": "Boom: tak 14, 1 goed, 0 niet"
+            }
+          },
+          "branch15": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 15, 1 right, 0 not",
+              "nl": "Boom: tak 15, 1 goed, 0 niet"
+            }
+          },
+          "branch16": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 16, 1 right, 0 not",
+              "nl": "Boom: tak 16, 1 goed, 0 niet"
+            }
+          },
+          "branch17": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 17, 1 right, 0 not",
+              "nl": "Boom: tak 17, 1 goed, 0 niet"
+            }
+          },
+          "branch18": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 18, 1 right, 0 not",
+              "nl": "Boom: tak 18, 1 goed, 0 niet"
+            }
+          },
+          "branch19": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 19, 1 right, 0 not",
+              "nl": "Boom: tak 19, 1 goed, 0 niet"
+            }
+          },
+          "branch20": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: branch 20, 1 right, 0 not",
+              "nl": "Boom: tak 20, 1 goed, 0 niet"
+            }
+          },
+          "path1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 1, 1 right, 0 not",
+              "nl": "Boom: pad 1, 1 goed, 0 niet"
+            }
+          },
+          "path2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 2, 1 right, 0 not",
+              "nl": "Boom: pad 2, 1 goed, 0 niet"
+            }
+          },
+          "path3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 3, 1 right, 0 not",
+              "nl": "Boom: pad 3, 1 goed, 0 niet"
+            }
+          },
+          "path4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 4, 1 right, 0 not",
+              "nl": "Boom: pad 4, 1 goed, 0 niet"
+            }
+          },
+          "path5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 5, 1 right, 0 not",
+              "nl": "Boom: pad 5, 1 goed, 0 niet"
+            }
+          },
+          "path6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 6, 1 right, 0 not",
+              "nl": "Boom: pad 6, 1 goed, 0 niet"
+            }
+          },
+          "path7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 7, 1 right, 0 not",
+              "nl": "Boom: pad 7, 1 goed, 0 niet"
+            }
+          },
+          "path8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 8, 1 right, 0 not",
+              "nl": "Boom: pad 8, 1 goed, 0 niet"
+            }
+          },
+          "path9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 9, 1 right, 0 not",
+              "nl": "Boom: pad 9, 1 goed, 0 niet"
+            }
+          },
+          "path10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 10, 1 right, 0 not",
+              "nl": "Boom: pad 10, 1 goed, 0 niet"
+            }
+          },
+          "path11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 11, 1 right, 0 not",
+              "nl": "Boom: pad 11, 1 goed, 0 niet"
+            }
+          },
+          "path12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 12, 1 right, 0 not",
+              "nl": "Boom: pad 12, 1 goed, 0 niet"
+            }
+          },
+          "path13": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 13, 1 right, 0 not",
+              "nl": "Boom: pad 13, 1 goed, 0 niet"
+            }
+          },
+          "path14": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 14, 1 right, 0 not",
+              "nl": "Boom: pad 14, 1 goed, 0 niet"
+            }
+          },
+          "path15": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 15, 1 right, 0 not",
+              "nl": "Boom: pad 15, 1 goed, 0 niet"
+            }
+          },
+          "path16": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: path 16, 1 right, 0 not",
+              "nl": "Boom: pad 16, 1 goed, 0 niet"
+            }
+          },
+          "answer": {
+            "baseType": "string",
+            "label": {
+              "en": "Tree: the probability of the event as written (3/8, 0.375)",
+              "nl": "Boom: de kans op de gebeurtenis zoals geschreven (3/8, 0.375)"
+            }
+          },
+          "answerValue": {
+            "baseType": "float",
+            "label": {
+              "en": "Tree: the probability of the event as a number",
+              "nl": "Boom: de kans op de gebeurtenis als getal"
+            },
+            "tolerance": "range"
+          },
+          "answerCheck": {
+            "baseType": "integer",
+            "label": {
+              "en": "Tree: 1 when the probability of the event is right",
+              "nl": "Boom: 1 als de kans op de gebeurtenis goed is"
+            }
+          },
+          "trials": {
+            "baseType": "integer",
+            "label": {
+              "en": "The number of trials the candidate ran",
+              "nl": "Het aantal keer dat de kandidaat het experiment uitvoerde"
+            }
+          },
+          "design": {
+            "baseType": "string",
+            "label": {
+              "en": "Design: the spinner or bag (JSON)",
+              "nl": "Ontwerp: de draaischijf of zak (JSON)"
+            }
+          },
+          "tree": {
+            "baseType": "string",
+            "label": {
+              "en": "Tree: what the candidate filled in (JSON)",
+              "nl": "Boom: wat de kandidaat invulde (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Set up the experiment…",
+          "nl": "Kansexperiment instellen…"
+        },
+        "width": 1100,
+        "height": 760
+      }
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "html": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "HTML of the interaction", "nl": "HTML van de interactie" },
+    "$comment": "A whole HTML document or only body content, written in the authoring mode. Elements with data-response and a name make up the response; data-wordcount-for shows a word count. Inline styles and data: images are kept; scripts, event handlers and external loads are removed. Empty: the example fact sheet"
+  },
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the interaction", "nl": "Instructie boven de interactie" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts (word count)", "nl": "Taal van de eigen teksten van de PCI (aantal woorden)" }
+  }
+}

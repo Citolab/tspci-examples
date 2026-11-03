@@ -40,10 +40,10 @@
     "README.md"
   ],
   "devDependencies": {
-    "@citolab/preact-store": "2.14.0",
-    "@citolab/tspci": "2.14.0",
-    "@citolab/tspci-qti3": "2.14.0",
-    "@citolab/tspci-tao": "2.14.0",
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
     "@types/three": "^0.136.0",
     "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
@@ -52,12 +52,15 @@
     "three-orbitcontrols": "^2.110.3"
   },
   "scripts": {
-    "dev": "set ROLLUP_WATCH=true && tspci --dev",
+    "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
     "prod": "tspci",
     "watch": "tspci --watch",
     "package-tao": "tspci --target tao",
     "package-qti3": "tspci --target qti3",
-    "prepack": "npm run prod && npm run package-tao"
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-3d-blocks npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-3d-blocks npx vitest run --project=storybook"
   },
   "config": {
     "tspci": {
@@ -69,9 +72,9 @@
         "spatial reasoning",
         "3d"
       ],
-      "score": [
-        "MATCH_CORRECT",
-        "NONE"
+      "scoring": [
+        "match_correct",
+        "human"
       ],
       "short": "blocks",
       "sbom": {

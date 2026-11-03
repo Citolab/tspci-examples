@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+/* the drawing's inputs and the 3D picture take the focus ring of the PCI */
+.td-focus:focus-visible {
+  outline: 3px solid var(--color-sky-600);
+  outline-offset: 2px;
+}
+.td-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* a field on the drawing: sizes in the drawing's units (--k), so it scales with the drawing */
+.td-dim {
+  outline: none;
+  /* a border under 1px is drawn as 1px, a shadow is not: the frame scales with the drawing */
+  box-shadow: inset 0 0 0 calc(var(--k) * 0.3px) var(--color-sky-700);
+}
+.td-dim:focus {
+  background: white;
+  box-shadow: inset 0 0 0 calc(var(--k) * 0.3px) var(--color-sky-700), 0 0 0 calc(var(--k) * 0.6px) var(--color-sky-500);
+}
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}

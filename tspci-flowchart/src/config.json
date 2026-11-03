@@ -1,0 +1,36 @@
+{
+  "prompt": {
+    "default": "Complete the hand hygiene procedure for care staff: put the right card in each empty slot. One card is left over.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the chart", "nl": "Instructie boven het schema" }
+  },
+  "flowchart": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Flowchart", "nl": "Stroomschema" },
+    "$comment": "JSON written by the authoring mode (flowchart.ts): the task (order, complete, free), the cards, the chart with locked blocks and slots, the solution and the checks; empty: the example"
+  },
+  "scoring": {
+    "default": "match",
+    "editor": "enum",
+    "label": { "en": "Scoring", "nl": "Scoren" },
+    "options": [
+      { "value": "match", "label": { "en": "The item compares the graph with the correct response (string)", "nl": "Het item vergelijkt de graaf met het goede antwoord (string)" } },
+      { "value": "pci", "label": { "en": "PCI checks: the PCI scores the author's checks (record with score)", "nl": "Checks van de PCI: de PCI scoort de checks van de auteur (record met score)" } }
+    ]
+  },
+  "showOutline": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the flow as text under the chart", "nl": "Het schema als tekst onder het schema tonen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

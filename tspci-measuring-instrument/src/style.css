@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* the magnifier fades in; not when the candidate prefers less motion */
+.mi-lens {
+  animation: mi-fade 0.15s ease-out;
+}
+@keyframes mi-fade {
+  from { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mi-lens { animation: none; }
+}

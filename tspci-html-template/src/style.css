@@ -1,0 +1,62 @@
+/* SPDX-License-Identifier: GPL-2.0-only
+ * Based on https://github.com/oatymart/html-template-interaction-pci, © 2024 Martin Nicholson and Open Assessment Technologies SA
+ * Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
+ *
+ * The look of the author's form elements. It is in a layer, so any style in the author's own HTML (not in a layer)
+ * wins over it, whatever its specificity.
+ */
+@import "tailwindcss";
+
+@layer components {
+  .ht-body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--color-slate-800);
+  }
+  .ht-body p { margin: 0 0 .5rem; }
+  .ht-body img { max-width: 100%; height: auto; }
+
+  .ht-body :is(input:not([type]), input[type="text"], input[type="number"], input[type="email"], input[type="url"],
+      input[type="search"], textarea, select) {
+    box-sizing: border-box;
+    border: 1px solid var(--color-slate-400);
+    border-radius: 0.375rem;
+    background-color: #fff;
+    color: var(--color-slate-900);
+    padding: 0.25rem 0.5rem;
+    font: inherit;
+    min-height: 2rem;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .ht-body textarea { width: 100%; min-height: 6rem; resize: vertical; }
+  .ht-body select {
+    appearance: none;
+    padding-right: 2rem;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='%23475569'%3E%3Cpath d='M5.3 7.3a1 1 0 0 1 1.4 0L10 10.6l3.3-3.3a1 1 0 1 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 0-1.4z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1rem;
+    cursor: pointer;
+  }
+  .ht-body :is(input, textarea, select):hover:not(:disabled, [readonly]) { border-color: var(--color-slate-500); }
+  .ht-body :is(input, textarea, select):focus-visible {
+    outline: 2px solid var(--color-sky-600);
+    outline-offset: 1px;
+    border-color: var(--color-sky-600);
+  }
+  .ht-body :is(input[type="checkbox"], input[type="radio"]) {
+    accent-color: var(--color-sky-600);
+    width: 1.125rem;
+    height: 1.125rem;
+    margin: 0 .375rem 0 0;
+    vertical-align: -0.2em;
+    cursor: pointer;
+  }
+  .ht-body label:has(> input[type="checkbox"], > input[type="radio"]) { cursor: pointer; }
+  .ht-body :is(input, textarea, select):is(:disabled, [readonly]) {
+    background-color: var(--color-slate-50);
+    cursor: default;
+  }
+  .ht-body [data-wordcount-for] { color: var(--color-slate-500); font-size: .875rem; }
+}

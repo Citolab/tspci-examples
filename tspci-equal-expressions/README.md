@@ -55,7 +55,7 @@ systems.
 
 ## Response and scoring
 
-The PCI is not scored (`"role": "tool"`, `"score": ["NONE"]`).
+The PCI is not scored (`"scoring": ["none"]`).
 
 **The response** is the list of numbers tried, oldest first (`cardinality="ordered" base-type="float"`):
 `[10, 5, 8, 7]`. A number tried twice is in it once; the state's log has every try with its time. Until the first try,

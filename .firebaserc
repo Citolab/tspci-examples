@@ -1,0 +1,12 @@
+{
+  "projects": {
+    "default": "pci-showcase"
+  },
+  "targets": {
+    "pci-showcase": {
+      "hosting": {
+        "storybook": ["pci-showcase-storybook"]
+      }
+    }
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "colors": {
+    "default": "#cc0000, #cc6900, #f7ef00, #afe000, #00b512, #00bfa5, #009bbf, #008af4, #ae00f4, #f400e3, #f40000, #cccccc, #ffffff, #222222",
+    "editor": "colorList",
+    "label": { "en": "Colours to choose from", "nl": "Kleuren om uit te kiezen" },
+    "$comment": "#rrggbb; one per line (the original) or separated by commas"
+  },
+  "scene": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Starting figure", "nl": "Startfiguur" },
+    "$comment": "JSON written by the authoring mode, the original's format: [{\"p\":[x,y,z],\"c\":rgb}], a cube 50 wide, its centre at 25 + 50·n; empty: start with nothing"
+  },
+  "targetShape": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Target shape (scoring)", "nl": "Doelvorm (scoren)" },
+    "$comment": "JSON in the same format: the shape Scoring.find looks for in the building (any of four turns); the response gets \"score\": 1 when found, 0 when not; empty: no score"
+  },
+  "matchColors": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "The target shape must match in colour too", "nl": "De doelvorm moet ook in kleur kloppen" }
+  },
+  "emptyColor": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Colour that marks empty space in the target shape (#rrggbb, optional)", "nl": "Kleur voor lege ruimte in de doelvorm (#rrggbb, optioneel)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the texts", "nl": "Taal van de teksten" }
+  }
+}

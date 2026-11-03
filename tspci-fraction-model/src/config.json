@@ -1,0 +1,36 @@
+{
+  "prompt": {
+    "default": "Shade 2/3 of circle A and 4/6 of bar B.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the models", "nl": "Instructie boven de modellen" }
+  },
+  "models": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Models", "nl": "Modellen" },
+    "$comment": "JSON written by the authoring mode (fraction.ts): per model the type (bar, circle, grid, set), the parts, whether the candidate divides it, the task (shade or name), the given shading and the answer; empty: the example"
+  },
+  "scoring": {
+    "default": "match",
+    "editor": "enum",
+    "label": { "en": "Scoring", "nl": "Scoren" },
+    "options": [
+      { "value": "match", "label": { "en": "The item scores the fractions in lowest terms (ordered list of strings)", "nl": "Het item scoort de breuken, zo eenvoudig mogelijk (geordende lijst strings)" } },
+      { "value": "pci", "label": { "en": "The PCI scores them: equivalence, parts, lowest terms (record with score)", "nl": "De PCI scoort ze: gelijkwaardig, aantal delen, zo eenvoudig mogelijk (record met score)" } }
+    ]
+  },
+  "showReadout": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the shaded fraction and percentage under each model (gives away the count)", "nl": "Gekleurde breuk en percentage onder elk model tonen (verraadt de telling)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (37.5%)", "nl": "Engels (37.5%)" } },
+      { "value": "nl", "label": { "en": "Dutch (37,5%)", "nl": "Nederlands (37,5%)" } }
+    ],
+    "label": { "en": "Language of the numbers and texts", "nl": "Taal van de getallen en teksten" }
+  }
+}

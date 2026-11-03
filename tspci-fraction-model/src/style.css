@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+/* the models: white parts with a dark outline; shaded parts blue (Okabe-Ito) with white hatching, so never colour alone */
+.fm-model {
+  --fm-line: #1e293b;
+  --fm-shade: #0072b2;
+  --fm-focus: #e69f00;
+}
+.fm-part {
+  fill: #fff;
+  stroke: var(--fm-line);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.fm-shade { fill: var(--fm-shade); }
+.fm-hatch { stroke: #fff; stroke-opacity: 0.55; }
+.fm-interactive .fm-part { cursor: pointer; outline: none; transition: fill 120ms ease; }
+.fm-interactive .fm-part:not(.fm-on):hover { fill: #e0f2fe; }
+.fm-focus {
+  stroke: var(--fm-focus);
+  stroke-width: 4;
+  stroke-dasharray: 6 3;
+  pointer-events: none;
+}
+.fm-scale line { stroke: var(--fm-line); stroke-width: 1.5; }
+.fm-scale text { fill: #334155; font-size: 11px; font-family: ui-sans-serif, system-ui, sans-serif; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fm-interactive .fm-part { transition: none; }
+}

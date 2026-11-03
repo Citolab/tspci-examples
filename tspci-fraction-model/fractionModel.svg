@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <pattern id="h" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(45)">
+      <rect width="6" height="6" fill="#0072b2"/>
+      <line x1="0" y1="0" x2="0" y2="6" stroke="#fff" stroke-opacity="0.55" stroke-width="2.5"/>
+    </pattern>
+  </defs>
+  <g stroke="#1e293b" stroke-width="2" stroke-linejoin="round">
+    <path d="M32 24 L32 4 A20 20 0 0 1 49.32 34 Z" fill="url(#h)"/>
+    <path d="M32 24 L49.32 34 A20 20 0 0 1 14.68 34 Z" fill="url(#h)"/>
+    <path d="M32 24 L14.68 34 A20 20 0 0 1 32 4 Z" fill="#fff"/>
+    <rect x="5" y="50" width="9" height="10" fill="url(#h)"/>
+    <rect x="14" y="50" width="9" height="10" fill="url(#h)"/>
+    <rect x="23" y="50" width="9" height="10" fill="url(#h)"/>
+    <rect x="32" y="50" width="9" height="10" fill="url(#h)"/>
+    <rect x="41" y="50" width="9" height="10" fill="#fff"/>
+    <rect x="50" y="50" width="9" height="10" fill="#fff"/>
+  </g>
+</svg>

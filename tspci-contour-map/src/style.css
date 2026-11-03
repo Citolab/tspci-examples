@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* a closed circuit (data-show-current): the parts with current glow, lamps and LEDs light up */
+.cb-live {
+  color: var(--color-amber-600);
+  filter: drop-shadow(0 0 2px color-mix(in oklab, var(--color-amber-400) 70%, transparent));
+  animation: cb-pulse 1.6s ease-in-out infinite;
+}
+.cb-lit circle {
+  fill: color-mix(in oklab, var(--color-yellow-300) 75%, transparent);
+}
+.cb-lit-led .cb-body {
+  fill: var(--color-rose-500);
+  fill-opacity: 0.8;
+}
+@keyframes cb-pulse {
+  50% { filter: drop-shadow(0 0 5px var(--color-amber-400)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cb-live { animation: none; }
+}

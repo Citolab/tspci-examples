@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+/* a total above its reference intake: vermillion with stripes, so it is not told by colour alone (the ▲ and the % say it too) */
+.nl-over {
+  background-color: #d55e00;
+  background-image: repeating-linear-gradient(135deg, transparent 0 4px, rgb(255 255 255 / 0.45) 4px 7px);
+}
+.nl-label abbr {
+  text-decoration: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}

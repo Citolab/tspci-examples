@@ -1,0 +1,255 @@
+{
+  "name": "@citolab/pci-contour-map",
+  "version": "1.0.0-alpha.1",
+  "description": "contour lines and relief: a contour map and a 3D relief model of a terrain, with tasks: draw a cross-section, find the highest point, read heights, draw where a river flows",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "geography",
+    "contour-lines",
+    "relief",
+    "cross-section",
+    "three"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-contour-map"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "contourMap.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-contour-map npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-contour-map npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "contourMap",
+      "label": "Contour map",
+      "tags": [
+        "geography",
+        "contour-lines",
+        "relief",
+        "map",
+        "3d"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "contourMap",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the tasks of data-tasks on the terrain of data-terrain; README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the tasks done right",
+              "nl": "Score: punten van de goed gemaakte opdrachten"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all tasks",
+              "nl": "Maximale score: punten van alle opdrachten"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every task is right",
+              "nl": "Goed: 1 als alle opdrachten goed zijn"
+            }
+          },
+          "task1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 1: its points when right, else 0",
+              "nl": "Opdracht 1: de punten als hij goed is, anders 0"
+            }
+          },
+          "task1number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 1, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 1, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task1value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 1: the answer as text",
+              "nl": "Opdracht 1: het antwoord als tekst"
+            }
+          },
+          "task2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 2: its points when right, else 0",
+              "nl": "Opdracht 2: de punten als hij goed is, anders 0"
+            }
+          },
+          "task2number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 2, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 2, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task2value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 2: the answer as text",
+              "nl": "Opdracht 2: het antwoord als tekst"
+            }
+          },
+          "task3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 3: its points when right, else 0",
+              "nl": "Opdracht 3: de punten als hij goed is, anders 0"
+            }
+          },
+          "task3number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 3, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 3, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task3value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 3: the answer as text",
+              "nl": "Opdracht 3: het antwoord als tekst"
+            }
+          },
+          "task4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 4: its points when right, else 0",
+              "nl": "Opdracht 4: de punten als hij goed is, anders 0"
+            }
+          },
+          "task4number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 4, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 4, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task4value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 4: the answer as text",
+              "nl": "Opdracht 4: het antwoord als tekst"
+            }
+          },
+          "task5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 5: its points when right, else 0",
+              "nl": "Opdracht 5: de punten als hij goed is, anders 0"
+            }
+          },
+          "task5number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 5, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 5, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task5value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 5: the answer as text",
+              "nl": "Opdracht 5: het antwoord als tekst"
+            }
+          },
+          "task6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Task 6: its points when right, else 0",
+              "nl": "Opdracht 6: de punten als hij goed is, anders 0"
+            }
+          },
+          "task6number": {
+            "baseType": "float",
+            "label": {
+              "en": "Task 6, a number: profile points within the margin, metres to the target, the first height, or metres from the true stream",
+              "nl": "Opdracht 6, een getal: punten binnen de marge, meters tot het doel, de eerste hoogte, of meters van de echte beek"
+            }
+          },
+          "task6value": {
+            "baseType": "string",
+            "label": {
+              "en": "Task 6: the answer as text",
+              "nl": "Opdracht 6: het antwoord als tekst"
+            }
+          },
+          "answers": {
+            "baseType": "string",
+            "label": {
+              "en": "Answers: everything the candidate did, per task (JSON)",
+              "nl": "Antwoorden: alles wat de kandidaat deed, per opdracht (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Make the terrain and the tasks…",
+          "nl": "Terrein en opdrachten maken…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}

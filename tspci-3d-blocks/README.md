@@ -39,7 +39,7 @@ systems; TAO shows them as a form, with a dropdown for the colour mode and colou
 
 ## Scoring
 
-The PCI is made for `match_correct` (`authoring.json`: `"score": ["MATCH_CORRECT", "NONE"]`).
+The PCI is made for `match_correct` (`authoring.json`: `"scoring": ["match_correct", "human"]`).
 
 **The response** is a string (`cardinality="single" base-type="string"`): the three views of the build, as JSON. Per
 view, every cell of the grid is `found: true` when a brick is seen there.
@@ -56,7 +56,7 @@ view, every cell of the grid is `found: true` when a brick is seen there.
   scores it: 1 when the views match, otherwise 0.
 - The views depend on the grid size: change the grid size and set the correct response again.
 - **No response**: until the candidate places a brick, `getResponse()` reports nothing.
-- `NONE`: use the PCI without scoring, for instance as a tool or for a human rater.
+- `human`: use the PCI without automatic scoring, for instance as a tool or for a human rater.
 
 ## Using it
 

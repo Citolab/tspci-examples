@@ -46,7 +46,7 @@ systems. The texts of the item (formula names, units, axis labels) are settings,
 
 ## Response and scoring
 
-The PCI is not scored (`"role": "tool"`, `"score": ["NONE"]`).
+The PCI is not scored (`"scoring": ["none"]`).
 
 **The response** is the list of numbers in the table, oldest first (`cardinality="ordered" base-type="float"`):
 `[30, 40, 50, 10, 60, 45]`. Until the candidate adds or removes a number, `getResponse()` reports nothing (the start

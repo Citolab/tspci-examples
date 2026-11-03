@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <pattern id="h" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+      <rect width="4" height="4" fill="#fde7b0"/>
+      <line x1="0" y1="0" x2="0" y2="4" stroke="#d99a1e" stroke-width="1.6"/>
+    </pattern>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="#f0f9ff"/>
+  <!-- a cube -->
+  <path d="M14 22 L32 13 L50 22 L50 44 L32 53 L14 44 Z" fill="#cbd5e1" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M14 22 L32 31 L50 22 M32 31 L32 53" fill="none" stroke="#1e293b" stroke-width="1.6" stroke-linejoin="round"/>
+  <!-- the regular hexagon through the midpoints of six edges -->
+  <path d="M23 17.5 L41 17.5 L50 33 L41 48.5 L23 48.5 L14 33 Z" fill="url(#h)" stroke="#7c2d12" stroke-width="2" stroke-linejoin="round"/>
+  <!-- the plane's arrow -->
+  <path d="M32 33 L44 8" stroke="#0072b2" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M44 8 L39.5 11 L45.5 13.5 Z" fill="#0072b2"/>
+</svg>

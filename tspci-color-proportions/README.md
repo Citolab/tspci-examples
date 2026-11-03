@@ -36,7 +36,7 @@ systems.
 
 ## Scoring
 
-The PCI is made for `match_correct` (`authoring.json`: `"score": ["MATCH_CORRECT", "NONE"]`).
+The PCI is made for `match_correct` (`authoring.json`: `"scoring": ["match_correct", "human"]`).
 
 **The response** is a string (`cardinality="single" base-type="string"`): per colour used, the share of the whole shape
 it covers, in percent, as JSON. Colours are written in lower case and the list is sorted by colour.
@@ -54,7 +54,7 @@ it covers, in percent, as JSON. Colours are written in lower case and the list i
   scores it: 1 when every colour has the right share and no other colour is used, otherwise 0.
 - The response contains the colours themselves: change `data-colors` or the shape and set the correct response again.
 - **No response**: until the candidate colours a part, `getResponse()` reports nothing.
-- `NONE`: use the PCI without scoring, for instance as a tool or for a human rater.
+- `human`: use the PCI without automatic scoring, for instance as a tool or for a human rater.
 
 ## Using it
 

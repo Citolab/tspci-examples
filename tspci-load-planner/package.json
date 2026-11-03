@@ -1,0 +1,232 @@
+{
+  "name": "@citolab/pci-load-planner",
+  "version": "1.0.0-alpha.1",
+  "description": "load a van, a container or a pallet with boxes in 3D: stacking, this side up, fragile, weight, centre of gravity and unloading order, checked by the PCI",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "logistics",
+    "loading",
+    "load-plan",
+    "3d",
+    "three"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-load-planner"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "loadPlanner.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-load-planner npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-load-planner npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "loadPlanner",
+      "label": "Load planner",
+      "tags": [
+        "logistics",
+        "loading",
+        "3d",
+        "economics"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "loadPlanner",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI evaluates the author's checks (data-plan); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the passed checks",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check passes",
+              "nl": "Goed: 1 als alle checks kloppen"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 1: 1 passed, 0 not",
+              "nl": "Check 1: 1 klopt, 0 niet"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 2: 1 passed, 0 not",
+              "nl": "Check 2: 1 klopt, 0 niet"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 3: 1 passed, 0 not",
+              "nl": "Check 3: 1 klopt, 0 niet"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 4: 1 passed, 0 not",
+              "nl": "Check 4: 1 klopt, 0 niet"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 5: 1 passed, 0 not",
+              "nl": "Check 5: 1 klopt, 0 niet"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 6: 1 passed, 0 not",
+              "nl": "Check 6: 1 klopt, 0 niet"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 7: 1 passed, 0 not",
+              "nl": "Check 7: 1 klopt, 0 niet"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 8: 1 passed, 0 not",
+              "nl": "Check 8: 1 klopt, 0 niet"
+            }
+          },
+          "check9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 9: 1 passed, 0 not",
+              "nl": "Check 9: 1 klopt, 0 niet"
+            }
+          },
+          "check10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Check 10: 1 passed, 0 not",
+              "nl": "Check 10: 1 klopt, 0 niet"
+            }
+          },
+          "loaded": {
+            "baseType": "integer",
+            "label": {
+              "en": "Loaded: the number of boxes in the cargo space",
+              "nl": "Geladen: het aantal dozen in de laadruimte"
+            }
+          },
+          "volume": {
+            "baseType": "float",
+            "label": {
+              "en": "Used volume in %",
+              "nl": "Benut volume in %"
+            }
+          },
+          "weight": {
+            "baseType": "float",
+            "label": {
+              "en": "Total weight in kg",
+              "nl": "Totaal gewicht in kg"
+            }
+          },
+          "cogx": {
+            "baseType": "float",
+            "label": {
+              "en": "Centre of gravity: cm behind (+) or in front of (−) the middle",
+              "nl": "Zwaartepunt: cm achter (+) of voor (−) het midden"
+            }
+          },
+          "cogy": {
+            "baseType": "float",
+            "label": {
+              "en": "Centre of gravity: cm right (+) or left (−) of the middle",
+              "nl": "Zwaartepunt: cm rechts (+) of links (−) van het midden"
+            }
+          },
+          "placement": {
+            "baseType": "string",
+            "label": {
+              "en": "Placement: every loaded box (JSON)",
+              "nl": "Plaatsing: alle geladen dozen (JSON)"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Make the load plan…",
+          "nl": "Laadplan maken…"
+        },
+        "width": 1150,
+        "height": 800
+      }
+    }
+  }
+}

@@ -1,0 +1,542 @@
+{
+  "prompt": {
+    "default": "Solve for x: 3x + 5 = 2x − 7. Type your answer.",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction above the formula",
+      "nl": "Instructie boven de formule"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the buttons and the texts for screen readers",
+      "nl": "Taal van de knoppen en de teksten voor schermlezers"
+    }
+  },
+  "authorizeWhiteSpace": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Authorize white space (the space bar types a space)",
+      "nl": "Spaties toestaan (de spatiebalk typt een spatie)"
+    }
+  },
+  "useGapExpression": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Use an expression with gaps",
+      "nl": "Uitdrukking met open plekken"
+    }
+  },
+  "gapExpression": {
+    "default": "x^2+\\taoGap x+\\taoGap=(x+3)(x+5)",
+    "editor": "pci",
+    "label": {
+      "en": "Expression with gaps",
+      "nl": "Uitdrukking met open plekken"
+    },
+    "$comment": "LaTeX with \\taoGap for every gap and \\taoBr for a line break, as the original; written by the authoring mode"
+  },
+  "gapStyle": {
+    "default": "math-gap-small",
+    "editor": "enum",
+    "label": {
+      "en": "Gap size",
+      "nl": "Breedte van de open plekken"
+    },
+    "options": [
+      {
+        "value": "math-gap-small",
+        "label": {
+          "en": "Small",
+          "nl": "Smal"
+        }
+      },
+      {
+        "value": "math-gap-medium",
+        "label": {
+          "en": "Medium",
+          "nl": "Middel"
+        }
+      },
+      {
+        "value": "math-gap-large",
+        "label": {
+          "en": "Large",
+          "nl": "Breed"
+        }
+      }
+    ]
+  },
+  "tool_sqrt": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "√x Square root",
+      "nl": "√x Wortel"
+    }
+  },
+  "tool_frac": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "x/y Fraction",
+      "nl": "x/y Breuk"
+    }
+  },
+  "tool_exp": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "xⁿ Exponent",
+      "nl": "xⁿ Macht"
+    }
+  },
+  "tool_subscript": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "xₙ Subscript",
+      "nl": "xₙ Subscript"
+    }
+  },
+  "tool_log": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "log Logarithm",
+      "nl": "log Logaritme"
+    }
+  },
+  "tool_ln": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "ln Natural logarithm",
+      "nl": "ln Natuurlijke logaritme"
+    }
+  },
+  "tool_limit": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "lim Limit",
+      "nl": "lim Limiet"
+    }
+  },
+  "tool_sum": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∑ Sum",
+      "nl": "∑ Som"
+    }
+  },
+  "tool_nthroot": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "ⁿ√x Nth root",
+      "nl": "ⁿ√x N-de machtswortel"
+    }
+  },
+  "tool_e": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "e Euler's constant",
+      "nl": "e Getal van Euler"
+    }
+  },
+  "tool_infinity": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∞ Infinity",
+      "nl": "∞ Oneindig"
+    }
+  },
+  "tool_lparen": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "( Left parenthesis",
+      "nl": "( Haakje openen"
+    }
+  },
+  "tool_rparen": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": ") Right parenthesis",
+      "nl": ") Haakje sluiten"
+    }
+  },
+  "tool_lbrace": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "{ Left curly bracket",
+      "nl": "{ Accolade openen"
+    }
+  },
+  "tool_rbrace": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "} Right curly bracket",
+      "nl": "} Accolade sluiten"
+    }
+  },
+  "tool_lbrack": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "[ Left square bracket",
+      "nl": "[ Blokhaak openen"
+    }
+  },
+  "tool_rbrack": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "] Right square bracket",
+      "nl": "] Blokhaak sluiten"
+    }
+  },
+  "tool_integral": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∫ Integral",
+      "nl": "∫ Integraal"
+    }
+  },
+  "tool_colon": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": ": Colon",
+      "nl": ": Dubbele punt"
+    }
+  },
+  "tool_to": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "→ Right arrow",
+      "nl": "→ Pijl naar rechts"
+    }
+  },
+  "tool_degree": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "° Degree",
+      "nl": "° Graden"
+    }
+  },
+  "tool_percent": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "% Percent",
+      "nl": "% Procent"
+    }
+  },
+  "tool_angle": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∠ Angle",
+      "nl": "∠ Hoek"
+    }
+  },
+  "tool_triangle": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "△ Triangle",
+      "nl": "△ Driehoek"
+    }
+  },
+  "tool_similar": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∼ Similar to",
+      "nl": "∼ Gelijkvormig met"
+    }
+  },
+  "tool_paral": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∥ Parallel to",
+      "nl": "∥ Evenwijdig aan"
+    }
+  },
+  "tool_perp": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "⊥ Perpendicular to",
+      "nl": "⊥ Loodrecht op"
+    }
+  },
+  "tool_vline": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "| Vertical line, divides",
+      "nl": "| Verticale streep, is deler van"
+    }
+  },
+  "tool_pi": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "π Pi",
+      "nl": "π Pi"
+    }
+  },
+  "tool_sin": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "sin Sine",
+      "nl": "sin Sinus"
+    }
+  },
+  "tool_cos": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "cos Cosine",
+      "nl": "cos Cosinus"
+    }
+  },
+  "tool_tan": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "tan Tangent",
+      "nl": "tan Tangens"
+    }
+  },
+  "tool_lower": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "< Less than",
+      "nl": "< Kleiner dan"
+    }
+  },
+  "tool_greater": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "> Greater than",
+      "nl": "> Groter dan"
+    }
+  },
+  "tool_lte": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "≤ Less than or equal to",
+      "nl": "≤ Kleiner dan of gelijk aan"
+    }
+  },
+  "tool_gte": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "≥ Greater than or equal to",
+      "nl": "≥ Groter dan of gelijk aan"
+    }
+  },
+  "tool_approx": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "≈ Approximately",
+      "nl": "≈ Ongeveer gelijk aan"
+    }
+  },
+  "tool_equal": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "= Equals",
+      "nl": "= Is gelijk aan"
+    }
+  },
+  "tool_plus": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "+ Plus",
+      "nl": "+ Plus"
+    }
+  },
+  "tool_minus": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "– Minus",
+      "nl": "– Min"
+    }
+  },
+  "tool_times": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "× Times",
+      "nl": "× Keer"
+    }
+  },
+  "tool_timesdot": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "· Times (dot)",
+      "nl": "· Keer (punt)"
+    }
+  },
+  "tool_divide": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "÷ Divided by",
+      "nl": "÷ Gedeeld door"
+    }
+  },
+  "tool_plusminus": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "± Plus or minus",
+      "nl": "± Plus of min"
+    }
+  },
+  "tool_inmem": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∈ Is an element of",
+      "nl": "∈ Is element van"
+    }
+  },
+  "tool_ninmem": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∉ Is not an element of",
+      "nl": "∉ Is geen element van"
+    }
+  },
+  "tool_union": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∪ Union",
+      "nl": "∪ Vereniging"
+    }
+  },
+  "tool_intersec": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∩ Intersection",
+      "nl": "∩ Doorsnede"
+    }
+  },
+  "tool_congruent": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "≅ Congruent to",
+      "nl": "≅ Congruent met"
+    }
+  },
+  "tool_subset": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "⊂ Subset of",
+      "nl": "⊂ Deelverzameling van"
+    }
+  },
+  "tool_superset": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "⊃ Superset of",
+      "nl": "⊃ Bevat als deelverzameling"
+    }
+  },
+  "tool_contains": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "∋ Contains as element",
+      "nl": "∋ Bevat als element"
+    }
+  },
+  "tool_matrix_2row": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "2×1 Matrix with 2 rows",
+      "nl": "2×1 Matrix met 2 rijen"
+    }
+  },
+  "tool_matrix_2row_2col": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "2×2 Matrix with 2 rows and 2 columns",
+      "nl": "2×2 Matrix met 2 rijen en 2 kolommen"
+    }
+  },
+  "allowNewLine": {
+    "default": "false",
+    "editor": "hidden",
+    "$comment": "experimental in the original (Enter types a line break); not supported with MathLive, kept so items of the original keep their settings"
+  },
+  "enableAutoWrap": {
+    "default": "false",
+    "editor": "hidden",
+    "$comment": "experimental in the original (wrap long formulas); not supported with MathLive, kept so items of the original keep their settings"
+  },
+  "gapResponseIsJson": {
+    "default": "true",
+    "editor": "hidden",
+    "$comment": "true: the gaps as a JSON array; false: separated by commas (items made before the original's v3.0.0)"
+  },
+  "isReviewMode": {
+    "default": "false",
+    "editor": "hidden",
+    "$comment": "true: show the response read only (TAO sets it in review)"
+  }
+}

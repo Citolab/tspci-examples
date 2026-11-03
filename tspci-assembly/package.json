@@ -1,0 +1,172 @@
+{
+  "name": "@citolab/pci-assembly",
+  "version": "1.0.0-alpha.1",
+  "description": "assemble or disassemble a product in 3D in the right order: parts with prerequisites, feedback on wrong steps, scored as an ordered list or by the PCI",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "assembly",
+    "disassembly",
+    "technology",
+    "3d",
+    "three"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-assembly"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "assembly.svg",
+    "example.png",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "@types/three": "0.180.0",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18",
+    "three": "0.180.0"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-assembly npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-assembly npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "assembly",
+      "label": "Assembly order",
+      "tags": [
+        "assembly",
+        "disassembly",
+        "technology",
+        "order",
+        "3d"
+      ],
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "short": "assembly",
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "$comment": "Scoring pci (the default): this record, scored by the PCI from data-assembly. Scoring list: an ordered identifier list of the part ids (MATCH_CORRECT); scoring string: the ids comma separated, single string (README)",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the checks that pass, minus the penalty per violation",
+              "nl": "Score: punten van de checks die kloppen, min de aftrek per overtreding"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score",
+              "nl": "Maximale score"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every part is used and no step breaks a rule",
+              "nl": "Goed: 1 als alle onderdelen gebruikt zijn en geen stap een regel breekt"
+            }
+          },
+          "valid": {
+            "baseType": "integer",
+            "label": {
+              "en": "Valid order: every part, no rule broken (1 or 0)",
+              "nl": "Geldige volgorde: alle onderdelen, geen regel gebroken (1 of 0)"
+            }
+          },
+          "complete": {
+            "baseType": "integer",
+            "label": {
+              "en": "All parts used (1 or 0)",
+              "nl": "Alle onderdelen gebruikt (1 of 0)"
+            }
+          },
+          "first": {
+            "baseType": "integer",
+            "label": {
+              "en": "The right first part (1 or 0; only with a first part set)",
+              "nl": "Het goede eerste onderdeel (1 of 0; alleen als er een is ingesteld)"
+            }
+          },
+          "violations": {
+            "baseType": "integer",
+            "label": {
+              "en": "Violations: steps before a part they need, counted per missing part",
+              "nl": "Overtredingen: stappen voor een onderdeel dat eerst moet, per ontbrekend onderdeel"
+            }
+          },
+          "blocked": {
+            "baseType": "integer",
+            "label": {
+              "en": "Blocked attempts (feedback: block)",
+              "nl": "Tegengehouden pogingen (feedback: tegenhouden)"
+            }
+          },
+          "steps": {
+            "baseType": "integer",
+            "label": {
+              "en": "Steps: the number of parts in the order",
+              "nl": "Stappen: het aantal onderdelen in de volgorde"
+            }
+          },
+          "order": {
+            "baseType": "string",
+            "label": {
+              "en": "Order: the part ids, comma separated",
+              "nl": "Volgorde: de ids van de onderdelen, gescheiden door komma's"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Set up the product…",
+          "nl": "Product inrichten…"
+        },
+        "width": 1100,
+        "height": 780
+      }
+    }
+  }
+}
