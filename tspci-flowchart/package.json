@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-flowchart",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "build or complete a flowchart: put cards in order, fill the slots of a partial chart, or build freely; the PCI scores the graph layout independently",
   "author": {
     "name": "Citolab",
