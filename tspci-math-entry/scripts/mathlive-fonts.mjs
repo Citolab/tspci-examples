@@ -7,8 +7,9 @@
 // with the fonts inlined as data: URLs. The PCI is one AMD file, so it cannot load the fonts from a directory next to it.
 import fs from "fs";
 import path from "path";
+import { fileURLToPath } from "url";
 
-const root = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const fontsDir = path.join(root, "node_modules", "mathlive", "fonts");
 const css = fs.readFileSync(path.join(root, "node_modules", "mathlive", "mathlive-fonts.css"), "utf-8");
 
