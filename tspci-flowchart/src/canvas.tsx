@@ -638,6 +638,8 @@ const Canvas = ({ settings, chart, start, onChange, texts, perms, readOnly = fal
               aria-readonly={readOnly ? "true" : undefined} onKeyDown={onKeyDown}
               className="group relative grid touch-none select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-4"
               style={{
+                // exactly the cells wide: the arrow layer (viewBox) and the pointer maths assume the grid is columns × CW
+                width: `${columns * CW}px`,
                 gridTemplateColumns: `repeat(${columns}, ${CW}px)`, gridTemplateRows: `repeat(${rows}, ${CH}px)`,
                 backgroundImage: "radial-gradient(circle, #dbe3ec 1.2px, transparent 1.3px)", backgroundSize: `${CW / 2}px ${CH / 2}px`, backgroundPosition: `${CW / 4}px ${CH / 4}px`,
               }}>
