@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only
+   Based on https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Lentillespci,
+   © DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière (Wiquid)
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+
+@import "tailwindcss";
+
+:host {
+  display: block;
+}

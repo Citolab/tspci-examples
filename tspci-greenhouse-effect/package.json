@@ -1,0 +1,120 @@
+{
+  "name": "@citolab/pci-greenhouse-effect",
+  "version": "1.0.0-alpha.1",
+  "description": "the greenhouse effect in a one-layer atmosphere model: more or less greenhouse gas, energy flows as arrows and the surface temperature",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original EffetDeSerrepci)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "greenhouse effect",
+    "climate",
+    "energy balance",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-greenhouse-effect"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "greenhouseEffect.svg",
+    "example.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-greenhouse-effect npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-greenhouse-effect npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "greenhouseEffect",
+      "label": "Greenhouse effect",
+      "tags": [
+        "greenhouse effect",
+        "climate",
+        "energy balance",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "greenhouseEffect",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the question of its settings (question = target or direction) in correct/score; README",
+        "fields": {
+          "level": {
+            "baseType": "float",
+            "label": { "en": "Level: greenhouse gas set, % of the surface infrared the atmosphere absorbs", "nl": "Niveau: ingesteld broeikasgas, % van het infrarood van het oppervlak dat de atmosfeer opneemt", "fr": "Niveau : gaz à effet de serre réglé, % de l'infrarouge du sol absorbé par l'atmosphère" }
+          },
+          "epsilon": {
+            "baseType": "float",
+            "label": { "en": "Epsilon: infrared absorptivity of the atmosphere (0 to 1)", "nl": "Epsilon: infrarood-absorptie van de atmosfeer (0 tot 1)", "fr": "Epsilon : absorptivité infrarouge de l'atmosphère (0 à 1)" }
+          },
+          "temperature": {
+            "baseType": "float",
+            "label": { "en": "Temperature: surface temperature in °C, rounded as shown", "nl": "Temperatuur: temperatuur van het oppervlak in °C, afgerond zoals getoond", "fr": "Température : température de la surface en °C, arrondie comme affichée" }
+          },
+          "tried": {
+            "baseType": "string",
+            "label": { "en": "Tried: the levels the candidate stopped at, with their temperatures (JSON)", "nl": "Geprobeerd: de niveaus waar de kandidaat stopte, met hun temperaturen (JSON)", "fr": "Essais : les niveaux où le candidat s'est arrêté, avec leurs températures (JSON)" }
+          },
+          "prediction": {
+            "baseType": "string",
+            "label": { "en": "Prediction (direction question): up, same or down", "nl": "Voorspelling (richtingvraag): up, same of down", "fr": "Prévision (question de sens) : up, same ou down" }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": { "en": "Correct: 1 when the answer to the question is correct", "nl": "Goed: 1 als het antwoord op de vraag goed is", "fr": "Correct : 1 si la réponse à la question est correcte" }
+          },
+          "score": {
+            "baseType": "integer",
+            "label": { "en": "Score: 1 or 0", "nl": "Score: 1 of 0", "fr": "Score : 1 ou 0" }
+          }
+        }
+      }
+    }
+  }
+}

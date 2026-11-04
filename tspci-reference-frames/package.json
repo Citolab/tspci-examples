@@ -1,0 +1,112 @@
+{
+  "name": "@citolab/pci-reference-frames",
+  "version": "1.0.0-alpha.1",
+  "description": "relativity of motion: a train or a motorbike seen from the ground, from the vehicle or from a second observer, with the trajectories of points traced as they move",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "physics",
+    "motion",
+    "reference-frame",
+    "relativity",
+    "cycloid",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-reference-frames"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "referenceFrames.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-reference-frames npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-reference-frames npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "referenceFrames",
+      "label": "Reference frames",
+      "tags": [
+        "physics",
+        "motion",
+        "reference frame",
+        "relativity",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "referenceFrames",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the answers to the author's questions (data-trajectory-questions, data-motion-questions) against the key that follows from the motion, or the author's own key; README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": { "en": "Score: questions answered correctly", "nl": "Score: goed beantwoorde vragen", "fr": "Score : questions correctement répondues" }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": { "en": "Maximum score: number of questions", "nl": "Maximale score: aantal vragen", "fr": "Score maximal : nombre de questions" }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": { "en": "Correct: 1 when every question is answered correctly", "nl": "Goed: 1 als elke vraag goed is", "fr": "Correct : 1 si toutes les réponses sont justes" }
+          },
+          "answers": {
+            "baseType": "string",
+            "label": { "en": "Answers: point@frame=answer, separated by ;", "nl": "Antwoorden: punt@stelsel=antwoord, gescheiden door ;", "fr": "Réponses : point@référentiel=réponse, séparées par ;" }
+          },
+          "viewed": {
+            "baseType": "string",
+            "label": { "en": "Viewed: the frames played, each with the traced points (ground:rim,hub;vehicle:rim)", "nl": "Bekeken: de afgespeelde stelsels, elk met de gevolgde punten (ground:rim,hub;vehicle:rim)", "fr": "Vu : les référentiels joués, chacun avec les points tracés (ground:rim,hub;vehicle:rim)" }
+          }
+        }
+      }
+    }
+  }
+}

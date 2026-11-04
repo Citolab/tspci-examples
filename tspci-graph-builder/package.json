@@ -1,0 +1,173 @@
+{
+  "name": "@citolab/pci-graph-builder",
+  "version": "1.0.0-alpha.1",
+  "description": "the candidate builds a graph from measured data: a table, the axes, the scale, the points and the line, scored with the author's checks",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "graph",
+    "table",
+    "data",
+    "science"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-graph-builder"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "graphBuilder.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-graph-builder npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-graph-builder npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "graphBuilder",
+      "label": "Graph builder",
+      "tags": [
+        "graph",
+        "table",
+        "data",
+        "science"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "graphBuilder",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI evaluates the author's checks (data-points-*); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the passed checks",
+              "nl": "Score: punten van de checks die kloppen"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all checks",
+              "nl": "Maximale score: punten van alle checks"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every check with points passes",
+              "nl": "Goed: 1 als alle checks met punten kloppen"
+            }
+          },
+          "checkTable": {
+            "baseType": "integer",
+            "label": {
+              "en": "Table: 1 every measurement in the table, 0 not",
+              "nl": "Tabel: 1 alle metingen in de tabel, 0 niet"
+            }
+          },
+          "checkAxes": {
+            "baseType": "integer",
+            "label": {
+              "en": "Axes: 1 the right quantity and unit on both axes, 0 not",
+              "nl": "Assen: 1 de goede grootheid en eenheid op beide assen, 0 niet"
+            }
+          },
+          "checkScale": {
+            "baseType": "integer",
+            "label": {
+              "en": "Scale: 1 a suitable scale on both axes, 0 not",
+              "nl": "Schaal: 1 een geschikte schaalverdeling op beide assen, 0 niet"
+            }
+          },
+          "checkPoints": {
+            "baseType": "integer",
+            "label": {
+              "en": "Points: 1 every measurement plotted (within the tolerance) and no other points, 0 not",
+              "nl": "Punten: 1 alle metingen uitgezet (binnen de marge) en geen andere punten, 0 niet"
+            }
+          },
+          "checkLine": {
+            "baseType": "integer",
+            "label": {
+              "en": "Line: 1 the points are connected, 0 not",
+              "nl": "Lijn: 1 de punten zijn verbonden, 0 niet"
+            }
+          },
+          "tableCells": {
+            "baseType": "integer",
+            "label": {
+              "en": "Table cells: the number of right cells",
+              "nl": "Tabelcellen: het aantal goede cellen"
+            }
+          },
+          "pointsMatched": {
+            "baseType": "integer",
+            "label": {
+              "en": "Points matched: the measurements with a plotted point within the tolerance",
+              "nl": "Punten: het aantal metingen met een uitgezet punt binnen de marge"
+            }
+          },
+          "graph": {
+            "baseType": "string",
+            "label": {
+              "en": "Graph: axes, scales, points and line (JSON)",
+              "nl": "Grafiek: assen, schaal, punten en lijn (JSON)"
+            }
+          },
+          "table": {
+            "baseType": "string",
+            "label": {
+              "en": "Table: the headings and rows the candidate typed (JSON)",
+              "nl": "Tabel: de kopjes en rijen die de kandidaat typte (JSON)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

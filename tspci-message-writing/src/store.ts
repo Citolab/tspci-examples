@@ -17,7 +17,8 @@ export type EmailState = {
   /** when they pressed Send (local time, ISO), or null */
   sent: string | null;
 };
-export type ChatModel = { transcript: ChatEntry[]; waiting: string | null; ended: boolean; draft: string };
+/** The chat (message.ts ChatState) and the text typed but not sent; `at` and `name` are missing in older states. */
+export type ChatModel = { transcript: ChatEntry[]; waiting: string | null; ended: boolean; at?: string | null; name?: string; draft: string };
 export type PostModel = { text: string; posted: string | null };
 
 export type StateModel = {

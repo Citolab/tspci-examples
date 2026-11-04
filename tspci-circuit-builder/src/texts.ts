@@ -8,6 +8,8 @@ const enParts: Record<PartType, string> = {
   switch: "Switch", pushButton: "Push button", buzzer: "Buzzer", motor: "Motor", ldr: "LDR", ntc: "NTC",
   fuse: "Fuse", voltmeter: "Voltmeter", ammeter: "Ammeter", cell: "Cell", battery: "Battery",
   dcSource: "DC source", acSource: "AC source", transistor: "Transistor",
+  aluminiumFoil: "Aluminium foil", copper: "Copper", ironNail: "Iron nail", graphite: "Pencil lead (graphite)", cotton: "Cotton",
+  wood: "Wood", plastic: "Plastic", glass: "Glass", rubber: "Rubber",
 };
 const nlParts: Record<PartType, string> = {
   wire: "Draad", corner: "Hoekdraad", tee: "T-splitsing", cross: "Kruising (verbonden)", crossover: "Kruisende draden",
@@ -15,6 +17,8 @@ const nlParts: Record<PartType, string> = {
   switch: "Schakelaar", pushButton: "Drukschakelaar", buzzer: "Zoemer", motor: "Motor", ldr: "LDR", ntc: "NTC",
   fuse: "Zekering", voltmeter: "Voltmeter", ammeter: "Ampèremeter", cell: "Cel", battery: "Batterij",
   dcSource: "Gelijkspanningsbron", acSource: "Wisselspanningsbron", transistor: "Transistor",
+  aluminiumFoil: "Aluminiumfolie", copper: "Koper", ironNail: "IJzeren spijker", graphite: "Potloodstift (grafiet)", cotton: "Katoen",
+  wood: "Hout", plastic: "Plastic", glass: "Glas", rubber: "Rubber",
 };
 
 const list = (names: string[], and: string) => (names.length < 2 ? names.join("") : `${names.slice(0, -1).join(", ")} ${and} ${names[names.length - 1]}`);
@@ -50,6 +54,16 @@ const en = {
   cleared: "The board is as it was at the start.",
   openEnds: (n: number) => (n === 1 ? "1 open end" : `${n} open ends`),
   closedCircuit: "Closed circuit",
+  // the lamp tool (data-lamp-tool)
+  breakLamp: "Break lamp",
+  repairLamp: "Repair lamp",
+  broken: "broken",
+  lit: "lit",
+  lampBroken: (part: string, row: number, column: number) => `${part} in row ${row}, column ${column} is broken: no current goes through it.`,
+  lampRepaired: (part: string, row: number, column: number) => `${part} in row ${row}, column ${column} works again.`,
+  notALamp: "Choose a lamp on the board to break or repair it.",
+  lampHelp: " Break lamp (or B) breaks the chosen lamp, or repairs it.",
+  sample: "test material",
   // authoring mode
   tabBoard: "Board",
   tabSolution: "Solution",
@@ -83,7 +97,13 @@ const en = {
     parallel: "Parallel",
     forward: "Points the right way",
     solution: "Same circuit as the solution",
+    lit: "Has current (lamp lit)",
   } as Record<Check["type"], string>,
+  withMaterial: "in series with",
+  noMaterial: "any (no material)",
+  off: "no current (stays off)",
+  brokenOnly: "only with a broken lamp",
+  brokenHint: "The solution has no broken lamps: a check \"only with a broken lamp\" is not tried on it.",
   anySource: "Any source",
   describe: (check: Check, name: (r: PartRef) => string): string => {
     switch (check.type) {
@@ -99,6 +119,8 @@ const en = {
         return `${list(check.parts.map(name), "and")} the right way round`;
       case "solution":
         return "The same circuit as the solution";
+      case "lit":
+        return `${list(check.parts.map(name), "and")} ${check.off ? "without current" : "with current"}${check.material ? ` with ${name(check.material).toLowerCase()}` : ""}${check.broken ? ", with a lamp broken" : ""}`;
     }
   },
   problemPalette: "The palette is empty: the candidate has nothing to place.",
@@ -140,6 +162,15 @@ const nl: typeof en = {
   cleared: "Het bord is weer zoals aan het begin.",
   openEnds: (n: number) => (n === 1 ? "1 los eind" : `${n} losse einden`),
   closedCircuit: "Gesloten stroomkring",
+  breakLamp: "Lampje kapot",
+  repairLamp: "Lampje heel maken",
+  broken: "kapot",
+  lit: "brandt",
+  lampBroken: (part: string, row: number, column: number) => `${part} in rij ${row}, kolom ${column} is kapot: er gaat geen stroom doorheen.`,
+  lampRepaired: (part: string, row: number, column: number) => `${part} in rij ${row}, kolom ${column} doet het weer.`,
+  notALamp: "Kies een lampje op het bord om het kapot of weer heel te maken.",
+  lampHelp: " Lampje kapot (of B) maakt het gekozen lampje kapot, of weer heel.",
+  sample: "testmateriaal",
   tabBoard: "Bord",
   tabSolution: "Oplossing",
   tabPalette: "Onderdelen",
@@ -172,7 +203,13 @@ const nl: typeof en = {
     parallel: "Parallel",
     forward: "In de goede richting",
     solution: "Dezelfde schakeling als de oplossing",
+    lit: "Er gaat stroom door (lampje brandt)",
   },
+  withMaterial: "in serie met",
+  noMaterial: "geen (geen materiaal)",
+  off: "geen stroom (blijft uit)",
+  brokenOnly: "alleen met een kapot lampje",
+  brokenHint: "De oplossing heeft geen kapotte lampjes: een check \"alleen met een kapot lampje\" wordt er niet op getest.",
   anySource: "Elke bron",
   describe: (check: Check, name: (r: PartRef) => string): string => {
     switch (check.type) {
@@ -188,6 +225,8 @@ const nl: typeof en = {
         return `${list(check.parts.map(name), "en")} in de goede richting`;
       case "solution":
         return "Dezelfde schakeling als de oplossing";
+      case "lit":
+        return `${list(check.parts.map(name), "en")} ${check.off ? "zonder stroom" : "met stroom"}${check.material ? ` met ${name(check.material).toLowerCase()}` : ""}${check.broken ? ", met een kapot lampje" : ""}`;
     }
   },
   problemPalette: "Het palet is leeg: de kandidaat kan niets plaatsen.",

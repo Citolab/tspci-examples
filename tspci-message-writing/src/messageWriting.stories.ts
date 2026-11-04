@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from "@storybook/html-vite";
 import { expect, userEvent, waitFor } from "storybook/test";
 import { lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, type AuthoringArgs, type PciArgs } from "../../.storybook/tspci";
 import pci from "./index";
+import { CHOICE_CHAT } from "./message";
 
 const meta = {
   title: "Message writing",
@@ -438,5 +439,160 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     await userEvent.keyboard("{ArrowRight}");
     expect(canvas.getByRole("tab", { name: "Inhoud" })).toHaveAttribute("aria-selected", "true");
     expect(JSON.parse(instance.getProperties().scenario!).post.task).toBe("Reageer op het bericht.");
+  },
+};
+
+// --- Chat with reply buttons (choice steps), a name step, a document card and notices (inspired by the DEPP ChatBot PCI)
+
+const CHOICES = JSON.stringify({ chat: CHOICE_CHAT });
+
+export const ChatChoices: Story = {
+  args: { properties: { environment: "chat", chatDelay: "20", scenario: CHOICES } },
+  play: async ({ canvasElement, step }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    const log = canvas.getByRole("log", { name: "Messages" });
+
+    await step("a notice, then the name step: the candidate types their name", async () => {
+      await waitFor(() => expect(log.querySelectorAll("li")).toHaveLength(2));
+      expect(log.querySelector("[data-kind=system]")).toHaveTextContent("Notice: Mila added you to the chat.");
+      await userEvent.type(canvas.getByRole("textbox", { name: "Type your name" }), "Lena de Vries{Enter}");
+    });
+
+    await step("{firstName} is filled in; a document card; reply buttons instead of the text box", async () => {
+      await waitFor(() => expect(canvas.getByRole("group", { name: "Choose your reply." })).toBeInTheDocument());
+      expect(log).toHaveTextContent("Nice to meet you, Lena!");
+      expect(canvas.getByTestId("chat-card")).toHaveTextContent("Document: Training schedule");
+      expect(canvas.getByTestId("chat-card")).toHaveTextContent("Thursday 18:00–19:30, field 1");
+      expect(canvas.queryByRole("textbox")).toBeNull();
+      const buttons = canvas.getAllByRole("button").filter((b) => b.dataset.option);
+      expect(buttons.map((b) => b.dataset.option)).toEqual(["yes", "thursday", "maybe", "whatever"]);
+      // real buttons (type="button"): in the tab order, Enter and Space press them
+      buttons[1].focus();
+      expect(buttons[1].tagName).toBe("BUTTON");
+      await userEvent.click(buttons[1]);
+      expect(canvas.getByRole("status")).toHaveTextContent("You replied: Sorry, I can't on Tuesday. Is Thursday OK?");
+    });
+
+    await step("the choice in the response: id, category, points, the step", async () => {
+      await waitFor(() => expect(log).toHaveTextContent("Do you have a question about the training, Lena?"));
+      const r = pci.getResponse();
+      expect(field(r, "choices")).toEqual({ string: "thursday" });
+      expect(field(r, "categories")).toEqual({ string: "polite" });
+      expect(field(r, "choicepoints")).toEqual({ integer: 2 });
+      expect(field(r, "laststep")).toEqual({ string: "thursday" });
+      expect(field(r, "name")).toEqual({ string: "Lena de Vries" });
+      // written replies only: the name and the button are not text
+      expect(field(r, "text")).toEqual({ string: "" });
+    });
+
+    await step("a written step after the choice; the chat ends", async () => {
+      await userEvent.type(canvas.getByRole("textbox", { name: "Write a message" }), "What should I wear?{Enter}");
+      await waitFor(() => expect(log).toHaveTextContent("This chat has ended."));
+      const r = pci.getResponse();
+      expect(field(r, "laststep")).toEqual({ string: "bye" });
+      expect(field(r, "score")).toEqual({ integer: 3 });
+      expect(field(r, "text")).toEqual({ string: "What should I wear?" });
+      expect(field(r, "message")?.string).toMatch(/Lena de Vries: Sorry, I can't on Tuesday\. Is Thursday OK\? \(thursday\)/);
+      expect(field(r, "message")?.string).toMatch(/Mila: \[Training schedule\] Tuesday/);
+    });
+  },
+};
+
+export const ChatChoicesDutch: Story = {
+  args: { properties: { language: "nl", environment: "chat", chatDelay: "0", scenario: CHOICES } },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    await userEvent.type(canvas.getByRole("textbox", { name: "Typ je naam" }), "Daan{Enter}");
+    const group = await waitFor(() => canvas.getByRole("group", { name: "Kies je antwoord." }));
+    expect(canvas.getByTestId("chat-card")).toHaveTextContent("Document: Training schedule");
+    await userEvent.click(group.querySelector<HTMLElement>("[data-option=whatever]")!);
+    expect(canvas.getByRole("status")).toHaveTextContent("Je antwoordde: Whatever.");
+    const r = pci.getResponse();
+    expect(field(r, "categories")).toEqual({ string: "rude" });
+    expect(field(r, "choicepoints")).toEqual({ integer: 0 });
+    expect(field(r, "check2")).toEqual({ integer: 0 });
+  },
+};
+
+export const RestoresChoiceChat: Story = {
+  args: { properties: { environment: "chat", chatDelay: "0", scenario: CHOICES } },
+  play: async ({ canvasElement, step }) => {
+    const first = await openPci(canvasElement);
+    await userEvent.type(first.canvas.getByRole("textbox", { name: "Type your name" }), "Lena{Enter}");
+    await userEvent.click(await waitFor(() => first.canvas.getByRole("button", { name: "Maybe." })));
+    const response = first.pci.getResponse();
+    await waitFor(() => expect(first.canvas.getByRole("log")).toHaveTextContent("Do you have a question"));
+    const count = first.canvas.getAllByTestId("chat-message").length;
+    expect(count).toBe(8);
+
+    await step("from the state: the same chat, no waiting", async () => {
+      const second = await remountPci(canvasElement, pci, { properties: { environment: "chat", chatDelay: "5000", scenario: CHOICES }, state: first.pci.getState() });
+      expect(second.canvas.getAllByTestId("chat-message")).toHaveLength(count);
+      expect(field(second.pci.getResponse(), "choices")).toEqual({ string: "maybe" });
+      expect(field(second.pci.getResponse(), "name")).toEqual({ string: "Lena" });
+      expect(second.changes).toHaveLength(0);
+    });
+
+    await step("from the response (boundTo): the transcript is answered by the script again", async () => {
+      const third = await remountPci(canvasElement, pci, { properties: { environment: "chat", chatDelay: "0", scenario: CHOICES }, boundTo: { RESPONSE: response } });
+      const r = third.pci.getResponse();
+      expect(field(r, "choices")).toEqual({ string: "maybe" });
+      expect(field(r, "laststep")).toEqual({ string: "question" });
+      expect(third.canvas.getByRole("textbox", { name: "Write a message" })).toBeInTheDocument();
+    });
+  },
+};
+
+export const ChatChoicesSolution: Story = {
+  args: { status: "solution", properties: { environment: "chat", chatDelay: "0", scenario: CHOICES } },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    // the model answer: "Sam", the button "yes", a question; read-only, no buttons
+    expect(canvas.getByRole("log", { name: "Messages" })).toHaveTextContent("Yes, I'll be there. Thank you!");
+    expect(canvas.queryByRole("group", { name: "Choose your reply." })).toBeNull();
+    expect(canvas.queryByRole("textbox")).toBeNull();
+    const r = pci.getResponse();
+    expect(field(r, "choices")).toEqual({ string: "yes" });
+    expect(field(r, "correct")).toEqual({ integer: 1 });
+  },
+};
+
+export const AuthoringChoices: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { environment: "chat", scenario: CHOICES } },
+  play: async ({ canvasElement, step }) => {
+    const { instance, canvas } = await openAuthoring(canvasElement);
+    const scenario = () => JSON.parse(instance.getProperties().scenario!);
+
+    await step("the mixed scenario is valid; its model answer passes the choices checks", async () => {
+      expect(instance.validate()).toEqual([]);
+      await userEvent.click(canvas.getByRole("tab", { name: "Checks" }));
+      expect(canvas.getByTestId("summary")).toHaveTextContent("The model answer scores 3 of 3.");
+      expect(canvas.getByTestId("check-1-category")).toHaveValue("rude");
+    });
+
+    await step("reply buttons, the name step and the points per category in the content tab", async () => {
+      await userEvent.click(canvas.getByRole("tab", { name: "Content" }));
+      expect(canvas.getByTestId("step-0-ask-name")).toBeChecked();
+      expect(canvas.getByTestId("step-1-messages")).toHaveValue(
+        "Mila: Nice to meet you, {firstName}! Here is the training schedule.\nMila: # Training schedule | Tuesday 18:00–19:30, field 2\\nThursday 18:00–19:30, field 1\\nBring a stick, shin guards and a water bottle.\nMila: Can you come on Tuesday?"
+      );
+      expect(canvas.getByTestId("step-1-options")).toHaveValue(
+        "yes: Yes, I'll be there. Thank you! | polite | question\nthursday: Sorry, I can't on Tuesday. Is Thursday OK? | polite | thursday\nmaybe: Maybe. | neutral | question\nwhatever: Whatever. | rude | question"
+      );
+      fill(canvas.getByTestId("step-1-options"), "yes: Yes! | polite | nowhere");
+      expect(instance.validate()).toEqual(expect.arrayContaining(["Step schedule needs 2 to 4 reply buttons.", "Step schedule goes on to nowhere, which does not exist.", "Check 2 counts the category rude, which no reply button has."]));
+      fill(canvas.getByTestId("step-1-options"), "yes: Yes! | polite | question | 3\nno: No. | rude");
+      expect(scenario().chat.steps[1].options).toEqual([{ id: "yes", text: "Yes!", category: "polite", next: "question", points: 3 }, { id: "no", text: "No.", category: "rude" }]);
+      expect(instance.validate()).toEqual([]);
+      fill(canvas.getByTestId("category-points"), "polite: 4\nrude: -1");
+      expect(scenario().chat.categoryPoints).toEqual({ polite: 4, rude: -1 });
+      await userEvent.click(canvas.getByTestId("step-1-ask-name"));
+      expect(instance.validate()).toContain("Step schedule asks for the name and has reply buttons: choose one.");
+      await userEvent.click(canvas.getByTestId("step-1-ask-name"));
+      fill(canvas.getByTestId("step-2-messages"), "= Mila is away.\n# | no title");
+      expect(scenario().chat.steps[2].messages).toEqual([{ from: "", kind: "system", text: "Mila is away." }, { from: "", kind: "card", title: "", text: "no title" }]);
+      expect(instance.validate()).toContain("Step thursday has a document card without a title.");
+    });
   },
 };

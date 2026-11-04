@@ -1,0 +1,80 @@
+{
+  "prompt": {
+    "default": "Pour mashed potato into the U-tube, then add an effervescent tablet and close the tube. What happens to the purée?",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "viscosityLevels": {
+    "default": "3",
+    "editor": "enum",
+    "label": { "en": "Thicknesses of the mashed potato the candidate can choose", "nl": "Diktes van de puree waaruit de kandidaat kiest", "fr": "Consistances de purée au choix du candidat" },
+    "options": [
+      { "value": "2", "label": { "en": "Two: runny and stiff (as in the original)", "nl": "Twee: dun en stevig (zoals het origineel)", "fr": "Deux : fluide et compacte (comme l'original)" } },
+      { "value": "3", "label": { "en": "Three: runny, thick and stiff", "nl": "Drie: dun, dik en stevig", "fr": "Trois : fluide, épaisse et compacte" } }
+    ]
+  },
+  "maxTablets": {
+    "default": "3",
+    "editor": "integer",
+    "min": 1,
+    "max": 3,
+    "label": { "en": "Most effervescent tablets (1: always one, no choice)", "nl": "Maximaal aantal bruistabletten (1: altijd één, geen keuze)", "fr": "Nombre maximal de cachets (1 : toujours un, sans choix)" }
+  },
+  "rules": {
+    "default": "fluid = flow; medium = flow; medium 3+ = explosion; compact = dome; compact 2+ = explosion",
+    "editor": "textarea",
+    "label": {
+      "en": "Rule table: thickness [tablets] = outcome, separated by ; (fluid, medium, compact; 2 = exactly two, 2+ = two or more; flow, dome, explosion). The most specific rule wins",
+      "nl": "Regeltabel: dikte [tabletten] = uitkomst, gescheiden door ; (fluid, medium, compact; 2 = precies twee, 2+ = twee of meer; flow, dome, explosion). De meest specifieke regel wint",
+      "fr": "Table de règles : consistance [cachets] = résultat, séparés par ; (fluid, medium, compact ; 2 = exactement deux, 2+ = deux ou plus ; flow, dome, explosion). La règle la plus précise l'emporte"
+    }
+  },
+  "showEruptionType": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "After an experiment, show the real eruption type it models", "nl": "Na een experiment het echte type uitbarsting tonen dat het nabootst", "fr": "Après une expérience, montrer le type d'éruption réel modélisé" }
+  },
+  "eruptionTypes": {
+    "default": "flow = effusive; dome = explosive; explosion = explosive",
+    "editor": "text",
+    "label": { "en": "Eruption type per outcome: outcome = effusive or explosive, separated by ;", "nl": "Type uitbarsting per uitkomst: uitkomst = effusive of explosive, gescheiden door ;", "fr": "Type d'éruption par résultat : résultat = effusive ou explosive, séparés par ;" }
+  },
+  "task": {
+    "default": "none",
+    "editor": "enum",
+    "label": { "en": "Task for the candidate (scored)", "nl": "Opdracht voor de kandidaat (gescoord)", "fr": "Tâche pour le candidat (notée)" },
+    "options": [
+      { "value": "none", "label": { "en": "None: explore only (response: the experiments)", "nl": "Geen: alleen onderzoeken (antwoord: de experimenten)", "fr": "Aucune : exploration seule (réponse : les expériences)" } },
+      { "value": "viscosity", "label": { "en": "Link each outcome to a thickness of the mashed potato", "nl": "Koppel elke uitkomst aan een dikte van de puree", "fr": "Associer chaque résultat à une consistance de purée" } },
+      { "value": "eruption", "label": { "en": "Link each outcome to an eruption type", "nl": "Koppel elke uitkomst aan een type uitbarsting", "fr": "Associer chaque résultat à un type d'éruption" } }
+    ]
+  },
+  "key": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Key of the task: outcome = answer, separated by ; (| between accepted answers). Empty: from the rule table and the eruption types",
+      "nl": "Sleutel van de opdracht: uitkomst = antwoord, gescheiden door ; (| tussen goed gerekende antwoorden). Leeg: uit de regeltabel en de types uitbarsting",
+      "fr": "Clé de la tâche : résultat = réponse, séparés par ; (| entre réponses acceptées). Vide : d'après la table de règles et les types d'éruption"
+    }
+  },
+  "animation": {
+    "default": "auto",
+    "editor": "enum",
+    "label": { "en": "Animation", "nl": "Animatie", "fr": "Animation" },
+    "options": [
+      { "value": "auto", "label": { "en": "Smooth (step by step when the candidate prefers reduced motion)", "nl": "Vloeiend (stap voor stap als de kandidaat minder beweging wil)", "fr": "Fluide (pas à pas si le candidat préfère réduire les animations)" } },
+      { "value": "steps", "label": { "en": "Always step by step", "nl": "Altijd stap voor stap", "fr": "Toujours pas à pas" } }
+    ]
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels", "fr": "Anglais" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands", "fr": "Néerlandais" } },
+      { "value": "fr", "label": { "en": "French", "nl": "Frans", "fr": "Français" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" }
+  }
+}

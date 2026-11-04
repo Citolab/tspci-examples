@@ -1,0 +1,136 @@
+{
+  "name": "@citolab/pci-volcano-model",
+  "version": "1.0.0-alpha.1",
+  "description": "a classroom volcano model: mashed potato in a U-tube, an effervescent tablet and a stopper; viscosity and gas decide between a lava flow, a dome and an explosion",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original Volcanismepci)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "volcano",
+    "earth science",
+    "model",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-volcano-model"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "volcanoModel.svg",
+    "example.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-volcano-model npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-volcano-model npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "volcanoModel",
+      "label": "Volcano model",
+      "tags": [
+        "volcano",
+        "earth science",
+        "model",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "volcanoModel",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The experiments the candidate ran, and with data-task the matching, scored by the PCI against the author's key (README)",
+        "fields": {
+          "experiments": {
+            "baseType": "string",
+            "label": {
+              "en": "Experiments: JSON list of { viscosity, tablets, outcome, eruption }",
+              "nl": "Experimenten: JSON-lijst van { viscosity, tablets, outcome, eruption }",
+              "fr": "Expériences : liste JSON de { viscosity, tablets, outcome, eruption }"
+            }
+          },
+          "count": {
+            "baseType": "integer",
+            "label": { "en": "Number of experiments run", "nl": "Aantal uitgevoerde experimenten", "fr": "Nombre d'expériences réalisées" }
+          },
+          "outcomes": {
+            "baseType": "string",
+            "label": {
+              "en": "Outcomes seen, separated by ; (flow, dome, explosion)",
+              "nl": "Geziene uitkomsten, gescheiden door ; (flow, dome, explosion)",
+              "fr": "Résultats observés, séparés par ; (flow, dome, explosion)"
+            }
+          },
+          "resets": {
+            "baseType": "integer",
+            "label": { "en": "Times the candidate started again", "nl": "Aantal keer opnieuw begonnen", "fr": "Nombre de remises à zéro" }
+          },
+          "answers": {
+            "baseType": "string",
+            "label": {
+              "en": "Task: the candidate's matching, outcome = answer separated by ;",
+              "nl": "Opdracht: de koppeling van de kandidaat, uitkomst = antwoord gescheiden door ;",
+              "fr": "Tâche : les associations du candidat, résultat = réponse séparés par ;"
+            }
+          },
+          "score": {
+            "baseType": "integer",
+            "label": { "en": "Task: outcomes matched as in the key", "nl": "Opdracht: uitkomsten gekoppeld zoals in de sleutel", "fr": "Tâche : résultats associés comme dans la clé" }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": { "en": "Task: number of outcomes to match", "nl": "Opdracht: aantal te koppelen uitkomsten", "fr": "Tâche : nombre de résultats à associer" }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": { "en": "Task: 1 when every outcome is matched as in the key", "nl": "Opdracht: 1 als elke uitkomst goed gekoppeld is", "fr": "Tâche : 1 si chaque résultat est bien associé" }
+          }
+        }
+      }
+    }
+  }
+}

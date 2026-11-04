@@ -56,6 +56,9 @@ export const Default: Story = {
     // the palette, with how many are left
     expect(canvas.getByRole("button", { name: "Switch, 1 left" })).toBeEnabled();
     expect(canvas.getByRole("button", { name: "Wire" })).toBeEnabled();
+    // the lamp tool is off by default; the test materials are not in the palette
+    expect(canvas.queryByRole("button", { name: "Break lamp" })).toBeNull();
+    expect(canvas.queryByRole("button", { name: /^Aluminium foil/ })).toBeNull();
     expect(pci.getResponse()).toBeUndefined();
   },
 };
@@ -240,6 +243,7 @@ export const OwnCircuit: Story = {
     expect(canvas.queryByText(/open ends/)).toBeNull();
     expect(canvas.queryByRole("button", { name: /^Switch/ })).toBeNull();
     await drag(canvas.getByRole("button", { name: "Lamp, 1 left" }), cell(canvas, 1, 4));
+    expect(part(canvas, 1, 4)).toBe("lamp@0");
     expect(canvas.getByRole("button", { name: "Lamp, none left" })).toBeDisabled();
     pci.setResponse(boardResponse(loop));
     await waitFor(() => expect(canvas.getByText("Closed circuit")).toBeInTheDocument());
@@ -337,6 +341,187 @@ export const TwoInstances: Story = {
   },
 };
 
+// --- Test materials (inspired by the DEPP Circuit PCI): which materials conduct?
+
+/** A board as text, every part locked: a token per cell, "." empty, type@rotation (c corner, - wire, t tee, V DC source, L lamp). */
+const lockedBoard = (text: string) => {
+  const short: { [k: string]: string } = { c: "corner", "-": "wire", t: "tee", V: "dcSource", L: "lamp" };
+  return text.trim().split("\n").flatMap((line, y) => line.trim().split(/\s+/).flatMap((token, x) => {
+    if (token === ".") return [];
+    const [name, rotation = "0"] = token.split("@");
+    return [{ type: short[name] ?? name, x, y, rotation: Number(rotation), locked: true }];
+  }));
+};
+
+/** A loop with a lamp and a gap in the top wire: the candidate puts a material in the gap. */
+const materialsCircuit = JSON.stringify({
+  columns: 4, rows: 3,
+  preset: lockedBoard(`
+c@180 -    .    c@270
+V@90  .    .    L@90
+c@90  -    -    c@0`),
+  palette: "aluminiumFoil:1 copper:1 ironNail:1 graphite:1 cotton:1 wood:1 plastic:1 glass:1 rubber:1",
+  checks: [
+    { type: "lit", parts: ["lamp"], material: "aluminiumFoil" },
+    { type: "lit", parts: ["lamp"], material: "cotton", off: true },
+  ],
+});
+
+export const TestMaterials: Story = {
+  args: { properties: { circuit: materialsCircuit, prompt: "Which materials conduct? Put a material between the clips.", showCurrent: "true" } },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    const lamp = () => cell(canvas, 2, 4);
+
+    await step("the materials in the palette", async () => {
+      for (const name of ["Aluminium foil", "Copper", "Iron nail", "Pencil lead (graphite)", "Cotton", "Wood", "Plastic", "Glass", "Rubber"]) {
+        expect(canvas.getByRole("button", { name: `${name}, 1 left` })).toBeEnabled();
+      }
+      expect(lamp()).toHaveAccessibleName("Row 2, column 4: Lamp, turned 90°, locked");
+    });
+
+    await step("cotton: the lamp stays off", async () => {
+      // a small board under a wider toolbar: the drop lands on the right cell
+      await drag(canvas.getByRole("button", { name: "Cotton, 1 left" }), cell(canvas, 1, 3));
+      expect(part(canvas, 1, 3)).toBe("cotton@0");
+      expect(lamp()).toHaveAccessibleName("Row 2, column 4: Lamp, turned 90°, locked");
+      expect(canvas.queryByText("Closed circuit")).toBeNull();
+      const r = await lastChange(mounted);
+      expect([field(r, "check1")?.integer, field(r, "check2")?.integer]).toEqual([0, 1]);
+      expect(field(r, "topology")).toEqual({ string: "cotton(1-2) dcSource(3>1) lamp(2-3)" });
+    });
+
+    await step("aluminium foil in its place: the lamp lights", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Aluminium foil, 1 left" }));
+      await userEvent.click(cell(canvas, 1, 3));
+      expect(part(canvas, 1, 3)).toBe("cotton@0"); // a cell with a part: choose it, nothing placed
+      await userEvent.click(canvas.getByRole("button", { name: "Delete" }));
+      await userEvent.click(cell(canvas, 1, 3));
+      expect(part(canvas, 1, 3)).toBe("aluminiumFoil@0");
+      expect(lamp()).toHaveAccessibleName("Row 2, column 4: Lamp, turned 90°, locked, lit");
+      expect(canvas.getByText("Closed circuit")).toBeInTheDocument();
+      const r = pci.getResponse();
+      expect([field(r, "check1")?.integer, field(r, "check2")?.integer]).toEqual([1, 0]);
+      expect(field(r, "score")).toEqual({ integer: 1 });
+    });
+  },
+};
+
+export const TestMaterialsDutch: Story = {
+  args: { properties: { circuit: materialsCircuit, prompt: "Welke materialen geleiden?", showCurrent: "true", language: "nl" } },
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    for (const name of ["Aluminiumfolie", "Koper", "IJzeren spijker", "Potloodstift (grafiet)", "Katoen", "Hout", "Plastic", "Glas", "Rubber"]) {
+      expect(canvas.getByRole("button", { name: `${name}, nog 1` })).toBeEnabled();
+    }
+    await userEvent.click(canvas.getByRole("button", { name: "Potloodstift (grafiet), nog 1" }));
+    await userEvent.click(canvas.getByRole("gridcell", { name: /^Rij 1, kolom 3:/ }));
+    expect(canvas.getByRole("gridcell", { name: /^Rij 2, kolom 4:/ })).toHaveAccessibleName("Rij 2, kolom 4: Lampje, 90° gedraaid, vast, brandt");
+    expect(canvas.getByText("Gesloten stroomkring")).toBeInTheDocument();
+  },
+};
+
+// --- The lamp tool (inspired by the DEPP LampeDouble PCI): break a lamp, see what the others do
+
+const seriesLamps = JSON.stringify({
+  columns: 4, rows: 3,
+  preset: lockedBoard(`
+c@180 L    L    c@270
+V@90  .    .    -@90
+c@90  -    -    c@0`),
+  palette: "wire",
+  checks: [{ type: "lit", parts: ["lamp"], broken: true, off: true }, { type: "closed" }],
+});
+const parallelLamps = JSON.stringify({
+  columns: 4, rows: 3,
+  preset: lockedBoard(`
+c@180 -    t@180 c@270
+V@90  .    L@90  L@90
+c@90  -    t@0   c@0`),
+  palette: "wire",
+  checks: [{ type: "lit", parts: ["lamp"], broken: true }],
+});
+const lampProperties = (circuit: string, extra: Record<string, string> = {}) =>
+  ({ circuit, prompt: "Break a lamp. What happens to the other lamp?", showCurrent: "true", lampTool: "true", ...extra });
+
+export const BreakALampInSeries: Story = {
+  args: { properties: lampProperties(seriesLamps) },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    const breakButton = () => canvas.getByTestId("break-lamp");
+
+    await step("both lamps burn; the tool needs a lamp", async () => {
+      expect(cell(canvas, 1, 2)).toHaveAccessibleName("Row 1, column 2: Lamp, locked, lit");
+      expect(cell(canvas, 1, 3)).toHaveAccessibleName("Row 1, column 3: Lamp, locked, lit");
+      expect(breakButton()).toBeDisabled();
+      expect(pci.getResponse()).toBeUndefined();
+    });
+
+    await step("break the first lamp: the second goes out too", async () => {
+      await userEvent.click(cell(canvas, 1, 2));
+      await userEvent.click(canvas.getByRole("button", { name: "Break lamp" }));
+      expect(canvas.getByRole("status")).toHaveTextContent("Lamp in row 1, column 2 is broken: no current goes through it.");
+      expect(cell(canvas, 1, 2)).toHaveAccessibleName("Row 1, column 2: Lamp, locked, broken");
+      expect(cell(canvas, 1, 2)).toHaveAttribute("data-broken", "true");
+      expect(cell(canvas, 1, 3)).toHaveAccessibleName("Row 1, column 3: Lamp, locked");
+      expect(canvas.queryByText("Closed circuit")).toBeNull();
+      const r = await lastChange(mounted);
+      // the other lamp off with one broken ✓; closed (as built: a broken lamp counts as whole) ✓
+      expect([field(r, "check1")?.integer, field(r, "check2")?.integer]).toEqual([1, 1]);
+      expect(JSON.parse(field(r, "board")!.string!).parts).toContainEqual({ type: "lamp", x: 1, y: 0, rotation: 0, locked: true, broken: true });
+    });
+
+    await step("the state keeps the broken lamp", async () => {
+      const state = pci.getState();
+      expect(JSON.parse(state).state.broken).toEqual(["1,0"]);
+      const second = await remountPci(canvasElement, pci, { state, properties: lampProperties(seriesLamps) });
+      expect(cell(second.canvas, 1, 2)).toHaveAccessibleName("Row 1, column 2: Lamp, locked, broken");
+      expect(second.pci.getResponse()).toEqual(pci.getResponse());
+
+      await step("repair it with the keyboard (B)", async () => {
+        await userEvent.click(cell(second.canvas, 1, 2));
+        await userEvent.keyboard("b");
+        expect(second.canvas.getByRole("status")).toHaveTextContent("Lamp in row 1, column 2 works again.");
+        expect(cell(second.canvas, 1, 3)).toHaveAccessibleName("Row 1, column 3: Lamp, locked, lit");
+        expect(second.pci.getResponse()).toBeUndefined();
+      });
+    });
+  },
+};
+
+export const BreakALampInParallelDutch: Story = {
+  args: { properties: lampProperties(parallelLamps, { language: "nl", prompt: "Maak een lampje kapot." }) },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    const ncell = (row: number, column: number) => canvas.getByRole("gridcell", { name: new RegExp(`^Rij ${row}, kolom ${column}:`) });
+    await userEvent.click(ncell(2, 3));
+    await userEvent.click(canvas.getByRole("button", { name: "Lampje kapot" }));
+    expect(ncell(2, 3)).toHaveAccessibleName("Rij 2, kolom 3: Lampje, 90° gedraaid, vast, kapot");
+    expect(ncell(2, 4)).toHaveAccessibleName("Rij 2, kolom 4: Lampje, 90° gedraaid, vast, brandt");
+    expect(canvas.getByText("Gesloten stroomkring")).toBeInTheDocument();
+    expect(field(pci.getResponse(), "check1")).toEqual({ integer: 1 });
+    expect(canvas.getByRole("button", { name: "Lampje heel maken" })).toBeEnabled();
+  },
+};
+
+/** Review: the broken lamp of the declared correct response shows; the tool is not there. */
+export const BrokenLampInReview: Story = {
+  args: {
+    status: "solution",
+    properties: lampProperties(parallelLamps),
+    responseDeclaration: { cardinality: "record", correctResponse: { value: [{ fieldIdentifier: "board", value: JSON.stringify({ parts: [{ type: "lamp", x: 3, y: 1, rotation: 90, broken: true }] }) }] } },
+  },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    await waitFor(() => expect(cell(canvas, 2, 4)).toHaveAttribute("data-broken", "true"));
+    expect(cell(canvas, 2, 3)).toHaveAccessibleName("Row 2, column 3: Lamp, turned 90°, locked, lit");
+    expect(canvas.queryByTestId("break-lamp")).toBeNull();
+    expect(field(pci.getResponse(), "correct")).toEqual({ integer: 1 });
+  },
+};
+
 // --- Authoring mode: what an authoring system shows the item author (getAuthoringInstance)
 
 /** The authoring mode, as an authoring system shows it after "Build the circuit…". */
@@ -389,5 +574,25 @@ export const AuthoringMode: StoryObj<AuthoringArgs> = {
       expect(canvas.getByTestId("topology")).toHaveTextContent(TOPOLOGY);
       expect(canvas.getByTestId("summary")).toHaveTextContent("The solution scores 6 of 6.");
     });
+  },
+};
+
+/** The checks tab: a "has current" check with a test material. */
+export const AuthoringLitCheck: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { circuit: materialsCircuit } },
+  play: async ({ canvasElement }) => {
+    const { instance, canvas } = await openAuthoring(canvasElement);
+    const circuit = () => JSON.parse(instance.getProperties().circuit!);
+    await userEvent.click(canvas.getByRole("tab", { name: "Checks" }));
+    expect(canvas.getByTestId("check-0-material")).toHaveValue("aluminiumFoil");
+    expect(canvas.getByTestId("check-1-off")).toBeChecked();
+    await userEvent.click(canvas.getByRole("button", { name: "+ Add a check" }));
+    await userEvent.selectOptions(canvas.getByTestId("check-2-type"), "Has current (lamp lit)");
+    await userEvent.selectOptions(canvas.getByTestId("check-2-material"), "Copper");
+    await userEvent.click(canvas.getByTestId("check-2-broken"));
+    expect(circuit().checks[2]).toEqual({ type: "lit", parts: ["lamp"], material: "copper", broken: true, points: 1 });
+    await userEvent.click(canvas.getByRole("tab", { name: "Palette" }));
+    expect(canvas.getByRole("checkbox", { name: "In the palette: Glass" })).toBeChecked();
   },
 };

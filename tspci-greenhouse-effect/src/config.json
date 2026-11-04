@@ -1,0 +1,117 @@
+{
+  "prompt": {
+    "default": "Move the slider to change the amount of greenhouse gas in the atmosphere. Watch the energy flows and the temperature of the Earth's surface.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "question": {
+    "default": "none",
+    "editor": "enum",
+    "label": { "en": "Question (scored)", "nl": "Vraag (gescoord)", "fr": "Question (notée)" },
+    "options": [
+      { "value": "none", "label": { "en": "None: a tool (response: what the candidate tried)", "nl": "Geen: een hulpmiddel (antwoord: wat de kandidaat probeerde)", "fr": "Aucune : un outil (réponse : ce que le candidat a essayé)" } },
+      { "value": "target", "label": { "en": "Set the greenhouse gas so that the temperature is the target", "nl": "Stel het broeikasgas zo in dat de temperatuur het doel is", "fr": "Régler les gaz à effet de serre pour atteindre la température cible" } },
+      { "value": "direction", "label": { "en": "Predict the direction of the temperature change", "nl": "Voorspel de richting van de temperatuurverandering", "fr": "Prévoir le sens du changement de température" } }
+    ]
+  },
+  "targetTemperature": {
+    "default": "20",
+    "editor": "number",
+    "label": { "en": "Target question: surface temperature to set (°C)", "nl": "Doelvraag: in te stellen temperatuur van het oppervlak (°C)", "fr": "Question cible : température de la surface à atteindre (°C)" }
+  },
+  "tolerance": {
+    "default": "0.5",
+    "editor": "number",
+    "label": { "en": "Target question: tolerance (°C), correct when the temperature shown is within it", "nl": "Doelvraag: marge (°C), goed als de getoonde temperatuur erbinnen valt", "fr": "Question cible : tolérance (°C), correct si la température affichée est dans cette marge" }
+  },
+  "direction": {
+    "default": "more",
+    "editor": "enum",
+    "label": { "en": "Direction question: the change to predict the effect of", "nl": "Richtingvraag: de verandering waarvan het effect voorspeld wordt", "fr": "Question de sens : le changement dont il faut prévoir l'effet" },
+    "options": [
+      { "value": "more", "label": { "en": "More greenhouse gas (correct: rises)", "nl": "Meer broeikasgas (goed: stijgt)", "fr": "Plus de gaz à effet de serre (correct : augmente)" } },
+      { "value": "less", "label": { "en": "Less greenhouse gas (correct: falls)", "nl": "Minder broeikasgas (goed: daalt)", "fr": "Moins de gaz à effet de serre (correct : baisse)" } }
+    ]
+  },
+  "predictFirst": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Direction question: predict before the slider unlocks; the prediction is fixed once the slider is used", "nl": "Richtingvraag: eerst voorspellen, dan pas de schuif; de voorspelling ligt vast zodra de schuif gebruikt is", "fr": "Question de sens : prévoir avant de pouvoir utiliser le curseur ; la prévision est fixée dès que le curseur est utilisé" }
+  },
+  "startLevel": {
+    "default": "78",
+    "editor": "number",
+    "label": { "en": "Greenhouse gas at the start: % of the surface infrared the atmosphere absorbs (78: about 15 °C)", "nl": "Broeikasgas bij de start: % van het infrarood van het oppervlak dat de atmosfeer opneemt (78: ongeveer 15 °C)", "fr": "Gaz à effet de serre au départ : % de l'infrarouge du sol absorbé par l'atmosphère (78 : environ 15 °C)" }
+  },
+  "levelStep": {
+    "default": "1",
+    "editor": "number",
+    "label": { "en": "Step of the slider (%)", "nl": "Stap van de schuif (%)", "fr": "Pas du curseur (%)" }
+  },
+  "solarConstant": {
+    "default": "1361",
+    "editor": "number",
+    "label": { "en": "Solar constant (W/m²)", "nl": "Zonneconstante (W/m²)", "fr": "Constante solaire (W/m²)" }
+  },
+  "albedo": {
+    "default": "0.30",
+    "editor": "number",
+    "label": { "en": "Albedo: share of the sunlight reflected (0 to 1, or %)", "nl": "Albedo: deel van het zonlicht dat teruggekaatst wordt (0 tot 1, of %)", "fr": "Albédo : part des rayons solaires renvoyée (0 à 1, ou %)" }
+  },
+  "atmosphereSolar": {
+    "default": "0",
+    "editor": "number",
+    "label": { "en": "Share of the sunlight the atmosphere absorbs (0 to 1, or %; 0: the classic model, 0.2: as in the original diagram)", "nl": "Deel van het zonlicht dat de atmosfeer opneemt (0 tot 1, of %; 0: het klassieke model, 0,2: zoals in het oorspronkelijke schema)", "fr": "Part des rayons solaires absorbée par l'atmosphère (0 à 1, ou % ; 0 : le modèle classique, 0,2 : comme dans le schéma d'origine)" }
+  },
+  "numbers": {
+    "default": "wm2",
+    "editor": "enum",
+    "label": { "en": "Numbers on the arrows", "nl": "Getallen bij de pijlen", "fr": "Nombres sur les flèches" },
+    "options": [
+      { "value": "wm2", "label": { "en": "W/m²", "nl": "W/m²", "fr": "W/m²" } },
+      { "value": "percent", "label": { "en": "% of the sunlight", "nl": "% van het zonlicht", "fr": "% des rayons solaires" } },
+      { "value": "both", "label": { "en": "W/m² and %", "nl": "W/m² en %", "fr": "W/m² et %" } },
+      { "value": "none", "label": { "en": "None (only the widths)", "nl": "Geen (alleen de breedtes)", "fr": "Aucun (seulement les largeurs)" } }
+    ]
+  },
+  "showTable": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the table of energy flows", "nl": "Tabel met energiestromen tonen", "fr": "Afficher le tableau des flux d'énergie" }
+  },
+  "showTemperature": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the temperature as a number (otherwise only the thermometer)", "nl": "Temperatuur als getal tonen (anders alleen de thermometer)", "fr": "Afficher la température en nombre (sinon seulement le thermomètre)" }
+  },
+  "showLevel": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the % of infrared the atmosphere absorbs", "nl": "Het % infrarood dat de atmosfeer opneemt tonen", "fr": "Afficher le % d'infrarouge absorbé par l'atmosphère" }
+  },
+  "temperatureUnit": {
+    "default": "C",
+    "editor": "enum",
+    "label": { "en": "Unit of temperature", "nl": "Eenheid van temperatuur", "fr": "Unité de température" },
+    "options": [
+      { "value": "C", "label": { "en": "°C", "nl": "°C", "fr": "°C" } },
+      { "value": "K", "label": { "en": "K", "nl": "K", "fr": "K" } },
+      { "value": "both", "label": { "en": "°C and K", "nl": "°C en K", "fr": "°C et K" } }
+    ]
+  },
+  "decimals": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Decimals of the temperature (0 to 3)", "nl": "Decimalen van de temperatuur (0 tot 3)", "fr": "Décimales de la température (0 à 3)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (15.0 °C)", "nl": "Engels (15.0 °C)", "fr": "Anglais (15.0 °C)" } },
+      { "value": "nl", "label": { "en": "Dutch (15,0 °C)", "nl": "Nederlands (15,0 °C)", "fr": "Néerlandais (15,0 °C)" } },
+      { "value": "fr", "label": { "en": "French (15,0 °C)", "nl": "Frans (15,0 °C)", "fr": "Français (15,0 °C)" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-circuit-builder",
-  "version": "1.0.0-beta.1",
-  "description": "complete a circuit diagram on a grid: drag symbols and wires, the PCI checks the circuit (closed, series, parallel, polarity)",
+  "version": "1.1.0-beta.1",
+  "description": "complete a circuit diagram on a grid: drag symbols, wires and test materials, break lamps; the PCI checks the circuit (closed, series, parallel, polarity, lamps lit)",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"

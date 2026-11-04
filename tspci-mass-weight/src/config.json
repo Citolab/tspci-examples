@@ -1,0 +1,390 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction above the bench (empty: a standard instruction in the candidate's language)",
+      "nl": "Instructie boven de tafel (leeg: een standaardinstructie in de taal van de kandidaat)",
+      "fr": "Consigne au-dessus de la paillasse (vide : une consigne standard dans la langue du candidat)"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "label": {
+      "en": "Language of the PCI",
+      "nl": "Taal van de PCI",
+      "fr": "Langue de la PCI"
+    },
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels",
+          "fr": "Anglais"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands",
+          "fr": "Néerlandais"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French",
+          "nl": "Frans",
+          "fr": "Français"
+        }
+      }
+    ]
+  },
+  "places": {
+    "default": "earth, moon, mars",
+    "editor": "text",
+    "label": {
+      "en": "Places: earth, moon and/or mars, separated by commas (one place: no tabs)",
+      "nl": "Plaatsen: earth, moon en/of mars, gescheiden door komma's (één plaats: geen tabs)",
+      "fr": "Lieux : earth, moon et/ou mars, séparés par des virgules (un seul lieu : pas d'onglets)"
+    }
+  },
+  "gEarth": {
+    "default": "9.8",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "g on Earth (N/kg)",
+      "nl": "g op aarde (N/kg)",
+      "fr": "g sur la Terre (N/kg)"
+    }
+  },
+  "gMoon": {
+    "default": "1.6",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "g on the Moon (N/kg)",
+      "nl": "g op de maan (N/kg)",
+      "fr": "g sur la Lune (N/kg)"
+    }
+  },
+  "gMars": {
+    "default": "3.6",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "g on Mars (N/kg)",
+      "nl": "g op Mars (N/kg)",
+      "fr": "g sur Mars (N/kg)"
+    }
+  },
+  "showG": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Show g of the place",
+      "nl": "Toon g van de plaats",
+      "fr": "Afficher g du lieu"
+    }
+  },
+  "objects": {
+    "default": "statuette\nmeteorite",
+    "editor": "textarea",
+    "label": {
+      "en": "Objects, one per line (at most 6): statuette, meteorite, stone, cube, or \"English | Nederlands | Français; mass (g or kg); volume (mL, empty: too big for the cylinder); height in the cylinder (mL, optional)\"",
+      "nl": "Voorwerpen, één per regel (hooguit 6): statuette, meteorite, stone, cube, of \"English | Nederlands | Français; massa (g of kg); volume (mL, leeg: te groot voor de maatcilinder); hoogte in de maatcilinder (mL, optioneel)\"",
+      "fr": "Objets, un par ligne (6 au plus) : statuette, meteorite, stone, cube, ou « English | Nederlands | Français; masse (g ou kg); volume (mL, vide : trop grand pour l'éprouvette); hauteur dans l'éprouvette (mL, facultatif) »"
+    }
+  },
+  "showScale": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Scale on the bench",
+      "nl": "Weegschaal op de tafel",
+      "fr": "Balance sur la paillasse"
+    }
+  },
+  "showDynamometer": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Dynamometer on the bench",
+      "nl": "Krachtmeter op de tafel",
+      "fr": "Dynamomètre sur la paillasse"
+    }
+  },
+  "showCylinder": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Graduated cylinder on the bench",
+      "nl": "Maatcilinder op de tafel",
+      "fr": "Éprouvette graduée sur la paillasse"
+    }
+  },
+  "scaleOnOff": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Scale: the candidate switches it on (off: always on)",
+      "nl": "Weegschaal: de kandidaat zet hem aan (uit: altijd aan)",
+      "fr": "Balance : le candidat l'allume (non : toujours allumée)"
+    }
+  },
+  "scaleType": {
+    "default": "mass",
+    "editor": "enum",
+    "label": {
+      "en": "Scale: what it shows on the Moon and Mars",
+      "nl": "Weegschaal: wat hij op de maan en Mars aangeeft",
+      "fr": "Balance : ce qu'elle affiche sur la Lune et sur Mars"
+    },
+    "options": [
+      {
+        "value": "mass",
+        "label": {
+          "en": "The mass, as a balance (the same everywhere)",
+          "nl": "De massa, als een balans (overal hetzelfde)",
+          "fr": "La masse, comme une balance (partout la même)"
+        }
+      },
+      {
+        "value": "earth",
+        "label": {
+          "en": "Calibrated on Earth (shows m·g / g of Earth)",
+          "nl": "Op aarde geijkt (geeft m·g / g van de aarde)",
+          "fr": "Étalonnée sur Terre (affiche m·g / g de la Terre)"
+        }
+      }
+    ]
+  },
+  "scaleCapacity": {
+    "default": "50",
+    "editor": "number",
+    "min": 0.001,
+    "label": {
+      "en": "Scale: capacity (kg)",
+      "nl": "Weegschaal: weegbereik (kg)",
+      "fr": "Balance : portée (kg)"
+    }
+  },
+  "scaleResolution": {
+    "default": "1",
+    "editor": "number",
+    "min": 0.001,
+    "label": {
+      "en": "Scale: resolution (g)",
+      "nl": "Weegschaal: nauwkeurigheid (g)",
+      "fr": "Balance : précision (g)"
+    }
+  },
+  "dynamometerMax": {
+    "default": "500",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "Dynamometer: range (N)",
+      "nl": "Krachtmeter: bereik (N)",
+      "fr": "Dynamomètre : calibre (N)"
+    }
+  },
+  "dynamometerStep": {
+    "default": "10",
+    "editor": "number",
+    "min": 0.01,
+    "label": {
+      "en": "Dynamometer: N between two ticks",
+      "nl": "Krachtmeter: N tussen twee streepjes",
+      "fr": "Dynamomètre : N entre deux graduations"
+    }
+  },
+  "cylinderCapacity": {
+    "default": "100",
+    "editor": "number",
+    "min": 1,
+    "label": {
+      "en": "Cylinder: volume up to the brim (mL; more overflows)",
+      "nl": "Maatcilinder: volume tot de rand (mL; meer loopt over)",
+      "fr": "Éprouvette : volume jusqu'au bord (mL ; au-delà elle déborde)"
+    }
+  },
+  "cylinderMax": {
+    "default": "90",
+    "editor": "number",
+    "min": 1,
+    "label": {
+      "en": "Cylinder: top graduation (mL; higher cannot be read)",
+      "nl": "Maatcilinder: hoogste streep (mL; hoger is niet af te lezen)",
+      "fr": "Éprouvette : graduation la plus haute (mL ; au-dessus, lecture impossible)"
+    }
+  },
+  "cylinderStep": {
+    "default": "5",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "Cylinder: mL between two graduations",
+      "nl": "Maatcilinder: mL tussen twee streepjes",
+      "fr": "Éprouvette : mL entre deux graduations"
+    }
+  },
+  "waterMax": {
+    "default": "140",
+    "editor": "number",
+    "min": 1,
+    "label": {
+      "en": "Water slider: maximum (mL)",
+      "nl": "Schuif voor het water: maximum (mL)",
+      "fr": "Curseur de l'eau : maximum (mL)"
+    }
+  },
+  "waterStep": {
+    "default": "5",
+    "editor": "number",
+    "min": 0.1,
+    "label": {
+      "en": "Water slider: step (mL)",
+      "nl": "Schuif voor het water: stap (mL)",
+      "fr": "Curseur de l'eau : pas (mL)"
+    }
+  },
+  "showReadings": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Show the readings as text under the instruments",
+      "nl": "Toon de aflezingen als tekst onder de instrumenten",
+      "fr": "Afficher les lectures en texte sous les instruments"
+    }
+  },
+  "answers": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Answer fields (scored): mass, weight, volume and/or density, separated by commas; empty: none",
+      "nl": "Antwoordvelden (gescoord): mass, weight, volume en/of density, gescheiden door komma's; leeg: geen",
+      "fr": "Champs de réponse (notés) : mass, weight, volume et/ou density, séparés par des virgules ; vide : aucun"
+    }
+  },
+  "answerObject": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Answers: the object (its built-in name or its line number; empty: the first)",
+      "nl": "Antwoorden: het voorwerp (de ingebouwde naam of het regelnummer; leeg: het eerste)",
+      "fr": "Réponses : l'objet (son nom prédéfini ou son numéro de ligne ; vide : le premier)"
+    }
+  },
+  "answerPlace": {
+    "default": "earth",
+    "editor": "enum",
+    "label": {
+      "en": "Answers: the place of the weight",
+      "nl": "Antwoorden: de plaats van het gewicht",
+      "fr": "Réponses : le lieu du poids"
+    },
+    "options": [
+      {
+        "value": "earth",
+        "label": {
+          "en": "Earth",
+          "nl": "Aarde",
+          "fr": "Terre"
+        }
+      },
+      {
+        "value": "moon",
+        "label": {
+          "en": "Moon",
+          "nl": "Maan",
+          "fr": "Lune"
+        }
+      },
+      {
+        "value": "mars",
+        "label": {
+          "en": "Mars",
+          "nl": "Mars",
+          "fr": "Mars"
+        }
+      }
+    ]
+  },
+  "massUnit": {
+    "default": "g",
+    "editor": "enum",
+    "label": {
+      "en": "Answers: unit of the mass",
+      "nl": "Antwoorden: eenheid van de massa",
+      "fr": "Réponses : unité de la masse"
+    },
+    "options": [
+      {
+        "value": "g",
+        "label": {
+          "en": "g",
+          "nl": "g",
+          "fr": "g"
+        }
+      },
+      {
+        "value": "kg",
+        "label": {
+          "en": "kg",
+          "nl": "kg",
+          "fr": "kg"
+        }
+      }
+    ]
+  },
+  "densityUnit": {
+    "default": "g/mL",
+    "editor": "enum",
+    "label": {
+      "en": "Answers: unit of the density",
+      "nl": "Antwoorden: eenheid van de dichtheid",
+      "fr": "Réponses : unité de la masse volumique"
+    },
+    "options": [
+      {
+        "value": "g/mL",
+        "label": {
+          "en": "g/mL",
+          "nl": "g/mL",
+          "fr": "g/mL"
+        }
+      },
+      {
+        "value": "g/cm3",
+        "label": {
+          "en": "g/cm³",
+          "nl": "g/cm³",
+          "fr": "g/cm³"
+        }
+      },
+      {
+        "value": "kg/m3",
+        "label": {
+          "en": "kg/m³",
+          "nl": "kg/m³",
+          "fr": "kg/m³"
+        }
+      }
+    ]
+  },
+  "tolerance": {
+    "default": "2",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Answers: tolerance (% of the right value)",
+      "nl": "Antwoorden: marge (% van de juiste waarde)",
+      "fr": "Réponses : tolérance (% de la bonne valeur)"
+    }
+  }
+}

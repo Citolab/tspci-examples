@@ -1,0 +1,177 @@
+{
+  "name": "@citolab/pci-mass-weight",
+  "version": "1.0.0-alpha.1",
+  "description": "a lab bench: weigh objects on a scale, hang them on a dynamometer and sink them in a graduated cylinder, on Earth, the Moon or Mars",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière (Wiquid) (original ForceGravite and Delor PCIs)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "mass",
+    "weight",
+    "volume",
+    "density",
+    "gravity",
+    "physics",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-mass-weight"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "massWeight.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-mass-weight npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-mass-weight npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "massWeight",
+      "label": "Mass and weight",
+      "tags": [
+        "mass",
+        "weight",
+        "volume",
+        "density",
+        "gravity",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "massWeight",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the answer fields the author asked for (data-answers) against the object and place of data-answer-object and data-answer-place, within data-tolerance percent; README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: answer fields within the tolerance (only with answer fields)",
+              "nl": "Score: antwoordvelden binnen de marge (alleen met antwoordvelden)",
+              "fr": "Score : champs de réponse dans la tolérance (seulement avec des champs de réponse)"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: the number of answer fields",
+              "nl": "Maximale score: het aantal antwoordvelden",
+              "fr": "Score maximal : le nombre de champs de réponse"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every answer field is within the tolerance",
+              "nl": "Goed: 1 als elk antwoordveld binnen de marge ligt",
+              "fr": "Correct : 1 si chaque champ de réponse est dans la tolérance"
+            }
+          },
+          "mass": {
+            "baseType": "float",
+            "label": {
+              "en": "Mass the candidate typed (in the unit of the item)",
+              "nl": "Massa die de kandidaat typte (in de eenheid van het item)",
+              "fr": "Masse saisie par le candidat (dans l'unité de l'item)"
+            }
+          },
+          "weight": {
+            "baseType": "float",
+            "label": {
+              "en": "Weight the candidate typed, in N",
+              "nl": "Gewicht (zwaartekracht) die de kandidaat typte, in N",
+              "fr": "Poids saisi par le candidat, en N"
+            }
+          },
+          "volume": {
+            "baseType": "float",
+            "label": {
+              "en": "Volume the candidate typed, in mL",
+              "nl": "Volume dat de kandidaat typte, in mL",
+              "fr": "Volume saisi par le candidat, en mL"
+            }
+          },
+          "density": {
+            "baseType": "float",
+            "label": {
+              "en": "Density the candidate typed (in the unit of the item)",
+              "nl": "Dichtheid die de kandidaat typte (in de eenheid van het item)",
+              "fr": "Masse volumique saisie par le candidat (dans l'unité de l'item)"
+            }
+          },
+          "used": {
+            "baseType": "string",
+            "label": {
+              "en": "Instruments used: place:instrument pairs, e.g. \"earth:scale moon:dynamometer\"",
+              "nl": "Gebruikte instrumenten: paren plaats:instrument, bijv. \"earth:scale moon:dynamometer\"",
+              "fr": "Instruments utilisés : paires lieu:instrument, p. ex. \"earth:scale moon:dynamometer\""
+            }
+          },
+          "readings": {
+            "baseType": "string",
+            "label": {
+              "en": "Readings: every reading the candidate saw, in order (JSON)",
+              "nl": "Aflezingen: elke aflezing die de kandidaat zag, op volgorde (JSON)",
+              "fr": "Lectures : chaque lecture vue par le candidat, dans l'ordre (JSON)"
+            }
+          },
+          "bench": {
+            "baseType": "string",
+            "label": {
+              "en": "Bench: the place, where each object is, the water and the scale at the end (JSON)",
+              "nl": "Tafel: de plaats, waar elk voorwerp is, het water en de weegschaal aan het eind (JSON)",
+              "fr": "Paillasse : le lieu, la position de chaque objet, l'eau et la balance à la fin (JSON)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

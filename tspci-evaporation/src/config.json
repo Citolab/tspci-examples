@@ -1,0 +1,367 @@
+{
+  "prompt": {
+    "default": "Salt is made by letting sea water evaporate in shallow basins. Set up the containers, run the experiment and compare how fast the water evaporates.",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction above the experiment",
+      "nl": "Instructie boven de proef",
+      "fr": "Consigne au-dessus de l'expérience"
+    }
+  },
+  "question": {
+    "default": "Does the surface area of the water influence how fast it evaporates? Design a fair test and run it.",
+    "editor": "textarea",
+    "label": {
+      "en": "Research question (empty: none)",
+      "nl": "Onderzoeksvraag (leeg: geen)",
+      "fr": "Question de recherche (vide : aucune)"
+    }
+  },
+  "target": {
+    "default": "area",
+    "editor": "enum",
+    "label": {
+      "en": "The variable the research question is about (scored: only this one may differ between the containers)",
+      "nl": "De variabele van de onderzoeksvraag (gescoord: alleen deze mag tussen de bakjes verschillen)",
+      "fr": "La variable de la question de recherche (notée : seule celle-ci peut différer entre les récipients)"
+    },
+    "options": [
+      {
+        "value": "none",
+        "label": {
+          "en": "None (any fair test scores)",
+          "nl": "Geen (elke eerlijke proef scoort)",
+          "fr": "Aucune (toute expérience équitable compte)"
+        }
+      },
+      {
+        "value": "temperature",
+        "label": {
+          "en": "Temperature",
+          "nl": "Temperatuur",
+          "fr": "Température"
+        }
+      },
+      {
+        "value": "area",
+        "label": {
+          "en": "Surface area (width)",
+          "nl": "Oppervlak (breedte)",
+          "fr": "Surface (largeur)"
+        }
+      },
+      {
+        "value": "wind",
+        "label": {
+          "en": "Wind",
+          "nl": "Wind",
+          "fr": "Vent"
+        }
+      },
+      {
+        "value": "salt",
+        "label": {
+          "en": "Salt concentration",
+          "nl": "Zoutgehalte",
+          "fr": "Concentration en sel"
+        }
+      },
+      {
+        "value": "volume",
+        "label": {
+          "en": "Volume of water",
+          "nl": "Hoeveelheid water",
+          "fr": "Volume d'eau"
+        }
+      }
+    ]
+  },
+  "count": {
+    "default": "2",
+    "editor": "enum",
+    "label": {
+      "en": "Number of containers",
+      "nl": "Aantal bakjes",
+      "fr": "Nombre de récipients"
+    },
+    "options": [
+      {
+        "value": "2",
+        "label": {
+          "en": "2",
+          "nl": "2",
+          "fr": "2"
+        }
+      },
+      {
+        "value": "3",
+        "label": {
+          "en": "3",
+          "nl": "3",
+          "fr": "3"
+        }
+      }
+    ]
+  },
+  "changeTemperature": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate may change the temperature",
+      "nl": "De kandidaat mag de temperatuur veranderen",
+      "fr": "Le candidat peut changer la température"
+    }
+  },
+  "changeArea": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate may change the width (surface area)",
+      "nl": "De kandidaat mag de breedte (oppervlak) veranderen",
+      "fr": "Le candidat peut changer la largeur (surface)"
+    }
+  },
+  "changeWind": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate may change the wind (a fan)",
+      "nl": "De kandidaat mag de wind (een ventilator) veranderen",
+      "fr": "Le candidat peut changer le vent (un ventilateur)"
+    }
+  },
+  "changeSalt": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate may change the salt concentration",
+      "nl": "De kandidaat mag de zoutconcentratie veranderen",
+      "fr": "Le candidat peut changer la concentration en sel"
+    }
+  },
+  "changeVolume": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate may change the volume of water",
+      "nl": "De kandidaat mag de hoeveelheid water veranderen",
+      "fr": "Le candidat peut changer le volume d'eau"
+    }
+  },
+  "temperature": {
+    "default": "20",
+    "editor": "number",
+    "label": {
+      "en": "Temperature (°C) at the start, and when the candidate cannot change it",
+      "nl": "Temperatuur (°C) bij de start, en als de kandidaat die niet kan veranderen",
+      "fr": "Température (°C) au départ, et si le candidat ne peut pas la changer"
+    }
+  },
+  "temperatureMin": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "Temperature slider: minimum",
+      "nl": "Schuif temperatuur: minimum",
+      "fr": "Curseur température : minimum"
+    }
+  },
+  "temperatureMax": {
+    "default": "80",
+    "editor": "number",
+    "label": {
+      "en": "Temperature slider: maximum",
+      "nl": "Schuif temperatuur: maximum",
+      "fr": "Curseur température : maximum"
+    }
+  },
+  "temperatureStep": {
+    "default": "5",
+    "editor": "number",
+    "label": {
+      "en": "Temperature slider: step",
+      "nl": "Schuif temperatuur: stap",
+      "fr": "Curseur température : pas"
+    }
+  },
+  "width": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "Width of the container (cm; the surface is width × 10 cm) at the start, and when the candidate cannot change it",
+      "nl": "Breedte van het bakje (cm; the surface is width × 10 cm) bij de start, en als de kandidaat die niet kan veranderen",
+      "fr": "Largeur du récipient (cm; the surface is width × 10 cm) au départ, et si le candidat ne peut pas la changer"
+    }
+  },
+  "widthMin": {
+    "default": "5",
+    "editor": "number",
+    "label": {
+      "en": "Width of the container slider: minimum",
+      "nl": "Schuif breedte van het bakje: minimum",
+      "fr": "Curseur largeur du récipient : minimum"
+    }
+  },
+  "widthMax": {
+    "default": "30",
+    "editor": "number",
+    "label": {
+      "en": "Width of the container slider: maximum",
+      "nl": "Schuif breedte van het bakje: maximum",
+      "fr": "Curseur largeur du récipient : maximum"
+    }
+  },
+  "widthStep": {
+    "default": "5",
+    "editor": "number",
+    "label": {
+      "en": "Width of the container slider: step",
+      "nl": "Schuif breedte van het bakje: stap",
+      "fr": "Curseur largeur du récipient : pas"
+    }
+  },
+  "wind": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Wind at the start, and when the candidate cannot change it",
+      "nl": "Wind bij de start, en als de kandidaat die niet kan veranderen",
+      "fr": "Vent au départ, et si le candidat ne peut pas le changer"
+    }
+  },
+  "salt": {
+    "default": "35",
+    "editor": "number",
+    "label": {
+      "en": "Salt concentration (g/L; sea water 35) at the start, and when the candidate cannot change it",
+      "nl": "Zoutconcentratie (g/L; sea water 35) bij de start, en als de kandidaat die niet kan veranderen",
+      "fr": "Concentration en sel (g/L; sea water 35) au départ, et si le candidat ne peut pas la changer"
+    }
+  },
+  "saltMin": {
+    "default": "0",
+    "editor": "number",
+    "label": {
+      "en": "Salt concentration slider: minimum",
+      "nl": "Schuif zoutconcentratie: minimum",
+      "fr": "Curseur concentration en sel : minimum"
+    }
+  },
+  "saltMax": {
+    "default": "250",
+    "editor": "number",
+    "label": {
+      "en": "Salt concentration slider: maximum",
+      "nl": "Schuif zoutconcentratie: maximum",
+      "fr": "Curseur concentration en sel : maximum"
+    }
+  },
+  "saltStep": {
+    "default": "5",
+    "editor": "number",
+    "label": {
+      "en": "Salt concentration slider: step",
+      "nl": "Schuif zoutconcentratie: stap",
+      "fr": "Curseur concentration en sel : pas"
+    }
+  },
+  "volume": {
+    "default": "200",
+    "editor": "number",
+    "label": {
+      "en": "Volume of water (mL) at the start, and when the candidate cannot change it",
+      "nl": "Hoeveelheid water (mL) bij de start, en als de kandidaat die niet kan veranderen",
+      "fr": "Volume d'eau (mL) au départ, et si le candidat ne peut pas la changer"
+    }
+  },
+  "volumeMin": {
+    "default": "50",
+    "editor": "number",
+    "label": {
+      "en": "Volume of water slider: minimum",
+      "nl": "Schuif hoeveelheid water: minimum",
+      "fr": "Curseur volume d'eau : minimum"
+    }
+  },
+  "volumeMax": {
+    "default": "500",
+    "editor": "number",
+    "label": {
+      "en": "Volume of water slider: maximum",
+      "nl": "Schuif hoeveelheid water: maximum",
+      "fr": "Curseur volume d'eau : maximum"
+    }
+  },
+  "volumeStep": {
+    "default": "50",
+    "editor": "number",
+    "label": {
+      "en": "Volume of water slider: step",
+      "nl": "Schuif hoeveelheid water: stap",
+      "fr": "Curseur volume d'eau : pas"
+    }
+  },
+  "start": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Start values per container, overriding the values above: key=value separated by ;, containers separated by | (e.g. temperature=60 | temperature=20)",
+      "nl": "Startwaarden per bakje, in plaats van de waarden hierboven: sleutel=waarde gescheiden door ;, bakjes gescheiden door | (bijv. temperature=60 | temperature=20)",
+      "fr": "Valeurs de départ par récipient, à la place des valeurs ci-dessus : clé=valeur séparées par ;, récipients séparés par | (p. ex. temperature=60 | temperature=20)"
+    },
+    "$comment": "keys: temperature, width (or area), wind (true/false), salt, volume. Also for a variable the candidate cannot change: that is how the original's fixed demonstration is made"
+  },
+  "duration": {
+    "default": "48",
+    "editor": "number",
+    "label": {
+      "en": "Length of the experiment on the clock (hours)",
+      "nl": "Duur van de proef op de klok (uren)",
+      "fr": "Durée de l'expérience sur l'horloge (heures)"
+    }
+  },
+  "runSeconds": {
+    "default": "20",
+    "editor": "number",
+    "label": {
+      "en": "Real seconds the whole experiment takes at speed ×1",
+      "nl": "Echte seconden die de hele proef duurt bij snelheid ×1",
+      "fr": "Secondes réelles que dure toute l'expérience à la vitesse ×1"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English (12.5 h)",
+          "nl": "Engels (12.5 h)",
+          "fr": "Anglais (12.5 h)"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch (12,5 uur)",
+          "nl": "Nederlands (12,5 uur)",
+          "fr": "Néerlandais (12,5 uur)"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French (12,5 h)",
+          "nl": "Frans (12,5 h)",
+          "fr": "Français (12,5 h)"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the experiment and its texts",
+      "nl": "Taal van de proef en de teksten",
+      "fr": "Langue de l'expérience et de ses textes"
+    }
+  }
+}

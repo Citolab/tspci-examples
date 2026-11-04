@@ -2,7 +2,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  EXAMPLE, blocks, countChars, countWords, evaluate, format, hasPhrase, messageText, nextStep, parseAddresses, parseScenario, passes,
+  CHOICE_CHAT, EXAMPLE, blocks, chatAnswer, choicesOf, fillName, lastStepOf, sentOf, countChars, countWords, evaluate, format, hasPhrase, messageText, nextStep, parseAddresses, parseScenario, passes,
   plainText, repliesOf, replay, sendChat, serializeScenario, startChat, toHtml, type Answer, type Check, type Limits,
 } from "../src/message.ts";
 
@@ -190,4 +190,72 @@ test("the message for a rater", () => {
     draft: "half",
   });
   assert.equal(chat, "[10:15] Noor: Hi\n[10:16] You: Hey\n(not sent) half");
+});
+
+test("chat: choice steps, the name step, cards and notices", () => {
+  const chat = CHOICE_CHAT;
+  let s = startChat(chat, T, "Sam Jansen");
+  assert.deepEqual([s.waiting, s.at, s.transcript.length, s.transcript[0].kind], ["hello", "hello", 2, "system"]);
+  // the name step: the reply is the name; {firstName} in the next messages
+  s = sendChat(chat, s, "  Lena   de Vries ", T, "Sam Jansen");
+  assert.equal(s.name, "Lena de Vries");
+  assert.equal(s.transcript[2].kind, "name");
+  assert.equal(s.transcript[3].text, "Nice to meet you, Lena! Here is the training schedule.");
+  assert.deepEqual([s.transcript[4].kind, s.transcript[4].title], ["card", "Training schedule"]);
+  assert.equal(s.waiting, "schedule");
+  // a choice step takes only its options (by id or text); free text does nothing
+  assert.equal(sendChat(chat, s, "I will come", T, "Sam"), s);
+  s = sendChat(chat, s, "sorry, i can't on tuesday. is thursday ok?", T, "Sam");
+  assert.deepEqual([s.transcript[6].kind, s.transcript[6].choice, s.transcript[6].from], ["choice", "thursday", "Lena de Vries"]);
+  assert.deepEqual([s.waiting, s.at], ["thursday", "thursday"]);
+  assert.equal(s.transcript[8].text, "Do you have a question about the training, Lena?");
+  s = sendChat(chat, s, "What should I wear?", T, "Sam");
+  assert.deepEqual([s.ended, s.waiting, lastStepOf(s)], [true, null, "bye"]);
+  assert.equal(s.transcript[s.transcript.length - 1].kind, "system");
+  // only written replies are text; the choices with their step, category and points
+  assert.deepEqual(repliesOf(s.transcript), ["What should I wear?"]);
+  assert.deepEqual(sentOf(s.transcript), ["Lena de Vries", "thursday", "What should I wear?"]);
+  assert.deepEqual(choicesOf(chat, s.transcript), [{ step: "schedule", id: "thursday", category: "polite", points: 2 }]);
+  // replaying what was sent gives the same chat (setResponse)
+  assert.deepEqual(replay(chat, sentOf(s.transcript), T, "Sam Jansen"), s);
+});
+
+test("chat: the choices check, points per option or per category", () => {
+  const chat = CHOICE_CHAT;
+  const rude = chatAnswer(chat, replay(chat, ["Sam", "whatever", "Why?"], T, "Sam").transcript);
+  assert.deepEqual(rude.choices!.map((c) => [c.id, c.category, c.points]), [["whatever", "rude", 0]]);
+  assert.equal(evaluate(chat.checks, rude, {}).score, 1); // only the replies check
+  const polite = chatAnswer(chat, replay(chat, chat.model!, T, "Sam").transcript);
+  assert.deepEqual(evaluate(chat.checks, polite, {}).results.map((r) => r.passed), [true, true, true]);
+  // an option's own points win over its category's
+  const own = { ...chat, steps: chat.steps.map((st) => (st.options ? { ...st, options: st.options.map((o) => (o.id === "maybe" ? { ...o, points: 5 } : o)) } : st)) };
+  assert.equal(choicesOf(own, replay(own, ["Sam", "maybe"], T, "Sam").transcript)[0].points, 5);
+  // without choices the check does not pass, whatever its range
+  assert.equal(passes({ type: "choices", name: "rude", max: 0 }, answer({ environment: "chat", choices: [] }), {}), false);
+  assert.equal(passes({ type: "choices", name: "Polite", min: 1 }, polite, {}), true);
+  // the old example: no options, no choices
+  assert.deepEqual(chatAnswer(EXAMPLE.chat, replay(EXAMPLE.chat, ["juice"], T, "Sam").transcript).choices, []);
+});
+
+test("chat: the name placeholder; the scenario keeps the new step types", () => {
+  assert.equal(fillName("Hi {name}! {firstName}, {FirstName}", "Lena de Vries"), "Hi Lena de Vries! Lena, Lena");
+  // without a name step, the name of the scenario
+  assert.equal(startChat({ ...CHOICE_CHAT, steps: CHOICE_CHAT.steps.slice(3) }, T, "Sam Jansen").transcript[0].text, "Do you have a question about the training, Sam?");
+  const again = parseScenario(serializeScenario({ ...EXAMPLE, chat: CHOICE_CHAT }));
+  assert.deepEqual(again.chat.steps, CHOICE_CHAT.steps);
+  assert.deepEqual(again.chat.categoryPoints, CHOICE_CHAT.categoryPoints);
+  assert.deepEqual(again.chat.checks, CHOICE_CHAT.checks);
+  // options without an id get one; HTML stays text; unknown kinds are left out
+  const own = parseScenario(JSON.stringify({ chat: { steps: [{ messages: [{ from: "A", text: "<b>x</b>", kind: "iframe" }], options: [{ text: "A" }, { text: "" }, { text: "B", points: "2" }] }] } }));
+  assert.deepEqual(own.chat.steps[0].messages, [{ from: "A", text: "<b>x</b>" }]);
+  assert.deepEqual(own.chat.steps[0].options, [{ id: "o1", text: "A" }, { id: "o3", text: "B", points: 2 }]);
+});
+
+test("the message for a rater: notices, cards, choices", () => {
+  const labels = { to: "To", cc: "Cc", subject: "Subject", attachments: "Attachments", me: "Lena", draft: "not sent", notSent: "not sent" };
+  const s = replay(CHOICE_CHAT, ["Lena", "maybe"], T, "Sam");
+  const text = messageText(chatAnswer(CHOICE_CHAT, s.transcript), labels, { transcript: s.transcript });
+  assert.match(text, /^\[10:15\] \(Mila added you to the chat\.\)\n/);
+  assert.match(text, /\[10:15\] Mila: \[Training schedule\] Tuesday/);
+  assert.match(text, /\[10:15\] Lena: Maybe\. \(maybe\)/);
 });

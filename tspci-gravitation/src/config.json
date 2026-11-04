@@ -1,0 +1,107 @@
+{
+  "prompt": {
+    "default": "Change the distance between the planet and the star, the mass of the planet and its radius. Record measurements to find out which quantities change the gravitational force.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "starMass": {
+    "default": "1e36",
+    "editor": "number",
+    "label": {
+      "en": "Mass of the star in kg (1e36 gives the numbers of the original; the Sun: 1.989e30)",
+      "nl": "Massa van de ster in kg (1e36 geeft de getallen van het origineel; de zon: 1.989e30)",
+      "fr": "Masse de l'étoile en kg (1e36 donne les valeurs de l'original ; le Soleil : 1.989e30)"
+    }
+  },
+  "showDistance": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Distance: show a slider", "nl": "Afstand: schuif tonen", "fr": "Distance : afficher un curseur" }
+  },
+  "distanceMin": { "default": "50", "editor": "number", "label": { "en": "Distance slider: minimum (million km, more than 0)", "nl": "Afstandsschuif: minimum (miljoen km, meer dan 0)", "fr": "Curseur de distance : minimum (millions de km, plus que 0)" } },
+  "distanceMax": { "default": "550", "editor": "number", "label": { "en": "Distance slider: maximum (million km)", "nl": "Afstandsschuif: maximum (miljoen km)", "fr": "Curseur de distance : maximum (millions de km)" } },
+  "distanceStep": { "default": "50", "editor": "number", "label": { "en": "Distance slider: step", "nl": "Afstandsschuif: stap", "fr": "Curseur de distance : pas" } },
+  "distance": {
+    "default": "100",
+    "editor": "number",
+    "label": { "en": "Distance at the start (and when it is not shown)", "nl": "Afstand bij de start (en als hij niet getoond wordt)", "fr": "Distance au départ (et quand elle n'est pas affichée)" }
+  },
+  "showMass": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Mass of the planet: show a slider", "nl": "Massa van de planeet: schuif tonen", "fr": "Masse de la planète : afficher un curseur" }
+  },
+  "massMin": { "default": "1", "editor": "number", "label": { "en": "Mass slider: minimum (× 10²³ kg, more than 0)", "nl": "Massaschuif: minimum (× 10²³ kg, meer dan 0)", "fr": "Curseur de masse : minimum (× 10²³ kg, plus que 0)" } },
+  "massMax": { "default": "30", "editor": "number", "label": { "en": "Mass slider: maximum (× 10²³ kg)", "nl": "Massaschuif: maximum (× 10²³ kg)", "fr": "Curseur de masse : maximum (× 10²³ kg)" } },
+  "massStep": { "default": "1", "editor": "number", "label": { "en": "Mass slider: step", "nl": "Massaschuif: stap", "fr": "Curseur de masse : pas" } },
+  "mass": {
+    "default": "10",
+    "editor": "number",
+    "label": { "en": "Mass at the start (and when it is not shown)", "nl": "Massa bij de start (en als hij niet getoond wordt)", "fr": "Masse au départ (et quand elle n'est pas affichée)" }
+  },
+  "showRadius": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Radius of the planet: show a slider (it changes the picture, not the force: a distractor)",
+      "nl": "Straal van de planeet: schuif tonen (verandert de afbeelding, niet de kracht: een afleider)",
+      "fr": "Rayon de la planète : afficher un curseur (change le dessin, pas la force : un distracteur)"
+    }
+  },
+  "radiusMin": { "default": "2500", "editor": "number", "label": { "en": "Radius slider: minimum (km, more than 0)", "nl": "Straalschuif: minimum (km, meer dan 0)", "fr": "Curseur de rayon : minimum (km, plus que 0)" } },
+  "radiusMax": { "default": "22500", "editor": "number", "label": { "en": "Radius slider: maximum (km)", "nl": "Straalschuif: maximum (km)", "fr": "Curseur de rayon : maximum (km)" } },
+  "radiusStep": { "default": "500", "editor": "number", "label": { "en": "Radius slider: step", "nl": "Straalschuif: stap", "fr": "Curseur de rayon : pas" } },
+  "radius": {
+    "default": "10000",
+    "editor": "number",
+    "label": { "en": "Radius at the start (and when it is not shown)", "nl": "Straal bij de start (en als hij niet getoond wordt)", "fr": "Rayon au départ (et quand il n'est pas affiché)" }
+  },
+  "digits": {
+    "default": "3",
+    "editor": "integer",
+    "label": { "en": "Significant digits of the force (1 to 5)", "nl": "Significante cijfers van de kracht (1 tot 5)", "fr": "Chiffres significatifs de la force (1 à 5)" }
+  },
+  "record": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "A button to record measurements in a table", "nl": "Een knop om metingen in een tabel vast te leggen", "fr": "Un bouton pour enregistrer des mesures dans un tableau" }
+  },
+  "maxRecords": {
+    "default": "20",
+    "editor": "integer",
+    "label": { "en": "Rows in the table of measurements (1 to 100; the last ones are kept)", "nl": "Rijen in de tabel met metingen (1 tot 100; de laatste blijven)", "fr": "Lignes du tableau de mesures (1 à 100 ; les dernières sont gardées)" }
+  },
+  "question": {
+    "default": "influence",
+    "editor": "enum",
+    "label": { "en": "Question in the PCI", "nl": "Vraag in de PCI", "fr": "Question dans la PCI" },
+    "options": [
+      { "value": "none", "label": { "en": "None (a tool; the question goes in another interaction)", "nl": "Geen (een hulpmiddel; de vraag staat in een andere interactie)", "fr": "Aucune (un outil ; la question est dans une autre interaction)" } },
+      { "value": "influence", "label": { "en": "Which quantities influence the force? (checkboxes, scored)", "nl": "Welke grootheden hebben invloed op de kracht? (vinkjes, gescoord)", "fr": "Quelles grandeurs influencent la force ? (cases à cocher, notée)" } }
+    ]
+  },
+  "questionText": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Text of the question (empty: the standard text in the candidate's language)", "nl": "Tekst van de vraag (leeg: de standaardtekst in de taal van de kandidaat)", "fr": "Texte de la question (vide : le texte standard dans la langue du candidat)" }
+  },
+  "key": {
+    "default": "distance;mass",
+    "editor": "text",
+    "label": {
+      "en": "Key: the quantities that influence the force (distance;mass;radius, separated by ;)",
+      "nl": "Sleutel: de grootheden met invloed op de kracht (distance;mass;radius, gescheiden door ;)",
+      "fr": "Clé : les grandeurs qui influencent la force (distance;mass;radius, séparées par ;)"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (6.67 × 10²⁶ N)", "nl": "Engels (6.67 × 10²⁶ N)", "fr": "Anglais (6.67 × 10²⁶ N)" } },
+      { "value": "nl", "label": { "en": "Dutch (6,67 × 10²⁶ N)", "nl": "Nederlands (6,67 × 10²⁶ N)", "fr": "Néerlandais (6,67 × 10²⁶ N)" } },
+      { "value": "fr", "label": { "en": "French (6,67 × 10²⁶ N)", "nl": "Frans (6,67 × 10²⁶ N)", "fr": "Français (6,67 × 10²⁶ N)" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" }
+  }
+}

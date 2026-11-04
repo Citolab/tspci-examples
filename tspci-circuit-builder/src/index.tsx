@@ -13,7 +13,10 @@ import { IStore } from "@citolab/preact-store";
 
 import configProps from "./config.json";
 import { Actions, StateModel, initStore } from "./store";
-import { Circuit, MAX_CHECKS, Placed, evaluate, ownParts, parseCircuit, sameParts, serializeBoard, serializeCircuit, startParts } from "./circuit";
+import {
+  Circuit, MAX_CHECKS, Placed, boardOf, brokenCells, brokenFromBoard, evaluate, ownParts, parseCircuit, sameParts, serializeBoard, serializeCircuit,
+  startParts,
+} from "./circuit";
 import { textsFor } from "./texts";
 // config.json carries editor hints for authoring systems (AUTHORING.md); the build passes only the defaults, as strings
 type PropTypes = PciProperties<typeof configProps>;
@@ -84,7 +87,10 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       try {
         // getState() saves { state, log }
         const saved = JSON.parse(stateString);
-        if (Array.isArray(saved?.state?.parts)) this.store.restoreState({ parts: ownParts(this.circuit, saved.state.parts) }, saved.log ?? []);
+        if (Array.isArray(saved?.state?.parts)) {
+          const broken = Array.isArray(saved.state.broken) ? saved.state.broken.filter((k: unknown) => typeof k === "string") : [];
+          this.store.restoreState({ parts: ownParts(this.circuit, saved.state.parts), ...(broken.length ? { broken } : {}) }, saved.log ?? []);
+        }
       } catch {
         // not a state of this PCI: start with the board as the author made it
       }
@@ -139,7 +145,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     declaration: ConfigProperties<PropTypes>["responseDeclaration"]
   ): QtiVariableJSON | null => {
     const board = boardText(declaration?.correctResponse?.value ?? declaration?.correctResponse);
-    return board ? this.responseFor(ownParts(this.circuit, JSON.parse(board))) : null;
+    if (!board) return null;
+    const parsed = JSON.parse(board);
+    return this.responseFor(ownParts(this.circuit, parsed), brokenFromBoard(parsed));
   };
 
   private solutionResponse = (): QtiVariableJSON | null => (this.circuit.solution ? this.responseFor(this.circuit.solution) : null);
@@ -157,6 +165,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     render(
       <Interaction prompt={this.config.properties.prompt} circuit={this.circuit} store={this.store} texts={textsFor(this.config.properties.language)}
         showOpenEnds={isTrue(this.config.properties.showOpenEnds)} showCurrent={isTrue(this.config.properties.showCurrent)}
+        lampTool={isTrue(this.config.properties.lampTool)}
         readOnly={this.config.status === "solution"} />,
       this.shadowdom
     );
@@ -198,9 +207,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     window.requestAnimationFrame(() => this.render());
   };
 
-  /** The record for a board: the checks' results and score, the topology and the board itself. */
-  private responseFor = (parts: Placed[]): QtiVariableJSON => {
-    const e = evaluate(this.circuit, parts);
+  /** The record for a board: the checks' results and score, the topology and the board itself (with the broken lamps). */
+  private responseFor = (parts: Placed[], broken: string[] = []): QtiVariableJSON => {
+    const e = evaluate(this.circuit, parts, broken);
     const record: QtiRecordItem[] = [
       { name: "score", base: { integer: e.score } },
       { name: "maxscore", base: { integer: e.maxscore } },
@@ -211,18 +220,20 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       if (r) record.push({ name: `check${i + 1}`, base: { integer: r.passed ? 1 : 0 } });
     }
     record.push({ name: "topology", base: { string: e.topology } });
-    record.push({ name: "board", base: { string: serializeBoard(this.circuit, parts) } });
+    record.push({ name: "board", base: { string: serializeBoard(this.circuit, parts, broken) } });
     return { record };
   };
 
   /**
    * A record: score and maxscore (the points of the passed and of all checks), correct (every check passed),
-   * check1 … (1 or 0 per check), the topology and the board as JSON. Nothing until the candidate changed the board.
+   * check1 … (1 or 0 per check), the topology and the board as JSON (broken lamps marked "broken": true). Nothing until
+   * the candidate changed the board or broke a lamp.
    */
   getResponse = (): QtiVariableJSON | undefined => {
-    const { parts } = this.store.getState();
-    if (sameParts(parts, startParts(this.circuit))) return undefined;
-    return this.responseFor(parts);
+    const { parts, broken = [] } = this.store.getState();
+    const out = [...brokenCells(boardOf(this.circuit, parts), broken)];
+    if (sameParts(parts, startParts(this.circuit)) && !out.length) return undefined;
+    return this.responseFor(parts, out);
   };
 
   // the store tells the interaction (and the Delivery System) about the reset
@@ -235,7 +246,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     const text = boardText(response);
     if (!text) return;
     try {
-      this.store.restoreState({ parts: ownParts(this.circuit, JSON.parse(text)) }, []);
+      const board = JSON.parse(text);
+      const broken = brokenFromBoard(board);
+      this.store.restoreState({ parts: ownParts(this.circuit, board), ...(broken.length ? { broken } : {}) }, []);
     } catch {
       console.error(`couldn't restore the response: ${text}`);
       this.resetResponse();

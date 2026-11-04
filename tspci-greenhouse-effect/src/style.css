@@ -1,0 +1,68 @@
+/* SPDX-License-Identifier: GPL-2.0-only
+ * Based on https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/EffetDeSerrepci,
+ * © DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière (Wiquid)
+ * Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+/* the sliders: a track that fills up to the thumb (--fill), a large thumb, a clear focus ring */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 36px;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #0f766e 0 var(--fill, 0%), #e2e8f0 var(--fill, 0%) 100%);
+}
+.range::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+}
+.range::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background: #0f766e;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -7px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 3px solid #0f766e;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.3);
+}
+.range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 3px solid #0f766e;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.3);
+}
+.range:focus {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgb(13 148 136 / 0.35);
+}
+.range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgb(13 148 136 / 0.35);
+}
+@media (forced-colors: active) {
+  .range {
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
+}

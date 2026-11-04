@@ -1,0 +1,145 @@
+{
+  "prompt": {
+    "default": "Air pollution irritates the bronchioles, the smallest airways of the lungs. Move the slider and compare the bronchiole of a healthy person with that of a person with asthma.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "persons": {
+    "default": "both",
+    "editor": "enum",
+    "label": { "en": "Bronchioles shown", "nl": "Getoonde bronchiolen", "fr": "Bronchioles affichées" },
+    "options": [
+      { "value": "both", "label": { "en": "Healthy person and person with asthma, side by side", "nl": "Gezonde persoon en persoon met astma, naast elkaar", "fr": "Individu en bonne santé et individu asthmatique, côte à côte" } },
+      { "value": "healthy", "label": { "en": "Only the healthy person", "nl": "Alleen de gezonde persoon", "fr": "Seulement l'individu en bonne santé" } },
+      { "value": "asthmatic", "label": { "en": "Only the person with asthma", "nl": "Alleen de persoon met astma", "fr": "Seulement l'individu asthmatique" } }
+    ]
+  },
+  "pollutionMin": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Pollution scale: lowest level", "nl": "Vervuilingsschaal: laagste niveau", "fr": "Échelle de pollution : niveau le plus bas" }
+  },
+  "pollutionMax": {
+    "default": "20",
+    "editor": "integer",
+    "label": { "en": "Pollution scale: highest level", "nl": "Vervuilingsschaal: hoogste niveau", "fr": "Échelle de pollution : niveau le plus haut" }
+  },
+  "pollutionStart": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Pollution level at the start", "nl": "Vervuilingsniveau bij de start", "fr": "Niveau de pollution au départ" }
+  },
+  "labelLess": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Label at the low end of the scale (empty: \"Less pollution\" in the language)", "nl": "Label aan het lage eind van de schaal (leeg: \"Minder vervuiling\" in de taal)", "fr": "Étiquette au bas de l'échelle (vide : « Moins de pollution » dans la langue)" }
+  },
+  "labelMore": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Label at the high end of the scale (empty: \"More pollution\" in the language)", "nl": "Label aan het hoge eind van de schaal (leeg: \"Meer vervuiling\" in de taal)", "fr": "Étiquette en haut de l'échelle (vide : « Plus de pollution » dans la langue)" }
+  },
+  "healthyAtMin": {
+    "default": "0",
+    "editor": "number",
+    "label": { "en": "Healthy bronchiole: narrowing of the air passage at the lowest level (% of the radius)", "nl": "Gezonde bronchiool: vernauwing van de luchtdoorgang bij het laagste niveau (% van de straal)", "fr": "Bronchiole saine : rétrécissement du passage de l'air au niveau le plus bas (% du rayon)" }
+  },
+  "healthyAtMax": {
+    "default": "10",
+    "editor": "number",
+    "label": { "en": "Healthy bronchiole: narrowing at the highest level (% of the radius)", "nl": "Gezonde bronchiool: vernauwing bij het hoogste niveau (% van de straal)", "fr": "Bronchiole saine : rétrécissement au niveau le plus haut (% du rayon)" }
+  },
+  "asthmaticAtMin": {
+    "default": "2.5",
+    "editor": "number",
+    "label": { "en": "Asthmatic bronchiole: narrowing at the lowest level (% of the radius)", "nl": "Bronchiool bij astma: vernauwing bij het laagste niveau (% van de straal)", "fr": "Bronchiole asthmatique : rétrécissement au niveau le plus bas (% du rayon)" }
+  },
+  "asthmaticAtMax": {
+    "default": "50",
+    "editor": "number",
+    "label": { "en": "Asthmatic bronchiole: narrowing at the highest level (% of the radius; the original: 50)", "nl": "Bronchiool bij astma: vernauwing bij het hoogste niveau (% van de straal; het origineel: 50)", "fr": "Bronchiole asthmatique : rétrécissement au niveau le plus haut (% du rayon ; l'original : 50)" }
+  },
+  "mucusShare": {
+    "default": "40",
+    "editor": "number",
+    "label": { "en": "Part of the narrowing that is extra mucus (%; the rest is the swollen wall)", "nl": "Deel van de vernauwing dat extra slijm is (%; de rest is de gezwollen wand)", "fr": "Part du rétrécissement due au mucus (% ; le reste est la paroi enflée)" }
+  },
+  "showArea": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the area of the air passage (% of normal)", "nl": "Oppervlakte van de luchtdoorgang tonen (% van normaal)", "fr": "Afficher la surface du passage de l'air (% de la normale)" }
+  },
+  "showFlow": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show the airflow (% of normal, Poiseuille: ∝ r⁴)", "nl": "Luchtstroom tonen (% van normaal, Poiseuille: ∝ r⁴)", "fr": "Afficher le débit d'air (% de la normale, Poiseuille : ∝ r⁴)" }
+  },
+  "decimals": {
+    "default": "0",
+    "editor": "integer",
+    "label": { "en": "Decimals of the percentages (0 to 2)", "nl": "Decimalen van de percentages (0 tot 2)", "fr": "Décimales des pourcentages (0 à 2)" }
+  },
+  "question": {
+    "default": "none",
+    "editor": "enum",
+    "label": { "en": "Question below the simulation (scored)", "nl": "Vraag onder de simulatie (gescoord)", "fr": "Question sous la simulation (notée)" },
+    "options": [
+      { "value": "none", "label": { "en": "None (the simulation is a tool)", "nl": "Geen (de simulatie is een hulpmiddel)", "fr": "Aucune (la simulation est un outil)" } },
+      { "value": "threshold", "label": { "en": "From which level is the airflow (or area) below a percentage?", "nl": "Vanaf welk niveau is de luchtstroom (of oppervlakte) onder een percentage?", "fr": "À partir de quel niveau le débit (ou la surface) est-il sous un pourcentage ?" } },
+      { "value": "ratio", "label": { "en": "How many times larger is the healthy airflow than the asthmatic one at a level?", "nl": "Hoeveel keer zo groot is de gezonde luchtstroom als die bij astma, bij een niveau?", "fr": "Combien de fois le débit sain est-il plus grand que le débit asthmatique, à un niveau ?" } }
+    ]
+  },
+  "questionPerson": {
+    "default": "asthmatic",
+    "editor": "enum",
+    "label": { "en": "Threshold question: whose bronchiole", "nl": "Drempelvraag: wiens bronchiool", "fr": "Question de seuil : bronchiole de qui" },
+    "options": [
+      { "value": "asthmatic", "label": { "en": "Person with asthma", "nl": "Persoon met astma", "fr": "Individu asthmatique" } },
+      { "value": "healthy", "label": { "en": "Healthy person", "nl": "Gezonde persoon", "fr": "Individu en bonne santé" } }
+    ]
+  },
+  "questionQuantity": {
+    "default": "flow",
+    "editor": "enum",
+    "label": { "en": "Threshold question: quantity", "nl": "Drempelvraag: grootheid", "fr": "Question de seuil : grandeur" },
+    "options": [
+      { "value": "flow", "label": { "en": "Airflow", "nl": "Luchtstroom", "fr": "Débit d'air" } },
+      { "value": "area", "label": { "en": "Area of the air passage", "nl": "Oppervlakte van de luchtdoorgang", "fr": "Surface du passage de l'air" } }
+    ]
+  },
+  "questionPercent": {
+    "default": "50",
+    "editor": "number",
+    "label": { "en": "Threshold question: below this % of normal", "nl": "Drempelvraag: onder dit % van normaal", "fr": "Question de seuil : sous ce % de la normale" }
+  },
+  "questionLevel": {
+    "default": "",
+    "editor": "integer",
+    "label": { "en": "Comparison question: pollution level (empty: the highest)", "nl": "Vergelijkingsvraag: vervuilingsniveau (leeg: het hoogste)", "fr": "Question de comparaison : niveau de pollution (vide : le plus haut)" }
+  },
+  "tolerance": {
+    "default": "0.5",
+    "editor": "number",
+    "label": { "en": "The answer is correct within ± this of the correct answer", "nl": "Het antwoord is goed binnen ± dit van het goede antwoord", "fr": "La réponse est juste à ± cette valeur près" }
+  },
+  "points": {
+    "default": "1",
+    "editor": "integer",
+    "label": { "en": "Points for a correct answer", "nl": "Punten voor een goed antwoord", "fr": "Points pour une réponse juste" }
+  },
+  "questionText": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Text of the question (empty: made from the settings, in the language)", "nl": "Tekst van de vraag (leeg: gemaakt uit de instellingen, in de taal)", "fr": "Texte de la question (vide : construit à partir des réglages, dans la langue)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (6.3%)", "nl": "Engels (6.3%)", "fr": "Anglais (6.3%)" } },
+      { "value": "nl", "label": { "en": "Dutch (6,3%)", "nl": "Nederlands (6,3%)", "fr": "Néerlandais (6,3%)" } },
+      { "value": "fr", "label": { "en": "French (6,3 %)", "nl": "Frans (6,3 %)", "fr": "Français (6,3 %)" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" }
+  }
+}

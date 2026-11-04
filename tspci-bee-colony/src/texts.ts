@@ -1,0 +1,131 @@
+// SPDX-License-Identifier: GPL-2.0-only
+// Based on https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Abeillepci,
+// © DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière (Wiquid)
+// Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
+
+// The texts of the PCI per language (data-language); the item's own texts (prompt, question) are settings.
+
+const en = {
+  simulation: "Bee colony simulation",
+  hint: "Move the sliders and watch the hive.",
+  factors: { pesticide: "Amount of pesticide", hornet: "Asian hornet", varroa: "Varroa mite" } as Record<string, string>,
+  short: { pesticide: "Pesticide", hornet: "Hornet", varroa: "Varroa" } as Record<string, string>,
+  bees: (n: number, text: string) => `${text} ${n === 1 ? "bee" : "bees"}`,
+  population: (bees: string) => `Hive population: ${bees}`,
+  none: "none",
+  max: "max",
+  levelOf: (level: number, max: number) => `level ${level} of ${max}`,
+  controls: "Factors",
+  record: "Record trial",
+  trials: "Your trials",
+  trial: "Trial",
+  populationColumn: "Population",
+  noTrials: "No trials yet: set the sliders and press Record trial.",
+  remove: (i: number) => `Remove trial ${i}`,
+  recorded: (i: number, population: string) => `Trial ${i} recorded: ${population}.`,
+  alreadyRecorded: (i: number) => `This combination is already in the table (trial ${i}).`,
+  tableFull: "The table is full: remove a trial first.",
+  removed: (i: number) => `Trial ${i} removed.`,
+  question: "Question",
+  largestEffect: "Which factor has the largest effect on the population of the hive?",
+  equal: "They all have the same effect",
+  predict: (combination: string) => `How many bees live in the hive with ${combination}?`,
+  atLevel: (factor: string, level: number) => `${factor.toLowerCase()} at level ${level}`,
+  and: "and",
+  yourAnswer: "Your answer",
+  beesUnit: "bees",
+  notANumber: "Type a whole number, for example 45000.",
+  // the picture, for a screen reader
+  scene: {
+    hive: (bees: number) => (bees === 0 ? "A meadow with an empty beehive: no bees fly." : `A meadow with a beehive; ${bees === 1 ? "1 bee flies" : `${bees} bees fly`} around it.`),
+    flowers: ["No flowers are left.", "Only a few flowers are left.", "", "Some flowers have gone.", "The meadow is full of flowers."],
+    pesticide: "A haze of pesticide hangs over the meadow.",
+    hornet: (n: number) => (n === 1 ? "An Asian hornet hunts at the hive." : `${n} Asian hornets hunt at the hive.`),
+    varroa: "Varroa mites crawl on the hive.",
+  },
+};
+
+export type Texts = typeof en;
+
+const nl: Texts = {
+  simulation: "Simulatie van een bijenvolk",
+  hint: "Verschuif de schuiven en kijk wat er met de bijenkast gebeurt.",
+  factors: { pesticide: "Hoeveelheid bestrijdingsmiddel", hornet: "Aziatische hoornaar", varroa: "Varroamijt" },
+  short: { pesticide: "Bestrijdingsmiddel", hornet: "Hoornaar", varroa: "Varroa" },
+  bees: (n: number, text: string) => `${text} ${n === 1 ? "bij" : "bijen"}`,
+  population: (bees: string) => `Populatie van de bijenkast: ${bees}`,
+  none: "geen",
+  max: "max",
+  levelOf: (level: number, max: number) => `niveau ${level} van ${max}`,
+  controls: "Factoren",
+  record: "Proef noteren",
+  trials: "Jouw proeven",
+  trial: "Proef",
+  populationColumn: "Populatie",
+  noTrials: "Nog geen proeven: stel de schuiven in en kies Proef noteren.",
+  remove: (i: number) => `Proef ${i} verwijderen`,
+  recorded: (i: number, population: string) => `Proef ${i} genoteerd: ${population}.`,
+  alreadyRecorded: (i: number) => `Deze combinatie staat al in de tabel (proef ${i}).`,
+  tableFull: "De tabel is vol: verwijder eerst een proef.",
+  removed: (i: number) => `Proef ${i} verwijderd.`,
+  question: "Vraag",
+  largestEffect: "Welke factor heeft het grootste effect op de populatie van de bijenkast?",
+  equal: "Ze hebben allemaal hetzelfde effect",
+  predict: (combination: string) => `Hoeveel bijen wonen er in de kast bij ${combination}?`,
+  atLevel: (factor: string, level: number) => `${factor.toLowerCase()} op niveau ${level}`,
+  and: "en",
+  yourAnswer: "Jouw antwoord",
+  beesUnit: "bijen",
+  notANumber: "Typ een heel getal, bijvoorbeeld 45000.",
+  scene: {
+    hive: (bees: number) => (bees === 0 ? "Een weide met een lege bijenkast: er vliegen geen bijen." : `Een weide met een bijenkast; er ${bees === 1 ? "vliegt 1 bij" : `vliegen ${bees} bijen`} omheen.`),
+    flowers: ["Er zijn geen bloemen meer.", "Er zijn nog maar een paar bloemen.", "", "Een deel van de bloemen is verdwenen.", "De weide staat vol bloemen."],
+    pesticide: "Een nevel van bestrijdingsmiddel hangt boven de weide.",
+    hornet: (n: number) => (n === 1 ? "Een Aziatische hoornaar jaagt bij de kast." : `${n} Aziatische hoornaars jagen bij de kast.`),
+    varroa: "Er kruipen varroamijten op de kast.",
+  },
+};
+
+const fr: Texts = {
+  simulation: "Simulation d'une colonie d'abeilles",
+  hint: "Modifiez les paramètres et observez la ruche.",
+  factors: { pesticide: "Quantité de pesticide", hornet: "Frelon asiatique", varroa: "Varroa" },
+  short: { pesticide: "Pesticide", hornet: "Frelon", varroa: "Varroa" },
+  // in French 0 and 1 take the singular, as in the original ("0 abeille")
+  bees: (n: number, text: string) => `${text} ${n <= 1 ? "abeille" : "abeilles"}`,
+  population: (bees: string) => `Population de la ruche : ${bees}`,
+  none: "aucun",
+  max: "max",
+  levelOf: (level: number, max: number) => `niveau ${level} sur ${max}`,
+  controls: "Facteurs",
+  record: "Noter l'essai",
+  trials: "Vos essais",
+  trial: "Essai",
+  populationColumn: "Population",
+  noTrials: "Aucun essai pour l'instant : réglez les curseurs et choisissez Noter l'essai.",
+  remove: (i: number) => `Supprimer l'essai ${i}`,
+  recorded: (i: number, population: string) => `Essai ${i} noté : ${population}.`,
+  alreadyRecorded: (i: number) => `Cette combinaison est déjà dans le tableau (essai ${i}).`,
+  tableFull: "Le tableau est plein : supprimez d'abord un essai.",
+  removed: (i: number) => `Essai ${i} supprimé.`,
+  question: "Question",
+  largestEffect: "Quel facteur a le plus grand effet sur la population de la ruche ?",
+  equal: "Ils ont tous le même effet",
+  predict: (combination: string) => `Combien d'abeilles vivent dans la ruche avec ${combination} ?`,
+  atLevel: (factor: string, level: number) => `${factor.toLowerCase()} au niveau ${level}`,
+  and: "et",
+  yourAnswer: "Votre réponse",
+  beesUnit: "abeilles",
+  notANumber: "Tapez un nombre entier, par exemple 45 000.",
+  scene: {
+    hive: (bees: number) => (bees === 0 ? "Une prairie avec une ruche vide : aucune abeille ne vole." : `Une prairie avec une ruche ; ${bees === 1 ? "1 abeille vole" : `${bees} abeilles volent`} autour.`),
+    flowers: ["Il ne reste plus de fleurs.", "Il ne reste que quelques fleurs.", "", "Une partie des fleurs a disparu.", "La prairie est pleine de fleurs."],
+    pesticide: "Un nuage de pesticide flotte au-dessus de la prairie.",
+    hornet: (n: number) => (n === 1 ? "Un frelon asiatique chasse près de la ruche." : `${n} frelons asiatiques chassent près de la ruche.`),
+    varroa: "Des varroas rampent sur la ruche.",
+  },
+};
+
+const texts: Record<string, Texts> = { en, nl, fr };
+/** "nl", "fr-FR" → their texts; anything else English. */
+export const textsFor = (language: string): Texts => texts[(language ?? "").slice(0, 2).toLowerCase()] ?? en;

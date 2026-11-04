@@ -1,0 +1,134 @@
+{
+  "name": "@citolab/pci-bee-colony",
+  "version": "1.0.0-alpha.1",
+  "description": "the disappearance of bees: set pesticide, Asian hornet (and varroa) and see what happens to a hive; record trials and answer a question",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original Abeillepci)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "biology",
+    "bees",
+    "ecology",
+    "simulation",
+    "investigation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-bee-colony"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "beeColony.svg",
+    "example.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-bee-colony npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-bee-colony npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "beeColony",
+      "label": "Bee colony",
+      "tags": [
+        "biology",
+        "bees",
+        "ecology",
+        "simulation",
+        "investigation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "beeColony",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores the question (data-question) against the author's key or the model; README",
+        "fields": {
+          "pesticide": {
+            "baseType": "integer",
+            "label": { "en": "Pesticide: the final level of the slider", "nl": "Bestrijdingsmiddel: het laatste niveau van de schuif", "fr": "Pesticide : la position finale du curseur" }
+          },
+          "hornet": {
+            "baseType": "integer",
+            "label": { "en": "Asian hornet: the final level of the slider", "nl": "Aziatische hoornaar: het laatste niveau van de schuif", "fr": "Frelon asiatique : la position finale du curseur" }
+          },
+          "varroa": {
+            "baseType": "integer",
+            "label": { "en": "Varroa mite: the final level (only when the third factor is on)", "nl": "Varroamijt: het laatste niveau (alleen als de derde factor aan staat)", "fr": "Varroa : la position finale (seulement si le troisième facteur est activé)" }
+          },
+          "population": {
+            "baseType": "integer",
+            "label": { "en": "Population of the hive at the final levels", "nl": "Populatie van de kast bij de laatste niveaus", "fr": "Population de la ruche aux positions finales" }
+          },
+          "trials": {
+            "baseType": "string",
+            "label": { "en": "Trials the candidate recorded in the table (JSON)", "nl": "Proeven die de kandidaat in de tabel noteerde (JSON)", "fr": "Essais notés dans le tableau (JSON)" }
+          },
+          "history": {
+            "baseType": "string",
+            "label": { "en": "Every slider move: the levels after it (JSON, as the original logged)", "nl": "Elke beweging van een schuif: de niveaus erna (JSON, zoals het origineel logde)", "fr": "Chaque mouvement de curseur : les positions après (JSON, comme l'original)" }
+          },
+          "answer": {
+            "baseType": "string",
+            "label": { "en": "Answer to the question: a factor (pesticide, hornet, varroa, equal) or a number", "nl": "Antwoord op de vraag: een factor (pesticide, hornet, varroa, equal) of een getal", "fr": "Réponse à la question : un facteur (pesticide, hornet, varroa, equal) ou un nombre" }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": { "en": "Correct: 1 when the answer matches the key", "nl": "Goed: 1 als het antwoord bij de sleutel past", "fr": "Correct : 1 si la réponse correspond à la clé" }
+          },
+          "score": {
+            "baseType": "integer",
+            "label": { "en": "Score: 1 for a correct answer", "nl": "Score: 1 voor een goed antwoord", "fr": "Score : 1 pour une bonne réponse" }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": { "en": "Maximum score: 1 with a question, 0 without", "nl": "Maximale score: 1 met een vraag, 0 zonder", "fr": "Score maximal : 1 avec une question, 0 sans" }
+          }
+        }
+      }
+    }
+  }
+}

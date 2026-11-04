@@ -8,7 +8,8 @@
 A QTI 3 Portable Custom Interaction (PCI) in which the candidate completes a circuit diagram on a grid: they drag
 circuit symbols and straight, corner and T-wires onto the board, rotate them and connect them to the parts the author
 put there (a source, wires, a transistor). The PCI turns the grid into a netlist and checks the circuit itself: closed,
-in series, parallel, the right way round. The item author builds the board, the palette, a solution and the checks in
+in series, parallel, the right way round, which lamps are lit. The candidate can also test which materials conduct, and
+break a lamp to see what the other lamps do (series or parallel). The item author builds the board, the palette, a solution and the checks in
 the PCI itself. Made with [tspci](https://github.com/Citolab/tspci).
 
 <p align="center">
@@ -21,6 +22,19 @@ the PCI itself. Made with [tspci](https://github.com/Citolab/tspci).
   resistor, lamp (circle with a cross), LED, diode, switch, push button, buzzer, motor, LDR, NTC, fuse, voltmeter,
   ammeter, cell, battery, DC source, AC source, NPN transistor; and wires: straight, corner, T-junction, junction
   (a cross, joined) and crossing wires (not joined). Letters and `+`/`−` stay upright when a part turns.
+- **Test materials**: a sample between two crocodile clips, each with its own shape and colour. Conductors: aluminium
+  foil (`aluminiumFoil`), copper (`copper`), an iron nail (`ironNail`), pencil lead (`graphite`); insulators: cotton
+  (`cotton`), wood (`wood`), plastic (`plastic`), glass (`glass`), rubber (`rubber`). The author puts the ones they want
+  in the palette (an item without a palette does not get them). The analysis treats a conductor as a closed switch (a
+  branch without resistance worth mentioning) and an insulator as open: no current goes through it, so a lamp in series
+  with cotton stays off and the `closed` check fails. Series, parallel and the topology are about the drawing: the
+  sample counts there like any component (`cotton(1-2) dcSource(3>1) lamp(2-3)`).
+- **Breaking lamps** (`data-lamp-tool`, off by default): the candidate chooses a lamp (also a locked one) and presses
+  "Break lamp" (or `B`); a broken lamp is drawn with a snapped filament and conducts no current, and the other lamps
+  follow: in series they go out, in parallel they stay lit. "Repair lamp" (or `B` again) makes it whole. A screen reader
+  hears "broken" and "lit" in the cell's name. Use it with `data-show-current`, or the candidate sees no lamp light.
+  The broken lamps are in the state and in the response's `board` (`"broken": true`); a lamp that is moved takes its
+  mark along, one that is removed loses it.
 - **Placing**: drag a part from the palette onto a cell, or choose a part (it stays chosen) and click cells. Drag a
   part on the board to move it (onto another part: they swap), off the board to remove it. Rotate with the button, `R`
   or a double click. Delete, Undo and Start again. The palette shows how many of a part are left.
@@ -43,7 +57,8 @@ the PCI itself. Made with [tspci](https://github.com/Citolab/tspci).
   `in>out`. The same circuit gives the same text wherever the parts lie, however they are turned (when that does not
   matter) and however the wires run.
 - **Show current** (`data-show-current`, off by default because it gives away whether the circuit is closed): a closed
-  circuit glows, lamps and a forward LED light up.
+  circuit glows, lamps and a forward LED light up. Parts that are open by themselves (an insulator, a broken lamp) do
+  not keep the rest from glowing: a lamp parallel to a broken one stays lit.
 - **Authoring mode**: the item author builds everything in the PCI itself (`getAuthoringInstance`), via "Configure…"
   ("Build the circuit…") in an authoring system that supports it (qti-construction, TAO with tspci-tao, the dev page),
   in four tabs: **Board** (the size, and the parts the candidate starts with; new parts are locked, untick Locked to
@@ -71,6 +86,7 @@ systems.
 | Circuit                     | `data-circuit`           | empty: the example     | written by the authoring mode, as JSON (below)                  |
 | Mark open wire ends         | `data-show-open-ends`    | `true`                 | red rings on terminals with nothing on the other side           |
 | Light up a closed circuit   | `data-show-current`      | `false`                | gives away whether the circuit is closed                        |
+| Break and repair lamps      | `data-lamp-tool`         | `false`                | the "Break lamp" tool, to see series versus parallel            |
 | Language                    | `data-language`          | `en`                   | `en` or `nl`: the texts of the PCI                              |
 
 ```json
@@ -93,7 +109,9 @@ systems.
 - **Palette**: part types with an optional count (`led:1`; without a count as many as the candidate likes). Without a
   palette: every part. The types: `wire`, `corner`, `tee`, `cross`, `crossover`, `resistor`, `variableResistor`,
   `lamp`, `led`, `diode`, `switch`, `pushButton`, `buzzer`, `motor`, `ldr`, `ntc`, `fuse`, `voltmeter`, `ammeter`,
-  `cell`, `battery`, `dcSource`, `acSource`, `transistor`.
+  `cell`, `battery`, `dcSource`, `acSource`, `transistor`, and the test materials `aluminiumFoil`, `copper`, `ironNail`,
+  `graphite`, `cotton`, `wood`, `plastic`, `glass`, `rubber` (also by their Dutch names: `aluminiumfolie`, `koper`,
+  `spijker`, `potloodstift`, `katoen`, `hout`, `glas`).
 - **Solution**: the parts besides the locked ones, as the candidate would leave the board.
 
 ### The checks
@@ -109,6 +127,17 @@ whole board, locked parts included.
 | `parallel` | there are different components of these types, each pair across the same two nodes                                    | "the LED and the buzzer parallel"             |
 | `forward`  | every LED / diode / battery / cell of these types points with the current of the source (a DC source first, then a battery or cell) | "the LED the right way round"    |
 | `solution` | the topology is the same as the solution's                                                                             | "the same circuit as the answer model"        |
+| `lit`      | every part of these types that is not broken has current (a lamp is lit, an LED lights the right way round); with `material`, that test material is on the board in series with each; with `off`, none of them has current; with `broken`, only when the candidate broke a lamp | "the lamp lights with aluminium foil", "the lamp stays off with cotton", "the other lamp stays lit when one is broken" |
+
+```json
+{ "type": "lit", "parts": ["lamp"], "material": "aluminiumFoil" }
+{ "type": "lit", "parts": ["lamp"], "material": "cotton", "off": true }
+{ "type": "lit", "parts": ["lamp"], "broken": true }
+```
+
+Broken lamps only count for `lit`: the other checks look at the circuit as the candidate built it, so a lamp the
+candidate broke to try something out does not cost the `closed` point. An insulating test material does make a circuit
+open. The authoring mode does not try a `lit` check with `broken` on the solution (it has no broken lamps).
 
 `parallel` means connected across the same two points: an LED with its own series resistor is not parallel to a
 buzzer, its branch is. Use `solution` (topology) for "the same circuit as this one".
@@ -125,7 +154,7 @@ checks, the item's response processing turns them into points. The response is a
 | `correct`            | `integer` | 1 when every check passes (and there is at least one), else 0              |
 | `check1` … `check8`  | `integer` | 1 or 0 per check, in the order of the checks; only the checks there are    |
 | `topology`           | `string`  | the canonical netlist (above), the same for every layout of a circuit      |
-| `board`              | `string`  | every part on the grid, the locked ones marked, as JSON, for a rater       |
+| `board`              | `string`  | every part on the grid, the locked and broken ones marked, as JSON, for a rater |
 
 ```json
 { "record": [
@@ -148,7 +177,7 @@ checks, the item's response processing turns them into points. The response is a
   Checks tab), or use the `solution` check. Either way the layout does not count.
 - `match_correct` is not offered: QTI's `match` cannot compare records, and the same circuit can be drawn in many ways.
 - `human`: use the PCI without automatic scoring, for a human rater (`board` has the whole board).
-- **No response**: until the candidate changes the board, `getResponse()` reports nothing.
+- **No response**: until the candidate changes the board (or breaks a lamp), `getResponse()` reports nothing.
 
 ```xml
 <qti-response-declaration identifier="RESPONSE" cardinality="record"/>
@@ -173,9 +202,10 @@ checks, the item's response processing turns them into points. The response is a
 </qti-response-processing>
 ```
 
-**State and response.** `getState()` holds the candidate's parts (and the log), so the board can be restored.
-`setResponse` (and `boundTo` without a state) reads the `board` field, or a board as a string; the other fields follow
-from it. In `status: "solution"` the board of the declared correct response is shown (a string, or a record value with
+**State and response.** `getState()` holds the candidate's parts, the broken lamps (`broken`, cells as `"x,y"`) and the
+log, so the board can be restored; a state saved by an earlier version (without `broken`) still loads. `setResponse`
+(and `boundTo` without a state) reads the `board` field, or a board as a string, broken lamps included; the other
+fields follow from it. In `status: "solution"` the board of the declared correct response is shown (a string, or a record value with
 the field `board`); without one, the author's solution.
 
 ## Using it
@@ -205,5 +235,15 @@ In a QTI 3 item, with `index.js` at `resources/pci/index.js` of the package:
   <qti-interaction-markup></qti-interaction-markup>
 </qti-portable-custom-interaction>
 ```
+
+## Inspired by the DEPP Circuit and LampeDouble PCIs
+
+The test materials and the lamp tool (version 1.1) take two ideas from PCIs of the French DEPP (Ministère de
+l'Éducation nationale, by Jean-Philippe Rivière / Wiquid), [janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)
+(`views/js/pciCreator/ims/Circuitpci` and `LampeDoublepci`): a circuit in which the pupil tests whether aluminium foil
+or cotton conducts, and two lamps in which the pupil blows one to see what happens to the other. They are re-implemented
+here from scratch in the circuit builder's own analysis (no code or images of the originals), so this package stays
+MIT. What is new compared with them: any material from a list, in any circuit the author builds; breaking any lamp,
+in series, parallel or mixed circuits; checks that score it; keyboard and screen reader access; Dutch and English.
 
 Source and the other examples: [Citolab/tspci-examples](https://github.com/Citolab/tspci-examples).

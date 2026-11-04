@@ -5,9 +5,9 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 48 examples in this repository that can give a head start while creating new Portable Custom Interactions.
-Twelve of them are ports of existing open-source PCIs and keep the licence of the original (see
-[Ports of open-source PCIs](#ports-of-open-source-pcis)).
+There are 57 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+Twenty-one of them are ports of existing open-source PCIs and keep the licence of the original (see
+[Ports of open-source PCIs](#ports-of-open-source-pcis) and [Ports of the DEPP PCIs](#ports-of-the-depp-pcis)).
 To run these examples go the to folder of the specific example and run:
 
 ``` sh
@@ -126,7 +126,7 @@ scoring). Every example describes both in two files it already has:
 | tspci-chance-tools | `textarea`, `enum`, `pci`, `boolean`, `hidden` | `record` (design, tree), `single` `string` (tool) | `custom`, `human` (its tool mode is not scored) |
 | tspci-text-marker | `textarea`, `pci`, `enum`, `integer`, `boolean`, `text` | `record` (a field per target, the marks) | `custom`, `human` |
 | tspci-form-fill | `textarea`, `pci`, `enum`, `boolean` | `record` (a check and a value per field) | `custom`, `human` |
-| tspci-message-writing | `textarea`, `enum`, `pci`, `boolean`, `integer` | `record` (the message, checks, metadata) | `human` (a human rater), `custom` |
+| tspci-message-writing | `textarea`, `enum`, `pci`, `boolean`, `integer` | `record` (the message, checks, chosen replies, metadata) | `human` (a human rater), `custom` |
 | tspci-week-planner | `textarea`, `pci`, `boolean`, `enum` | `record` (a field per rule, the schedule) | `custom`, `human` |
 | tspci-flowchart | `textarea`, `pci`, `enum`, `boolean` | `single` `string` (the graph) or a `record` | `match_correct`, `custom`, `human` |
 | tspci-timeline | `textarea`, `pci`, `boolean`, `integer`, `enum` | `record` (a year or period per event, the order) | `custom`, `human` |
@@ -145,6 +145,15 @@ scoring). Every example describes both in two files it already has:
 | tspci-voxelcraft | `colorList`, `pci`, `boolean`, `text`, `enum` | `single` `string` | `match_correct`, `human` |
 | tspci-the-room | `textarea`, `text`, `enum`, `boolean`, `integer` | `single` `string` | `custom`, `human` |
 | tspci-geogebra-applet | `text`, `pci`, `enum`, `integer`, `boolean` | `record` (`correct`, `candidateResponse`, `score`, `maxscore`, `applet`) | `custom`, `human` |
+| tspci-gravitation | `textarea`, `number`, `boolean`, `integer`, `enum`, `text` | `record` (distance, mass, radius, force, measurements, answer, score) | `custom`, `human` |
+| tspci-mass-weight | `textarea`, `enum`, `text`, `number`, `boolean` | `record` (mass, weight, volume, density, instruments used, readings, bench, score) | `custom`, `human` |
+| tspci-bee-colony | `textarea`, `integer`, `boolean`, `text`, `enum`, `number` | `record` (levels, population, trials, history, answer, score) | `custom`, `human` |
+| tspci-graph-builder | `textarea`, `text`, `enum`, `boolean`, `integer`, `number` | `record` (score, a field per check, the graph and table) | `custom`, `human` |
+| tspci-greenhouse-effect | `textarea`, `enum`, `number`, `boolean`, `integer` | `record` (level, ε, temperature, tried, prediction, score) | `custom`, `human` |
+| tspci-evaporation | `textarea`, `enum`, `boolean`, `number` | `record` (fair test, design, results, runs, score) | `custom`, `human` |
+| tspci-bronchiole | `textarea`, `enum`, `integer`, `text`, `number`, `boolean` | `record` (pollution, area and airflow per airway, levels, answer, score) | `custom`, `human`, `none` |
+| tspci-reference-frames | `textarea`, `enum`, `text`, `number`, `integer`, `boolean` | `record` (answers, frames viewed, score) | `custom`, `human` |
+| tspci-volcano-model | `textarea`, `enum`, `integer`, `boolean`, `text` | `record` (experiments, outcomes, answers, score) | `custom`, `human` |
 
 How an authoring system uses this depends on the system.
 
@@ -441,6 +450,11 @@ PCI in which the candidate completes a circuit diagram with symbols and wires on
   right way round, the same circuit as the solution; each check is a rubric line with its points
 - Reports a `record` with the score, a field per check, the circuit as a topology that does not depend on the layout,
   and the board for a rater
+- New in 1.1: materials to test (aluminium foil, copper, an iron nail and pencil lead conduct; cotton, wood, plastic,
+  glass and rubber do not) with a `lit` check, and a tool to break and repair lamps to compare series and parallel
+  (`data-lamp-tool`, off by default). Inspired by the DEPP Circuit and LampeDouble PCIs
+  ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)), written without their code, so
+  still MIT
 
 <p align="center">
   <img src="./tspci-circuit-builder/example.png" alt="example circuit builder" width="560">
@@ -528,7 +542,7 @@ lists and 2D views.
 | [tspci-chance-tools](./tspci-chance-tools) | runs dice, spinner, bag and coin experiments, designs a spinner or bag, fills in a probability tree | exact probabilities, decimals within a margin |
 | [tspci-text-marker](./tspci-text-marker) | marks words and sentences in a source text with named categories | per target: overlap, all words or exact, with a tolerance |
 | [tspci-form-fill](./tspci-form-fill) | fills in a paper or online form (a waybill, a bank transfer) from given information | per field: value, format (IBAN, postcode), relations such as totals |
-| [tspci-message-writing](./tspci-message-writing) | writes an email, chat replies or a post in a realistic environment | a human rater, plus checks: recipient, subject, attachment, words, phrases |
+| [tspci-message-writing](./tspci-message-writing) | writes an email, chat replies or a post in a realistic environment; in a chat also answers with reply buttons that branch the conversation | a human rater, plus checks: recipient, subject, attachment, words, phrases, points per chosen reply or category |
 | [tspci-week-planner](./tspci-week-planner) | plans tasks in an agenda of days, times and people, rooms or vehicles | rules: order, days, hours, breaks, overlaps, opening hours |
 | [tspci-flowchart](./tspci-flowchart) | orders cards, completes or builds a flowchart with decisions | the graph, whatever the layout, or rules such as X before Y |
 | [tspci-timeline](./tspci-timeline) | places events at a date, in a period (the Dutch tijdvakken) or in order | a margin in years, the period, ordered pairs |
@@ -557,8 +571,19 @@ of this repository: see the `LICENSE` file and the "Source and licence" section 
 | tspci-voxelcraft | [openPCI voxelcraft](https://github.com/openPCI/openPCIs/tree/master/voxelcraft) | GPL-3.0-only |
 | tspci-the-room | [openPCI theroom](https://github.com/openPCI/openPCIs/tree/master/theroom) | GPL-3.0-only |
 
+| tspci-gravitation | [DEPP NouvelleTerrepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/NouvelleTerrepci) | GPL-2.0-only |
+| tspci-mass-weight | [DEPP ForceGravitepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/ForceGravitepci) and [Delorpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Delorpci) | GPL-2.0-only |
+| tspci-bee-colony | [DEPP Abeillepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Abeillepci) | GPL-2.0-only |
+| tspci-graph-builder | [DEPP Lentillespci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Lentillespci) | GPL-2.0-only |
+| tspci-greenhouse-effect | [DEPP EffetDeSerrepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/EffetDeSerrepci) | GPL-2.0-only |
+| tspci-evaporation | [DEPP MaraisSalantpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/MaraisSalantpci) | GPL-2.0-only |
+| tspci-bronchiole | [DEPP Broncopci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Broncopci) | GPL-2.0-only |
+| tspci-reference-frames | [DEPP Trainpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Trainpci) and [Relatempci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Relatempci) | GPL-2.0-only |
+| tspci-volcano-model | [DEPP Volcanismepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Volcanismepci) | GPL-2.0-only |
+
 The openPCI PCIs are by Elias J.T. Hansen, Anna Rusmann and Jeppe Bundsgaard (Aarhus University and Aalborg
-University). Where an original ran author-written JavaScript to score (svgmap, voxelcraft, theroom), the port scores
+University). The DEPP PCIs are by Jean-Philippe Rivière (Wiquid) for the DEPP of the French Ministère de l'Éducation
+nationale; see [Ports of the DEPP PCIs](#ports-of-the-depp-pcis). Where an original ran author-written JavaScript to score (svgmap, voxelcraft, theroom), the port scores
 with settings or declarative rules instead: no PCI here evaluates author code.
 
 ## tspci-likert
@@ -719,6 +744,159 @@ Port of [openPCI theroom](https://github.com/openPCI/openPCIs/tree/master/theroo
 
 <p align="center">
   <img src="./tspci-the-room/example.png" alt="example the room" width="560">
+</p>
+
+## Ports of the DEPP PCIs
+
+The nine examples below are rewrites of PCIs that Jean-Philippe Rivière ([Wiquid](https://www.wiquid.fr)) made for the
+DEPP, the evaluation directorate of the French Ministère de l'Éducation nationale, for its science assessments. They
+were published as a TAO extension, [janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)
+(in `views/js/pciCreator/ims/`, each PCI also in its own repository, such as
+[PCI-Effet-de-Serre-IMS-Version](https://github.com/janfix/PCI-Effet-de-Serre-IMS-Version)). That extension is
+licensed **GPL-2.0-only** (its `composer.json`; its files carry the GPL-2 header of OAT's PCI template), so each port
+is GPL-2.0-only too, with a `LICENSE` file, an SPDX header in every source file and a "Source and licence" section in
+its README.
+
+Unlike the ports above they do **not** keep the response format of the original: the originals were fixed French
+scenarios that logged click counters or slider histories as a JSON string, without scoring. Each port is a new
+TypeScript, Preact and SVG implementation (none of the original images are used) with a documented model, author
+settings, English, Dutch and French, keyboard and screen-reader access, a `record` response with optional scoring, and
+a restorable state; its README explains how the response relates to what the original logged. They are
+`1.0.0-alpha.1`: the warning about the [alpha examples](#alpha-examples) applies to them too.
+
+Not ported: Circuit and LampeDouble (ideas merged into tspci-circuit-builder), ChatBot (ideas merged into
+tspci-message-writing), Snap (it bundles the whole Snap! application, AGPL), Explorer (a simulated file explorer that
+loads external images), Glips (a writing scenario with 2.6 MB of French audio and animations), and Cuisine and Berthold
+(image slideshows without interaction).
+
+## tspci-gravitation
+
+A star and a planet: the candidate changes the distance, the planet's mass and its radius (a distractor) and reads the
+gravitational force from Newton's law, in scientific notation per language (en, nl, fr).
+Port of [DEPP NouvelleTerrepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/NouvelleTerrepci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-gravitation/LICENSE)).
+
+- Star mass, slider ranges, shown quantities and significant digits can be configured; the defaults give the original's numbers
+- A table of recorded measurements for control of variables, and an optional question "which quantities influence the force?" that the PCI scores against the author's key
+- Reports a `record` (values, force, measurements, answer, score)
+
+<p align="center">
+  <img src="./tspci-gravitation/example.png" alt="example gravitation" width="480">
+</p>
+
+## tspci-mass-weight
+
+A lab bench with a digital scale (with tare), a dynamometer and a graduated cylinder: the candidate drags objects (or
+uses buttons) onto the instruments on Earth, the Moon or Mars, finds that the mass stays the same while the weight
+changes, and measures a volume by immersion.
+Merges the DEPP PCIs [ForceGravitepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/ForceGravitepci) and [Delorpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Delorpci), licensed **GPL-2.0-only** like the originals ([LICENSE](./tspci-mass-weight/LICENSE)).
+
+- Configurable objects (names in English, Dutch and French; mass, volume), places and their g, instruments, ranges and graduations
+- Reports a `record`: the readings the candidate saw, which instrument was used where, the final bench, and optional mass, weight, volume and density answers scored within a tolerance
+
+<p align="center">
+  <img src="./tspci-mass-weight/example.png" alt="example mass and weight bench" width="560">
+</p>
+
+## tspci-bee-colony
+
+The disappearance of bees: set the amount of pesticide and the Asian hornet (and optionally the varroa mite) with
+sliders and see what happens to a hive in an SVG meadow: bees and flowers disappear, a hornet flies across, and the
+population is shown.
+Port of [DEPP Abeillepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Abeillepci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-bee-colony/LICENSE)).
+
+- The model is set by the author: start population, levels and bees lost per level for each factor (the default is the original's 80000 − 20000·(pesticide + hornet))
+- A results table of trials, and an optional scored question: which factor has the largest effect, or the population for a combination
+- Reports a `record` (levels, population, trials, every slider move, answer, score); `prefers-reduced-motion`; English, Dutch and French
+
+<p align="center">
+  <img src="./tspci-bee-colony/example.png" alt="example bee colony" width="560">
+</p>
+
+## tspci-graph-builder
+
+The candidate builds a graph from measured data: a table, then the axes, the scale, the points and the line.
+Port of [DEPP Lentillespci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Lentillespci) ("Observation de la pousse des lentilles"), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-graph-builder/LICENSE)).
+
+- The data as SVG pictures (a lentil sprout next to a ruler per day) and/or a table; the author's own data, quantities, units and distractors
+- The candidate fills in a table, chooses quantity and unit per axis, sets the scale, and plots points by click, drag or keyboard; "Draw the line" connects them
+- The PCI scores itself with the author's checks (table, axes, scale, points within a tolerance, line); reports a `record` with the score, a field per check and the graph and table as JSON
+
+<p align="center">
+  <img src="./tspci-graph-builder/example.png" alt="example graph builder" width="560">
+</p>
+
+## tspci-greenhouse-effect
+
+The greenhouse effect in the classic one-layer atmosphere model: a slider for the amount of greenhouse gas (the share ε
+of the surface infrared the atmosphere absorbs), the Earth's energy flows as arrows whose widths follow the flows, and a
+thermometer (ε = 0.78 gives about 15 °C).
+Port of [DEPP EffetDeSerrepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/EffetDeSerrepci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-greenhouse-effect/LICENSE)).
+
+- Settings for the solar constant, albedo and sunlight absorbed by the air; numbers on the arrows in W/m², % or none; °C/K; a table of the flows
+- Optional scored question: set a target temperature (with a tolerance), or predict the direction of change (slider unlocks after predicting)
+- Reports a `record` with level, ε, temperature, the levels tried, prediction, correct and score; English, Dutch and French
+
+<p align="center">
+  <img src="./tspci-greenhouse-effect/example.png" alt="example greenhouse effect" width="560">
+</p>
+
+## tspci-evaporation
+
+An evaporation experiment the candidate designs: for 2 or 3 trays of salt water they set temperature, width (surface
+area), wind, salt and volume, then run a simulated clock (speed, pause, reset): water levels drop, vapour rises and salt
+crystallizes, drawn in SVG from a documented model (rate ∝ area × vapour pressure × wind). The original ran two fixed demonstrations.
+Port of [DEPP MaraisSalantpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/MaraisSalantpci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-evaporation/LICENSE)).
+
+- The author picks what may change, the ranges, fixed and start values, and a research question with a target variable
+- Reports a `record`: the design, the results (dry after, crystals from, water left) and every run, plus a fair-test check and score
+- English, Dutch and French; state restored halfway through a run
+
+<p align="center">
+  <img src="./tspci-evaporation/example.png" alt="example evaporation" width="560">
+</p>
+
+## tspci-bronchiole
+
+Cross-sections of a bronchiole of a healthy person and of a person with asthma: a pollution slider makes the wall swell
+and the mucus grow, the asthmatic airway much more.
+Port of [DEPP Broncopci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Broncopci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-bronchiole/LICENSE)).
+
+- New SVG drawn from a model; the area of the air passage (∝ r²) and the airflow (∝ r⁴, Poiseuille) as % of normal
+- Settings for the persons shown, the scale and its labels, and each airway's response; English, Dutch and French
+- Optional scored question (from which level is the airflow below X %, or the ratio of the airflows)
+- Reports a `record`: the level, area and airflow per airway, the levels visited, and the answer, correct and score
+
+<p align="center">
+  <img src="./tspci-bronchiole/example.png" alt="example bronchiole" width="560">
+</p>
+
+## tspci-reference-frames
+
+The relativity of motion: a train passes a cow (ladybirds on a wheel) or Zoé rides a motorbike past Marc, seen from the
+ground, the vehicle or a second moving observer.
+Merges the DEPP PCIs [Trainpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Trainpci) and [Relatempci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Relatempci), licensed **GPL-2.0-only** like the originals ([LICENSE](./tspci-reference-frames/LICENSE)).
+
+- Computed motion in SVG: play, pause, step, time slider and speed; trajectories traced as they move (a cycloid from the ground, a circle from the train); reduced motion respected
+- Optional questions: the shape of a trajectory from drawn options, or whether something moves or is at rest for an observer; the key follows from the motion
+- Reports a `record` with the score, the answers and which frames and points were viewed; English, Dutch and French
+
+<p align="center">
+  <img src="./tspci-reference-frames/example.png" alt="example reference frames" width="560">
+</p>
+
+## tspci-volcano-model
+
+A classroom volcano model: mashed potato in a U-tube, an effervescent tablet and a stopper. The gas pushes the purée up:
+runny purée flows over (an effusive eruption), stiff purée makes a dome or, with more gas, explodes.
+Port of [DEPP Volcanismepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Volcanismepci), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-volcano-model/LICENSE)).
+
+- 2 or 3 thicknesses and 1 to 3 tablets; the outcome per combination comes from a rule table the author edits
+- Smooth SVG animation, or step by step with reduced motion; a narrated status, in English, Dutch and French
+- After an experiment it can show the real eruption type it models; an optional matching task is scored against the author's key
+- Reports a `record`: the experiments (thickness, tablets, outcome), the answers and the score
+
+<p align="center">
+  <img src="./tspci-volcano-model/example.png" alt="example volcano model" width="560">
 </p>
 
 ## tspci-geogebra-applet

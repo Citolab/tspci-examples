@@ -1,0 +1,100 @@
+{
+  "name": "@citolab/pci-bronchiole",
+  "version": "1.0.0-alpha.1",
+  "description": "cross-sections of a bronchiole of a healthy person and of a person with asthma: more air pollution narrows the air passage; area and airflow (Poiseuille) as a percentage of normal",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "biology",
+    "asthma",
+    "pollution",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-bronchiole"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "bronchiole.svg",
+    "example.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-bronchiole npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-bronchiole npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "bronchiole",
+      "label": "Pollution and the bronchioles",
+      "tags": [
+        "biology",
+        "asthma",
+        "pollution",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human",
+        "none"
+      ],
+      "short": "bronchiole",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI scores its own question (data-question) in correct and score; without a question it is a tool: score none or human (README)",
+        "fields": {
+          "pollution": { "baseType": "integer", "label": { "en": "Pollution level the candidate left the slider at", "nl": "Vervuilingsniveau waarop de kandidaat de schuif liet", "fr": "Niveau de pollution final du curseur" } },
+          "healthyArea": { "baseType": "float", "label": { "en": "Healthy bronchiole: area of the air passage, % of normal", "nl": "Gezonde bronchiool: oppervlakte van de luchtdoorgang, % van normaal", "fr": "Bronchiole saine : surface du passage de l'air, % de la normale" } },
+          "healthyFlow": { "baseType": "float", "label": { "en": "Healthy bronchiole: airflow, % of normal", "nl": "Gezonde bronchiool: luchtstroom, % van normaal", "fr": "Bronchiole saine : débit d'air, % de la normale" } },
+          "asthmaticArea": { "baseType": "float", "label": { "en": "Asthmatic bronchiole: area of the air passage, % of normal", "nl": "Bronchiool bij astma: oppervlakte van de luchtdoorgang, % van normaal", "fr": "Bronchiole asthmatique : surface du passage de l'air, % de la normale" } },
+          "asthmaticFlow": { "baseType": "float", "label": { "en": "Asthmatic bronchiole: airflow, % of normal", "nl": "Bronchiool bij astma: luchtstroom, % van normaal", "fr": "Bronchiole asthmatique : débit d'air, % de la normale" } },
+          "levels": { "baseType": "string", "label": { "en": "Levels the candidate stopped at, in order (\"1,5,12,20\")", "nl": "Niveaus waar de kandidaat stopte, op volgorde (\"1,5,12,20\")", "fr": "Niveaux visités, dans l'ordre (« 1,5,12,20 »)" } },
+          "answer": { "baseType": "float", "label": { "en": "Answer to the question", "nl": "Antwoord op de vraag", "fr": "Réponse à la question" } },
+          "correct": { "baseType": "integer", "label": { "en": "Correct: 1 when the answer is within the tolerance", "nl": "Goed: 1 als het antwoord binnen de marge ligt", "fr": "Juste : 1 si la réponse est dans la tolérance" } },
+          "score": { "baseType": "integer", "label": { "en": "Score: the points when correct, else 0", "nl": "Score: de punten als het goed is, anders 0", "fr": "Score : les points si juste, sinon 0" } },
+          "maxscore": { "baseType": "integer", "label": { "en": "Maximum score: the points of the question", "nl": "Maximale score: de punten van de vraag", "fr": "Score maximal : les points de la question" } }
+        }
+      }
+    }
+  }
+}

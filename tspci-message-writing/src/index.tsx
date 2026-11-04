@@ -15,7 +15,7 @@ import configProps from "./config.json";
 import { Actions, StateModel, initStore } from "./store";
 import {
   Answer, ENVIRONMENTS, Environment, MAX_CHECKS, Scenario, WRITING_LANGUAGES, WritingLanguage, countChars, countWords, evaluate, messageText,
-  parseAddresses, parseScenario, repliesOf, replay, serializeScenario, startChat, toHtml, type ChatEntry,
+  chatAnswer, lastStepOf, parseAddresses, parseScenario, replay, sentOf, serializeScenario, startChat, toHtml, type ChatEntry,
 } from "./message";
 import { textsFor } from "./texts";
 import { localIso } from "./context";
@@ -171,7 +171,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     const s = this.scenario;
     const start = s.email.start;
     const reply = start.startsWith("reply:") ? s.email.inbox.find((m) => `reply:${m.id}` === start) : null;
-    const chat = startChat(s.chat, localIso());
+    const chat = startChat(s.chat, localIso(), s.me.name);
     return {
       email: {
         view: reply || start === "new" ? "compose" : "inbox",
@@ -235,11 +235,21 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       let transcript: ChatEntry[] | null = null;
       try {
         const t = f.transcript ? JSON.parse(f.transcript) : null;
-        if (Array.isArray(t)) transcript = t.filter((e) => e && typeof e.text === "string").map((e) => ({ from: String(e.from ?? ""), text: e.text, time: String(e.time ?? now), ...(e.me ? { me: true } : {}) }));
+        if (Array.isArray(t)) {
+          transcript = t.filter((e) => e && typeof e.text === "string").map((e) => {
+            const entry: ChatEntry = { from: String(e.from ?? ""), text: e.text, time: String(e.time ?? now) };
+            if (e.me) entry.me = true;
+            if (["system", "card", "choice", "name"].includes(e.kind)) entry.kind = e.kind;
+            if (typeof e.title === "string") entry.title = e.title;
+            if (typeof e.choice === "string") entry.choice = e.choice;
+            return entry;
+          });
+        }
       } catch {
         /* the replies, or the text */
       }
-      let replies: string[] = transcript ? repliesOf(transcript) : [];
+      // what the candidate sent (replies, chosen options, a name), answered by the script again
+      let replies: string[] = transcript ? sentOf(transcript) : [];
       if (!transcript) {
         try {
           replies = f.replies ? JSON.parse(f.replies) : (f.text ?? "").split(/\n\s*\n/);
@@ -328,8 +338,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
       return { environment: "email", to: parseAddresses(e.to, contacts), cc: parseAddresses(e.cc, contacts), subject: e.subject.trim(), attachments: e.attachments, text: e.body, replies: [e.body] };
     }
     if (this.environment === "chat") {
-      const replies = repliesOf(s.chat.transcript);
-      return { environment: "chat", to: [], cc: [], subject: "", attachments: [], text: replies.join("\n\n"), replies };
+      return chatAnswer(this.scenario.chat, s.chat.transcript);
     }
     return { environment: "post", to: [], cc: [], subject: "", attachments: [], text: s.post.text, replies: [s.post.text] };
   };
@@ -350,14 +359,14 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     const a = this.answerOf(s);
     const part = this.scenario[this.environment];
     const e = evaluate(part.checks, a, part.limits, this.writingLanguage, this.scenario.contacts);
-    const sent = this.environment === "email" ? !!s.email.sent : this.environment === "post" ? !!s.post.posted : a.replies.length > 0;
+    const sent = this.environment === "email" ? !!s.email.sent : this.environment === "post" ? !!s.post.posted : s.chat.transcript.some((x) => x.me);
     const record: QtiRecordItem[] = [
       { name: "score", base: { integer: e.score } },
       { name: "maxscore", base: { integer: e.maxscore } },
       { name: "correct", base: { integer: e.correct ? 1 : 0 } },
     ];
     e.results.slice(0, MAX_CHECKS).forEach((r, i) => record.push({ name: `check${i + 1}`, base: { integer: r.passed ? 1 : 0 } }));
-    const me = { ...LABELS, me: this.scenario.me.name || "me" };
+    const me = { ...LABELS, me: s.chat.name || this.scenario.me.name || "me" };
     record.push({ name: "environment", base: { string: this.environment } });
     record.push({ name: "message", base: { string: messageText(a, me, { transcript: s.chat.transcript, draft: s.chat.draft, sent }) } });
     record.push({ name: "text", base: { string: a.text } });
@@ -371,6 +380,13 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     if (this.environment === "chat") {
       record.push({ name: "transcript", base: { string: JSON.stringify(s.chat.transcript) } });
       record.push({ name: "draft", base: { string: s.chat.draft } });
+      // choice steps (README): the chosen options, their categories, their points, and where the chat is or ended
+      const choices = a.choices ?? [];
+      record.push({ name: "choices", base: { string: choices.map((c) => c.id).join(",") } });
+      record.push({ name: "categories", base: { string: choices.map((c) => c.category).join(",") } });
+      record.push({ name: "choicepoints", base: { integer: choices.reduce((sum, c) => sum + c.points, 0) } });
+      record.push({ name: "laststep", base: { string: lastStepOf(s.chat) } });
+      if (s.chat.name) record.push({ name: "name", base: { string: s.chat.name } });
     }
     record.push({ name: "sent", base: { integer: sent ? 1 : 0 } });
     record.push({ name: "words", base: { integer: countWords(a.text) } });

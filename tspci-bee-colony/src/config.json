@@ -1,0 +1,123 @@
+{
+  "prompt": {
+    "default": "Pesticides and the Asian hornet are two causes of the disappearance of bees. Move the sliders and watch what happens to the hive.",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "startPopulation": {
+    "default": "80000",
+    "editor": "integer",
+    "min": 1,
+    "label": { "en": "Population of the hive without any factor (bees)", "nl": "Populatie van de kast zonder factoren (bijen)", "fr": "Population de la ruche sans facteur (abeilles)" }
+  },
+  "beesPerIcon": {
+    "default": "10000",
+    "editor": "integer",
+    "min": 1,
+    "label": { "en": "Bees per bee in the picture (at most 40 are drawn)", "nl": "Bijen per bij in de afbeelding (er worden er hoogstens 40 getekend)", "fr": "Abeilles par abeille dessinée (40 au plus)" }
+  },
+  "pesticide": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Factor: pesticide", "nl": "Factor: bestrijdingsmiddel", "fr": "Facteur : pesticide" }
+  },
+  "pesticideLevels": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 6,
+    "label": { "en": "Pesticide: number of levels above 0 (1 to 6)", "nl": "Bestrijdingsmiddel: aantal niveaus boven 0 (1 tot 6)", "fr": "Pesticide : nombre de positions au-dessus de 0 (1 à 6)" }
+  },
+  "pesticideEffect": {
+    "default": "20000",
+    "editor": "text",
+    "label": { "en": "Pesticide: bees lost per level (one number, or one per level separated by ;)", "nl": "Bestrijdingsmiddel: bijen minder per niveau (één getal, of één per niveau gescheiden door ;)", "fr": "Pesticide : abeilles perdues par position (un nombre, ou un par position séparés par ;)" }
+  },
+  "hornet": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Factor: Asian hornet", "nl": "Factor: Aziatische hoornaar", "fr": "Facteur : frelon asiatique" }
+  },
+  "hornetLevels": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 6,
+    "label": { "en": "Asian hornet: number of levels above 0 (1 to 6)", "nl": "Aziatische hoornaar: aantal niveaus boven 0 (1 tot 6)", "fr": "Frelon asiatique : nombre de positions au-dessus de 0 (1 à 6)" }
+  },
+  "hornetEffect": {
+    "default": "20000",
+    "editor": "text",
+    "label": { "en": "Asian hornet: bees lost per level (one number, or one per level separated by ;)", "nl": "Aziatische hoornaar: bijen minder per niveau (één getal, of één per niveau gescheiden door ;)", "fr": "Frelon asiatique : abeilles perdues par position (un nombre, ou un par position séparés par ;)" }
+  },
+  "varroa": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Third factor: varroa mite", "nl": "Derde factor: varroamijt", "fr": "Troisième facteur : varroa" }
+  },
+  "varroaLevels": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 6,
+    "label": { "en": "Varroa mite: number of levels above 0 (1 to 6)", "nl": "Varroamijt: aantal niveaus boven 0 (1 tot 6)", "fr": "Varroa : nombre de positions au-dessus de 0 (1 à 6)" }
+  },
+  "varroaEffect": {
+    "default": "10000",
+    "editor": "text",
+    "label": { "en": "Varroa mite: bees lost per level (one number, or one per level separated by ;)", "nl": "Varroamijt: bijen minder per niveau (één getal, of één per niveau gescheiden door ;)", "fr": "Varroa : abeilles perdues par position (un nombre, ou un par position séparés par ;)" }
+  },
+  "showTable": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Results table: the candidate records trials", "nl": "Resultatentabel: de kandidaat noteert proeven", "fr": "Tableau de résultats : le candidat note ses essais" }
+  },
+  "maxTrials": {
+    "default": "12",
+    "editor": "integer",
+    "min": 1,
+    "max": 50,
+    "label": { "en": "Rows in the results table (1 to 50)", "nl": "Rijen in de resultatentabel (1 tot 50)", "fr": "Lignes du tableau de résultats (1 à 50)" }
+  },
+  "question": {
+    "default": "none",
+    "editor": "enum",
+    "label": { "en": "Question under the simulation (scored)", "nl": "Vraag onder de simulatie (gescoord)", "fr": "Question sous la simulation (notée)" },
+    "options": [
+      { "value": "none", "label": { "en": "None (the response is what the candidate did)", "nl": "Geen (het antwoord is wat de kandidaat deed)", "fr": "Aucune (la réponse est ce que le candidat a fait)" } },
+      { "value": "largestEffect", "label": { "en": "Which factor has the largest effect? (a choice)", "nl": "Welke factor heeft het grootste effect? (een keuze)", "fr": "Quel facteur a le plus grand effet ? (un choix)" } },
+      { "value": "predict", "label": { "en": "The population for a combination of levels (a number)", "nl": "De populatie bij een combinatie van niveaus (een getal)", "fr": "La population pour une combinaison de positions (un nombre)" } }
+    ]
+  },
+  "questionText": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Text of the question (empty: a standard text in the language of the item)", "nl": "Tekst van de vraag (leeg: een standaardtekst in de taal van het item)", "fr": "Texte de la question (vide : un texte standard dans la langue de l'item)" }
+  },
+  "predictLevels": {
+    "default": "1;1;0",
+    "editor": "text",
+    "label": { "en": "Prediction: the levels of pesticide; hornet; varroa", "nl": "Voorspelling: de niveaus van bestrijdingsmiddel; hoornaar; varroa", "fr": "Prédiction : les positions de pesticide ; frelon ; varroa" }
+  },
+  "answerKey": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Key (empty: from the model): pesticide, hornet, varroa or equal, or a number", "nl": "Sleutel (leeg: uit het model): pesticide, hornet, varroa of equal, of een getal", "fr": "Clé (vide : d'après le modèle) : pesticide, hornet, varroa ou equal, ou un nombre" }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Prediction: margin around the key (bees)", "nl": "Voorspelling: marge rond de sleutel (bijen)", "fr": "Prédiction : marge autour de la clé (abeilles)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" },
+    "options": [
+      { "value": "en", "label": { "en": "English (80,000 bees)", "nl": "Engels (80,000 bees)", "fr": "Anglais (80,000 bees)" } },
+      { "value": "nl", "label": { "en": "Dutch (80.000 bijen)", "nl": "Nederlands (80.000 bijen)", "fr": "Néerlandais (80.000 bijen)" } },
+      { "value": "fr", "label": { "en": "French (80 000 abeilles)", "nl": "Frans (80 000 abeilles)", "fr": "Français (80 000 abeilles)" } }
+    ]
+  }
+}

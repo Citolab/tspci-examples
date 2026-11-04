@@ -31,26 +31,49 @@ export type EmailScenario = Part & {
   start: string;
   model?: { to?: string; cc?: string; subject?: string; body?: string; attachments?: string[] };
 };
-export type ChatLine = { from: string; text: string };
+/**
+ * A scripted message. `kind: "system"` is a notice in the middle of the chat ("Noor added you."), without a sender;
+ * `kind: "card"` is a document or info card: a panel with `title` and the text (plain text, never HTML). `{name}` and
+ * `{firstName}` in the text and title become the candidate's name.
+ */
+export type ChatLine = { from: string; text: string; kind?: "system" | "card"; title?: string };
 /** A branch: when the candidate's reply contains one of the keywords (`drink*|soda`), the chat goes on at `next`. */
 export type Branch = { keywords: string; next: string };
 /**
+ * A reply button of a choice step: the candidate picks it instead of writing. `category` (e.g. "polite") and the
+ * option's id go into the response; `next` is the step after it (else the step's `next`); `points` scores it (else
+ * the chat's `categoryPoints` for its category).
+ */
+export type ChatOption = { id: string; text: string; category?: string; next?: string; points?: number };
+export const MIN_OPTIONS = 2;
+export const MAX_OPTIONS = 4;
+/**
  * One step of the script: these messages arrive, then the chat waits for the candidate's reply, which picks the next
  * step: the first branch whose keywords the reply contains, else `next`. Without a next step, no more messages
- * arrive; `end` closes the chat after the messages (no reply).
+ * arrive; `end` closes the chat after the messages (no reply). With `options` (2 to 4) the candidate answers with
+ * one of these buttons instead of writing (branches are not used). With `ask: "name"` the candidate's reply is their
+ * name: `{name}` in later messages.
  */
-export type ChatStep = { id: string; messages: ChatLine[]; branches: Branch[]; next?: string; end?: boolean };
+export type ChatStep = { id: string; messages: ChatLine[]; branches: Branch[]; next?: string; end?: boolean; options?: ChatOption[]; ask?: "name" };
 export type ChatMember = { name: string; color?: string };
-export type ChatScenario = Part & { title: string; members: ChatMember[]; steps: ChatStep[]; model?: string[] };
+export type ChatScenario = Part & {
+  title: string;
+  members: ChatMember[];
+  steps: ChatStep[];
+  /** points per option category, for the options without points of their own */
+  categoryPoints?: Record<string, number>;
+  /** the replies, one per step; for a choice step the option's id (or its text) */
+  model?: string[];
+};
 export type Post = { author: string; handle?: string; date?: string; text: string; image?: string };
 export type PostScenario = Part & { platform: "forum" | "social"; title: string; posts: Post[]; model?: string };
 
-export type CheckType = "recipient" | "subject" | "attachment" | "words" | "chars" | "phrases" | "greeting" | "closing" | "replies";
-export const CHECK_TYPES: CheckType[] = ["recipient", "subject", "attachment", "words", "chars", "phrases", "greeting", "closing", "replies"];
+export type CheckType = "recipient" | "subject" | "attachment" | "words" | "chars" | "phrases" | "greeting" | "closing" | "replies" | "choices";
+export const CHECK_TYPES: CheckType[] = ["recipient", "subject", "attachment", "words", "chars", "phrases", "greeting", "closing", "replies", "choices"];
 /** The checks that mean something in an environment. */
 export const CHECKS_FOR: Record<Environment, CheckType[]> = {
   email: ["recipient", "subject", "attachment", "words", "chars", "phrases", "greeting", "closing"],
-  chat: ["words", "chars", "phrases", "greeting", "closing", "replies"],
+  chat: ["words", "chars", "phrases", "greeting", "closing", "replies", "choices"],
   post: ["words", "chars", "phrases", "greeting", "closing"],
 };
 export type Check = {
@@ -62,9 +85,12 @@ export type Check = {
   field?: "to" | "cc" | "any";
   /** recipient: no other addresses in that field; attachment: no other files */
   exact?: boolean;
-  /** attachment: the file name */
+  /** attachment: the file name; choices: an option category (count the options chosen of it, not the points) */
   name?: string;
-  /** words: the range (empty: data-min-words / data-max-words); chars: max (empty: data-max-chars); replies: min */
+  /**
+   * words: the range (empty: data-min-words / data-max-words); chars: max (empty: data-max-chars); replies: min;
+   * choices: the range of the points of the chosen options (or of their number in category `name`); none: min 1
+   */
   min?: number;
   max?: number;
   /** phrases: `bike*|bicycle*`, one entry per phrase; subject: words it must contain; greeting/closing: the options */
@@ -207,6 +233,61 @@ export const EXAMPLE: Scenario = {
   },
 };
 
+/**
+ * A chat that mixes the step types: the candidate types their name, reads a document card, answers with a reply
+ * button (scored by category) and writes a question. `{ "chat": CHOICE_CHAT }` as data-scenario (stories, README).
+ */
+export const CHOICE_CHAT: ChatScenario = {
+  task: "You are new at the hockey club. Chat with Mila: tell her your name, answer her question, and ask one question about the training.",
+  title: "Hockey club",
+  members: [{ name: "Mila", color: "#be185d" }],
+  steps: [
+    {
+      id: "hello",
+      messages: [{ from: "", kind: "system", text: "Mila added you to the chat." }, { from: "Mila", text: "Hi! Welcome to the club 👋 What's your name?" }],
+      branches: [],
+      ask: "name",
+      next: "schedule",
+    },
+    {
+      id: "schedule",
+      messages: [
+        { from: "Mila", text: "Nice to meet you, {firstName}! Here is the training schedule." },
+        { from: "Mila", kind: "card", title: "Training schedule", text: "Tuesday 18:00–19:30, field 2\nThursday 18:00–19:30, field 1\nBring a stick, shin guards and a water bottle." },
+        { from: "Mila", text: "Can you come on Tuesday?" },
+      ],
+      branches: [],
+      options: [
+        { id: "yes", text: "Yes, I'll be there. Thank you!", category: "polite", next: "question" },
+        { id: "thursday", text: "Sorry, I can't on Tuesday. Is Thursday OK?", category: "polite", next: "thursday" },
+        { id: "maybe", text: "Maybe.", category: "neutral", next: "question" },
+        { id: "whatever", text: "Whatever.", category: "rude", next: "question" },
+      ],
+    },
+    {
+      id: "thursday",
+      messages: [{ from: "Mila", text: "Sure, Thursday is fine." }, { from: "Mila", text: "Do you have a question about the training, {firstName}?" }],
+      branches: [],
+      next: "bye",
+    },
+    { id: "question", messages: [{ from: "Mila", text: "Do you have a question about the training, {firstName}?" }], branches: [], next: "bye" },
+    {
+      id: "bye",
+      messages: [{ from: "Mila", text: "Good question! The coach will tell you at the first training. See you!" }, { from: "", kind: "system", text: "Mila left the chat." }],
+      branches: [],
+      end: true,
+    },
+  ],
+  categoryPoints: { polite: 2, neutral: 1, rude: 0 },
+  limits: {},
+  checks: [
+    { type: "choices", min: 2, points: 1 },
+    { type: "choices", name: "rude", max: 0, points: 1 },
+    { type: "replies", min: 1, points: 1 },
+  ],
+  model: ["Sam", "yes", "What should I wear at the training?"],
+};
+
 // --- reading the scenario ------------------------------------------------------------------------------------------
 
 const str = (v: unknown, fallback = "") => (typeof v === "string" ? v : typeof v === "number" ? String(v) : fallback);
@@ -255,6 +336,28 @@ const readLimits = (v: any): Limits => {
   return l;
 };
 const readChecks = (v: any): Check[] => arr(v).map(readCheck).filter(Boolean).slice(0, MAX_CHECKS);
+
+/** A scripted message; only the fields there are (plain text: the chat never renders it as HTML). */
+const readLine = (l: any): ChatLine => {
+  const line: ChatLine = { from: str(l?.from), text: str(l?.text) };
+  if (l?.kind === "system" || l?.kind === "card") line.kind = l.kind;
+  if (line.kind === "card" && str(l?.title)) line.title = str(l.title);
+  return line;
+};
+/** A reply option; without an id it gets o1, o2 … (its place in the step). */
+const readOption = (o: any, i: number): ChatOption => {
+  const option: ChatOption = { id: str(o?.id).trim() || `o${i + 1}`, text: str(o?.text).trim() };
+  if (str(o?.category).trim()) option.category = str(o.category).trim();
+  if (str(o?.next).trim()) option.next = str(o.next).trim();
+  if (num(o?.points) !== undefined) option.points = num(o.points);
+  return option;
+};
+const readCategoryPoints = (v: any): Record<string, number> | undefined => {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return undefined;
+  const out: Record<string, number> = {};
+  for (const [k, p] of Object.entries(v)) if (k.trim() && num(p) !== undefined) out[k.trim()] = num(p)!;
+  return Object.keys(out).length ? out : undefined;
+};
 
 export const parseScenario = (text: string | undefined | null): Scenario => {
   let raw: any = null;
@@ -306,13 +409,17 @@ export const parseScenario = (text: string | undefined | null): Scenario => {
         steps: arr(c.steps).map((s, i) => {
           const step: ChatStep = {
             id: str(s?.id, `s${i + 1}`) || `s${i + 1}`,
-            messages: arr(s?.messages).map((l) => ({ from: str(l?.from), text: str(l?.text) })).filter((l) => l.text),
+            messages: arr(s?.messages).map(readLine).filter((l) => l.text || l.title),
             branches: arr(s?.branches).map((b) => ({ keywords: str(b?.keywords), next: str(b?.next) })).filter((b) => b.keywords && b.next),
           };
           if (str(s?.next)) step.next = str(s.next);
           if (s?.end === true) step.end = true;
+          const options = arr(s?.options).map(readOption).filter((o) => o.text);
+          if (options.length) step.options = options;
+          if (s?.ask === "name") step.ask = "name";
           return step;
         }),
+        ...(readCategoryPoints(c.categoryPoints) ? { categoryPoints: readCategoryPoints(c.categoryPoints) } : {}),
         model: c.model ? arr(c.model).map((m) => str(m)).filter(Boolean) : undefined,
       }
     : ex.chat;
@@ -528,7 +635,11 @@ export type Answer = {
   text: string;
   /** the chat replies (one, the text, in the other environments) */
   replies: string[];
+  /** chat: the reply options the candidate chose, in order */
+  choices?: Choice[];
 };
+/** A reply option the candidate chose: its id, category and points (option points, else the category's, else 0). */
+export type Choice = { step: string; id: string; category: string; points: number };
 
 export type CheckResult = { check: Check; passed: boolean; points: number };
 export type Evaluation = { results: CheckResult[]; score: number; maxscore: number; correct: boolean };
@@ -582,6 +693,13 @@ export const passes = (check: Check, a: Answer, limits: Limits, language: Writin
     }
     case "replies":
       return a.replies.filter((r) => r.trim()).length >= (check.min ?? 1);
+    case "choices": {
+      const chosen = a.choices ?? [];
+      if (!chosen.length) return false;
+      const n = check.name ? chosen.filter((c) => c.category.toLowerCase() === check.name!.toLowerCase()).length : chosen.reduce((sum, c) => sum + c.points, 0);
+      const min = check.min ?? (check.max === undefined ? 1 : undefined);
+      return (min === undefined || n >= min) && (check.max === undefined || n <= check.max);
+    }
   }
   return false;
 };
@@ -599,7 +717,19 @@ export const evaluate = (checks: Check[], a: Answer, limits: Limits, language: W
 
 // --- chat ----------------------------------------------------------------------------------------------------------
 
-export type ChatEntry = { from: string; text: string; time: string; me?: boolean };
+/**
+ * A message in the chat. The candidate's (`me`) are written replies, or with `kind: "choice"` a reply option they
+ * chose (`choice` is its id), or with `kind: "name"` the name they typed at a name step.
+ */
+export type ChatEntry = {
+  from: string;
+  text: string;
+  time: string;
+  me?: boolean;
+  kind?: "system" | "card" | "choice" | "name";
+  title?: string;
+  choice?: string;
+};
 export const stepById = (chat: ChatScenario, id: string | null | undefined) => chat.steps.find((s) => s.id === id) ?? null;
 
 /** The step after the candidate's reply to this step: the first branch whose keywords the reply has, else next. */
@@ -610,30 +740,107 @@ export const nextStep = (chat: ChatScenario, current: string | null, reply: stri
   return stepById(chat, branch?.next ?? step.next);
 };
 
-export type ChatState = { transcript: ChatEntry[]; waiting: string | null; ended: boolean };
+/**
+ * The chat so far. `waiting`: the step whose reply the chat waits for; `at`: the last step whose messages came (the
+ * step the conversation ended at); `name`: the name the candidate typed at a name step.
+ */
+export type ChatState = { transcript: ChatEntry[]; waiting: string | null; ended: boolean; at?: string | null; name?: string };
+
+/** `{name}` and `{firstName}` in a scripted text: the candidate's name and its first word. */
+export const fillName = (text: string, name: string) =>
+  (text ?? "").replace(/\{name\}/gi, name).replace(/\{first ?name\}/gi, name.trim().split(/\s+/)[0] ?? "");
+
+/** The step's messages as they arrive, with the name filled in. */
+const arrive = (step: ChatStep, time: string, name: string): ChatEntry[] =>
+  step.messages.map((m) => {
+    const e: ChatEntry = { from: m.from, text: fillName(m.text, name), time };
+    if (m.kind) e.kind = m.kind;
+    if (m.title) e.title = fillName(m.title, name);
+    return e;
+  });
 
 /** The chat as it starts: the first step's messages, waiting for the candidate (or ended). */
-export const startChat = (chat: ChatScenario, time: string): ChatState => {
+export const startChat = (chat: ChatScenario, time: string, name = ""): ChatState => {
   const first = chat.steps[0];
   if (!first) return { transcript: [], waiting: null, ended: false };
-  return { transcript: first.messages.map((m) => ({ ...m, time })), waiting: first.end ? null : first.id, ended: !!first.end };
+  return { transcript: arrive(first, time, name), waiting: first.end ? null : first.id, ended: !!first.end, at: first.id };
 };
 
-/** The candidate sends a reply: it goes into the chat, and the next step's messages follow. */
+/** The option of a choice step that a reply means: its id, or its text (any case). */
+export const optionFor = (step: ChatStep | null, reply: string): ChatOption | null => {
+  if (!step?.options?.length) return null;
+  const r = (reply ?? "").trim().toLowerCase();
+  return step.options.find((o) => o.id.toLowerCase() === r) ?? step.options.find((o) => o.text.toLowerCase() === r) ?? null;
+};
+
+/**
+ * The candidate sends a reply: it goes into the chat, and the next step's messages follow. At a choice step the reply
+ * must be one of its options (its id or text; the buttons send the id), else nothing happens. At a name step the
+ * reply is the candidate's name.
+ */
 export const sendChat = (chat: ChatScenario, state: ChatState, text: string, time: string, name: string): ChatState => {
   if (state.ended || !text.trim()) return state;
-  const transcript = [...state.transcript, { from: name, text: text.trim(), time, me: true }];
-  const next = state.waiting ? nextStep(chat, state.waiting, text) : null;
-  if (!next) return { transcript, waiting: null, ended: false };
-  return { transcript: [...transcript, ...next.messages.map((m) => ({ ...m, time }))], waiting: next.end ? null : next.id, ended: !!next.end };
+  const step = state.waiting ? stepById(chat, state.waiting) : null;
+  const who = state.name || name;
+  let entry: ChatEntry;
+  let next: ChatStep | null;
+  let newName = state.name;
+  const option = optionFor(step, text);
+  if (step?.options?.length) {
+    if (!option) return state; // a choice step only takes its options
+    entry = { from: who, text: option.text, time, me: true, kind: "choice", choice: option.id };
+    next = stepById(chat, option.next ?? step.next);
+  } else if (step?.ask === "name") {
+    newName = text.trim().replace(/\s+/g, " ").slice(0, 60);
+    entry = { from: newName, text: newName, time, me: true, kind: "name" };
+    next = nextStep(chat, state.waiting, text);
+  } else {
+    entry = { from: who, text: text.trim(), time, me: true };
+    next = state.waiting ? nextStep(chat, state.waiting, text) : null;
+  }
+  const transcript = [...state.transcript, entry];
+  const base: ChatState = { transcript, waiting: null, ended: false, at: state.at ?? state.waiting ?? null };
+  if (newName) base.name = newName;
+  if (!next) return base;
+  return { ...base, transcript: [...transcript, ...arrive(next, time, newName || name)], waiting: next.end ? null : next.id, ended: !!next.end, at: next.id };
 };
 
-/** The candidate's replies from a chat. */
-export const repliesOf = (transcript: ChatEntry[]) => transcript.filter((e) => e.me).map((e) => e.text);
+/** The candidate's written replies from a chat (not the options they chose, not their name). */
+export const repliesOf = (transcript: ChatEntry[]) => transcript.filter((e) => e.me && !e.kind).map((e) => e.text);
+
+/** What the candidate sent, as replay takes it: the written replies, the ids of the chosen options, the name. */
+export const sentOf = (transcript: ChatEntry[]) => transcript.filter((e) => e.me).map((e) => (e.kind === "choice" && e.choice ? e.choice : e.text));
+
+/** The option category's points, or the option's own. */
+const optionPoints = (chat: ChatScenario, o: ChatOption) => o.points ?? (o.category ? chat.categoryPoints?.[o.category] : undefined) ?? 0;
+
+/** The options the candidate chose, with the step they were chosen at, their category and points. */
+export const choicesOf = (chat: ChatScenario, transcript: ChatEntry[]): Choice[] => {
+  const out: Choice[] = [];
+  // walk the script again to know at which step each option was chosen (option ids need only be unique in a step)
+  let state = startChat(chat, "", "");
+  for (const e of transcript.filter((x) => x.me)) {
+    if (e.kind === "choice") {
+      const o = stepById(chat, state.waiting)?.options?.find((x) => x.id === e.choice) ?? null;
+      out.push({ step: state.waiting ?? "", id: e.choice ?? "", category: o?.category ?? "", points: o ? optionPoints(chat, o) : 0 });
+    }
+    state = sendChat(chat, state, e.kind === "choice" ? e.choice ?? "" : e.text, "", "x");
+  }
+  return out;
+};
+
+/** The step the conversation is at (or ended at): the last one whose messages came. */
+export const lastStepOf = (state: ChatState) => state.at ?? state.waiting ?? "";
+
+/** The chat's answer for the checks: the written replies and the chosen options. */
+export const chatAnswer = (chat: ChatScenario, transcript: ChatEntry[]): Answer => {
+  const replies = repliesOf(transcript);
+  return { environment: "chat", to: [], cc: [], subject: "", attachments: [], text: replies.join("\n\n"), replies, choices: choicesOf(chat, transcript) };
+};
 
 /** A chat from a list of replies (setResponse with only text, the model answer): the script answers each. */
 export const replay = (chat: ChatScenario, replies: string[], time: string, name: string): ChatState =>
-  replies.reduce((s, r) => sendChat(chat, s, r, time, name), startChat(chat, time));
+  replies.reduce((s, r) => sendChat(chat, s, r, time, name), startChat(chat, time, name));
 
 // --- the message for a rater ---------------------------------------------------------------------------------------
 
@@ -646,7 +853,10 @@ export type MessageLabels = { to: string; cc: string; subject: string; attachmen
 /** The whole message as a rater reads it: the header lines, a blank line, the text; a chat as `[time] name: text`. */
 export const messageText = (a: Answer, l: MessageLabels, extra: { transcript?: ChatEntry[]; draft?: string; sent?: boolean } = {}) => {
   if (a.environment === "chat") {
-    const out = (extra.transcript ?? []).map((e) => `[${clock(e.time)}] ${e.me ? l.me : e.from}: ${e.text}`);
+    const out = (extra.transcript ?? []).map((e) => {
+      const text = e.kind === "card" ? `[${e.title ?? ""}] ${e.text}` : e.kind === "choice" ? `${e.text} (${e.choice})` : e.text;
+      return e.kind === "system" ? `[${clock(e.time)}] (${text})` : `[${clock(e.time)}] ${e.me ? l.me : e.from}: ${text}`;
+    });
     if (extra.draft?.trim()) out.push(`(${l.draft}) ${extra.draft.trim()}`);
     return out.join("\n");
   }

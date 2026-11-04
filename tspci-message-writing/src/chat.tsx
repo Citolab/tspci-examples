@@ -1,9 +1,10 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { Env } from "./context";
-import { clock, sendChat } from "./message";
-import { Aids, Avatar, Editor, primary } from "./writing";
+import { ChatEntry, clock, repliesOf, sendChat, stepById } from "./message";
+import { Aids, Avatar, Editor, btn, primary } from "./writing";
 
-// The chat app: the conversation (a log), the scripted messages arriving one by one, the candidate's text box.
+// The chat app: the conversation (a log), the scripted messages arriving one by one, the candidate's text box, or
+// at a choice step the reply buttons (quick replies).
 
 export const ChatApp = ({ env }: { env: Env }) => {
   const { t, state, scenario, store, readOnly, announce } = env;
@@ -13,12 +14,18 @@ export const ChatApp = ({ env }: { env: Env }) => {
   const [shown, setShown] = useState(Math.min(env.seen, c.transcript.length));
   const list = useRef<HTMLDivElement>(null);
   const pending = c.transcript.length > shown ? c.transcript[shown] : null;
-  const typing = pending && !pending.me ? pending.from : null;
+  // messages still to come: no reply yet
+  const busy = !!pending;
+  const typing = busy && pending.kind !== "system" && pending.from ? pending.from : null;
+  const step = c.ended ? null : stepById(chat, c.waiting);
+  const options = step?.options?.length ? step.options : null;
 
   useEffect(() => {
     if (shown > c.transcript.length) return setShown(c.transcript.length); // reset
     if (shown === c.transcript.length) return;
-    if (c.transcript[shown].me || env.chatDelay <= 0) {
+    // the candidate's own message and a notice at once (nobody types them); the replies after it one by one
+    if (c.transcript[shown].me || c.transcript[shown].kind === "system") return setShown(shown + 1);
+    if (env.chatDelay <= 0) {
       setShown(c.transcript.length);
       return;
     }
@@ -29,18 +36,28 @@ export const ChatApp = ({ env }: { env: Env }) => {
   useLayoutEffect(() => {
     const el = list.current;
     if (el) el.scrollTop = el.scrollHeight;
-  }, [shown, typing]);
+  }, [shown, busy]);
 
   const color = (name: string) => chat.members.find((m) => m.name === name)?.color;
   const form = useRef<HTMLFormElement>(null);
   const send = () => {
-    if (!c.draft.trim() || typing || c.ended) return;
+    if (!c.draft.trim() || busy || c.ended || options) return;
     const next = sendChat(chat, c, c.draft, env.now(), scenario.me.name);
     store.dispatch({ type: "CHAT", payload: { ...next, draft: "", seconds: env.elapsed() } });
     // a new, empty box (the key below), with the focus
     requestAnimationFrame(() => form.current?.querySelector("textarea")?.focus());
     announce(t.sentReply);
   };
+  /** A reply button: the option goes into the chat as the candidate's message; the focus goes to the conversation. */
+  const choose = (id: string, text: string) => {
+    if (busy || c.ended) return;
+    const next = sendChat(chat, c, id, env.now(), scenario.me.name);
+    store.dispatch({ type: "CHAT", payload: { ...next, seconds: env.elapsed() } });
+    requestAnimationFrame(() => list.current?.focus());
+    announce(t.chose(text));
+  };
+  const nameStep = step?.ask === "name";
+  const inputLabel = nameStep ? t.yourName : t.writeMessage;
   const members = [...chat.members.map((m) => m.name), t.you];
 
   return (
@@ -58,17 +75,39 @@ export const ChatApp = ({ env }: { env: Env }) => {
         className="flex min-h-64 grow flex-col overflow-y-auto bg-[linear-gradient(#f8fafc,#f1f5f9)] px-4 py-3 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-sky-600">
         <ol className="m-0 flex list-none flex-col gap-2 p-0">
           {c.transcript.slice(0, shown).map((e, i) => {
-            const first = i === 0 || c.transcript[i - 1].from !== e.from || !!c.transcript[i - 1].me !== !!e.me;
+            const prev: ChatEntry | undefined = c.transcript[i - 1];
+            if (e.kind === "system") {
+              return (
+                <li key={i} className="self-center px-3 text-center text-[13px] italic text-slate-600" data-testid="chat-message" data-kind="system">
+                  <span className="sr-only">{t.systemNotice}: </span>{e.text}
+                </li>
+              );
+            }
+            const first = !prev || prev.kind === "system" || prev.kind === "card" || prev.from !== e.from || !!prev.me !== !!e.me;
+            const card = e.kind === "card";
             return (
-              <li key={i} className={`flex max-w-[85%] items-end gap-2 ${e.me ? "self-end flex-row-reverse" : "self-start"}`} data-testid="chat-message" data-me={e.me ? "true" : undefined}>
-                {!e.me && (first ? <Avatar name={e.from} color={color(e.from)} size={7} /> : <span className="w-7 shrink-0" />)}
-                <div className={`flex flex-col rounded-2xl px-3 py-1.5 shadow-xs ${e.me ? "rounded-br-md bg-sky-700 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800"}`}>
-                  <span className={first ? "text-[12px] font-semibold" : "sr-only"} style={!e.me && color(e.from) ? { color: color(e.from) } : undefined}>
-                    {e.me ? t.you : e.from}<span className="sr-only">:</span>
-                  </span>
-                  <span lang={env.lang} className="whitespace-pre-wrap text-[15px] leading-snug">{e.text}</span>
-                  <time dateTime={e.time} className={`self-end text-[11px] ${e.me ? "text-sky-100" : "text-slate-500"}`}>{clock(e.time)}</time>
-                </div>
+              <li key={i} className={`flex items-end gap-2 ${card ? "max-w-[92%]" : "max-w-[85%]"} ${e.me ? "self-end flex-row-reverse" : "self-start"}`} data-testid="chat-message" data-me={e.me ? "true" : undefined} data-kind={e.kind}>
+                {!e.me && (card && !e.from ? null : first || card ? <Avatar name={e.from} color={color(e.from)} size={7} /> : <span className="w-7 shrink-0" />)}
+                {card ? (
+                  <div className="flex min-w-48 flex-col gap-1 rounded-2xl rounded-bl-md border border-slate-300 bg-white px-3 py-2 shadow-xs" data-testid="chat-card">
+                    {e.from && <span className="text-[12px] font-semibold" style={color(e.from) ? { color: color(e.from) } : undefined}>{e.from}<span className="sr-only">:</span></span>}
+                    <div className="flex flex-col gap-1 rounded-lg border-l-4 border-sky-600 bg-slate-50 px-3 py-2">
+                      <span lang={env.lang} className="flex items-center gap-1.5 text-[15px] font-semibold text-slate-900">
+                        <span aria-hidden="true">📄</span><span className="sr-only">{t.document}: </span>{e.title}
+                      </span>
+                      <span lang={env.lang} className="whitespace-pre-wrap text-[14px] leading-snug text-slate-800">{e.text}</span>
+                    </div>
+                    <time dateTime={e.time} className="self-end text-[11px] text-slate-500">{clock(e.time)}</time>
+                  </div>
+                ) : (
+                  <div className={`flex flex-col rounded-2xl px-3 py-1.5 shadow-xs ${e.me ? "rounded-br-md bg-sky-700 text-white" : "rounded-bl-md border border-slate-200 bg-white text-slate-800"}`}>
+                    <span className={first ? "text-[12px] font-semibold" : "sr-only"} style={!e.me && color(e.from) ? { color: color(e.from) } : undefined}>
+                      {e.me ? t.you : e.from}<span className="sr-only">:</span>
+                    </span>
+                    <span lang={env.lang} className="whitespace-pre-wrap text-[15px] leading-snug">{e.text}</span>
+                    <time dateTime={e.time} className={`self-end text-[11px] ${e.me ? "text-sky-100" : "text-slate-500"}`}>{clock(e.time)}</time>
+                  </div>
+                )}
               </li>
             );
           })}
@@ -85,12 +124,28 @@ export const ChatApp = ({ env }: { env: Env }) => {
           </>
         ) : ""}
       </p>
-      {!readOnly && (
+      {!readOnly && options && (
+        <div className="flex flex-col gap-2 border-t border-slate-200 p-3" data-testid="quick-replies">
+          {!busy && (
+            <div role="group" aria-labelledby="quick-replies-label" className="flex flex-wrap justify-end gap-2">
+              <span id="quick-replies-label" className="sr-only">{t.chooseReply}</span>
+              {options.map((o) => (
+                <button key={o.id} type="button" lang={env.lang} data-option={o.id} onClick={() => choose(o.id, o.text)}
+                  className={`${btn} rounded-full border-sky-700 px-3.5 text-left text-[15px] text-sky-800 hover:bg-sky-50`}>
+                  {o.text}
+                </button>
+              ))}
+            </div>
+          )}
+          <p className="m-0 text-[12px] text-slate-500">{t.chooseReply}</p>
+        </div>
+      )}
+      {!readOnly && !options && (
         <form ref={form} className="flex flex-col gap-2 border-t border-slate-200 p-3" onSubmit={(e) => { e.preventDefault(); send(); }} aria-label={t.writeMessage}>
           <div className="flex items-end gap-2">
             <div className="grow">
-              <Editor key={c.transcript.filter((e) => e.me).length} id="chat-input" label={t.writeMessage} labelHidden value={c.draft} t={t} lang={env.lang} spellcheck={env.spellcheck} rows={2}
-                readOnly={c.ended} placeholder={c.ended ? t.chatEnded : t.writeMessage} describedBy="chat-hint chat-count"
+              <Editor key={c.transcript.filter((e) => e.me).length} id="chat-input" label={inputLabel} labelHidden value={c.draft} t={t} lang={env.lang} spellcheck={env.spellcheck && !nameStep} rows={nameStep ? 1 : 2}
+                readOnly={c.ended} placeholder={c.ended ? t.chatEnded : inputLabel} describedBy="chat-hint chat-count"
                 onChange={(draft) => store.dispatch({ type: "CHAT", payload: { draft, seconds: env.elapsed() } })}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey && !e.isComposing) {
@@ -99,10 +154,10 @@ export const ChatApp = ({ env }: { env: Env }) => {
                   }
                 }} />
             </div>
-            <button type="submit" className={`${primary} mb-0.5`} disabled={!!typing || c.ended || !c.draft.trim()}><span aria-hidden="true">➤</span> {t.send}</button>
+            <button type="submit" className={`${primary} mb-0.5`} disabled={busy || c.ended || !c.draft.trim()}><span aria-hidden="true">➤</span> {t.send}</button>
           </div>
           <p id="chat-hint" className="m-0 text-[12px] text-slate-500">{t.enterHint}</p>
-          <Aids text={c.transcript.filter((e) => e.me).map((e) => e.text).concat(c.draft).join("\n\n")} limits={env.limits} t={t} id="chat-count" showCount={env.showCount} spell={env.spell} />
+          <Aids text={repliesOf(c.transcript).concat(nameStep ? [] : [c.draft]).join("\n\n")} limits={env.limits} t={t} id="chat-count" showCount={env.showCount} spell={env.spell} />
         </form>
       )}
     </section>

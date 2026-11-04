@@ -26,10 +26,15 @@ export type PartDef = {
   polar?: { in: string; out: string };
   /** The terminal pairs the analysis treats as a branch (default: the two terminals). */
   branches?: [string, string][];
+  /** A test material (a sample between two clips): whether it conducts. A conductor is a branch like a closed switch,
+   *  an insulator is open: no current goes through it. */
+  material?: "conductor" | "insulator";
 };
 
 const two = (a = "a", b = "b"): Terminal[] => [{ side: "W", name: a }, { side: "E", name: b }];
 const component = (extra: Partial<PartDef> = {}): PartDef => ({ kind: "component", terminals: two(), ...extra });
+const conductor = (): PartDef => component({ material: "conductor" });
+const insulator = (): PartDef => component({ material: "insulator" });
 
 export const PARTS = {
   wire: { kind: "wire", terminals: two() },
@@ -65,6 +70,16 @@ export const PARTS = {
     polar: { in: "collector", out: "emitter" },
     branches: [["collector", "emitter"], ["base", "emitter"]],
   },
+  // test materials: which ones conduct? (inspired by the DEPP Circuit PCI)
+  aluminiumFoil: conductor(),
+  copper: conductor(),
+  ironNail: conductor(),
+  graphite: conductor(),
+  cotton: insulator(),
+  wood: insulator(),
+  plastic: insulator(),
+  glass: insulator(),
+  rubber: insulator(),
 } satisfies Record<string, PartDef>;
 
 export type PartType = keyof typeof PARTS;
@@ -76,6 +91,11 @@ export const def = (type: PartType): PartDef => PARTS[type];
 export const isPartType = (type: unknown): type is PartType => typeof type === "string" && Object.prototype.hasOwnProperty.call(PARTS, type);
 export const isWire = (type: PartType) => def(type).kind === "wire";
 export const isSource = (type: PartType) => def(type).kind === "source";
+export const isMaterial = (type: PartType) => !!def(type).material;
+export const conducts = (type: PartType) => def(type).material !== "insulator";
+export const MATERIAL_TYPES = PART_TYPES.filter(isMaterial);
+/** The parts of the palette when an item has none: every part except the test materials (as before they existed). */
+export const DEFAULT_PALETTE_TYPES = [...COMPONENT_TYPES.filter((t) => !isMaterial(t)), ...WIRE_TYPES];
 
 /** Names in the original Dutch interaction (schakelbordconfiguration) and other spellings, to our types. */
 const ALIASES: Record<string, PartType> = {
@@ -85,6 +105,10 @@ const ALIASES: Record<string, PartType> = {
   schakelaar: "switch", drukschakelaar: "pushButton", drukknop: "pushButton", zoemer: "buzzer", zekering: "fuse",
   batterij: "battery", gelijkspanningsbron: "dcSource", spanningsbron: "dcSource", wisselspanningsbron: "acSource",
   dc: "dcSource", ac: "acSource", voltmeter: "voltmeter", ampèremeter: "ammeter", amperemeter: "ammeter",
+  aluminium: "aluminiumFoil", aluminum: "aluminiumFoil", aluminumfoil: "aluminiumFoil", foil: "aluminiumFoil", aluminiumfolie: "aluminiumFoil",
+  zilverpapier: "aluminiumFoil", koper: "copper", nail: "ironNail", ijzerenspijker: "ironNail", spijker: "ironNail", pencillead: "graphite",
+  grafiet: "graphite", potloodstift: "graphite", potloodpunt: "graphite", katoen: "cotton", watten: "cotton", hout: "wood",
+  kunststof: "plastic", glas: "glass",
 };
 const LOWER = Object.fromEntries(PART_TYPES.map((t) => [t.toLowerCase(), t])) as Record<string, PartType>;
 /** "LED", "draadT", "Resistor" → led, tee, resistor; null for what is not a part. */
@@ -261,7 +285,7 @@ export const parseCircuit = (text: string | undefined | null): Circuit => {
   const presetParts = parseParts(rawPreset, bounds).map((p) => (marked ? p : { ...p, locked: true }));
   const lockedCells = new Set(presetParts.filter((p) => p.locked).map((p) => key(p.x, p.y)));
   const solution = raw.solution ? parseParts(raw.solution, bounds, false).filter((p) => !lockedCells.has(key(p.x, p.y))) : null;
-  const palette = raw.palette === undefined ? parsePalette([...COMPONENT_TYPES, ...WIRE_TYPES]) : parsePalette(raw.palette);
+  const palette = raw.palette === undefined ? parsePalette(DEFAULT_PALETTE_TYPES) : parsePalette(raw.palette);
   return { columns, rows, preset: presetParts, palette, solution, checks: parseChecks(raw.checks) };
 };
 
@@ -299,9 +323,45 @@ export const remaining = (c: Circuit, parts: Placed[], type: PartType): number |
   return Math.max(0, item.count - parts.filter((p) => p.type === type).length);
 };
 
-/** The response's board: every part, the locked ones marked, as JSON. Its size goes along so a rater can draw it. */
-export const serializeBoard = (c: Circuit, parts: Placed[]) =>
-  JSON.stringify({ columns: c.columns, rows: c.rows, parts: boardOf(c, parts).map(compact) });
+/** The response's board: every part, the locked ones marked, the broken lamps marked, as JSON. Its size goes along
+ *  so a rater can draw it. */
+export const serializeBoard = (c: Circuit, parts: Placed[], broken: Iterable<string> = []) => {
+  const board = boardOf(c, parts);
+  const out = brokenCells(board, broken);
+  return JSON.stringify({ columns: c.columns, rows: c.rows, parts: board.map((p) => ({ ...compact(p), ...(out.has(key(p.x, p.y)) ? { broken: true } : {}) })) });
+};
+
+// --- broken lamps (inspired by the DEPP LampeDouble PCI): the candidate unscrews or blows a lamp to see what the
+// other lamps do. A broken lamp conducts no current. They are kept as cells ("x,y"), so a locked lamp can break too.
+
+/** The parts the candidate can break: lamps. */
+export const canBreak = (type: PartType) => type === "lamp";
+/** The broken cells that hold a part that can break, on this board. */
+export const brokenCells = (board: Placed[], broken: Iterable<string> = []): Set<string> => {
+  const cells = new Set(broken);
+  return new Set(board.filter((p) => canBreak(p.type) && cells.has(key(p.x, p.y))).map((p) => key(p.x, p.y)));
+};
+/** The broken lamps of a board in a response (parts with broken: true), as cells. */
+export const brokenFromBoard = (board: unknown): string[] => {
+  const items = Array.isArray(board) ? board : Array.isArray((board as any)?.parts) ? (board as any).parts : [];
+  return items.flatMap((p: any) => {
+    const placed = p?.broken ? parsePlaced(p) : null;
+    return placed && canBreak(placed.type) ? [key(placed.x, placed.y)] : [];
+  });
+};
+/** Breaks a lamp that works, repairs a broken one; null when there is no lamp on the cell. */
+export const toggleBroken = (board: Placed[], broken: string[], x: number, y: number): string[] | null => {
+  const p = partAt(board, x, y);
+  if (!p || !canBreak(p.type)) return null;
+  const k = key(x, y);
+  const now = [...brokenCells(board, broken)];
+  return now.includes(k) ? now.filter((b) => b !== k) : [...now, k].sort();
+};
+/** A part moved (or two swapped places): its broken mark goes along. */
+export const moveBroken = (broken: string[], from: { x: number; y: number }, to: { x: number; y: number }): string[] => {
+  const a = key(from.x, from.y), b = key(to.x, to.y);
+  return broken.map((k) => (k === a ? b : k === b ? a : k)).sort();
+};
 
 /** Places, moves, turns and removes the candidate's parts; null when that cannot be done. */
 export const place = (c: Circuit, parts: Placed[], type: PartType, x: number, y: number, turn: Rotation = 0, ignoreLimit = false): Placed[] | null => {
@@ -408,26 +468,30 @@ export const buildNetlist = (parts: Placed[]): Netlist => {
 
 // --- the analysis: which branches carry current, what is in series and parallel, polarity
 
-/** A two-terminal path through an element (a transistor has two: collector–emitter and base–emitter). */
-type Branch = { id: number; element: number; a: number; b: number };
+/** A two-terminal path through an element (a transistor has two: collector–emitter and base–emitter). Open: no
+ *  current can go through it (an insulating test material, a broken lamp); it still counts for the structure. */
+type Branch = { id: number; element: number; a: number; b: number; open: boolean };
 
-const branchesOf = (net: Netlist): Branch[] => {
+const branchesOf = (net: Netlist, broken: Set<string>): Branch[] => {
   const list: Branch[] = [];
   for (const e of net.elements) {
     const d = def(e.type);
     const pairs = d.branches ?? [[d.terminals[0].name, d.terminals[1].name] as [string, string]];
-    for (const [p, q] of pairs) list.push({ id: list.length, element: e.index, a: e.nodes[p], b: e.nodes[q] });
+    const open = !conducts(e.type) || (canBreak(e.type) && broken.has(key(e.x, e.y)));
+    for (const [p, q] of pairs) list.push({ id: list.length, element: e.index, a: e.nodes[p], b: e.nodes[q], open });
   }
   return list;
 };
 /** The main branch of an element: the one series, parallel and polarity are about. */
 const mainBranch = (branches: Branch[], element: number) => branches.find((b) => b.element === element)!;
 
-/** Biconnected blocks (Hopcroft–Tarjan, on branch ids so parallel branches count): block number per branch. */
-const blocks = (nodes: number, branches: Branch[]): number[] => {
+/** Biconnected blocks (Hopcroft–Tarjan, on branch ids so parallel branches count): block number per branch. With
+ *  closedOnly, the open branches are left out (block -1): the blocks current can go round in. */
+const blocks = (nodes: number, branches: Branch[], closedOnly = false): number[] => {
   const adj: { to: number; id: number }[][] = Array.from({ length: nodes }, () => []);
   for (const br of branches) {
     if (br.a === br.b) continue; // short-circuited: in no loop with anything
+    if (closedOnly && br.open) continue;
     adj[br.a].push({ to: br.b, id: br.id });
     adj[br.b].push({ to: br.a, id: br.id });
   }
@@ -488,8 +552,11 @@ export type Analysis = {
   sources: number[];
   /** Sources whose terminals are joined by wires only (short circuit). */
   shorted: number[];
-  /** Per element: in a closed loop with a source, so current can flow through it (switches closed). */
+  /** Per element: in a closed loop with a source, so current can flow through it (switches closed; insulating test
+   *  materials and broken lamps open). */
   live: boolean[];
+  /** Per element: open by itself, no current through it whatever the rest is (an insulator, a broken lamp). */
+  open: boolean[];
   /** Whether two elements are in series: all the current through one goes through the other. */
   series: (i: number, j: number) => boolean;
   /** Whether two elements are connected across the same two nodes. */
@@ -503,17 +570,21 @@ export type Analysis = {
 
 const SOURCE_ORDER: PartType[] = ["dcSource", "battery", "cell", "acSource"];
 
-export const analyze = (parts: Placed[]): Analysis => {
+/** The analysis of a board; broken: the cells of broken lamps. Series, parallel and polarity are about the structure
+ *  (every component counts, as a closed switch does); live is about the current (open branches left out). */
+export const analyze = (parts: Placed[], broken: Iterable<string> = []): Analysis => {
   const net = buildNetlist(parts);
-  const branches = branchesOf(net);
+  const branches = branchesOf(net, brokenCells(parts, broken));
   const block = blocks(net.nodes, branches);
+  const current = branches.some((b) => b.open) ? blocks(net.nodes, branches, true) : block;
   const sources = net.elements.filter((e) => isSource(e.type)).map((e) => e.index);
   const shorted = sources.filter((s) => { const b = mainBranch(branches, s); return b.a === b.b; });
-  const sourceBlocks = new Set(sources.filter((s) => !shorted.includes(s)).map((s) => block[mainBranch(branches, s).id]));
+  const sourceBlocks = new Set(sources.filter((s) => !shorted.includes(s)).map((s) => current[mainBranch(branches, s).id]));
   const live = net.elements.map((e) => {
-    if (sources.includes(e.index)) return !shorted.includes(e.index) && branches.some((b) => b.element !== e.index && block[b.id] === block[mainBranch(branches, e.index).id]);
-    return branches.some((b) => b.element === e.index && b.a !== b.b && sourceBlocks.has(block[b.id]));
+    if (sources.includes(e.index)) return !shorted.includes(e.index) && branches.some((b) => b.element !== e.index && !b.open && current[b.id] === current[mainBranch(branches, e.index).id]);
+    return branches.some((b) => b.element === e.index && !b.open && b.a !== b.b && sourceBlocks.has(current[b.id]));
   });
+  const open = net.elements.map((e) => mainBranch(branches, e.index).open);
 
   const series = (i: number, j: number) => {
     if (i === j) return false;
@@ -547,7 +618,7 @@ export const analyze = (parts: Placed[]): Analysis => {
     if (loop(outNode, inNode)) return false;
     return null;
   };
-  return { net, sources, shorted, live, series, parallel, forward, mainSource };
+  return { net, sources, shorted, live, open, series, parallel, forward, mainSource };
 };
 
 /** Looks for a simple path from a to b over the branches (not the skipped ones, not through the forbidden nodes) for
@@ -666,9 +737,14 @@ export type Check =
   /** Every one of these polar parts (LED, diode, battery, cell) points with the current of the source. */
   | { type: "forward"; parts: PartRef[]; points?: number }
   /** The same circuit as the author's solution, however it is laid out. */
-  | { type: "solution"; points?: number };
+  | { type: "solution"; points?: number }
+  /** Every one of these parts (that is not broken) has current: a lamp is lit, an LED lights when it points the right
+   *  way. material: a test material of this type is on the board, in series with each of them ("the lamp lights with
+   *  aluminium foil"). off: none of them has current instead ("the lamp stays off with cotton"). broken: only when the
+   *  candidate broke a lamp ("the other lamp stays lit when one is broken"). */
+  | { type: "lit"; parts: PartRef[]; material?: PartType; off?: boolean; broken?: boolean; points?: number };
 export type CheckType = Check["type"];
-export const CHECK_TYPES: CheckType[] = ["parts", "closed", "series", "parallel", "forward", "solution"];
+export const CHECK_TYPES: CheckType[] = ["parts", "closed", "series", "parallel", "forward", "solution", "lit"];
 /** The response has a field per check, check1 … check8. */
 export const MAX_CHECKS = 8;
 
@@ -717,6 +793,14 @@ export const parseChecks = (value: unknown): Check[] => {
       case "solution":
         checks.push({ type: "solution", points: p });
         break;
+      case "lit": {
+        const material = partType(raw.material);
+        checks.push({
+          type: "lit", parts: refs, ...(material && isMaterial(material) ? { material } : {}), ...(raw.off ? { off: true } : {}),
+          ...(raw.broken ? { broken: true } : {}), points: p,
+        });
+        break;
+      }
     }
   }
   return checks.slice(0, MAX_CHECKS);
@@ -762,7 +846,15 @@ const isClosed = (a: Analysis, allowOpenEnds: boolean) =>
   a.live.every(Boolean) &&
   (allowOpenEnds || a.net.openEnds.length === 0);
 
-export const runCheck = (check: Check, c: Circuit, board: Placed[], a: Analysis, topo: () => string): boolean => {
+/** Whether an element has current now: live, and an LED or diode the right way round. */
+const hasCurrent = (a: Analysis, i: number) => {
+  const d = def(a.net.elements[i].type);
+  return a.live[i] && (!d.polar || d.kind === "source" || a.forward(i) !== false);
+};
+
+/** Runs a check. a: the analysis of the circuit as built (broken lamps count as whole: they are an experiment);
+ *  now: the analysis with the broken lamps (what the lamps show), for the lit check. */
+export const runCheck = (check: Check, c: Circuit, board: Placed[], a: Analysis, topo: () => string, now: Analysis = a): boolean => {
   const elements = a.net.elements;
   switch (check.type) {
     case "parts": {
@@ -789,15 +881,29 @@ export const runCheck = (check: Check, c: Circuit, board: Placed[], a: Analysis,
     }
     case "solution":
       return !!c.solution && topo() === topology(boardOf(c, c.solution));
+    case "lit": {
+      if (!check.parts.length) return false;
+      if (check.broken && !now.net.elements.some((e) => now.open[e.index] && canBreak(e.type))) return false;
+      const samples = check.material ? elements.filter((e) => e.type === check.material) : [];
+      if (check.material && !samples.length) return false;
+      return check.parts.every((ref) => {
+        const found = elements.filter((e) => matches(e.type, ref) && !(canBreak(e.type) && now.open[e.index]) && !samples.includes(e));
+        return found.length > 0 && found.every((e) =>
+          (!check.material || samples.some((m) => now.series(e.index, m.index))) && hasCurrent(now, e.index) === !check.off);
+      });
+    }
   }
 };
 
-/** The checks of the circuit on a board (the locked parts and the candidate's), with the score. */
-export const evaluate = (c: Circuit, parts: Placed[]): Evaluation => {
+/** The checks of the circuit on a board (the locked parts and the candidate's, and the cells of broken lamps), with
+ *  the score. */
+export const evaluate = (c: Circuit, parts: Placed[], broken: Iterable<string> = []): Evaluation => {
   const board = boardOf(c, parts);
   const analysis = analyze(board);
+  const out = brokenCells(board, broken);
+  const now = out.size ? analyze(board, out) : analysis;
   const topo = topology(board);
-  const results = c.checks.map((check) => ({ check, passed: runCheck(check, c, board, analysis, () => topo) }));
+  const results = c.checks.map((check) => ({ check, passed: runCheck(check, c, board, analysis, () => topo, now) }));
   const score = results.reduce((s, r) => s + (r.passed ? pointsOf(r.check) : 0), 0);
   const maxscore = c.checks.reduce((s, check) => s + pointsOf(check), 0);
   return { results, score, maxscore, correct: results.length > 0 && results.every((r) => r.passed), topology: topo, analysis, closed: isClosed(analysis, true) };

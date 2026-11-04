@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "preact/hooks";
 import type { JSX } from "preact";
 import {
-  Answer, CHECKS_FOR, CLOSINGS, Check, CheckType, ChatStep, Environment, ENVIRONMENTS, FileRef, GREETINGS, Limits, MAX_CHECKS, Mail, Person, Post,
-  Scenario, WRITING_LANGUAGES, WritingLanguage, evaluate, isAddress, parseAddresses, parseScenario, serializeScenario,
+  Answer, CHECKS_FOR, CLOSINGS, Check, CheckType, ChatLine, ChatOption, ChatStep, Environment, ENVIRONMENTS, FileRef, GREETINGS, Limits, MAX_CHECKS,
+  MAX_OPTIONS, MIN_OPTIONS, Mail, Person, Post, Scenario, WRITING_LANGUAGES, WritingLanguage, chatAnswer, evaluate, isAddress, parseAddresses, parseScenario,
+  replay, serializeScenario,
 } from "./message";
 import { Texts, textsFor } from "./texts";
 import { btn, input, primary } from "./writing";
@@ -22,7 +23,8 @@ export const modelAnswer = (d: Draft): Answer | null => {
   }
   if (d.environment === "chat") {
     const replies = s.chat.model ?? [];
-    return replies.length ? { environment: "chat", to: [], cc: [], subject: "", attachments: [], text: replies.join("\n\n"), replies } : null;
+    // through the script, as the candidate would: a reply at a step with reply buttons chooses one (its id or text)
+    return replies.length ? chatAnswer(s.chat, replay(s.chat, replies, "", s.me.name).transcript) : null;
   }
   return s.post.model ? { environment: "post", to: [], cc: [], subject: "", attachments: [], text: s.post.model, replies: [s.post.model] } : null;
 };
@@ -40,7 +42,12 @@ export const authoringProblems = (d: Draft, language: string, prompt = ""): stri
     if (!s.chat.steps.length) problems.push(t.problemNoSteps);
     for (const step of s.chat.steps) {
       if (!step.messages.length) problems.push(t.problemStepEmpty(step.id));
-      for (const next of [step.next, ...step.branches.map((b) => b.next)]) {
+      if (step.messages.some((m) => m.kind === "card" && !m.title?.trim())) problems.push(t.problemCardTitle(step.id));
+      const options = step.options ?? [];
+      if (options.length && (options.length < MIN_OPTIONS || options.length > MAX_OPTIONS)) problems.push(t.problemOptionCount(step.id));
+      if (new Set(options.map((o) => o.id)).size < options.length) problems.push(t.problemOptionIds(step.id));
+      if (options.length && step.ask === "name") problems.push(t.problemNameOptions(step.id));
+      for (const next of [step.next, ...step.branches.map((b) => b.next), ...options.map((o) => o.next)]) {
         if (next && !s.chat.steps.some((x) => x.id === next)) problems.push(t.problemUnknownStep(step.id, next));
       }
     }
@@ -50,6 +57,7 @@ export const authoringProblems = (d: Draft, language: string, prompt = ""): stri
     if (c.type === "recipient" && !c.address) problems.push(t.problemNoAddress(n));
     if (c.type === "attachment" && !s.email.files.some((f) => f.name.toLowerCase() === (c.name ?? "").toLowerCase())) problems.push(t.problemNoFile(n, c.name ?? ""));
     if (c.type === "phrases" && !c.phrases?.length) problems.push(t.problemNoPhrases(n));
+    if (c.type === "choices" && c.name && !s.chat.steps.some((x) => x.options?.some((o) => o.category?.toLowerCase() === c.name!.toLowerCase()))) problems.push(t.problemNoCategory(n, c.name));
     if (c.min !== undefined && c.max !== undefined && c.min > c.max) problems.push(t.problemRange(n));
   });
   const model = modelAnswer(d);
@@ -110,12 +118,52 @@ const readMembers = (text: string) =>
     const [name, color] = l.split("|").map((x) => x.trim());
     return color ? { name, color } : { name };
   });
-const messageLines = (step: ChatStep) => step.messages.map((m) => `${m.from}: ${m.text}`).join("\n");
-const readMessages = (text: string) =>
+// a message per line: "name: text", a notice "= text", a document card "name: # title | text" (a new line in it: \n)
+const messageLine = (m: ChatLine) =>
+  m.kind === "system" ? `= ${m.text}` : m.kind === "card" ? `${m.from ? `${m.from}: ` : ""}# ${m.title ?? ""} | ${m.text.replace(/\n/g, "\\n")}` : `${m.from}: ${m.text}`;
+const messageLines = (step: ChatStep) => step.messages.map(messageLine).join("\n");
+const readCard = (from: string, rest: string): ChatLine => {
+  const bar = rest.indexOf("|");
+  const title = (bar < 0 ? rest : rest.slice(0, bar)).replace(/^#\s*/, "").trim();
+  return { from, kind: "card", title, text: bar < 0 ? "" : rest.slice(bar + 1).trim().replace(/\\n/g, "\n") };
+};
+const readMessages = (text: string): ChatLine[] =>
   text.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
+    if (l.startsWith("=")) return { from: "", kind: "system", text: l.slice(1).trim() };
+    if (l.startsWith("#")) return readCard("", l);
     const i = l.indexOf(":");
-    return i > 0 ? { from: l.slice(0, i).trim(), text: l.slice(i + 1).trim() } : { from: "", text: l };
+    if (i <= 0) return { from: "", text: l };
+    const from = l.slice(0, i).trim();
+    const rest = l.slice(i + 1).trim();
+    return rest.startsWith("#") ? readCard(from, rest) : { from, text: rest };
   });
+// a reply button per line: "id: text | category | next step | points"
+const optionLines = (step: ChatStep) =>
+  (step.options ?? []).map((o) => {
+    const extra = [o.category ?? "", o.next ?? "", o.points === undefined ? "" : String(o.points)];
+    while (extra.length && !extra[extra.length - 1]) extra.pop();
+    return [`${o.id}: ${o.text}`, ...extra].join(" | ");
+  }).join("\n");
+const readOptions = (text: string): ChatOption[] =>
+  text.split("\n").map((l) => l.trim()).filter(Boolean).map((l, n) => {
+    const [head, category, next, points] = l.split("|").map((x) => x.trim());
+    const i = head.indexOf(":");
+    const o: ChatOption = i > 0 ? { id: head.slice(0, i).trim(), text: head.slice(i + 1).trim() } : { id: `o${n + 1}`, text: head };
+    if (category) o.category = category;
+    if (next) o.next = next;
+    if (points && Number.isFinite(Number(points))) o.points = Number(points);
+    return o;
+  }).filter((o) => o.text);
+const pointLines = (p: Record<string, number> | undefined) => Object.entries(p ?? {}).map(([k, v]) => `${k}: ${v}`).join("\n");
+const readPoints = (text: string): Record<string, number> | undefined => {
+  const out: Record<string, number> = {};
+  for (const l of text.split("\n")) {
+    const i = l.lastIndexOf(":");
+    const v = Number(l.slice(i + 1).trim());
+    if (i > 0 && l.slice(0, i).trim() && l.slice(i + 1).trim() && Number.isFinite(v)) out[l.slice(0, i).trim()] = v;
+  }
+  return Object.keys(out).length ? out : undefined;
+};
 const branchLines = (step: ChatStep) => step.branches.map((b) => `${b.keywords} -> ${b.next}`).join("\n");
 const readBranches = (text: string) =>
   text.split("\n").map((l) => l.trim()).filter(Boolean).map((l) => {
@@ -135,6 +183,7 @@ const newCheck = (type: CheckType, d: Draft): Check => {
     case "attachment": return { type, name: d.scenario.email.files[0]?.name ?? "", points: 1 };
     case "phrases": return { type, phrases: [], points: 1 };
     case "replies": return { type, min: 2, points: 1 };
+    case "choices": return { type, min: 1, points: 1 };
     default: return { type, points: 1 };
   }
 };
@@ -252,6 +301,11 @@ const Authoring = ({ initial, language, prompt, onChange, preview }: {
         <Text lbl={t.stepId} value={step.id} onChange={(id) => set({ id: id.trim() || step.id })} className="w-48" />
         <label className={label}>{t.stepMessages}<Lines value={messageLines(step)} onChange={(v) => set({ messages: readMessages(v) })} rows={3} testid={`step-${i}-messages`} /></label>
         <label className={label}>{t.branches}<Lines value={branchLines(step)} onChange={(v) => set({ branches: readBranches(v) })} rows={2} testid={`step-${i}-branches`} /></label>
+        <label className={label}>{t.replyOptions}<Lines value={optionLines(step)} rows={2} testid={`step-${i}-options`} onChange={(v) => {
+          const options = readOptions(v);
+          const { options: _old, ...rest } = step;
+          setChat({ steps: s.chat.steps.map((x, j) => (j === i ? (options.length ? { ...rest, options } : rest) : x)) });
+        }} /></label>
         <div className="flex flex-wrap items-end gap-3">
           <label className={label}>
             {t.next}
@@ -267,6 +321,13 @@ const Authoring = ({ initial, language, prompt, onChange, preview }: {
           <label className="flex items-center gap-2 pb-1 text-sm">
             <input type="checkbox" checked={!!step.end} className="accent-sky-700" onChange={(e) => set({ end: (e.target as HTMLInputElement).checked || undefined })} />
             {t.endChat}
+          </label>
+          <label className="flex items-center gap-2 pb-1 text-sm">
+            <input type="checkbox" checked={step.ask === "name"} className="accent-sky-700" data-testid={`step-${i}-ask-name`} onChange={(e) => {
+              const { ask: _old, ...rest } = step;
+              setChat({ steps: s.chat.steps.map((x, j) => (j === i ? ((e.target as HTMLInputElement).checked ? { ...rest, ask: "name" as const } : rest) : x)) });
+            }} />
+            {t.askName}
           </label>
           <Remove t={t} what={t.step(step.id)} onClick={() => setChat({ steps: s.chat.steps.filter((_, j) => j !== i) })} />
         </div>
@@ -326,6 +387,11 @@ const Authoring = ({ initial, language, prompt, onChange, preview }: {
         <Text lbl={`${t.candidate}: ${t.name}`} value={s.me.name} onChange={(name) => setScenario({ me: { ...s.me, name } })} />
       </div>
       <label className={label}>{t.chatMembers}<Lines value={memberLines(s.chat.members)} onChange={(v) => setChat({ members: readMembers(v) })} rows={2} testid="members" /></label>
+      <label className={label}>{t.categoryPoints}<Lines value={pointLines(s.chat.categoryPoints)} rows={2} testid="category-points" onChange={(v) => {
+        const { categoryPoints: _old, ...rest } = s.chat;
+        const categoryPoints = readPoints(v);
+        setScenario({ chat: categoryPoints ? { ...rest, categoryPoints } : rest });
+      }} /></label>
       <h3 className="m-0 text-sm font-semibold text-slate-800">{t.steps}</h3>
       <p className="m-0 text-[12px] text-slate-500">{t.stepsHint}</p>
       {s.chat.steps.map(stepCard)}
@@ -431,6 +497,13 @@ const Authoring = ({ initial, language, prompt, onChange, preview }: {
               </select>
             </label>
             <label className="flex items-center gap-2 pb-1 text-sm"><input type="checkbox" className="accent-sky-700" checked={!!c.exact} onChange={(e) => set({ ...c, exact: (e.target as HTMLInputElement).checked || undefined })} />{t.exact}</label>
+          </div>
+        )}
+        {c.type === "choices" && (
+          <div className="flex flex-wrap items-end gap-3">
+            <Text lbl={t.category} value={c.name ?? ""} onChange={(name) => set({ ...c, name: name.trim() || undefined })} testid={`check-${i}-category`} className="w-96" />
+            <Num lbl={t.min} value={c.min} onChange={(min) => set({ ...c, min })} testid={`check-${i}-min`} />
+            <Num lbl={t.max} value={c.max} onChange={(max) => set({ ...c, max })} testid={`check-${i}-max`} />
           </div>
         )}
         {(c.type === "words" || c.type === "chars" || c.type === "replies") && (

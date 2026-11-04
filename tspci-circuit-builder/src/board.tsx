@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "preact/hooks";
 import {
-  Circuit, PaletteItem, PartType, Placed, Rotation, analyze, boardOf, edgeKey, move, partAt, place, remaining, remove,
-  rotate, rotation as toRotation, terminalsOf,
+  Circuit, PaletteItem, PartType, Placed, Rotation, analyze, boardOf, brokenCells, canBreak, edgeKey, key, move, moveBroken, partAt,
+  place, remaining, remove, rotate, rotation as toRotation, terminalsOf, toggleBroken,
 } from "./circuit";
 import { CELL_UNITS, PartSymbol, sidePoint } from "./symbols";
 import { Texts } from "./texts";
@@ -19,7 +19,8 @@ const iconButton =
   "inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-2.5 py-1.5 text-sm text-slate-700 shadow-xs " +
   "hover:bg-slate-50 hover:border-slate-300 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600 disabled:opacity-40 disabled:hover:bg-white";
 
-const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = true, showCurrent = false, readOnly = false, ignoreLimits = false, onSelect, label, testid = "board" }: {
+const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = true, showCurrent = false, readOnly = false, ignoreLimits = false, onSelect, label, testid = "board",
+  lampTool = false, broken = [], onBrokenChange }: {
   /** Size and palette (the preset and checks are not used here). */
   circuit: Circuit;
   /** Parts nobody changes here: shown, not moved. */
@@ -39,6 +40,11 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
   onSelect?: (cell: { x: number; y: number } | null) => void;
   label?: string;
   testid?: string;
+  /** The candidate can break a lamp and repair it (data-lamp-tool). */
+  lampTool?: boolean;
+  /** The cells of the broken lamps. */
+  broken?: string[];
+  onBrokenChange?: (broken: string[]) => void;
 }) => {
   const t = texts;
   // the ops of circuit.ts read the size, the palette and the locked parts from a circuit
@@ -54,7 +60,14 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
   partsRef.current = parts;
 
   const all = boardOf(frame, parts);
-  const analysis = useMemo(() => analyze(all), [JSON.stringify(all)]);
+  const out = brokenCells(all, broken);
+  const isBroken = (x: number, y: number) => out.has(key(x, y));
+  const analysis = useMemo(() => analyze(all, out), [JSON.stringify(all), [...out].join(" ")]);
+  /** A part that leaves a cell (removed, replaced, moved) takes its broken mark along, or loses it. */
+  const setBroken = (next: string[]) => {
+    if (next.join(" ") !== broken.join(" ")) onBrokenChange?.(next);
+  };
+  const unbreak = (x: number, y: number) => setBroken(broken.filter((k) => k !== key(x, y)));
   const name = (type: PartType) => t.part[type];
   const where = (x: number, y: number) => [y + 1, x + 1] as const;
 
@@ -77,7 +90,7 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     if (!next) return setStatus(t.noneLeft(name(type)));
     // a part placed by the author keeps its lock mark
     const kept = existing?.locked ? next.map((p) => (p.x === x && p.y === y ? { ...p, locked: true } : p)) : next;
-    commit(kept, t.placed(name(type), ...where(x, y)));
+    if (commit(kept, t.placed(name(type), ...where(x, y)))) unbreak(x, y);
     setCursor({ x, y });
   };
   const moveTo = (from: { x: number; y: number }, to: { x: number; y: number }) => {
@@ -85,7 +98,10 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     const part = partAt(parts, from.x, from.y);
     if (!part || (from.x === to.x && from.y === to.y)) return;
     if (partAt(locked, to.x, to.y)) return setStatus(t.isLocked);
-    if (commit(move(frame, parts, from, to), t.moved(name(part.type), ...where(to.x, to.y)))) setCursor(to);
+    if (commit(move(frame, parts, from, to), t.moved(name(part.type), ...where(to.x, to.y)))) {
+      setCursor(to);
+      setBroken(moveBroken(broken, from, to));
+    }
   };
   const turn = (x: number, y: number) => {
     if (readOnly) return;
@@ -97,7 +113,16 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     if (readOnly) return;
     if (partAt(locked, x, y)) return setStatus(t.isLocked);
     const part = partAt(parts, x, y);
-    if (part) commit(remove(parts, x, y), t.removed(name(part.type)));
+    if (part && commit(remove(parts, x, y), t.removed(name(part.type)))) unbreak(x, y);
+  };
+  /** The lamp tool: break the lamp on the cell, or repair it; locked lamps too (it is an experiment, not a change). */
+  const breakAt = (x: number, y: number) => {
+    if (readOnly || !lampTool) return;
+    const p = partAt(all, x, y);
+    const next = toggleBroken(all, broken, x, y);
+    if (!p || !next) return setStatus(t.notALamp);
+    onBrokenChange?.(next);
+    setStatus(next.includes(key(x, y)) ? t.lampBroken(name(p.type), ...where(x, y)) : t.lampRepaired(name(p.type), ...where(x, y)));
   };
   const undo = () => {
     const previous = history.current.pop();
@@ -105,7 +130,9 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     onChange(previous);
     setStatus(t.undone);
   };
-  const clear = () => commit(start, t.cleared);
+  const clear = () => {
+    if (commit(start, t.cleared)) setBroken([]);
+  };
   const arm = (type: PartType | null) => {
     setArmed(type);
     if (type) setStatus(t.chosen(name(type)));
@@ -175,6 +202,9 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     } else if (key === "Enter" || key === " ") {
       e.preventDefault();
       if (armed) placeAt(armed, x, y);
+    } else if (lampTool && (key === "b" || key === "B")) {
+      e.preventDefault();
+      breakAt(x, y);
     } else if (key === "r" || key === "R") {
       e.preventDefault();
       turn(x, y);
@@ -194,7 +224,10 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
   const cellLabel = (x: number, y: number) => {
     const p = partAt(all, x, y);
     const open = analysis.net.openEnds.filter((o) => o.x === x && o.y === y).length;
-    const desc = p ? [name(p.type), t.turned(p.rotation), partAt(locked, x, y) || p.locked ? t.locked : "", showOpenEnds && open ? t.openEnds(open) : ""].filter(Boolean).join(", ") : t.empty;
+    const desc = p
+      ? [name(p.type), t.turned(p.rotation), partAt(locked, x, y) || p.locked ? t.locked : "", isBroken(x, y) ? t.broken : "", lit(p) ? t.lit : "",
+        showOpenEnds && open ? t.openEnds(open) : ""].filter(Boolean).join(", ")
+      : t.empty;
     return `${t.cell(y + 1, x + 1)}: ${desc}`;
   };
   const liveNodes = useMemo(() => {
@@ -202,7 +235,10 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     analysis.net.elements.forEach((e) => analysis.live[e.index] && Object.values(e.nodes).forEach((n) => nodes.add(n)));
     return nodes;
   }, [analysis]);
-  const closed = analysis.sources.length > 0 && analysis.shorted.length === 0 && analysis.live.length > analysis.sources.length && analysis.live.every(Boolean);
+  // closed: current flows and every component has it, except what is open by itself (an insulator, a broken lamp)
+  const closed = analysis.sources.length > 0 && analysis.shorted.length === 0 && analysis.live.length > analysis.sources.length &&
+    analysis.live.every((l, i) => l || analysis.open[i]) && analysis.live.some((l, i) => l && !analysis.sources.includes(i));
+  const elementAt = (p: Placed) => analysis.net.elements.find((el) => el.x === p.x && el.y === p.y);
   const glowing = (p: Placed) => {
     if (!showCurrent || !closed) return false;
     const node = analysis.net.edgeNode[edgeKey(p.x, p.y, terminalsOf(p.type, p.rotation)[0].side)];
@@ -210,11 +246,9 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
   };
   const lit = (p: Placed) => {
     if (!showCurrent || !closed) return false;
-    if (p.type === "lamp") return true;
-    if (p.type === "led") {
-      const e = analysis.net.elements.find((el) => el.x === p.x && el.y === p.y);
-      return !!e && analysis.forward(e.index) === true;
-    }
+    const e = elementAt(p);
+    if (p.type === "lamp") return !!e && analysis.live[e.index];
+    if (p.type === "led") return !!e && analysis.live[e.index] && analysis.forward(e.index) === true;
     return false;
   };
 
@@ -230,6 +264,8 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
   const dragTurn = dragging && dragging.drag.from === "board" ? partAt(parts, dragging.drag.x, dragging.drag.y)?.rotation ?? 0 : 0;
   const target = dragging ? cellFromPoint(dragging.pointerX, dragging.pointerY) : null;
   const selected = partAt(parts, cursor.x, cursor.y);
+  const cursorPart = partAt(all, cursor.x, cursor.y);
+  const cursorLamp = !!cursorPart && canBreak(cursorPart.type);
   const cellId = (x: number, y: number) => `${testid}-cell-${x}-${y}`;
 
   const paletteItem = (item: PaletteItem) => {
@@ -275,6 +311,12 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
               <button type="button" className={iconButton} disabled={!selected} onClick={() => removeAt(cursor.x, cursor.y)} data-testid="delete">
                 <span aria-hidden="true">✕</span>{t.remove}
               </button>
+              {lampTool && (
+                <button type="button" className={iconButton} disabled={!cursorLamp} onClick={() => breakAt(cursor.x, cursor.y)} data-testid="break-lamp">
+                  <span aria-hidden="true">{cursorLamp && isBroken(cursor.x, cursor.y) ? "✓" : "⚡"}</span>
+                  {cursorLamp && isBroken(cursor.x, cursor.y) ? t.repairLamp : t.breakLamp}
+                </button>
+              )}
               <button type="button" className={iconButton} onClick={undo} data-testid="undo">
                 <span aria-hidden="true">↶</span>{t.undo}
               </button>
@@ -282,14 +324,16 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
               <button type="button" className={`${iconButton} ml-auto`} aria-expanded={helpOpen} aria-label={t.showHelp} title={t.showHelp} onClick={() => setHelpOpen(!helpOpen)} data-testid="help"><span aria-hidden="true">?</span></button>
             </div>
           )}
-          {helpOpen && <p className="m-0 max-w-[60ch] rounded-lg bg-sky-50 p-2.5 text-xs text-sky-900">{t.help}</p>}
-          <div className="relative rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
+          {helpOpen && <p className="m-0 max-w-[60ch] rounded-lg bg-sky-50 p-2.5 text-xs text-sky-900">{t.help}{lampTool ? t.lampHelp : ""}</p>}
+          <div className="relative self-start rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
             <div ref={boardRef} role="grid" tabIndex={0} aria-label={label ?? t.board} aria-activedescendant={cellId(cursor.x, cursor.y)} data-testid={testid}
               aria-readonly={readOnly ? "true" : undefined}
               onKeyDown={onKeyDown}
               className="group relative grid touch-none select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-2"
               style={{
                 gridTemplateColumns: `repeat(${circuit.columns}, ${CELL}px)`, gridTemplateRows: `repeat(${circuit.rows}, ${CELL}px)`,
+                // exactly the cells: a toolbar wider than a small board must not stretch it (drops and the overlay use its size)
+                width: `${circuit.columns * CELL}px`,
                 backgroundImage: "linear-gradient(to right, #eef2f6 1px, transparent 1px), linear-gradient(to bottom, #eef2f6 1px, transparent 1px)",
                 backgroundSize: `${CELL}px ${CELL}px`, boxShadow: "inset -1px -1px 0 #eef2f6",
               }}>
@@ -303,14 +347,14 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
                     const beingDragged = dragging?.drag.from === "board" && dragging.drag.x === x && dragging.drag.y === y;
                     return (
                       <div role="gridcell" id={cellId(x, y)} key={x} aria-label={cellLabel(x, y)} aria-selected={isCursor} aria-readonly={fixed || readOnly ? "true" : undefined}
-                        data-testid={`cell-${x}-${y}`} data-part={p ? `${p.type}@${p.rotation}` : undefined}
+                        data-testid={`cell-${x}-${y}`} data-part={p ? `${p.type}@${p.rotation}` : undefined} data-broken={p && isBroken(x, y) ? "true" : undefined}
                         className={"relative " + (fixed ? "bg-slate-100/70 " : "") + (isTarget ? "bg-sky-100 " : "") + (isCursor ? "z-10 " : "")}
                         onClick={() => clickCell(x, y)}
                         onDblClick={() => turn(x, y)}
                         onPointerDown={(e) => p && !fixed && startDrag(e, { from: "board", x, y })}>
                         {p && (
-                          <PartSymbol type={p.type} rotation={p.rotation}
-                            className={"absolute inset-0 size-full transition-opacity " + (fixed ? "text-slate-500 " : "text-slate-900 ") + (beingDragged ? "opacity-30 " : "") +
+                          <PartSymbol type={p.type} rotation={p.rotation} broken={isBroken(x, y)}
+                            className={(isBroken(x, y) ? "cb-broken " : "") + "absolute inset-0 size-full transition-opacity " + (fixed ? "text-slate-500 " : "text-slate-900 ") + (beingDragged ? "opacity-30 " : "") +
                               (glowing(p) ? "cb-live " : "") + (lit(p) ? (p.type === "led" ? "cb-lit-led " : "cb-lit ") : "") + (!fixed && !readOnly ? "cursor-grab" : "")} />
                         )}
                         {p && (fixed || p.locked) && (

@@ -32,6 +32,10 @@ required words, a greeting and a closing). The item author writes the scenario i
     ("Noor is typing…" first, `data-chat-delay` milliseconds each), then waits for the candidate's reply; the reply
     picks the next step by keywords (`drink*|lemonade` → "drinks"), or else the step's default. A step can end the chat.
     After the script, the candidate can still write; nobody answers. `Enter` sends, `Shift` + `Enter` starts a new line.
+    A step can also offer **reply buttons** (2 to 4 quick replies) instead of the text box, each with an id, an optional
+    category and its own next step, so a script can mix written and chosen replies; a **name step** asks the
+    candidate's name for `{name}` / `{firstName}` in later messages; and the script can show **notices** ("Mila added
+    you to the chat.") and **document cards** (a titled panel with text). See [Choice steps](#choice-steps).
   - **Post** (`post`): a forum thread (title, a first post and replies) or a social-media feed, and a reply box. With a
     character limit the Post button stays off while the text is too long, as on a real platform; **Edit** reopens a
     placed post.
@@ -45,7 +49,8 @@ required words, a greeting and a closing). The item author writes the scenario i
   Every message has a time stamp; the candidate's carry the time they sent them.
 - **Accessibility**: real structure for a screen reader: the mailbox is a `nav` with a list of messages (each a button
   that says "unread" and the number of attachments), an opened mail an `article`, the composer a `form` with labelled
-  fields; the chat is a `log` with an ordered list; the thread an ordered list of `article`s. Everything works with the
+  fields; the chat is a `log` with an ordered list, its reply buttons a labelled `group` of real buttons ("Choose your
+  reply."), a notice and a card say what they are ("Notice:", "Document:"); the thread an ordered list of `article`s. Everything works with the
   keyboard. A status line tells what happened ("Reply to Lotte Bakker.", "dietary-needs.pdf attached.", "Your message
   has been sent."). Animations (the typing dots, the switch) stop with `prefers-reduced-motion`.
 - **Time spent**: the seconds from the start until the last change, over every session (the state keeps it).
@@ -58,8 +63,10 @@ required words, a greeting and a closing). The item author writes the scenario i
   attach; the chat's members and script; the thread), **Model answer**, **Checks** (each shows whether the model answer
   passes it, with its score), **Preview** (the candidate's view) and **JSON** (the whole scenario, to copy or paste).
   `validate()` reports, in the author's language: no task, a reply to a mail that is not there, a chat step without
-  messages or going to a step that does not exist, a check without an address, file or phrases, a minimum above the
-  maximum, and every check the model answer does not pass.
+  messages or going to a step that does not exist (also from a reply button), a step with fewer than 2 or more than 4
+  reply buttons or two with the same id, a step that asks the name and has reply buttons, a document card without a
+  title, a check without an address, file or phrases, a `choices` check on a category no button has, a minimum above
+  the maximum, and every check the model answer does not pass.
 
 ## What can be configured
 
@@ -115,6 +122,8 @@ example's.
   filled in).
 - **Dates** are local times without a zone, shown in the candidate's language ("12 Oct 2026, 09:14").
 - **Images** (attachments, posts) are URLs, also `data:` URLs; the example's map is an inline SVG.
+- **Chat steps** can have `options` (reply buttons), `ask: "name"`, and messages with `kind` `system` or `card`:
+  [Choice steps](#choice-steps).
 - **Keywords and phrases**: case-insensitive whole words in any script (`fiets` does not match `motorfiets`); `*` is
   any letters (`bike*` matches `bikes`), `|` separates alternatives, words in a phrase may have spaces or punctuation
   between them.
@@ -134,7 +143,8 @@ attachment in a chat) never passes.
 | `phrases`    | the text contains each of `phrases` (or at least `need` of them)                                     | all     |
 | `greeting`   | the first line (chat: of the first reply) starts with one of `phrases`; missing: the default list    | all     |
 | `closing`    | one of the last three lines starts with one of `phrases` (chat: the last reply contains one)          | all     |
-| `replies`    | the candidate sent at least `min` chat messages                                                      | chat    |
+| `replies`    | the candidate wrote at least `min` chat messages (reply buttons and the name do not count)           | chat    |
+| `choices`    | the points of the chosen reply buttons are within `min`–`max` (no range: at least 1); with `name` (a category), the number of buttons chosen of that category is (`"name": "rude", "max": 0`: none); never without a choice | chat |
 
 The default greetings and closings follow `data-writing-language`: English `Dear`, `Hello`, `Hi` … / `Kind regards`,
 `Best wishes`, `Yours sincerely` …; Dutch `Beste`, `Geachte`, `Hallo`, `Hoi` … / `Met vriendelijke groet`, `Groetjes`
@@ -157,12 +167,20 @@ optional `custom` checks for the objective parts. The response is a record (`car
 | `text`               | `string`  | what the candidate wrote: the mail's text, the post, or the chat replies (blank lines between) |
 | `html`               | `string`  | the text with its formatting as HTML (`<p>`, `<strong>`, `<em>`, `<ul>`; the rest escaped) |
 | `subject`, `to`, `cc`, `attachments` | `string` | email only; addresses in lower case and file names, comma separated   |
-| `transcript`         | `string`  | chat only: the whole conversation as JSON (`[{ "from", "text", "time", "me" }]`)       |
+| `transcript`         | `string`  | chat only: the whole conversation as JSON (`[{ "from", "text", "time", "me" }]`; and `kind`, `title`, `choice`, below) |
 | `draft`              | `string`  | chat only: text typed but not sent                                                    |
-| `sent`               | `integer` | 1 when the mail was sent or the post placed (chat: when there is a reply)            |
+| `choices`            | `string`  | chat only: the ids of the chosen reply buttons, in order, comma separated            |
+| `categories`         | `string`  | chat only: their categories, in the same order (empty for a button without one)       |
+| `choicepoints`       | `integer` | chat only: the points of the chosen buttons                                          |
+| `laststep`           | `string`  | chat only: the step the conversation is at, or ended at                              |
+| `name`               | `string`  | chat only, after a name step: the name the candidate typed                           |
+| `sent`               | `integer` | 1 when the mail was sent or the post placed (chat: when there is a reply or a choice) |
 | `words`, `chars`     | `integer` | the counts of `text`, without the formatting marks                                   |
 | `seconds`            | `integer` | the time spent until the last change                                                  |
 | `spellcheck`         | `integer` | 1 when the browser's spellcheck was on                                                |
+
+In a chat, `text`, `html`, `words` and `chars` hold only what the candidate wrote: not the reply buttons they chose,
+nor their name.
 
 **For a rater.** An authoring or rating system shows the response as the message: `message` is the message as the
 recipient would get it, in English labels whatever the item's language (so the response does not depend on it):
@@ -177,7 +195,9 @@ Dear Lotte,
 …
 ```
 
-A message not sent yet starts with `(not sent)`; a chat is `[10:15] Noor: …` / `[10:16] Sam Jansen: …` per line.
+A message not sent yet starts with `(not sent)`; a chat is `[10:15] Noor: …` / `[10:16] Sam Jansen: …` per line, a
+notice `[10:15] (Mila added you to the chat.)`, a card `[10:15] Mila: [Training schedule] Tuesday …`, a chosen button
+`[10:16] Lena: Maybe. (maybe)` (its id in brackets).
 Show `html` instead of `text` to keep the bold, italics and lists. The rater scores in the item's own outcome (a
 rubric), next to or instead of the checks.
 
@@ -210,6 +230,65 @@ the time) and the last 50 steps. `setResponse` (and `boundTo` without a state) r
 `cc`, `subject`, `attachments` and `sent`, or the chat's `transcript` (the script answers the replies again); a plain
 string is the text. A response of another environment is ignored. In `status: "solution"` the declared correct
 response is shown (a record value with these fields, or a string), or else the scenario's model answer.
+
+## Choice steps
+
+Inspired by the DEPP ChatBot PCI ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp),
+`Chatbotpci`), in which the candidate talks with a bot by choosing between answers, each with a meaning category,
+re-implemented here in the chat (no code of it is used). A chat script can mix three kinds of steps:
+
+```json
+{
+  "chat": {
+    "title": "Hockey club", "members": [{ "name": "Mila", "color": "#be185d" }],
+    "categoryPoints": { "polite": 2, "neutral": 1, "rude": 0 },
+    "steps": [
+      { "id": "hello", "ask": "name", "next": "schedule",
+        "messages": [{ "kind": "system", "from": "", "text": "Mila added you to the chat." }, { "from": "Mila", "text": "What's your name?" }] },
+      { "id": "schedule",
+        "messages": [
+          { "from": "Mila", "text": "Nice to meet you, {firstName}!" },
+          { "from": "Mila", "kind": "card", "title": "Training schedule", "text": "Tuesday 18:00–19:30, field 2\nThursday 18:00–19:30, field 1" },
+          { "from": "Mila", "text": "Can you come on Tuesday?" }],
+        "options": [
+          { "id": "yes", "text": "Yes, I'll be there. Thank you!", "category": "polite", "next": "question" },
+          { "id": "thursday", "text": "Sorry, I can't on Tuesday. Is Thursday OK?", "category": "polite", "next": "question" },
+          { "id": "maybe", "text": "Maybe.", "category": "neutral", "next": "question" },
+          { "id": "whatever", "text": "Whatever.", "category": "rude", "next": "question", "points": 0 }] },
+      { "id": "question", "messages": [{ "from": "Mila", "text": "Any question about the training, {firstName}?" }] }
+    ],
+    "checks": [{ "type": "choices", "min": 2 }, { "type": "choices", "name": "rude", "max": 0 }, { "type": "replies", "min": 1 }],
+    "model": ["Sam", "yes", "What should I wear?"]
+  }
+}
+```
+
+- **Reply buttons** (`options`, 2 to 4): the step's messages arrive, then the buttons show instead of the text box (as
+  quick-reply chips; real buttons, in the tab order). The chosen button's text goes into the chat as the candidate's
+  message and its `next` step follows (else the step's `next`; the step's keyword `branches` are not used). Each
+  button has an `id` (default `o1`, `o2` …: its place), its `text`, and optionally a `category` and `points`.
+- **Scoring**: a button's points are its own `points`, else its category's in `categoryPoints`, else 0;
+  `choicepoints` in the response is their sum. A `choices` check turns them into the item's score: at least / at most
+  so many points, or so many (or no) buttons of a category. Or score `choices` / `categories` / `laststep` in the
+  item's own response processing.
+- **The name** (`"ask": "name"`): the candidate's reply at this step is their name (the response's `name`; their
+  messages are under that name for a rater). `{name}` (the whole name) and `{firstName}` (its first word) in later
+  scripted messages and card titles are filled in; without a name step, or before it, they are the scenario's
+  `me.name`.
+- **Notices and document cards** (`kind`): a `system` message is a line in the middle of the chat, without a sender,
+  that arrives without "… is typing"; a `card` is a panel with a `title` and the text, from a member or from no one.
+  Both are plain text, as every message: no HTML, no links, no frames.
+- In the authoring mode (Content tab): reply buttons one per line as `id: text | category | next step | points`, a
+  notice as `= text`, a card as `Mila: # title | text` (`\n` for a new line in it), a check box for the name step,
+  and the points per category as `category: points`. The model answer lists, per step, the reply, or the id of the
+  button.
+
+**Compared with the DEPP ChatBot PCI.** Its response `{"AnswersSet": [ids], "Semantic": [categories], "LastNode": id}`
+is here `choices`, `categories` and `laststep` (strings, comma separated, in a record with the rest), its `_Fname_`
+is `{firstName}`, its "System" lines are notices, and its document panels are cards with plain text instead of
+author HTML or an iframe. New here: written and chosen steps in one chat, points per button or category with checks,
+keyboard and screen-reader access, state restore without the bot typing everything again, and English and Dutch
+screens.
 
 ## Using it
 

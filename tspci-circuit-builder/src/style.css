@@ -19,3 +19,9 @@
 @media (prefers-reduced-motion: reduce) {
   .cb-live { animation: none; }
 }
+
+/* a broken lamp (data-lamp-tool): no light, greyed */
+.cb-broken {
+  color: var(--color-rose-700);
+  opacity: 0.75;
+}

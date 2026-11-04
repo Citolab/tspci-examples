@@ -2,7 +2,7 @@ import { useMemo, useState } from "preact/hooks";
 import Board from "./board";
 import {
   CHECK_TYPES, COMPONENT_TYPES, Check, CheckType, Circuit, MAX_CHECKS, MAX_SIZE, MIN_SIZE, PART_TYPES, PartRef, PartType,
-  Placed, WIRE_TYPES, def, evaluate, inBounds, lockedParts, parsePalette, partAt, startParts, topology, boardOf,
+  MATERIAL_TYPES, Placed, WIRE_TYPES, def, evaluate, inBounds, lockedParts, parsePalette, partAt, startParts, topology, boardOf,
 } from "./circuit";
 import { PartSymbol } from "./symbols";
 import { Texts, refName, textsFor } from "./texts";
@@ -25,10 +25,13 @@ export const authoringProblems = (c: Circuit, language: string): string[] => {
       if (!item && used > given) problems.push(t.problemNotInPalette(t.part[type]));
       else if (item && item.count !== null && used > item.count + given) problems.push(t.problemPaletteShort(t.part[type]));
     }
-    evaluate(c, c.solution).results.forEach((r, i) => !r.passed && problems.push(t.problemCheck(i + 1)));
+    // a check that needs a broken lamp cannot pass on the solution (it has none): not a problem
+    evaluate(c, c.solution).results.forEach((r, i) => !r.passed && !brokenOnly(r.check) && problems.push(t.problemCheck(i + 1)));
   }
   return problems;
 };
+
+const brokenOnly = (check: Check) => check.type === "lit" && !!check.broken;
 
 const button = "rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm hover:bg-slate-50 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-sky-600";
 const field = "rounded-md border border-slate-300 bg-white px-2 py-1 text-sm";
@@ -50,6 +53,7 @@ const newCheck = (type: CheckType, components: PartType[]): Check => {
     case "parallel": return { type, parts: [first, components[1] ?? first], points: 1 };
     case "forward": return { type, parts: [components.find((p) => def(p).polar && def(p).kind !== "source") ?? "led"], points: 1 };
     case "solution": return { type, points: 1 };
+    case "lit": return { type, parts: [components.includes("lamp") ? "lamp" : first], points: 1 };
   }
 };
 
@@ -106,7 +110,7 @@ const Authoring = ({ initial, language, onChange }: { initial: Circuit; language
   };
 
   const checkEditor = (check: Check, i: number) => {
-    const passed = evaluation?.results[i]?.passed;
+    const passed = brokenOnly(check) ? undefined : evaluation?.results[i]?.passed;
     const refList = (list: PartRef[], options: PartRef[], min: number) => (
       <div className="flex flex-wrap items-center gap-1.5">
         {list.map((r, j) => (
@@ -157,6 +161,31 @@ const Authoring = ({ initial, language, onChange }: { initial: Circuit; language
         )}
         {(check.type === "series" || check.type === "parallel") && refList(check.parts, refs, 2)}
         {check.type === "forward" && refList(check.parts, refs.filter((r) => r === "source" ? false : !!def(r as PartType).polar), 1)}
+        {check.type === "lit" && (
+          <div className="flex flex-wrap items-center gap-2">
+            {refList(check.parts, refs.filter((r) => r !== "source"), 1)}
+            <label className="inline-flex items-center gap-1 text-xs">
+              {t.withMaterial}
+              <select className={field} value={check.material ?? ""} data-testid={`check-${i}-material`}
+                onChange={(e) => {
+                  const v = (e.target as HTMLSelectElement).value as PartType | "";
+                  const { material: _, ...rest } = check;
+                  setCheck(i, v ? { ...rest, material: v } : rest);
+                }}>
+                <option value="">{t.noMaterial}</option>
+                {MATERIAL_TYPES.map((m) => <option key={m} value={m}>{t.part[m]}</option>)}
+              </select>
+            </label>
+            <label className="inline-flex items-center gap-1 text-xs">
+              <input type="checkbox" checked={!!check.off} data-testid={`check-${i}-off`} onChange={(e) => setCheck(i, { ...check, off: (e.target as HTMLInputElement).checked || undefined })} />
+              {t.off}
+            </label>
+            <label className="inline-flex items-center gap-1 text-xs" title={t.brokenHint}>
+              <input type="checkbox" checked={!!check.broken} data-testid={`check-${i}-broken`} onChange={(e) => setCheck(i, { ...check, broken: (e.target as HTMLInputElement).checked || undefined })} />
+              {t.brokenOnly}
+            </label>
+          </div>
+        )}
         {check.type === "closed" && (
           <label className="inline-flex items-center gap-1 text-xs">
             <input type="checkbox" checked={!!check.allowOpenEnds} onChange={(e) => setCheck(i, { ...check, allowOpenEnds: (e.target as HTMLInputElement).checked || undefined })} />

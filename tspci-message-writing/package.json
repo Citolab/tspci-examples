@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-message-writing",
-  "version": "1.0.0-alpha.1",
+  "version": "1.1.0-alpha.1",
   "description": "write in a realistic communication environment: reply to an email, chat in a class chat, post on a forum or social media; for a human rater, with optional checks the PCI scores",
   "author": {
     "name": "Citolab",
@@ -19,7 +19,8 @@
     "email",
     "chat",
     "language",
-    "forum"
+    "forum",
+    "chatbot"
   ],
   "publishConfig": {
     "access": "public"
@@ -228,6 +229,41 @@
             "label": {
               "en": "Draft: chat text typed but not sent",
               "nl": "Concept: getypte chattekst die niet is verstuurd"
+            }
+          },
+          "choices": {
+            "baseType": "string",
+            "label": {
+              "en": "Choices: the ids of the reply buttons chosen in the chat, comma separated",
+              "nl": "Keuzes: de id's van de gekozen antwoordknoppen in de chat, met komma's"
+            }
+          },
+          "categories": {
+            "baseType": "string",
+            "label": {
+              "en": "Categories: the category of each chosen reply button, comma separated",
+              "nl": "Categorieën: de categorie van elke gekozen antwoordknop, met komma's"
+            }
+          },
+          "choicepoints": {
+            "baseType": "integer",
+            "label": {
+              "en": "Choice points: the points of the chosen reply buttons",
+              "nl": "Keuzepunten: de punten van de gekozen antwoordknoppen"
+            }
+          },
+          "laststep": {
+            "baseType": "string",
+            "label": {
+              "en": "Last step: the step of the chat script the conversation is at or ended at",
+              "nl": "Laatste stap: de stap van het chatscript waar het gesprek is of eindigde"
+            }
+          },
+          "name": {
+            "baseType": "string",
+            "label": {
+              "en": "Name: the name the candidate typed in the chat",
+              "nl": "Naam: de naam die de kandidaat in de chat typte"
             }
           },
           "sent": {

@@ -1,0 +1,96 @@
+{
+  "prompt": {
+    "default": "Watch the train from the cow's point of view and from the passenger's. What does the trajectory of the red ladybird look like?",
+    "editor": "textarea",
+    "label": { "en": "Instruction above the simulation", "nl": "Instructie boven de simulatie", "fr": "Consigne au-dessus de la simulation" }
+  },
+  "scene": {
+    "default": "train",
+    "editor": "enum",
+    "label": { "en": "Scene", "nl": "Scène", "fr": "Scène" },
+    "options": [
+      { "value": "train", "label": { "en": "A train passes a cow; ladybirds on a wheel", "nl": "Een trein rijdt langs een koe; lieveheersbeestjes op een wiel", "fr": "Un train passe devant une vache ; des coccinelles sur une roue" } },
+      { "value": "motorbike", "label": { "en": "Zoé on a motorbike, Marc on a rock", "nl": "Zoé op een motor, Marc op een rots", "fr": "Zoé à moto, Marc sur un rocher" } }
+    ]
+  },
+  "frames": {
+    "default": "ground;vehicle",
+    "editor": "text",
+    "label": { "en": "Points of view the candidate can choose: ground, vehicle, second (separated by ;)", "nl": "Standpunten die de kandidaat kan kiezen: ground, vehicle, second (gescheiden door ;)", "fr": "Points de vue au choix du candidat : ground, vehicle, second (séparés par ;)" },
+    "$comment": "ground: the cow or Marc (the Earth's frame); vehicle: the passenger or Zoé; second: a second observer (a car or a cyclist) that moves at secondSpeed"
+  },
+  "startFrame": {
+    "default": "ground",
+    "editor": "enum",
+    "label": { "en": "Point of view at the start", "nl": "Standpunt bij de start", "fr": "Point de vue au départ" },
+    "options": [
+      { "value": "ground", "label": { "en": "The ground (the cow, Marc)", "nl": "De grond (de koe, Marc)", "fr": "Le sol (la vache, Marc)" } },
+      { "value": "vehicle", "label": { "en": "The vehicle (the passenger, Zoé)", "nl": "Het voertuig (de passagier, Zoé)", "fr": "Le véhicule (le passager, Zoé)" } },
+      { "value": "second", "label": { "en": "The second observer", "nl": "De tweede waarnemer", "fr": "Le second observateur" } }
+    ]
+  },
+  "points": {
+    "default": "rim;hub;passenger;bystander",
+    "editor": "text",
+    "label": { "en": "Points whose trajectory the candidate can show: rim, hub, passenger, bystander, second", "nl": "Punten waarvan de kandidaat de baan kan laten zien: rim, hub, passenger, bystander, second", "fr": "Points dont le candidat peut montrer la trajectoire : rim, hub, passenger, bystander, second" },
+    "$comment": "rim: a point on the rim of the rear wheel (the red ladybird, the valve); hub: its axle (the blue ladybird); passenger: the passenger or Zoé; bystander: the cow or Marc; second: the second observer"
+  },
+  "traced": {
+    "default": "rim",
+    "editor": "text",
+    "label": { "en": "Trajectories shown at the start (separated by ;)", "nl": "Banen die bij de start zichtbaar zijn (gescheiden door ;)", "fr": "Trajectoires affichées au départ (séparées par ;)" }
+  },
+  "secondSpeed": {
+    "default": "0.5",
+    "editor": "number",
+    "label": { "en": "Speed of the second observer, times the vehicle's (−1 to 2; negative: the other way)", "nl": "Snelheid van de tweede waarnemer, maal die van het voertuig (−1 tot 2; negatief: de andere kant op)", "fr": "Vitesse du second observateur, en multiple de celle du véhicule (−1 à 2 ; négative : en sens inverse)" }
+  },
+  "turns": {
+    "default": "2",
+    "editor": "integer",
+    "label": { "en": "Length of the run in turns of the wheel (1 to 4)", "nl": "Lengte van de rit in omwentelingen van het wiel (1 tot 4)", "fr": "Durée du trajet en tours de roue (1 à 4)" }
+  },
+  "rate": {
+    "default": "1",
+    "editor": "enum",
+    "label": { "en": "Playback speed at the start", "nl": "Afspeelsnelheid bij de start", "fr": "Vitesse de lecture au départ" },
+    "options": [
+      { "value": "0.25", "label": { "en": "0.25×", "nl": "0,25×", "fr": "0,25×" } },
+      { "value": "0.5", "label": { "en": "0.5×", "nl": "0,5×", "fr": "0,5×" } },
+      { "value": "1", "label": { "en": "1× (a turn of the wheel in 6.3 s)", "nl": "1× (een omwenteling in 6,3 s)", "fr": "1× (un tour de roue en 6,3 s)" } },
+      { "value": "2", "label": { "en": "2×", "nl": "2×", "fr": "2×" } }
+    ]
+  },
+  "autoplay": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Start playing right away (not with reduced motion)", "nl": "Meteen afspelen (niet bij beperkte beweging)", "fr": "Lancer l'animation tout de suite (sauf mouvement réduit)" }
+  },
+  "trajectoryQuestions": {
+    "default": "rim@ground;rim@vehicle",
+    "editor": "textarea",
+    "label": { "en": "Questions: the shape of a trajectory, as point@frame (separated by ;)", "nl": "Vragen: de vorm van een baan, als punt@stelsel (gescheiden door ;)", "fr": "Questions : la forme d'une trajectoire, en point@référentiel (séparées par ;)" },
+    "$comment": "rim@ground asks for the trajectory of the rim point seen from the ground. The key follows from the motion; rim@ground=cycloid sets it. Shapes: rest, line, circle, cycloid, loops, wave. Empty: no questions"
+  },
+  "motionQuestions": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Questions: does a point move or is it at rest, as point@frame (separated by ;)", "nl": "Vragen: beweegt een punt of is het in rust, als punt@stelsel (gescheiden door ;)", "fr": "Questions : un point est-il en mouvement ou au repos, en point@référentiel (séparées par ;)" },
+    "$comment": "passenger@ground; passenger@vehicle; bystander@vehicle. The key follows from the motion; passenger@vehicle=rest sets it (moves or rest)"
+  },
+  "shapeOptions": {
+    "default": "rest;line;circle;cycloid",
+    "editor": "text",
+    "label": { "en": "Shapes to choose from: rest, line, circle, cycloid, loops, wave (the keys are always among them)", "nl": "Vormen om uit te kiezen: rest, line, circle, cycloid, loops, wave (de sleutels zitten er altijd bij)", "fr": "Formes proposées : rest, line, circle, cycloid, loops, wave (les clés en font toujours partie)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English (0.5×)", "nl": "Engels (0.5×)", "fr": "Anglais (0.5×)" } },
+      { "value": "nl", "label": { "en": "Dutch (0,5×)", "nl": "Nederlands (0,5×)", "fr": "Néerlandais (0,5×)" } },
+      { "value": "fr", "label": { "en": "French (0,5×)", "nl": "Frans (0,5×)", "fr": "Français (0,5×)" } }
+    ],
+    "label": { "en": "Language of the simulation and its texts", "nl": "Taal van de simulatie en de teksten", "fr": "Langue de la simulation et de ses textes" }
+  }
+}

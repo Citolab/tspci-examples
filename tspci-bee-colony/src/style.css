@@ -1,0 +1,120 @@
+/* SPDX-License-Identifier: GPL-2.0-only — based on Abeillepci (DEPP / Wiquid), modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+/* the sliders: a track that fills up to the thumb (--fill), a large thumb, a clear focus ring */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 36px;
+  background: transparent;
+  cursor: pointer;
+}
+.range::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(to right, #b45309 0 var(--fill, 0%), #e2e8f0 var(--fill, 0%) 100%);
+}
+.range::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+}
+.range::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background: #b45309;
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -7px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 3px solid #b45309;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.3);
+}
+.range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 9999px;
+  background: #fff;
+  border: 3px solid #b45309;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 0.3);
+}
+.range:focus {
+  outline: none;
+}
+.range:focus-visible::-webkit-slider-thumb {
+  box-shadow: 0 0 0 4px rgb(217 119 6 / 0.4);
+}
+.range:focus-visible::-moz-range-thumb {
+  box-shadow: 0 0 0 4px rgb(217 119 6 / 0.4);
+}
+@media (forced-colors: active) {
+  .range {
+    appearance: auto;
+    -webkit-appearance: auto;
+  }
+}
+
+.range:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+/* the picture: bees buzz around their spot, wings flap, hornets hover, one flies across when the hornet goes up */
+.fade {
+  transition: opacity 1.5s ease;
+}
+@keyframes bee-buzz {
+  0% { transform: translate(0px, 0px); }
+  25% { transform: translate(16px, -9px); }
+  50% { transform: translate(28px, 3px); }
+  75% { transform: translate(12px, 11px); }
+  100% { transform: translate(0px, 0px); }
+}
+.bee-fly {
+  animation: bee-buzz 3.2s ease-in-out infinite;
+}
+@keyframes wing-flap {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.35); }
+}
+.wing {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: wing-flap 0.14s linear infinite;
+}
+@keyframes hornet-hover {
+  0%, 100% { transform: translate(0px, 0px); }
+  50% { transform: translate(-10px, 6px); }
+}
+.hornet-hover {
+  animation: hornet-hover 2.4s ease-in-out infinite;
+}
+@keyframes hornet-flight {
+  from { transform: translate(-80px, 50px) scale(1); }
+  to { transform: translate(880px, 300px) scale(2.4); }
+}
+.hornet-flight {
+  animation: hornet-flight 6s linear forwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .bee-fly,
+  .wing,
+  .hornet-hover {
+    animation: none;
+  }
+  .fade {
+    transition: none;
+  }
+  .hornet-flight {
+    display: none;
+  }
+}

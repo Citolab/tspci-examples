@@ -20,6 +20,11 @@
     "editor": "boolean",
     "label": { "en": "Light up a closed circuit (gives away whether it is closed)", "nl": "Gesloten stroomkring laten oplichten (verraadt of hij gesloten is)" }
   },
+  "lampTool": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Let the candidate break and repair lamps (series and parallel; use with Light up a closed circuit)", "nl": "Kandidaat kan lampjes kapot en weer heel maken (serie en parallel; gebruik met Gesloten stroomkring laten oplichten)" }
+  },
   "language": {
     "default": "en",
     "editor": "enum",

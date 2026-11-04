@@ -2,8 +2,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  DEFAULT_CIRCUIT, analyze, boardOf, buildNetlist, evaluate, move, parseChecks, parseCircuit, parsePalette, partType, place,
-  remaining, remove, rotate, serializeBoard, serializeCircuit, terminalsOf, topology, ownParts, type Circuit, type Placed,
+  DEFAULT_CIRCUIT, MATERIAL_TYPES, analyze, boardOf, brokenFromBoard, buildNetlist, evaluate, move, moveBroken, parseChecks, parseCircuit,
+  parsePalette, partType, place, remaining, remove, rotate, serializeBoard, serializeCircuit, terminalsOf, toggleBroken, topology, ownParts,
+  type Circuit, type Placed,
 } from "../src/circuit.ts";
 
 // A board as text: one line per row, a token per cell. "." is empty; otherwise a short name and the rotation:
@@ -19,8 +20,8 @@ const grid = (text: string): Placed[] =>
       return [{ type, x, y, rotation: Number(rot) as Placed["rotation"] }];
     }));
 const circuitWith = (checks: unknown[], extra: Partial<Circuit> = {}): Circuit => ({ ...DEFAULT_CIRCUIT, preset: [], solution: null, ...extra, checks: parseChecks(checks) });
-const passes = (checks: unknown[], board: Placed[], extra: Partial<Circuit> = {}) =>
-  evaluate(circuitWith(checks, { columns: 16, rows: 16, ...extra }), board).results.map((r) => r.passed);
+const passes = (checks: unknown[], board: Placed[], extra: Partial<Circuit> = {}, broken: string[] = []) =>
+  evaluate(circuitWith(checks, { columns: 16, rows: 16, ...extra }), board, broken).results.map((r) => r.passed);
 
 // A source on the left, a lamp on the right: the simplest loop.
 //  ┌ ─ ┐
@@ -273,4 +274,110 @@ test("placing, moving, turning and removing; limits and locked cells", () => {
   assert.deepEqual(JSON.parse(board), { columns: 3, rows: 2, parts: [{ type: "dcSource", x: 0, y: 0, rotation: 0, locked: true }, { type: "led", x: 1, y: 1, rotation: 90 }] });
   assert.deepEqual(ownParts(c, JSON.parse(board)), parts);
   assert.deepEqual(boardOf(c, parts).length, 2);
+});
+
+// --- test materials (inspired by the DEPP Circuit PCI): a conductor is a branch like a closed switch, an insulator open
+
+/** The simple loop with a test material in the top wire. */
+const withSample = (material: string) => grid(`
+c@180 ${material} c@270
+V@90  .    L@90
+c@90  -    c@0`);
+
+test("test materials: names, and not in the palette of an item without one", () => {
+  assert.deepEqual(MATERIAL_TYPES, ["aluminiumFoil", "copper", "ironNail", "graphite", "cotton", "wood", "plastic", "glass", "rubber"]);
+  assert.deepEqual(["aluminiumfolie", "Aluminium foil", "koper", "spijker", "potloodstift", "katoen", "hout", "glas", "rubber"].map(partType),
+    ["aluminiumFoil", "aluminiumFoil", "copper", "ironNail", "graphite", "cotton", "wood", "glass", "rubber"]);
+  const noPalette = parseCircuit(JSON.stringify({ columns: 3, rows: 3 }));
+  assert.ok(noPalette.palette.every((p) => !MATERIAL_TYPES.includes(p.type)));
+  assert.deepEqual(parsePalette("copper:1 cotton"), [{ type: "copper", count: 1 }, { type: "cotton", count: null }]);
+});
+
+test("test materials: a conductor closes the circuit, an insulator keeps it open", () => {
+  for (const conductor of ["aluminiumFoil", "copper", "ironNail", "graphite"]) {
+    const a = analyze(withSample(conductor));
+    assert.deepEqual(a.live, [true, true, true], conductor);
+    assert.deepEqual(passes([{ type: "closed" }], withSample(conductor)), [true], conductor);
+  }
+  for (const insulator of ["cotton", "wood", "plastic", "glass", "rubber"]) {
+    const a = analyze(withSample(insulator));
+    assert.deepEqual(a.live, [false, false, false], insulator);
+    assert.deepEqual(a.open, [true, false, false], insulator);
+    assert.deepEqual(passes([{ type: "closed" }], withSample(insulator)), [false], insulator);
+  }
+  // the structure does not change: the sample is in series with the lamp either way, and in the topology
+  assert.deepEqual(passes([{ type: "series", parts: ["cotton", "lamp"] }], withSample("cotton")), [true]);
+  assert.equal(topology(withSample("cotton")), "cotton(1-2) dcSource(3>1) lamp(2-3)");
+  // an insulator parallel to the lamp: the lamp still has current
+  const across = grid(`
+c@180 -    t@180  c@270
+V@90  .    L@90   wood@90
+c@90  -    t@0    c@0`);
+  const a = analyze(across);
+  assert.deepEqual(a.live, [true, true, false]);
+  assert.deepEqual(passes([{ type: "lit", parts: ["lamp"] }, { type: "closed" }], across), [true, false]);
+});
+
+test("the lit check: with a material, or off", () => {
+  const checks = [
+    { type: "lit", parts: ["lamp"] },
+    { type: "lit", parts: ["lamp"], material: "aluminiumFoil" },
+    { type: "lit", parts: ["lamp"], material: "cotton", off: true },
+    { type: "lit", parts: ["lamp"], off: true },
+  ];
+  assert.deepEqual(passes(checks, withSample("aluminiumFoil")), [true, true, false, false]);
+  assert.deepEqual(passes(checks, withSample("cotton")), [false, false, true, true]);
+  assert.deepEqual(passes(checks, withSample("copper")), [true, false, false, false]); // not the foil
+  // an LED lights only the right way round
+  const led = (rot: number) => grid(`
+c@180 led@${rot} c@270
+V@90  .    L@90
+c@90  -    c@0`);
+  assert.deepEqual(passes([{ type: "lit", parts: ["led"] }], led(0)), [true]);
+  assert.deepEqual(passes([{ type: "lit", parts: ["led"] }], led(180)), [false]);
+  // reading: an unknown or non-material material is left out
+  assert.deepEqual(parseChecks([{ type: "lit", parts: "lamp", material: "lamp", off: 1 }, { type: "lit", parts: ["lamp"], material: "katoen", broken: true, points: 2 }]),
+    [{ type: "lit", parts: ["lamp"], off: true, points: 1 }, { type: "lit", parts: ["lamp"], material: "cotton", broken: true, points: 2 }]);
+});
+
+// --- broken lamps (inspired by the DEPP LampeDouble PCI)
+
+const SERIES = `
+c@180 L    L    c@270
+V@90  .    .    -@90
+c@90  -    -    c@0`;
+const PARALLEL = `
+c@180 -    t@180 c@270
+V@90  .    L@90  L@90
+c@90  -    t@0   c@0`;
+
+test("a broken lamp: in series the other goes out, in parallel it stays lit", () => {
+  const lamps = (board: string, broken: string[]) => {
+    const a = analyze(grid(board), broken);
+    return a.net.elements.filter((e) => e.type === "lamp").map((e) => a.live[e.index]);
+  };
+  assert.deepEqual(lamps(SERIES, []), [true, true]);
+  assert.deepEqual(lamps(SERIES, ["1,0"]), [false, false]);
+  assert.deepEqual(lamps(PARALLEL, ["2,1"]), [false, true]);
+  assert.deepEqual(lamps(PARALLEL, ["2,1", "3,1"]), [false, false]);
+  assert.deepEqual(lamps(PARALLEL, ["0,0", "9,9"]), [true, true]); // no lamp there: nothing breaks
+
+  const checks = [{ type: "lit", parts: ["lamp"], broken: true }, { type: "lit", parts: ["lamp"], broken: true, off: true }, { type: "closed" }, { type: "lit", parts: ["lamp"] }];
+  assert.deepEqual(passes(checks, grid(PARALLEL), {}, ["2,1"]), [true, false, true, true]); // the lamp that is not broken is lit
+  assert.deepEqual(passes(checks, grid(SERIES), {}, ["1,0"]), [false, true, true, false]);
+  assert.deepEqual(passes(checks, grid(PARALLEL)), [false, false, true, true]); // nothing broken
+});
+
+test("broken lamps in the board of the response, toggling and moving", () => {
+  const c = circuitWith([], { columns: 4, rows: 3 });
+  const parts = grid(PARALLEL);
+  const board = JSON.parse(serializeBoard(c, parts, ["2,1", "1,0"]));
+  assert.deepEqual(board.parts.filter((p: any) => p.broken).map((p: any) => `${p.type}@${p.x},${p.y}`), ["lamp@2,1"]);
+  assert.deepEqual(brokenFromBoard(board), ["2,1"]);
+  assert.equal(JSON.stringify(JSON.parse(serializeBoard(c, parts))).includes("broken"), false);
+  assert.deepEqual(toggleBroken(parts, [], 2, 1), ["2,1"]);
+  assert.deepEqual(toggleBroken(parts, ["2,1"], 2, 1), []);
+  assert.equal(toggleBroken(parts, [], 0, 1), null); // the source
+  assert.deepEqual(moveBroken(["2,1"], { x: 2, y: 1 }, { x: 3, y: 1 }), ["3,1"]);
+  assert.deepEqual(moveBroken(["2,1", "3,1"], { x: 2, y: 1 }, { x: 3, y: 1 }), ["2,1", "3,1"]);
 });

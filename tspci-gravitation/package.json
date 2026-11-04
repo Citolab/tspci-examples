@@ -1,0 +1,99 @@
+{
+  "name": "@citolab/pci-gravitation",
+  "version": "1.0.0-alpha.1",
+  "description": "a star and a planet: change the distance, the mass and the radius of the planet and read the gravitational force (Newton's law), record measurements and say which quantities matter",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "gravitation",
+    "newton",
+    "physics",
+    "simulation",
+    "control-of-variables"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-gravitation"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "gravitation.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-gravitation npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-gravitation npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "gravitation",
+      "label": "Gravitation",
+      "tags": [
+        "gravitation",
+        "physics",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "gravitation",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI computes the force and, with data-question=\"influence\", scores the ticked quantities against data-key (README)",
+        "fields": {
+          "distance": { "baseType": "float", "label": { "en": "Distance planet–star (million km)", "nl": "Afstand planeet–ster (miljoen km)", "fr": "Distance planète–étoile (millions de km)" } },
+          "mass": { "baseType": "float", "label": { "en": "Mass of the planet (10²³ kg)", "nl": "Massa van de planeet (10²³ kg)", "fr": "Masse de la planète (10²³ kg)" } },
+          "radius": { "baseType": "float", "label": { "en": "Radius of the planet (km)", "nl": "Straal van de planeet (km)", "fr": "Rayon de la planète (km)" } },
+          "force": { "baseType": "float", "label": { "en": "Gravitational force (N), as shown", "nl": "Gravitatiekracht (N), zoals getoond", "fr": "Force de gravitation (N), telle qu'affichée" } },
+          "changed": { "baseType": "string", "label": { "en": "Quantities the candidate changed (distance;mass;radius)", "nl": "Grootheden die de kandidaat veranderde (distance;mass;radius)", "fr": "Grandeurs modifiées par le candidat (distance;mass;radius)" } },
+          "measurements": { "baseType": "string", "label": { "en": "Recorded measurements (JSON)", "nl": "Vastgelegde metingen (JSON)", "fr": "Mesures enregistrées (JSON)" } },
+          "measurementCount": { "baseType": "integer", "label": { "en": "Number of recorded measurements", "nl": "Aantal vastgelegde metingen", "fr": "Nombre de mesures enregistrées" } },
+          "answer": { "baseType": "string", "label": { "en": "Question: the ticked quantities", "nl": "Vraag: de aangevinkte grootheden", "fr": "Question : les grandeurs cochées" } },
+          "correct": { "baseType": "integer", "label": { "en": "Question: 1 when the ticked quantities are the key", "nl": "Vraag: 1 als de aangevinkte grootheden de sleutel zijn", "fr": "Question : 1 si les grandeurs cochées sont la clé" } },
+          "score": { "baseType": "integer", "label": { "en": "Score of the question (0 or 1)", "nl": "Score van de vraag (0 of 1)", "fr": "Score de la question (0 ou 1)" } }
+        }
+      }
+    }
+  }
+}

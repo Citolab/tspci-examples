@@ -1,0 +1,158 @@
+{
+  "name": "@citolab/pci-evaporation",
+  "version": "1.0.0-alpha.1",
+  "description": "an evaporation experiment the candidate designs: containers of salt water with their own temperature, width, wind, salt and volume, a simulated clock, water levels and salt crystals",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original MaraisSalantpci)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "evaporation",
+    "salt",
+    "fair test",
+    "experiment",
+    "simulation"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-evaporation"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "evaporation.svg",
+    "example.png",
+    "LICENSE",
+    "README.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-evaporation npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-evaporation npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "evaporation",
+      "label": "Evaporation experiment",
+      "tags": [
+        "evaporation",
+        "salt",
+        "fair test",
+        "experiment",
+        "simulation"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "evaporation",
+      "response": {
+        "cardinality": "record",
+        "$comment": "The PCI checks the candidate's design against the research question (data-target); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: 1 when the candidate ran a fair test of the target variable",
+              "nl": "Score: 1 als de kandidaat een eerlijke proef met de doelvariabele heeft uitgevoerd",
+              "fr": "Score : 1 si le candidat a réalisé une expérience équitable sur la variable cible"
+            }
+          },
+          "fairTest": {
+            "baseType": "integer",
+            "label": {
+              "en": "Fair test: 1 when only the target variable differs between the containers",
+              "nl": "Eerlijke proef: 1 als alleen de doelvariabele tussen de bakjes verschilt",
+              "fr": "Expérience équitable : 1 si seule la variable cible diffère entre les récipients"
+            }
+          },
+          "ran": {
+            "baseType": "integer",
+            "label": {
+              "en": "Ran: 1 when this design ran to the end",
+              "nl": "Uitgevoerd: 1 als deze opzet tot het eind is uitgevoerd",
+              "fr": "Réalisée : 1 si ce dispositif a fonctionné jusqu'à la fin"
+            }
+          },
+          "varied": {
+            "baseType": "string",
+            "label": {
+              "en": "Variables that differ between the containers (separated by ;)",
+              "nl": "Variabelen die tussen de bakjes verschillen (gescheiden door ;)",
+              "fr": "Variables qui diffèrent entre les récipients (séparées par ;)"
+            }
+          },
+          "runCount": {
+            "baseType": "integer",
+            "label": {
+              "en": "Number of runs to the end",
+              "nl": "Aantal keer tot het eind uitgevoerd",
+              "fr": "Nombre d'expériences menées à leur terme"
+            }
+          },
+          "containers": {
+            "baseType": "string",
+            "label": {
+              "en": "Settings of the containers (JSON)",
+              "nl": "Instellingen van de bakjes (JSON)",
+              "fr": "Réglages des récipients (JSON)"
+            }
+          },
+          "results": {
+            "baseType": "string",
+            "label": {
+              "en": "Results per container: dry after, salt crystals from, volume left (JSON)",
+              "nl": "Resultaten per bakje: droog na, zoutkristallen vanaf, volume over (JSON)",
+              "fr": "Résultats par récipient : sec après, cristaux de sel dès, volume restant (JSON)"
+            }
+          },
+          "runs": {
+            "baseType": "string",
+            "label": {
+              "en": "Every run: settings and results (JSON)",
+              "nl": "Elke uitvoering: instellingen en resultaten (JSON)",
+              "fr": "Chaque expérience : réglages et résultats (JSON)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

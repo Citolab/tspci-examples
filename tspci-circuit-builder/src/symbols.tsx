@@ -44,6 +44,30 @@ const meter = (letter: string, turn: Rotation) => (
     <Label x={C} y={C} turn={turn}>{letter}</Label>
   </>
 );
+/** A test material: a sample between two crocodile clips (the leads end in the clips). */
+const sample = (body: JSX.Element) => (
+  <>
+    {leads(13, 51)}
+    <g className="cb-sample" stroke-width={1.6}>{body}</g>
+    <path d="M12 28.5H18.5L22.5 32L18.5 35.5H12Z" fill="currentColor" stroke-width={1.4} stroke-linejoin="round" />
+    <path d="M52 28.5H45.5L41.5 32L45.5 35.5H52Z" fill="currentColor" stroke-width={1.4} stroke-linejoin="round" />
+  </>
+);
+const lampCircle = (
+  <>
+    {leads(19, 45)}
+    <circle cx={C} cy={C} r={13} />
+  </>
+);
+/** A broken lamp: the cross (the filament) snapped in the middle, a crack in the glass. */
+const brokenLamp = (
+  <>
+    {lampCircle}
+    <path d="M22.8 22.8L28.5 28.5M35.5 35.5L41.2 41.2M41.2 22.8L35.5 28.5M28.5 35.5L22.8 41.2" />
+    <path d="M38 13L41 17L38.5 19L42 23" stroke-width={1.6} stroke-linejoin="round" />
+  </>
+);
+
 const plates = (xs: number[]) => xs.map((x, i) => (i % 2 === 0 ? <path d={`M${x} 18V46`} /> : <path d={`M${x} 25V39`} stroke-width={5} />));
 
 const DRAW: Record<PartType, (turn: Rotation) => JSX.Element> = {
@@ -56,8 +80,7 @@ const DRAW: Record<PartType, (turn: Rotation) => JSX.Element> = {
   variableResistor: () => <>{leads(16, 48)}{resistorBox}{arrow(14, 48, 50, 14)}</>,
   lamp: () => (
     <>
-      {leads(19, 45)}
-      <circle cx={C} cy={C} r={13} />
+      {lampCircle}
       <path d="M22.8 22.8L41.2 41.2M41.2 22.8L22.8 41.2" />
     </>
   ),
@@ -127,13 +150,23 @@ const DRAW: Record<PartType, (turn: Rotation) => JSX.Element> = {
       {arrowHead(31, 43.3, 37.9, 7)}
     </>
   ),
+  // the test materials: each sample has its own shape (and colour), so they are told apart without text
+  aluminiumFoil: () => sample(<path d="M21 26L25 24L29 27L33 24L37 27L43 25V39L39 41L35 38L31 41L27 38L21 40Z" fill="#cbd5e1" stroke-linejoin="round" />),
+  copper: () => sample(<><rect x={21} y={27} width={22} height={10} rx={1} fill="#d97706" fill-opacity={0.75} /><path d="M24 30H40" stroke="#fde68a" /></>),
+  ironNail: () => sample(<><path d="M23 25V39" stroke-width={3} /><path d="M24 30H38L43 32L38 34H24Z" fill="#64748b" stroke-linejoin="round" /></>),
+  graphite: () => sample(<rect x={21} y={29.5} width={22} height={5} rx={1} fill="#334155" />),
+  cotton: () => sample(<path d="M23 38A4 4 0 0 1 23 30A5 5 0 0 1 31 26A5 5 0 0 1 40 28A4.5 4.5 0 0 1 41 38Z" fill="white" stroke-linejoin="round" />),
+  wood: () => sample(<><rect x={21} y={25} width={22} height={14} rx={1} fill="#d6a96a" fill-opacity={0.8} /><path d="M23 29.5C28 27.5 34 31.5 41 29.5M23 34.5C28 32.5 34 36.5 41 34.5" stroke-width={1} /></>),
+  plastic: () => sample(<rect x={21} y={26} width={22} height={12} rx={5} fill="#38bdf8" fill-opacity={0.45} />),
+  glass: () => sample(<><rect x={21} y={25} width={22} height={14} rx={1} fill="#e0f2fe" fill-opacity={0.7} /><path d="M26 36L30 28M31 36L34 30" stroke-width={1.2} /></>),
+  rubber: () => sample(<rect x={21} y={27} width={22} height={10} rx={5} fill="#1f2937" fill-opacity={0.85} />),
 };
 
 /** A part in a cell: an <svg> of 64 × 64 user units, turned. */
-export const PartSymbol = ({ type, rotation, className, title }: { type: PartType; rotation: Rotation; className?: string; title?: string }) => (
+export const PartSymbol = ({ type, rotation, className, title, broken }: { type: PartType; rotation: Rotation; className?: string; title?: string; broken?: boolean }) => (
   <svg viewBox={`0 0 ${S} ${S}`} className={className} aria-hidden={title ? undefined : "true"} role={title ? "img" : undefined} aria-label={title} overflow="visible">
     <g transform={rotation ? `rotate(${rotation} ${C} ${C})` : undefined} fill="none" stroke="currentColor" stroke-width={2.5} stroke-linecap="round">
-      {DRAW[type](rotation)}
+      {broken && type === "lamp" ? brokenLamp : DRAW[type](rotation)}
     </g>
   </svg>
 );
