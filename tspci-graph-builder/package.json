@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-graph-builder",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "the candidate builds a graph from measured data: a table, the axes, the scale, the points and the line, scored with the author's checks",
   "author": {
     "name": "Citolab",

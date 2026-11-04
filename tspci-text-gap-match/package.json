@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-text-gap-match",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "drag text labels onto drop zones on an image (a port of openPCI textgapmatch)",
   "author": {
     "name": "Citolab",

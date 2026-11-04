@@ -1,21 +1,74 @@
-MIT License
+@citolab/pci-geogebra-applet
 
-Copyright (c) 2026 Stichting Cito Instituut voor Toetsontwikkeling
+This PCI is a derivative work of the GeoGebra PCI (GGBPCI) in janfix/extension-geogebra
+(https://github.com/janfix/extension-geogebra), by Jean-Philippe Rivière (Wiquid). The PCI code of that extension is
+"subject to the GeoGebra Non-Commercial License Agreement, see http://www.geogebra.org/license" (as stated in the
+headers of its files and in its README), so this PCI is too. Its TAO installer (PHP) is GPL-2.0-only; that part is not
+used here. Where the two disagree, this PCI follows the stricter one: the GeoGebra licence below.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Changes: Copyright (c) 2026 Stichting Cito Instituut voor Toetsontwikkeling, under the same licence.
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+For commercial use, contact GeoGebra GmbH at office@geogebra.org.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+The text below is copied from https://www.geogebra.org/license (retrieved November 2026). The version on that page is
+the one that applies.
+
+--------------------------------------------------------------------------------------------------------------------
+
+GeoGebra License
+You are free to copy, distribute and transmit GeoGebra for non-commercial purposes (please see details below).
+Guidelines to Distinguish Non-Commercial and Commercial Use
+You may only use the GeoGebra Software and Materials under the terms of a relevant license agreement. The license agreement which applies to you depends on your use of the Software and the Materials, which can be summarised as follows:
+You are free to copy, distribute and transmit GeoGebra for non-commercial purposes. Non-commercial use is subject to the terms of our GeoGebra Non-Commercial License Agreement.
+
+Any use of GeoGebra for a commercial purpose is subject to and requires a special license. If you intend to use GeoGebra for a commercial purpose, please contact office@geogebra.org to arrange a License and Collaboration Agreement with us.
+
+Whether a particular use of the GeoGebra Materials is "non-commercial" depends on the use, not the user. To assist, we have set out the notes below:
+Non-commercial Use. We anticipate that non-commercial use will primarily involve students and teachers who may wish to use GeoGebra at home and in school or university for the purposes of their school or academic study and teaching, without intending to seek any commercial advantage or financial gain. This includes teachers in schools and universities where tuition fees are charged, so long as the use of GeoGebra is limited to personal or individual classroom teaching.
+
+Commercial Use. We anticipate that commercial use will primarily involve publishers, online schools, online universities, and non-profit organizations who wish to use GeoGebra to support activities that are intended to secure a commercial advantage or the generation of revenue or monetary compensation.
+
+Examples of commercial use might include:
+use of GeoGebra (or any related materials or resources) to generate or develop educational materials or resources which will be sold in exchange for a fee (including course or tuition fees) or (if given away for free) which are used to gain a commercial advantage for the user;
+
+the provision of training, support or editorial services that use or reference GeoGebra (or any related materials or resources) in exchange for a fee;
+
+use of GeoGebra (or any related materials or resources) within a non-academic ebook, textbook or journal, whether or not the book or journal is distributed for a fee. Please note that academic papers and conferences do not require a License and Collaboration Agreement; and
+
+use of GeoGebra (or any related materials or resources) to assist in securing advertising or sponsorship-type revenues.
+
+For more information, please also read our GeoGebra License FAQ.
+GeoGebra Non-Commercial License Agreement
+GeoGebra GmbH is located in Linz, Austria ("we", "our" or "us"). We develop and support the GeoGebra dynamic mathematics software application, including its source code, installers, web applications and services, language files and associated documentation. When we refer to "GeoGebra" or "the Software" in this license we mean each of these component parts which together form the working GeoGebra software program. We operate GeoGebra (and publish its related resources) through our website located at https://www.geogebra.org.
+The terms of this License form a binding agreement between you, an individual user or non-commercial organization ("you" or "your"), and us regarding your non-commercial use of GeoGebra. By downloading, accessing, or otherwise using GeoGebra you indicate your agreement to be bound by these License terms.
+PLEASE NOTE THAT THIS LICENSE IS INTENDED FOR NON-COMMERCIAL USE OF GEOGEBRA ONLY. IF YOU INTEND TO USE GEOGEBRA FOR A COMMERCIAL PURPOSE, PLEASE CONTACT office@geogebra.org TO ARRANGE A COLLABORATION AGREEMENT WITH US BASED ON OUR COMMERCIAL LICENSE TERMS.
+If you would like to help with developing GeoGebra, please find GeoGebra's source code here: https://github.com/geogebra/geogebra.
+Non-Commercial License Terms
+This License incorporates (by reference) additional license terms referred to in paragraphs 3 and 4 below. In the event of any conflict between those additional terms and the terms of this License, the latter shall prevail.
+
+The GeoGebra installers, web services and various copyright materials, graphics and resources made available (together the "Materials") are licensed to you on a limited, non-exclusive, personal, non-transferable and royalty-free license under which you are free to use, copy, distribute, modify and transmit the Materials provided that you only do so for non-commercial purposes (without charging a fee to any third party) and provided that you attribute the Materials to us by (at least) mentioning our name, including an appropriate copyright notice and providing a link to our website located at https://www.geogebra.org.
+
+The GeoGebra source code is licensed to you under the terms of the EUPL v1.2. You can obtain a copy of the license via this link: https://interoperable-europe.ec.europa.eu/collection/eupl/eupl-text-eupl-12 ("EUPL"). Attribution (as required by the EUPL) should take the form of (at least) a mention of our name, an appropriate copyright notice and a link to our website located at https://www.geogebra.org. If you use, reproduce, combine, modify and redistribute the GeoGebra source code (or any individual software library) as part of a derivative work (as defined in the EUPL), you may do so in compliance with EUPL and without any non-commercial restriction on that work. However, any use of the source code together with the Materials and/or the Language Files (defined below) as part of the GeoGebra product remains subject to the remaining terms of this License and must be used for non-commercial purposes only.
+
+The GeoGebra language files (including all user interface "translation" files in the GeoGebra application and applets), all GeoGebra documentation and all GeoGebra user interface image and style files (including logos, icons and style sheets) (together "the Language Files") are licensed to you under the terms of the Creative Commons Attribution-NonCommercial-ShareAlike license (version 4.0 or later), the current text of which can be found via this link: https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en. Attribution (as required by that Creative Commons license) should take the form of (at least) a mention of our name GeoGebra®, an appropriate copyright notice and a link to our website located at https://www.geogebra.org.
+
+The Software (and all related materials and resources such as the Materials and Language Files) is licensed to you WITHOUT ANY WARRANTY and on an AS IS basis, including without limitation the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. We accept no liability for your use of the Software (save to the extent such liability cannot be excluded as a matter of law).
+
+The Software (and all related materials and resources) is licensed to you without any offer or promise of support or future development by GeoGebra GmbH or any third party. Please note that support services are available under the terms of our Collaboration Agreement – please contact office@geogebra.org for more information.
+
+You may install GeoGebra on multiple devices in multiple locations provided that you always use the Software for non-commercial purposes and otherwise in accordance with these License terms.
+
+The copyright and other intellectual property rights (including any trademarks) of whatever nature (arising anywhere in the world) in GeoGebra (and all related resources) are and will remain our property (or in the case of third-party materials (including software libraries) which we have the right to use, the property of the third-party licensor), and we reserve the right to grant licenses to use the GeoGebra software (and all related resources) to third parties.
+
+An "appropriate copyright notice" for the purposes of this License shall take the following form:
+Made with GeoGebra®
+
+This License is personal to you, and you must not assign it to a third party or permit any third party to benefit from it without our prior written consent.
+
+You will notify us immediately if you become aware of any unauthorized use of the whole or any part of the GeoGebra software (and all related resources).
+
+If any of the provisions of this License (including the additional terms incorporated by reference) are held to be invalid or unenforceable under any applicable statute or rule of law, it is to that extent to be deemed omitted from the License. Such an omission will not affect the validity of the remaining provisions, which will remain in full force and effect.
+
+This License (including the terms of the EUPL) shall be governed by and interpreted in accordance with Austrian law.
+
+These License terms were last updated in November 2025.

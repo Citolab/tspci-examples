@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-evaporation",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "an evaporation experiment the candidate designs: containers of salt water with their own temperature, width, wind, salt and volume, a simulated clock, water levels and salt crystals",
   "author": {
     "name": "Citolab",

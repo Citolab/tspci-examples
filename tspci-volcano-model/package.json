@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-volcano-model",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "a classroom volcano model: mashed potato in a U-tube, an effervescent tablet and a stopper; viscosity and gas decide between a lava flow, a dome and an explosion",
   "author": {
     "name": "Citolab",

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-the-room",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "furnish and arrange a 3D room; based on The Room 3D by openPCI (Aarhus and Aalborg University)",
   "author": {
     "name": "Citolab",

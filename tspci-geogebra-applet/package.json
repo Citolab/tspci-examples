@@ -1,12 +1,15 @@
 {
   "name": "@citolab/pci-geogebra-applet",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "a GeoGebra applet in a QTI item: the candidate constructs, the applet can score itself",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
   },
-  "license": "MIT",
+  "license": "LicenseRef-GeoGebra",
+  "contributors": [
+    "Jean-Philippe Rivière, Wiquid (original GeoGebra PCI GGBPCI in janfix/extension-geogebra)"
+  ],
   "homepage": "https://github.com/Citolab/tspci-examples#readme",
   "bugs": "https://github.com/Citolab/tspci-examples/issues",
   "keywords": [

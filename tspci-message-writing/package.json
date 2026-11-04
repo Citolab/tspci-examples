@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-message-writing",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-beta.1",
   "description": "write in a realistic communication environment: reply to an email, chat in a class chat, post on a forum or social media; for a human rater, with optional checks the PCI scores",
   "author": {
     "name": "Citolab",

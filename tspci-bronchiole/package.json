@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-bronchiole",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "cross-sections of a bronchiole of a healthy person and of a person with asthma: more air pollution narrows the air passage; area and airflow (Poiseuille) as a percentage of normal",
   "author": {
     "name": "Citolab",

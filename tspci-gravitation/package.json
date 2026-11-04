@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-gravitation",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "a star and a planet: change the distance, the mass and the radius of the planet and read the gravitational force (Newton's law), record measurements and say which quantities matter",
   "author": {
     "name": "Citolab",

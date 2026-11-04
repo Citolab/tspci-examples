@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-mass-weight",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-beta.1",
   "description": "a lab bench: weigh objects on a scale, hang them on a dynamometer and sink them in a graduated cylinder, on Earth, the Moon or Mars",
   "author": {
     "name": "Citolab",

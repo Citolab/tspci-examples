@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-gantt-chart",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "plan tasks on a timeline: drag and resize the bars of a Gantt chart (a port of the openPCI Gantt chart)",
   "author": {
     "name": "Citolab",

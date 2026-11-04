@@ -10,9 +10,10 @@ itself, or uses a material from geogebra.org. Made with [tspci](https://github.c
 >   every time the item opens. Offline, or where geogebra.org is blocked, the candidate sees an error instead of the
 >   applet. Locked-down browsers and networks must allow geogebra.org, and the candidate's browser connects to
 >   GeoGebra's servers (consider this in a privacy review).
-> - **GeoGebra has its own licence.** This PCI's code is MIT, but the GeoGebra app it loads falls under the
->   [GeoGebra licence](https://www.geogebra.org/license): free for non-commercial use; **commercial use requires a
->   licence from GeoGebra**. See [Licence and third-party](#licence-and-third-party).
+> - **Non-commercial use only.** This PCI is a port of the GeoGebra PCI by Jean-Philippe Rivière and keeps its
+>   licence, the [GeoGebra Non-Commercial License Agreement](https://www.geogebra.org/license); the GeoGebra app it
+>   loads falls under the same licence. **Commercial use requires a licence from GeoGebra.** This differs from the MIT
+>   licence of most other examples in this repository. See [Source and licence](#source-and-licence).
 > - GeoGebra is a trademark of GeoGebra GmbH. This PCI is not made or endorsed by GeoGebra.
 
 <p align="center">
@@ -182,17 +183,39 @@ In a QTI 3 item, with `index.js` at `resources/pci/index.js` of the package:
 A delivery system with a Content Security Policy has to allow `https://www.geogebra.org` (scripts, styles, fonts,
 images and connections: the app loads more from there) and `srcdoc` frames.
 
-## Licence and third-party
+## Source and licence
 
-- **This PCI** is licensed under the [MIT licence](./LICENSE), © Stichting Cito Instituut voor Toetsontwikkeling. Its
-  code is our own, written from GeoGebra's public documentation
-  ([Apps API](https://geogebra.github.io/docs/reference/en/GeoGebra_Apps_API/),
+This PCI is a derivative work of the GeoGebra PCI
+[`geogebrapci`](https://github.com/janfix/extension-geogebra/tree/master/views/js/pciCreator/ims/geogebrapci) (type
+`GGBPCI`) in [janfix/extension-geogebra](https://github.com/janfix/extension-geogebra), by Jean-Philippe Rivière
+(Wiquid). It keeps that PCI's response format: a `record` with `correct`, `candidateResponse`, `score`, `maxscore` and
+optionally `applet`, read from objects in the applet, so items and scoring made for the original stay meaningful.
+
+- **Licence.** The PCI code of that extension is "subject to the GeoGebra Non-Commercial License Agreement" (as stated
+  in the headers of its files and in its README, which points to [geogebra.org/license](https://www.geogebra.org/license)),
+  so this PCI is too: see [LICENSE](LICENSE), and `"license": "LicenseRef-GeoGebra"` in `package.json`. Its TAO
+  installer (PHP) is GPL-2.0-only according to its `composer.json`; that part is not used here, and where the two
+  disagree we follow the stricter one. **Use is free for non-commercial purposes only; for commercial use, contact
+  GeoGebra at [office@geogebra.org](mailto:office@geogebra.org).** This differs from the MIT licence of most other
+  examples in this repository.
+- **GeoGebra** itself is not part of this package. It is loaded from geogebra.org at runtime and falls under the same
+  licence. **If you use this PCI, check what that means for your own use** (and for the materials you load from
+  geogebra.org, which have their own terms). Using GeoGebra also means the candidate's browser connects to
+  geogebra.org.
+
+What changed, by Stichting Cito Instituut voor Toetsontwikkeling (2026):
+
+- Rewritten in TypeScript and Preact, built with tspci, as an IMS PCI v1.0 for QTI 3 and TAO; written from GeoGebra's
+  public documentation ([Apps API](https://geogebra.github.io/docs/reference/en/GeoGebra_Apps_API/),
   [App Parameters](https://geogebra.github.io/docs/reference/en/GeoGebra_App_Parameters/)) and the
-  [IMS PCI specification](https://www.imsglobal.org/sites/default/files/assessment/pciv1p0/pciv1p0.html).
-- **GeoGebra** is not part of this package. It is loaded from geogebra.org at runtime and falls under GeoGebra's own
-  licence, [geogebra.org/license](https://www.geogebra.org/license): free for non-commercial use; commercial use
-  requires a licence from GeoGebra. **If you use this PCI, check what that means for your own use** (and for the
-  materials you load from geogebra.org, which have their own terms). Using GeoGebra also means the candidate's browser
-  connects to geogebra.org.
+  [IMS PCI specification](https://www.imsglobal.org/sites/default/files/assessment/pciv1p0/pciv1p0.html). No code of
+  the original is used, and GeoGebra's `deployggb.js` is loaded from geogebra.org instead of bundled.
+- The applet runs in a `srcdoc` frame, so it works in the shadow roots QTI players put a PCI in, and scales down on a
+  smaller screen.
+- An authoring mode (`getAuthoringInstance`) in which the author builds the applet in the PCI itself, or loads a
+  geogebra.org material; the settings are `data-` attributes described in `dist/authoring.json`.
+- The candidate's applet is saved as the state and restored; `qti-interaction-changed` events after every change.
+- An accessible wrapper (labelled region, titled frame, loading and error messages with a **Try again** button) in
+  English and Dutch.
 
 Source and the other examples: [Citolab/tspci-examples](https://github.com/Citolab/tspci-examples).

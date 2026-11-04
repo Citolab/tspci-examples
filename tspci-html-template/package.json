@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-html-template",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "an interaction made of the author's own HTML: every input marked with data-response is part of the response",
   "author": {
     "name": "Citolab",

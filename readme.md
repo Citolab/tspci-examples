@@ -6,8 +6,8 @@ Example PCI's created with @citolab/tspci
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
 There are 61 examples in this repository that can give a head start while creating new Portable Custom Interactions.
-Twenty-four of them are ports of existing open-source PCIs and three more take ideas from one; all 27 credit the
-original authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis),
+Twenty-five of them are ports of existing PCIs and three more take ideas from one; all 28 credit the original
+authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis),
 [Ports of the DEPP PCIs](#ports-of-the-depp-pcis) and [Ports of the PARCC PCIs](#ports-of-the-parcc-pcis)).
 To run these examples go the to folder of the specific example and run:
 
@@ -558,8 +558,9 @@ lists and 2D views.
 
 The examples below are ports of existing open-source PCIs to IMS PCI v1.0 with tspci, with a new, accessible UI. They
 keep the response format of the original, so items and scoring made for the original stay meaningful. They are
-derivative works, so **each one keeps the licence of its original** (GPL-2.0-only, GPL-3.0-only or MIT with the
-original's copyright), not simply the MIT licence of this repository: see the `LICENSE` file and the "Source and
+derivative works, so **each one keeps the licence of its original** (GPL-2.0-only, GPL-3.0-only, MIT with the
+original's copyright, or for tspci-geogebra-applet the non-commercial GeoGebra licence, which is not open source), not
+simply the MIT licence of this repository: see the `LICENSE` file and the "Source and
 licence" section of the README in each folder.
 
 | example | original | licence |
@@ -576,7 +577,7 @@ licence" section of the README in each folder.
 | tspci-paint | [openPCI paint](https://github.com/openPCI/openPCIs/tree/master/paint) | GPL-3.0-only |
 | tspci-voxelcraft | [openPCI voxelcraft](https://github.com/openPCI/openPCIs/tree/master/voxelcraft) | GPL-3.0-only |
 | tspci-the-room | [openPCI theroom](https://github.com/openPCI/openPCIs/tree/master/theroom) | GPL-3.0-only |
-
+| tspci-geogebra-applet | [GeoGebra PCI (GGBPCI)](https://github.com/janfix/extension-geogebra/tree/master/views/js/pciCreator/ims/geogebrapci) (Jean-Philippe Rivière, Wiquid) | [GeoGebra Non-Commercial License](https://www.geogebra.org/license) (not open source: no commercial use) |
 | tspci-gravitation | [DEPP NouvelleTerrepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/NouvelleTerrepci) | GPL-2.0-only |
 | tspci-mass-weight | [DEPP ForceGravitepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/ForceGravitepci) and [Delorpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Delorpci) | GPL-2.0-only |
 | tspci-bee-colony | [DEPP Abeillepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Abeillepci) | GPL-2.0-only |
@@ -941,12 +942,15 @@ Port of [DEPP Volcanismepci](https://github.com/janfix/extension-wiquid-depp/tre
 ## tspci-geogebra-applet
 
 PCI with a [GeoGebra](https://www.geogebra.org) applet in it: the candidate constructs, graphs or calculates, and the
-applet can score the work itself. Not a port: written from scratch from GeoGebra's public
-[Apps API](https://geogebra.github.io/docs/reference/en/GeoGebra_Apps_API/), licensed MIT.
+applet can score the work itself. A port of the
+[GeoGebra PCI](https://github.com/janfix/extension-geogebra/tree/master/views/js/pciCreator/ims/geogebrapci) by
+Jean-Philippe Rivière (Wiquid), rewritten from GeoGebra's public
+[Apps API](https://geogebra.github.io/docs/reference/en/GeoGebra_Apps_API/); it keeps the original's licence, the
+[GeoGebra Non-Commercial License Agreement](https://www.geogebra.org/license), so **not MIT and not for commercial use**.
 
 - **Needs an internet connection**: the GeoGebra app is not in the package but loaded from geogebra.org when the item
   opens; offline or where geogebra.org is blocked, the candidate sees an error instead of the applet
-- **GeoGebra has its own [licence](https://www.geogebra.org/license)**: free for non-commercial use, commercial use
+- **GeoGebra has the same [licence](https://www.geogebra.org/license)**: free for non-commercial use, commercial use
   requires a licence from GeoGebra. GeoGebra is a trademark of GeoGebra GmbH; this PCI is not made or endorsed by
   GeoGebra
 - Starts from the candidate's state, the author's applet, a geogebra.org material or an empty app (classic, graphing,

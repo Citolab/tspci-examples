@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-q-sort",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.0-beta.1",
   "description": "a Q-sort: place statements in a forced, quasi-normal grid from most disagree to most agree, horizontal or vertical, with an optional pre-sort into three piles; based on openPCI WordRank",
   "author": {
     "name": "Citolab",
