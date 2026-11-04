@@ -1,0 +1,202 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction (empty: the example's)",
+      "nl": "Instructie (leeg: die van het voorbeeld)",
+      "fr": "Consigne (vide : celle de l'exemple)"
+    }
+  },
+  "elements": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "What the candidate can draw, and the correct answer",
+      "nl": "Wat de kandidaat kan tekenen, en het goede antwoord",
+      "fr": "Ce que le candidat peut tracer, et la bonne réponse"
+    },
+    "$comment": "JSON written by the authoring mode (model.ts ElementDef): [{ id, type: point|points|line|segment|ray|solutionSet, label, color, max, connect, dashed, styleToggle, score, correct: { points: [[x, y]], dashed, regions: [[x, y]] }, equation, minPoints }]; at most 12; empty: the example (y > ½x + 1)"
+  },
+  "xMin": {
+    "default": "-10",
+    "editor": "number",
+    "label": {
+      "en": "Horizontal axis from",
+      "nl": "Horizontale as van",
+      "fr": "Axe horizontal de"
+    }
+  },
+  "xMax": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "Horizontal axis to",
+      "nl": "Horizontale as tot",
+      "fr": "Axe horizontal à"
+    }
+  },
+  "yMin": {
+    "default": "-10",
+    "editor": "number",
+    "label": {
+      "en": "Vertical axis from",
+      "nl": "Verticale as van",
+      "fr": "Axe vertical de"
+    }
+  },
+  "yMax": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "Vertical axis to",
+      "nl": "Verticale as tot",
+      "fr": "Axe vertical à"
+    }
+  },
+  "xStep": {
+    "default": "1",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Horizontal distance between grid lines",
+      "nl": "Horizontale afstand tussen rasterlijnen",
+      "fr": "Distance horizontale entre les lignes de la grille"
+    }
+  },
+  "yStep": {
+    "default": "1",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Vertical distance between grid lines",
+      "nl": "Verticale afstand tussen rasterlijnen",
+      "fr": "Distance verticale entre les lignes de la grille"
+    }
+  },
+  "snap": {
+    "default": "grid",
+    "editor": "enum",
+    "label": {
+      "en": "Points snap to",
+      "nl": "Punten klikken vast op",
+      "fr": "Les points s'accrochent"
+    },
+    "options": [
+      {
+        "value": "grid",
+        "label": {
+          "en": "The grid lines",
+          "nl": "De rasterlijnen",
+          "fr": "Aux lignes de la grille"
+        }
+      },
+      {
+        "value": "half",
+        "label": {
+          "en": "Half a grid step",
+          "nl": "Een halve rasterstap",
+          "fr": "À un demi-pas"
+        }
+      },
+      {
+        "value": "tenth",
+        "label": {
+          "en": "A tenth of a grid step",
+          "nl": "Een tiende rasterstap",
+          "fr": "À un dixième de pas"
+        }
+      }
+    ]
+  },
+  "xLabel": {
+    "default": "x",
+    "editor": "text",
+    "label": {
+      "en": "Name of the horizontal axis",
+      "nl": "Naam van de horizontale as",
+      "fr": "Nom de l'axe horizontal"
+    }
+  },
+  "yLabel": {
+    "default": "y",
+    "editor": "text",
+    "label": {
+      "en": "Name of the vertical axis",
+      "nl": "Naam van de verticale as",
+      "fr": "Nom de l'axe vertical"
+    }
+  },
+  "allowEdge": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Points may be placed on the edge of the grid",
+      "nl": "Punten mogen op de rand van het raster",
+      "fr": "Les points peuvent être placés sur le bord de la grille"
+    }
+  },
+  "given": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Given points: a line per point, label;x;y",
+      "nl": "Gegeven punten: een regel per punt, naam;x;y",
+      "fr": "Points donnés : une ligne par point, nom;x;y"
+    }
+  },
+  "connectGiven": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Connect the given points from left to right",
+      "nl": "De gegeven punten van links naar rechts verbinden",
+      "fr": "Relier les points donnés de gauche à droite"
+    }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "min": 0,
+    "label": {
+      "en": "Tolerance of a point, in units of the axes",
+      "nl": "Marge van een punt, in eenheden van de assen",
+      "fr": "Tolérance d'un point, en unités des axes"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "label": {
+      "en": "Language of the texts",
+      "nl": "Taal van de teksten",
+      "fr": "Langue des textes"
+    },
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels",
+          "fr": "Anglais"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands",
+          "fr": "Néerlandais"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French",
+          "nl": "Frans",
+          "fr": "Français"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction (empty: the example's, when the blocks are empty too)",
+      "nl": "Instructie (leeg: die van het voorbeeld, als de blokken ook leeg zijn)",
+      "fr": "Consigne (vide : celle de l'exemple, si les blocs sont vides aussi)"
+    }
+  },
+  "blocks": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Blocks: a line per block, kind: label with {} for a blank (empty: the example)",
+      "nl": "Blokken: een regel per blok, soort: label met {} voor een open plek (leeg: het voorbeeld)",
+      "fr": "Blocs : une ligne par bloc, type : étiquette avec {} pour un trou (vide : l'exemple)"
+    },
+    "$comment": "kind: set, input, print, if, ifelse, while, repeat or for. In the label {} is a text box, {a|b|c} a dropdown, {total} fixed text. 'ifelse: if {} | else' sets the else line. Blocks that are not in the solution are distractors. README Written by the authoring mode (with program, solution, inputs and tests), or by hand."
+  },
+  "program": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Starting program: a block per line, indented inside a block; * in front locks it",
+      "nl": "Startprogramma: een blok per regel, ingesprongen in een blok; * ervoor zet het vast",
+      "fr": "Programme de départ : un bloc par ligne, en retrait dans un bloc ; * devant le fixe"
+    },
+    "$comment": "Lines as code ('total ← 0', matched to the blocks) or as kind: label ('* input: read {n}', a block of its own when it is not one of the blocks)."
+  },
+  "solution": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Solution: the correct program, written like the starting program",
+      "nl": "Oplossing: het goede programma, geschreven als het startprogramma",
+      "fr": "Solution : le bon programme, écrit comme le programme de départ"
+    }
+  },
+  "inputs": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Input at the start: a value per line",
+      "nl": "Invoer bij het begin: een waarde per regel",
+      "fr": "Entrée au départ : une valeur par ligne"
+    }
+  },
+  "tests": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Test cases for PCI scoring: a line per test, input; input => output; output",
+      "nl": "Testgevallen voor scoren door de PCI: een regel per test, invoer; invoer => uitvoer; uitvoer",
+      "fr": "Cas de test pour le score par la PCI : une ligne par test, entrée ; entrée => sortie ; sortie"
+    },
+    "$comment": "At most 8. A test passes when the program prints exactly those lines for that input."
+  },
+  "editInputs": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "The candidate can change the input",
+      "nl": "De kandidaat kan de invoer veranderen",
+      "fr": "Le candidat peut changer l'entrée"
+    }
+  },
+  "reuse": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "A block can be used more than once",
+      "nl": "Een blok kan meer dan eens gebruikt worden",
+      "fr": "Un bloc peut servir plusieurs fois"
+    }
+  },
+  "scoring": {
+    "default": "original",
+    "editor": "enum",
+    "label": {
+      "en": "Response and scoring",
+      "nl": "Antwoord en scoren",
+      "fr": "Réponse et score"
+    },
+    "options": [
+      {
+        "value": "original",
+        "label": {
+          "en": "The original's JSON (result, code, blocks, blanks): for a rater or custom response processing",
+          "nl": "De JSON van het origineel (resultaat, code, blokken, open plekken): voor een beoordelaar of eigen responsverwerking",
+          "fr": "Le JSON de l'original (résultat, code, blocs, trous) : pour un correcteur ou un traitement de réponse propre"
+        }
+      },
+      {
+        "value": "code",
+        "label": {
+          "en": "The program as text: the item compares it with the correct response",
+          "nl": "Het programma als tekst: het item vergelijkt het met het goede antwoord",
+          "fr": "Le programme en texte : l'item le compare à la bonne réponse"
+        }
+      },
+      {
+        "value": "pci",
+        "label": {
+          "en": "Test cases: the PCI runs the tests (record with score)",
+          "nl": "Testgevallen: de PCI voert de tests uit (record met score)",
+          "fr": "Cas de test : la PCI exécute les tests (record avec score)"
+        }
+      }
+    ]
+  },
+  "maxBlocks": {
+    "default": "30",
+    "editor": "integer",
+    "min": 1,
+    "max": 60,
+    "label": {
+      "en": "Most blocks in the program",
+      "nl": "Hoogstens zoveel blokken in het programma",
+      "fr": "Nombre maximal de blocs dans le programme"
+    }
+  },
+  "maxDepth": {
+    "default": "5",
+    "editor": "integer",
+    "min": 1,
+    "max": 10,
+    "label": {
+      "en": "Most levels of blocks inside blocks",
+      "nl": "Hoogstens zoveel niveaus blokken in blokken",
+      "fr": "Nombre maximal de niveaux de blocs dans des blocs"
+    }
+  },
+  "maxSteps": {
+    "default": "10000",
+    "editor": "integer",
+    "min": 100,
+    "max": 1000000,
+    "label": {
+      "en": "Most steps of a run (against loops that never end)",
+      "nl": "Hoogstens zoveel stappen per uitvoering (tegen herhalingen die nooit stoppen)",
+      "fr": "Nombre maximal de pas d'une exécution (contre les boucles sans fin)"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels",
+          "fr": "Anglais"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands",
+          "fr": "Néerlandais"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French",
+          "nl": "Frans",
+          "fr": "Français"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the texts (and of and/or/not, true/false)",
+      "nl": "Taal van de teksten (en van en/of/niet, waar/onwaar)",
+      "fr": "Langue des textes (et de et/ou/non, vrai/faux)"
+    }
+  }
+}

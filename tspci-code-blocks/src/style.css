@@ -1,0 +1,177 @@
+/* SPDX-License-Identifier: MIT
+   Based on https://github.com/rdncuee/CBP (Code Block Programming Interaction),
+   © 2022 The National Center for University Entrance Examinations
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+/* ─── the blocks as puzzle pieces ─────────────────────────────────────────────────────────────────────────────────
+   A piece has its colour in --c (look.tsx). A dent on top (in the colour of what is behind it, --canvas) and a tab
+   below (in its own colour) make stacked pieces look snapped together: the tab of a piece covers the dent of the
+   next. The C-shapes of if, if/else, while, repeat and for are a top piece, an arm per line inside (.cb-arm), an else
+   bar and a bottom bar, each a row of the editor. */
+
+.cb-root {
+  --arm: 1rem;
+  --canvas: #ffffff;
+}
+
+.cb-canvas {
+  --canvas: #f6f8fb;
+  background-color: var(--canvas);
+  background-image: radial-gradient(circle, #cfd8e3 1px, transparent 1.3px);
+  background-size: 18px 18px;
+}
+
+.cb-flyout {
+  --canvas: #eef2f7;
+  background-color: var(--canvas);
+}
+
+.cb-piece {
+  position: relative;
+  color: #fff;
+  border-radius: 7px;
+  background-color: var(--c);
+  /* the darker bottom edge is a background, not a shadow: on a C it stops at the arm, so the joins have no seam */
+  background-image: var(--stripes, linear-gradient(transparent, transparent)), linear-gradient(to top, rgb(0 0 0 / 0.2) 2px, transparent 2px);
+  background-repeat: no-repeat;
+  background-size: 100% 100%, var(--edge, 100%) 100%;
+  background-position: 0 0, right bottom;
+}
+
+.cb-piece::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0.75rem;
+  width: 1.25rem;
+  height: 0.3rem;
+  background-color: var(--canvas);
+  border-radius: 0 0 0.4rem 0.4rem;
+  z-index: 1;
+}
+
+.cb-piece::after {
+  content: "";
+  position: absolute;
+  bottom: -0.3rem;
+  left: var(--tab, 0.75rem);
+  width: 1.25rem;
+  height: 0.3rem;
+  background-color: var(--c);
+  background-image: var(--stripes, none);
+  border-radius: 0 0 0.4rem 0.4rem;
+  box-shadow: inset 0 -2px 0 rgb(0 0 0 / 0.2);
+  z-index: 2;
+}
+
+/* the hat the program hangs from: a rounded top, no dent */
+.cb-hat {
+  border-radius: 1.6rem 1.6rem 7px 7px / 1rem 1rem 7px 7px;
+  padding-top: 0.7rem;
+}
+.cb-hat::before {
+  display: none;
+}
+
+/* ─── C-shapes: top piece, arms, else bar, bottom bar ─── */
+
+/* the top: square where the arm joins, the bottom edge only right of the arm, the inner tab in the mouth */
+.cb-c-top {
+  border-bottom-left-radius: 0;
+  --edge: calc(100% - var(--arm));
+  --tab: calc(var(--arm) + 0.75rem);
+}
+/* the else bar between the two mouths of an if/else: as wide as a bottom bar at least */
+.cb-c-mid {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  min-width: calc(var(--arm) + 6rem);
+  --edge: calc(100% - var(--arm));
+  --tab: calc(var(--arm) + 0.75rem);
+}
+.cb-c-mid::before {
+  display: none;
+}
+/* the bottom bar that closes a C, with its own tab for the next block */
+.cb-c-end {
+  border-top-left-radius: 0;
+  width: calc(var(--arm) + 6rem);
+  max-width: 100%;
+  min-height: 1.5rem;
+}
+.cb-c-end::before {
+  display: none;
+}
+
+/* an arm: one line inside a C. It reaches 1px into the rows above and below (negative margins), so rows never show a
+   hairline between them, whatever the zoom. A thin gap of canvas on its inner side keeps a C inside a C (same colour)
+   apart from the one around it. */
+.cb-arm {
+  width: var(--arm);
+  flex-shrink: 0;
+  margin-block: -1px;
+  background-image: var(--stripes, linear-gradient(transparent, transparent)), linear-gradient(to right, var(--c) calc(100% - 3px), transparent calc(100% - 3px));
+  background-size: calc(100% - 3px) 100%, 100% 100%;
+  background-repeat: no-repeat;
+}
+.cb-mouth {
+  margin-block: 0;
+}
+
+/* the empty mouth of a C on its own (palette, previews) */
+.cb-mouth {
+  height: 0.9rem;
+}
+
+/* a locked block: stripes that only darken, so the white text keeps its contrast; on the whole C (top, arms, bars) */
+.cb-locked {
+  --stripes: repeating-linear-gradient(135deg, rgb(0 0 0 / 0.16) 0 6px, transparent 6px 12px);
+}
+
+/* selection and errors: rings inside the piece (dark outside, white inside), so they never cover the blocks around it,
+   visible on every block colour and on the canvas */
+.cb-selected {
+  box-shadow: inset 0 0 0 3px #111827, inset 0 0 0 5px #fff;
+}
+.cb-error {
+  box-shadow: inset 0 0 0 3px #dc2626, inset 0 0 0 5px #fff;
+}
+.cb-focus:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 5px #111827;
+}
+
+/* the block being dragged, lifted */
+.cb-ghost {
+  box-shadow: 0 12px 24px rgb(15 23 42 / 0.35);
+  transform: rotate(-2deg) scale(1.03);
+}
+/* where it will snap: a piece-shaped gap */
+.cb-drop {
+  background-color: var(--c);
+  opacity: 0.5;
+  border-radius: 7px;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111827;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cb-piece {
+    transition: box-shadow 0.12s ease;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cb-ghost {
+    transform: none;
+  }
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}

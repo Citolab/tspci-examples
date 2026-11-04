@@ -16,6 +16,7 @@
     "resolveJsonModule": true,
     "esModuleInterop": true,
     "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
   },
   "include": ["**/*"],
   "exclude": ["test", "src/**/*.stories.ts", "node_modules", "dist"],

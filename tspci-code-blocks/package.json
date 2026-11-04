@@ -1,0 +1,102 @@
+{
+  "name": "@citolab/pci-code-blocks",
+  "version": "1.0.0-beta.1",
+  "description": "the candidate builds a program from code blocks (set, input, print, if, if/else, while, repeat, for), fills in the blanks and runs it; a port of the Code Block Programming Interaction (rdncuee/CBP) with a safe interpreter of its own",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "The National Center for University Entrance Examinations (original Code Block Programming Interaction, https://github.com/rdncuee/CBP)"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "programming",
+    "code blocks",
+    "pseudocode",
+    "computational thinking"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-code-blocks"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "codeBlocks.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-code-blocks npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-code-blocks npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "codeBlocks",
+      "label": "Code blocks",
+      "tags": [
+        "programming",
+        "code blocks",
+        "pseudocode",
+        "algorithm"
+      ],
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "short": "codeBlocks",
+      "response": {
+        "$comment": "data-scoring=\"original\" (default): the JSON string of the original, {result, code, codeblock, textbox, dropdown}. data-scoring=\"code\": the program as pseudocode text, for MATCH_CORRECT. data-scoring=\"pci\": a record instead (score, maxscore, correct, test1…test8, code, program), CUSTOM. README",
+        "cardinality": "single",
+        "baseType": "string"
+      },
+      "authoring": {
+        "label": {
+          "en": "Make the blocks, the solution and the tests…",
+          "nl": "Blokken, oplossing en tests maken…",
+          "fr": "Créer les blocs, la solution et les tests…"
+        },
+        "width": 1000,
+        "height": 760
+      },
+      "correctResponse": "properties"
+    }
+  }
+}

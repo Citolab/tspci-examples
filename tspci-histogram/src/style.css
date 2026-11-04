@@ -1,0 +1,19 @@
+/* SPDX-License-Identifier: GPL-2.0-only
+   Based on https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/histogramInteraction,
+   © 2014-2017 Parcc, Inc. (Sam Sipasseuth, Open Assessment Technologies)
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+
+@import "tailwindcss";
+
+:host {
+  display: block;
+}
+
+.hg-bar:focus-visible {
+  outline: none;
+}
+.hg-bar:focus-visible .hg-focus {
+  stroke: #0f172a;
+  stroke-width: 3;
+  stroke-dasharray: 6 3;
+}

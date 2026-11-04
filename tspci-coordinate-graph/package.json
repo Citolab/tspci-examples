@@ -1,0 +1,208 @@
+{
+  "name": "@citolab/pci-coordinate-graph",
+  "version": "1.0.0-beta.1",
+  "description": "the candidate draws points, sets of points, lines, segments, rays and solution sets of inequalities on a coordinate grid, scored with the author's correct elements",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    "Thibault Milan, Open Assessment Technologies, for Parcc, Inc. (original PARCC graphLineAndPointInteraction, Graphing Line And Point)",
+    "Sam Sipasseuth, Open Assessment Technologies, for Parcc, Inc. (original PARCC graphLineAndPointInteraction and graphPointLineGraphInteraction, Point Graph)",
+    "Christophe Noël, Open Assessment Technologies, for Parcc, Inc. (original PARCC graphPointLineGraphInteraction, Point Graph)"
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "graph",
+    "coordinate-grid",
+    "line",
+    "inequality",
+    "math"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-coordinate-graph"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "coordinateGraph.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-coordinate-graph npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-coordinate-graph npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "coordinateGraph",
+      "label": "Coordinate graph",
+      "tags": [
+        "graph",
+        "coordinate-grid",
+        "line",
+        "inequality",
+        "math"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "coordinateGraph",
+      "response": {
+        "cardinality": "record",
+        "$comment": "Besides these, a field per element named by its id, as in PARCC graphLineAndPointInteraction: points_1, setPoints_2, lines_3, segments_4, rays_5: a list of point ([x, y]); solutionSet_6: a list of string, a polygon per shaded area (\"x y, x y, …\"). The PCI scores itself with the author's correct elements (data-elements); README",
+        "fields": {
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: points of the elements that are right",
+              "nl": "Score: punten van de elementen die goed zijn"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: points of all scored elements",
+              "nl": "Maximale score: punten van alle gescoorde elementen"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 when every scored element is right",
+              "nl": "Goed: 1 als alle gescoorde elementen goed zijn"
+            }
+          },
+          "check1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 1: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 1: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 2: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 2: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 3: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 3: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 4: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 4: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 5: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 5: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 6: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 6: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 7: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 7: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 8: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 8: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 9: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 9: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 10: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 10: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check11": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 11: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 11: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "check12": {
+            "baseType": "integer",
+            "label": {
+              "en": "Element 12: 1 right, 0 not (absent when it is not scored)",
+              "nl": "Element 12: 1 goed, 0 niet (ontbreekt als het niet gescoord wordt)"
+            }
+          },
+          "graph": {
+            "baseType": "string",
+            "label": {
+              "en": "Graph: what the candidate drew, with the line styles (JSON)",
+              "nl": "Grafiek: wat de kandidaat tekende, met de lijnstijlen (JSON)"
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+/* SPDX-License-Identifier: GPL-2.0-only
+   Based on https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphLineAndPointInteraction,
+   © 2014-2017 Parcc, Inc. (Open Assessment Technologies, for Parcc, Inc.)
+   Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026 */
+
+@import "tailwindcss";
+
+:host {
+  display: block;
+}

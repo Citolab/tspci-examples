@@ -1,0 +1,396 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction (empty: a short general instruction)",
+      "nl": "Instructie (leeg: een korte algemene instructie)",
+      "fr": "Consigne (vide : une courte consigne générale)"
+    }
+  },
+  "graphs": {
+    "default": "linear,absolute,quadratic,exponential,logarithmic,cosine,tangent",
+    "editor": "text",
+    "label": {
+      "en": "Types of function offered, separated by commas: linear, absolute, quadratic, exponential, logarithmic, cosine, tangent",
+      "nl": "Aangeboden soorten functies, gescheiden door komma's: linear, absolute, quadratic, exponential, logarithmic, cosine, tangent",
+      "fr": "Types de fonction proposés, séparés par des virgules : linear, absolute, quadratic, exponential, logarithmic, cosine, tangent"
+    },
+    "$comment": "The original's graphs property. The first is chosen at the start."
+  },
+  "startPoints": {
+    "default": "default",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "default",
+        "label": {
+          "en": "Two points to drag (as the original)",
+          "nl": "Twee punten om te verslepen (zoals het origineel)",
+          "fr": "Deux points à déplacer (comme l'original)"
+        }
+      },
+      {
+        "value": "empty",
+        "label": {
+          "en": "No points: the candidate places both",
+          "nl": "Geen punten: de kandidaat zet ze allebei",
+          "fr": "Aucun point : le candidat place les deux"
+        }
+      }
+    ],
+    "label": {
+      "en": "At the start",
+      "nl": "Bij de start",
+      "fr": "Au départ"
+    }
+  },
+  "showEquation": {
+    "default": "false",
+    "editor": "boolean",
+    "label": {
+      "en": "Show the equation of the graph",
+      "nl": "De vergelijking van de grafiek tonen",
+      "fr": "Afficher l'équation de la courbe"
+    }
+  },
+  "showAsymptotes": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Show asymptotes as dashed lines",
+      "nl": "Asymptoten als stippellijnen tonen",
+      "fr": "Afficher les asymptotes en pointillés"
+    }
+  },
+  "graphTitle": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Title above the graph",
+      "nl": "Titel boven de grafiek",
+      "fr": "Titre au-dessus du graphique"
+    }
+  },
+  "xStart": {
+    "default": "-10",
+    "editor": "number",
+    "label": {
+      "en": "x axis: from",
+      "nl": "x-as: van",
+      "fr": "Axe des x : de"
+    }
+  },
+  "xEnd": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "x axis: to",
+      "nl": "x-as: tot",
+      "fr": "Axe des x : à"
+    }
+  },
+  "xStep": {
+    "default": "1",
+    "editor": "number",
+    "label": {
+      "en": "x axis: a grid line every",
+      "nl": "x-as: een rasterlijn elke",
+      "fr": "Axe des x : une ligne de la grille tous les"
+    }
+  },
+  "xSubStep": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 20,
+    "label": {
+      "en": "x axis: points snap to the step divided by",
+      "nl": "x-as: punten springen naar de stap gedeeld door",
+      "fr": "Axe des x : les points s'alignent sur le pas divisé par"
+    }
+  },
+  "xLabel": {
+    "default": "x",
+    "editor": "text",
+    "label": {
+      "en": "x axis: label at the tip",
+      "nl": "x-as: label aan de punt",
+      "fr": "Axe des x : étiquette au bout"
+    }
+  },
+  "xTitle": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "x axis: title along the axis",
+      "nl": "x-as: titel langs de as",
+      "fr": "Axe des x : titre le long de l'axe"
+    }
+  },
+  "xAllowOuter": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "x axis: points may lie on the border of the grid",
+      "nl": "x-as: punten mogen op de rand van het rooster liggen",
+      "fr": "Axe des x : les points peuvent être sur le bord de la grille"
+    }
+  },
+  "yStart": {
+    "default": "-10",
+    "editor": "number",
+    "label": {
+      "en": "y axis: from",
+      "nl": "y-as: van",
+      "fr": "Axe des y : de"
+    }
+  },
+  "yEnd": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "y axis: to",
+      "nl": "y-as: tot",
+      "fr": "Axe des y : à"
+    }
+  },
+  "yStep": {
+    "default": "1",
+    "editor": "number",
+    "label": {
+      "en": "y axis: a grid line every",
+      "nl": "y-as: een rasterlijn elke",
+      "fr": "Axe des y : une ligne de la grille tous les"
+    }
+  },
+  "ySubStep": {
+    "default": "2",
+    "editor": "integer",
+    "min": 1,
+    "max": 20,
+    "label": {
+      "en": "y axis: points snap to the step divided by",
+      "nl": "y-as: punten springen naar de stap gedeeld door",
+      "fr": "Axe des y : les points s'alignent sur le pas divisé par"
+    }
+  },
+  "yLabel": {
+    "default": "y",
+    "editor": "text",
+    "label": {
+      "en": "y axis: label at the tip",
+      "nl": "y-as: label aan de punt",
+      "fr": "Axe des y : étiquette au bout"
+    }
+  },
+  "yTitle": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "y axis: title along the axis",
+      "nl": "y-as: titel langs de as",
+      "fr": "Axe des y : titre le long de l'axe"
+    }
+  },
+  "yAllowOuter": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "y axis: points may lie on the border of the grid",
+      "nl": "y-as: punten mogen op de rand van het rooster liggen",
+      "fr": "Axe des y : les points peuvent être sur le bord de la grille"
+    }
+  },
+  "width": {
+    "default": "450",
+    "editor": "integer",
+    "min": 150,
+    "max": 1200,
+    "label": {
+      "en": "Width of the grid in pixels (smaller on a narrow screen)",
+      "nl": "Breedte van het rooster in pixels (kleiner op een smal scherm)",
+      "fr": "Largeur de la grille en pixels (plus petite sur un écran étroit)"
+    }
+  },
+  "height": {
+    "default": "450",
+    "editor": "integer",
+    "min": 150,
+    "max": 1200,
+    "label": {
+      "en": "Height of the grid in pixels",
+      "nl": "Hoogte van het rooster in pixels",
+      "fr": "Hauteur de la grille en pixels"
+    }
+  },
+  "plotColor": {
+    "default": "#2563eb",
+    "editor": "color",
+    "label": {
+      "en": "Colour of the graph",
+      "nl": "Kleur van de grafiek",
+      "fr": "Couleur de la courbe"
+    }
+  },
+  "plotThickness": {
+    "default": "3",
+    "editor": "integer",
+    "min": 1,
+    "max": 12,
+    "label": {
+      "en": "Thickness of the graph",
+      "nl": "Dikte van de grafiek",
+      "fr": "Épaisseur de la courbe"
+    }
+  },
+  "pointColor": {
+    "default": "#1e3a8a",
+    "editor": "color",
+    "label": {
+      "en": "Colour of the points",
+      "nl": "Kleur van de punten",
+      "fr": "Couleur des points"
+    }
+  },
+  "pointRadius": {
+    "default": "8",
+    "editor": "integer",
+    "min": 4,
+    "max": 20,
+    "label": {
+      "en": "Radius of the points",
+      "nl": "Straal van de punten",
+      "fr": "Rayon des points"
+    }
+  },
+  "correctType": {
+    "default": "",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "",
+        "label": {
+          "en": "None (not scored by the PCI)",
+          "nl": "Geen (niet gescoord door de PCI)",
+          "fr": "Aucune (pas notée par la PCI)"
+        }
+      },
+      {
+        "value": "linear",
+        "label": {
+          "en": "Linear",
+          "nl": "Lineair",
+          "fr": "Affine"
+        }
+      },
+      {
+        "value": "absolute",
+        "label": {
+          "en": "Absolute value",
+          "nl": "Absolute waarde",
+          "fr": "Valeur absolue"
+        }
+      },
+      {
+        "value": "quadratic",
+        "label": {
+          "en": "Quadratic",
+          "nl": "Kwadratisch",
+          "fr": "Du second degré"
+        }
+      },
+      {
+        "value": "exponential",
+        "label": {
+          "en": "Exponential",
+          "nl": "Exponentieel",
+          "fr": "Exponentielle"
+        }
+      },
+      {
+        "value": "logarithmic",
+        "label": {
+          "en": "Logarithmic",
+          "nl": "Logaritmisch",
+          "fr": "Logarithme"
+        }
+      },
+      {
+        "value": "cosine",
+        "label": {
+          "en": "Sine/cosine",
+          "nl": "Sinus/cosinus",
+          "fr": "Sinus/cosinus"
+        }
+      },
+      {
+        "value": "tangent",
+        "label": {
+          "en": "Tangent",
+          "nl": "Tangens",
+          "fr": "Tangente"
+        }
+      }
+    ],
+    "label": {
+      "en": "Correct function: the type",
+      "nl": "Goede functie: het soort",
+      "fr": "Fonction correcte : le type"
+    }
+  },
+  "correctPoints": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Correct function: its two points, as x1 y1,x2 y2 (in the roles of the type)",
+      "nl": "Goede functie: de twee punten, als x1 y1,x2 y2 (in de rollen van het soort)",
+      "fr": "Fonction correcte : ses deux points, comme x1 y1,x2 y2 (dans les rôles du type)"
+    },
+    "$comment": "As the original's samplePoints: point 1 is the vertex for absolute and quadratic, on the midline for cosine, the centre for tangent."
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "label": {
+      "en": "Tolerance in units of the y axis",
+      "nl": "Marge in eenheden van de y-as",
+      "fr": "Tolérance en unités de l'axe des y"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels",
+          "fr": "Anglais"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands",
+          "fr": "Néerlandais"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French",
+          "nl": "Frans",
+          "fr": "Français"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the texts",
+      "nl": "Taal van de teksten",
+      "fr": "Langue des textes"
+    }
+  }
+}

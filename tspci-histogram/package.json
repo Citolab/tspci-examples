@@ -1,0 +1,98 @@
+{
+  "name": "@citolab/pci-histogram",
+  "version": "1.0.0-beta.1",
+  "description": "the candidate sets the heights of the bars of a histogram or bar chart from data, by dragging, with the keyboard or by typing",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    {
+      "name": "Sam Sipasseuth (Open Assessment Technologies) for Parcc, Inc.",
+      "url": "https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/histogramInteraction",
+      "email": "sam@taotesting.com"
+    }
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "histogram",
+    "bar chart",
+    "statistics",
+    "data",
+    "math"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-histogram"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "histogram.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-histogram npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-histogram npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "histogram",
+      "label": "Histogram",
+      "tags": [
+        "histogram",
+        "bar chart",
+        "statistics",
+        "data"
+      ],
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "short": "histogram",
+      "correctResponse": "properties",
+      "response": {
+        "$comment": "The height of every bar, in bar order (snapped to data-snap; a locked bar its start height). With data-scoring=\"pci\" a record instead: score, maxscore, correct, barsCorrect, heights (README).",
+        "cardinality": "ordered",
+        "baseType": "float"
+      }
+    }
+  }
+}

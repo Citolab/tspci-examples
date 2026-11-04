@@ -1,0 +1,304 @@
+{
+  "prompt": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Instruction (empty: the travel time example)",
+      "nl": "Instructie (leeg: het reistijdvoorbeeld)",
+      "fr": "Consigne (vide : l'exemple du temps de trajet)"
+    }
+  },
+  "chartType": {
+    "default": "histogram",
+    "editor": "enum",
+    "label": {
+      "en": "Kind of chart",
+      "nl": "Soort grafiek",
+      "fr": "Type de graphique"
+    },
+    "options": [
+      {
+        "value": "histogram",
+        "label": {
+          "en": "Histogram: adjacent bars, the class boundaries on the axis",
+          "nl": "Histogram: staven tegen elkaar, de klassengrenzen op de as",
+          "fr": "Histogramme : barres accolées, les bornes des classes sur l'axe"
+        }
+      },
+      {
+        "value": "bar",
+        "label": {
+          "en": "Bar chart: bars with gaps, a label per bar",
+          "nl": "Staafdiagram: staven met ruimte ertussen, een label per staaf",
+          "fr": "Diagramme en barres : barres espacées, une étiquette par barre"
+        }
+      }
+    ]
+  },
+  "classes": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Classes: the boundaries, separated by ; e.g. 0;10;20;30 (empty: the example)",
+      "nl": "Klassen: de grenzen, gescheiden door ; bijv. 0;10;20;30 (leeg: het voorbeeld)",
+      "fr": "Classes : les bornes, séparées par ; ex. 0;10;20;30 (vide : l'exemple)"
+    },
+    "$comment": "2 to 21 increasing numbers; a bar per class [lo, hi), the last one [lo, hi]. A histogram always takes these; a bar chart only when it has no labels."
+  },
+  "bars": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Bar chart: a label per line",
+      "nl": "Staafdiagram: een label per regel",
+      "fr": "Diagramme en barres : une étiquette par ligne"
+    },
+    "$comment": "At most 20 bars."
+  },
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Title of the chart (empty: the example's)",
+      "nl": "Titel van de grafiek (leeg: die van het voorbeeld)",
+      "fr": "Titre du graphique (vide : celui de l'exemple)"
+    }
+  },
+  "valueTitle": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Title of the vertical axis",
+      "nl": "Titel van de verticale as",
+      "fr": "Titre de l'axe vertical"
+    }
+  },
+  "categoryTitle": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Title of the horizontal axis",
+      "nl": "Titel van de horizontale as",
+      "fr": "Titre de l'axe horizontal"
+    }
+  },
+  "max": {
+    "default": "10",
+    "editor": "number",
+    "label": {
+      "en": "Largest value of the vertical axis",
+      "nl": "Grootste waarde van de verticale as",
+      "fr": "Valeur maximale de l'axe vertical"
+    },
+    "min": 0
+  },
+  "step": {
+    "default": "1",
+    "editor": "number",
+    "label": {
+      "en": "Step of the vertical axis: a gridline and a number every …",
+      "nl": "Stap van de verticale as: een rasterlijn en een getal elke …",
+      "fr": "Pas de l'axe vertical : une ligne et un nombre tous les …"
+    },
+    "min": 0
+  },
+  "snap": {
+    "default": "",
+    "editor": "number",
+    "label": {
+      "en": "A bar's height snaps to multiples of (empty: the step)",
+      "nl": "De hoogte van een staaf springt naar veelvouden van (leeg: de stap)",
+      "fr": "La hauteur d'une barre s'aligne sur les multiples de (vide : le pas)"
+    },
+    "min": 0
+  },
+  "startHeights": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Heights at the start, separated by ; (empty: all 0)",
+      "nl": "Hoogtes bij de start, gescheiden door ; (leeg: alle 0)",
+      "fr": "Hauteurs au départ, séparées par ; (vide : toutes à 0)"
+    }
+  },
+  "locked": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Given bars the candidate cannot change: their numbers, e.g. 1;3",
+      "nl": "Gegeven staven die de kandidaat niet kan veranderen: hun nummers, bijv. 1;3",
+      "fr": "Barres données que le candidat ne peut pas changer : leurs numéros, ex. 1;3"
+    }
+  },
+  "colors": {
+    "default": "#2563eb",
+    "editor": "colorList",
+    "label": {
+      "en": "Colours of the bars (repeated)",
+      "nl": "Kleuren van de staven (herhaald)",
+      "fr": "Couleurs des barres (répétées)"
+    }
+  },
+  "showValues": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "Show the value above each bar",
+      "nl": "De waarde boven elke staaf tonen",
+      "fr": "Afficher la valeur au-dessus de chaque barre"
+    }
+  },
+  "dataDisplay": {
+    "default": "table",
+    "editor": "enum",
+    "label": {
+      "en": "How the data is shown",
+      "nl": "Hoe de gegevens getoond worden",
+      "fr": "Comment les données sont montrées"
+    },
+    "options": [
+      {
+        "value": "table",
+        "label": {
+          "en": "A frequency table: a value per bar",
+          "nl": "Een frequentietabel: een waarde per staaf",
+          "fr": "Un tableau des effectifs : une valeur par barre"
+        }
+      },
+      {
+        "value": "list",
+        "label": {
+          "en": "A list of observations the candidate counts",
+          "nl": "Een lijst waarnemingen die de kandidaat telt",
+          "fr": "Une liste d'observations que le candidat compte"
+        }
+      },
+      {
+        "value": "none",
+        "label": {
+          "en": "Not shown (it is in the prompt or the item)",
+          "nl": "Niet getoond (het staat in de instructie of het item)",
+          "fr": "Non montrées (dans la consigne ou l'item)"
+        }
+      }
+    ]
+  },
+  "data": {
+    "default": "",
+    "editor": "textarea",
+    "label": {
+      "en": "Data: a value per bar separated by ; (table), or the observations (list) (empty: the example)",
+      "nl": "Gegevens: een waarde per staaf gescheiden door ; (tabel), of de waarnemingen (lijst) (leeg: het voorbeeld)",
+      "fr": "Données : une valeur par barre séparées par ; (tableau), ou les observations (liste) (vide : l'exemple)"
+    },
+    "$comment": "Table: 4;9;8;6;3. List: numbers for classes (separated by spaces, ;, new lines or ', '), or labels of the bars (separated by ;, new lines or commas). The correct heights follow from it when 'correct' is empty."
+  },
+  "correct": {
+    "default": "",
+    "editor": "text",
+    "label": {
+      "en": "Correct heights, separated by ; (empty: from the data)",
+      "nl": "Goede hoogtes, gescheiden door ; (leeg: uit de gegevens)",
+      "fr": "Hauteurs correctes, séparées par ; (vide : d'après les données)"
+    }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "label": {
+      "en": "Tolerance of a height (PCI scoring), in units of the vertical axis",
+      "nl": "Marge van een hoogte (scoring door de PCI), in eenheden van de verticale as",
+      "fr": "Tolérance d'une hauteur (notation par la PCI), en unités de l'axe vertical"
+    },
+    "min": 0
+  },
+  "scoring": {
+    "default": "match",
+    "editor": "enum",
+    "label": {
+      "en": "Response and scoring",
+      "nl": "Antwoord en scoring",
+      "fr": "Réponse et notation"
+    },
+    "options": [
+      {
+        "value": "match",
+        "label": {
+          "en": "The heights (ordered list): match_correct or your own rules",
+          "nl": "De hoogtes (geordende lijst): match_correct of eigen regels",
+          "fr": "Les hauteurs (liste ordonnée) : match_correct ou vos propres règles"
+        }
+      },
+      {
+        "value": "pci",
+        "label": {
+          "en": "The PCI scores (record with score and maxscore)",
+          "nl": "De PCI scoort (record met score en maxscore)",
+          "fr": "La PCI note (record avec score et maxscore)"
+        }
+      }
+    ]
+  },
+  "pciScore": {
+    "default": "all",
+    "editor": "enum",
+    "label": {
+      "en": "PCI scoring: points",
+      "nl": "Scoring door de PCI: punten",
+      "fr": "Notation par la PCI : points"
+    },
+    "options": [
+      {
+        "value": "all",
+        "label": {
+          "en": "1 point when every bar is right",
+          "nl": "1 punt als alle staven goed zijn",
+          "fr": "1 point si toutes les barres sont justes"
+        }
+      },
+      {
+        "value": "bar",
+        "label": {
+          "en": "1 point per right bar",
+          "nl": "1 punt per goede staaf",
+          "fr": "1 point par barre juste"
+        }
+      }
+    ]
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "label": {
+      "en": "Language of the texts",
+      "nl": "Taal van de teksten",
+      "fr": "Langue des textes"
+    },
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels",
+          "fr": "Anglais"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands",
+          "fr": "Néerlandais"
+        }
+      },
+      {
+        "value": "fr",
+        "label": {
+          "en": "French",
+          "nl": "Frans",
+          "fr": "Français"
+        }
+      }
+    ]
+  }
+}

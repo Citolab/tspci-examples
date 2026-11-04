@@ -5,10 +5,10 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 57 examples in this repository that can give a head start while creating new Portable Custom Interactions.
-Twenty-one of them are ports of existing open-source PCIs and two more take ideas from one; all 23 credit the
-original authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis)
-and [Ports of the DEPP PCIs](#ports-of-the-depp-pcis)).
+There are 61 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+Twenty-four of them are ports of existing open-source PCIs and three more take ideas from one; all 27 credit the
+original authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis),
+[Ports of the DEPP PCIs](#ports-of-the-depp-pcis) and [Ports of the PARCC PCIs](#ports-of-the-parcc-pcis)).
 To run these examples go the to folder of the specific example and run:
 
 ``` sh
@@ -155,6 +155,10 @@ scoring). Every example describes both in two files it already has:
 | tspci-bronchiole | `textarea`, `enum`, `integer`, `text`, `number`, `boolean` | `record` (pollution, area and airflow per airway, levels, answer, score) | `custom`, `human`, `none` |
 | tspci-reference-frames | `textarea`, `enum`, `text`, `number`, `integer`, `boolean` | `record` (answers, frames viewed, score) | `custom`, `human` |
 | tspci-volcano-model | `textarea`, `enum`, `integer`, `boolean`, `text` | `record` (experiments, outcomes, answers, score) | `custom`, `human` |
+| tspci-code-blocks | `textarea`, `pci`, `boolean`, `enum`, `integer` | `single` `string` (the original's JSON, or the program as code) or a `record` (test cases) | `match_correct`, `custom`, `human` |
+| tspci-function-graph | `textarea`, `text`, `enum`, `boolean`, `number`, `integer`, `color` | `record` (`functionGraphType`, `points`, `equation`, score) | `custom`, `human` |
+| tspci-coordinate-graph | `textarea`, `pci`, `number`, `enum`, `text`, `boolean` | `record` (score, a check per element, a point list per element, the graph) | `custom`, `human` |
+| tspci-histogram | `textarea`, `enum`, `text`, `number`, `colorList`, `boolean` | `ordered` `float` (the heights) or a `record` (score, heights) | `match_correct`, `custom`, `human` |
 
 How an authoring system uses this depends on the system.
 
@@ -554,8 +558,9 @@ lists and 2D views.
 
 The examples below are ports of existing open-source PCIs to IMS PCI v1.0 with tspci, with a new, accessible UI. They
 keep the response format of the original, so items and scoring made for the original stay meaningful. They are
-derivative works, so **each one keeps the licence of its original** (GPL-2.0-only or GPL-3.0-only), not the MIT licence
-of this repository: see the `LICENSE` file and the "Source and licence" section of the README in each folder.
+derivative works, so **each one keeps the licence of its original** (GPL-2.0-only, GPL-3.0-only or MIT with the
+original's copyright), not simply the MIT licence of this repository: see the `LICENSE` file and the "Source and
+licence" section of the README in each folder.
 
 | example | original | licence |
 | --- | --- | --- |
@@ -583,11 +588,18 @@ of this repository: see the `LICENSE` file and the "Source and licence" section 
 | tspci-volcano-model | [DEPP Volcanismepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Volcanismepci) | GPL-2.0-only |
 | tspci-circuit-builder (ideas only) | [DEPP Circuitpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Circuitpci) and [LampeDoublepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/LampeDoublepci) | GPL-2.0-only |
 | tspci-message-writing (ideas only) | [DEPP Chatbotpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Chatbotpci) | GPL-2.0-only |
+| tspci-code-blocks | [Code Block Programming Interaction](https://github.com/rdncuee/CBP) (The National Center for University Entrance Examinations) | MIT |
+| tspci-function-graph | [PARCC graphFunctionInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphFunctionInteraction) | GPL-2.0-only |
+| tspci-coordinate-graph | [PARCC graphLineAndPointInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphLineAndPointInteraction) and [graphPointLineGraphInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphPointLineGraphInteraction) | GPL-2.0-only |
+| tspci-histogram (idea only) | [PARCC histogramInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/histogramInteraction) | GPL-2.0-only |
 
 The openPCI PCIs are by Elias J.T. Hansen, Anna Rusmann and Jeppe Bundsgaard (Aarhus University and Aalborg
 University). The DEPP PCIs are by Jean-Philippe Rivière (Wiquid) for the DEPP of the French Ministère de l'Éducation
-nationale; see [Ports of the DEPP PCIs](#ports-of-the-depp-pcis). Where an original ran author-written JavaScript to score (svgmap, voxelcraft, theroom), the port scores
-with settings or declarative rules instead: no PCI here evaluates author code.
+nationale; see [Ports of the DEPP PCIs](#ports-of-the-depp-pcis). The PARCC PCIs are by Sam Sipasseuth, Thibault Milan
+and Christophe Noël (Open Assessment Technologies) for Parcc, Inc.; see [Ports of the PARCC PCIs](#ports-of-the-parcc-pcis).
+Where an original ran author-written JavaScript (svgmap, voxelcraft, theroom to score; Code Block Programming to run
+the candidate's program), the port uses settings, declarative rules or a block language of its own instead: no PCI
+here evaluates author code.
 
 ## tspci-likert
 
@@ -747,6 +759,27 @@ Port of [openPCI theroom](https://github.com/openPCI/openPCIs/tree/master/theroo
 
 <p align="center">
   <img src="./tspci-the-room/example.png" alt="example the room" width="560">
+</p>
+
+## tspci-code-blocks
+
+Programming with code blocks: the candidate puts blocks (set, input, print, if, if/else, while, repeat, for) in order,
+nests them, fills in their blanks and runs the program with their own input.
+Port of [Code Block Programming Interaction](https://github.com/rdncuee/CBP) by The National Center for University
+Entrance Examinations (Japan), licensed **MIT** with the original's copyright ([LICENSE](./tspci-code-blocks/LICENSE)).
+
+- Drag from a palette or add with a click; text boxes and dropdowns in blocks; locked blocks and distractors; full
+  keyboard access (move, indent into and out of a block, delete) with every change announced
+- Run shows the printed output, or a plain-language error with its line marked; a block language and interpreter of
+  its own (with step, output and nesting limits) instead of the original's JavaScript per block
+- The author writes blocks, starting program and solution as text (`set: {total} ← {}`); reports the original's JSON
+  `string`, the program as code for `match_correct`, or a `record` scored with the author's test cases
+- Authoring mode ("Configure…"): the item author makes the blocks (kind, label, text boxes, dropdowns, fixed parts),
+  builds the solution and the starting program (with locked blocks) in the candidate's editor, and fills the test cases
+  by running the solution; live checks in plain language; it writes the same text settings
+
+<p align="center">
+  <img src="./tspci-code-blocks/example.png" alt="example code blocks" width="560">
 </p>
 
 ## Ports of the DEPP PCIs
@@ -923,4 +956,70 @@ applet can score the work itself. Not a port: written from scratch from GeoGebra
 
 <p align="center">
   <img src="./tspci-geogebra-applet/example.png" alt="example GeoGebra applet" width="560">
+</p>
+
+## Ports of the PARCC PCIs
+
+The three examples below are rewrites of math Technology Enhanced Items that Open Assessment Technologies (Sam
+Sipasseuth, Thibault Milan, Christophe Noël) made for PARCC, the consortium behind American state assessments, as a
+TAO extension: [parcc/extension-parcc-tei](https://github.com/parcc/extension-parcc-tei) (in
+`views/js/pciCreator/dev/`), © 2014-2017 Parcc, Inc. The extension's `LICENSE`, `manifest.php` and file headers state
+the GNU GPL version 2 "non-upgradable", so each port is **GPL-2.0-only**. (Its `composer.json` says `"PARCC"`, which is
+not a known licence; we follow the GPL-2.0-only stated everywhere else.)
+
+Each port is a new TypeScript, Preact and SVG implementation (the originals use jQuery and Raphael) with English, Dutch
+and French, keyboard and screen-reader access, optional scoring by the PCI and a restorable state. The function graph
+and the coordinate graph keep the original's response fields and restore a response of the original. They are
+`1.0.0-beta.1`: experimental, never used in an assessment; try them out before you use them in one.
+
+Not ported: graphNumberLine and graphZoomNumberLine (tspci-number-line already does intervals), fractionModel
+(tspci-fraction-model does more), and interactivePassage and multiTabbedExhibit (reading passages in tabs).
+
+## tspci-function-graph
+
+The candidate graphs a function: chooses the type (linear, absolute value, quadratic, exponential, logarithmic,
+sine/cosine, tangent) and places the two points that fix it.
+Port of [PARCC graphFunctionInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphFunctionInteraction), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-function-graph/LICENSE)).
+
+- The author chooses the types offered and the grid; points are clicked, dragged, typed or moved with the keyboard
+  and snap to the grid
+- The curve is drawn live with dashed asymptotes, optionally with its equation in the axis names
+  (`h = −5(t − 2)² + 20`); when the points fix no function, the candidate is told why
+- Reports the original's `record` (`functionGraphType`, `points`) with the equation and, when the correct function is
+  known, a score: any two points on the correct function count
+
+<p align="center">
+  <img src="./tspci-function-graph/example.png" alt="example function graph" width="560">
+</p>
+
+## tspci-coordinate-graph
+
+The candidate draws on an x-y grid: points, sets of points, lines, segments, rays and solution sets of inequalities
+(dashed or solid lines, shaded areas).
+Port of [PARCC graphLineAndPointInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphLineAndPointInteraction), with [graphPointLineGraphInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphPointLineGraphInteraction) (Point Graph) merged in, licensed **GPL-2.0-only** like the originals ([LICENSE](./tspci-coordinate-graph/LICENSE)).
+
+- The author's elements, each with a label, colour and number of points; a point graph with given points that can be
+  connected from left to right
+- Click, drag, drag off the grid to remove, or a keyboard cursor; every element (and the equation of each line) is
+  described for screen readers
+- Scores itself against correct elements the author draws in an authoring mode; reports a `record` with the score, a
+  check per element, a point list per element named as in the original, and the graph
+
+<p align="center">
+  <img src="./tspci-coordinate-graph/example.png" alt="example coordinate graph" width="560">
+</p>
+
+## tspci-histogram
+
+The candidate draws a histogram (adjacent bars with class boundaries) or a bar chart by setting each bar's height,
+from a frequency table or from a list of observations they tally.
+Takes the idea of [PARCC histogramInteraction](https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/histogramInteraction), licensed **GPL-2.0-only** like the original ([LICENSE](./tspci-histogram/LICENSE)). The original is an unfinished scaffold (it draws nothing and always reports 0), so this one is written from scratch.
+
+- Drag or click a bar, use the arrow keys (each bar is a slider) or type its height; heights snap to the author's
+  step; locked bars, colours and start heights
+- Reports the heights as an `ordered` `float` list for `match_correct`, or a `record` scored by the PCI against the
+  correct heights (from the author's list or the data) within a tolerance
+
+<p align="center">
+  <img src="./tspci-histogram/example.png" alt="example histogram" width="560">
 </p>

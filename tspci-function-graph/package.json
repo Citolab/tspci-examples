@@ -1,0 +1,138 @@
+{
+  "name": "@citolab/pci-function-graph",
+  "version": "1.0.0-beta.1",
+  "description": "the candidate graphs a function: chooses the type (linear, absolute value, quadratic, exponential, logarithmic, sine/cosine, tangent) and places its two points on a grid; the PCI draws the curve",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    {
+      "name": "Sam Sipasseuth (Open Assessment Technologies), for Parcc, Inc. (copyright holder, © 2014-2017)",
+      "url": "https://github.com/parcc/extension-parcc-tei/tree/master/views/js/pciCreator/dev/graphFunctionInteraction",
+      "$comment": "author of the original PARCC graphFunctionInteraction (Graphing Function) PCI and its PARCC/graphFunction library"
+    }
+  ],
+  "license": "GPL-2.0-only",
+  "homepage": "https://github.com/Citolab/tspci-examples#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "function",
+    "graph",
+    "mathematics",
+    "algebra"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-function-graph"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "functionGraph.svg",
+    "example.png",
+    "README.md",
+    "LICENSE"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.1",
+    "@citolab/tspci": "3.0.1",
+    "@citolab/tspci-qti3": "3.0.1",
+    "@citolab/tspci-tao": "3.0.1",
+    "@tailwindcss/postcss": "^4.1.18",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "preact": "10.28.2",
+    "tailwindcss": "^4.1.18"
+  },
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test test/",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-function-graph npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-function-graph npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "functionGraph",
+      "label": "Function graph",
+      "tags": [
+        "function",
+        "graph",
+        "mathematics",
+        "algebra"
+      ],
+      "scoring": [
+        "custom",
+        "human"
+      ],
+      "short": "functionGraph",
+      "response": {
+        "cardinality": "record",
+        "$comment": "functionGraphType and points as the original PARCC graphFunctionInteraction; score, maxscore and correct only when the PCI knows the correct function (README)",
+        "fields": {
+          "functionGraphType": {
+            "baseType": "string",
+            "label": {
+              "en": "Type of function: linear, absolute, quadratic, exponential, logarithmic, cosine or tangent",
+              "nl": "Soort functie: linear, absolute, quadratic, exponential, logarithmic, cosine of tangent"
+            }
+          },
+          "points": {
+            "baseType": "string",
+            "label": {
+              "en": "Points: the two points as x1 y1,x2 y2",
+              "nl": "Punten: de twee punten als x1 y1,x2 y2"
+            }
+          },
+          "equation": {
+            "baseType": "string",
+            "label": {
+              "en": "Equation of the graph (empty when the points determine no function)",
+              "nl": "Vergelijking van de grafiek (leeg als de punten geen functie bepalen)"
+            }
+          },
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score: 1 the correct function, 0 not",
+              "nl": "Score: 1 de goede functie, 0 niet"
+            }
+          },
+          "maxscore": {
+            "baseType": "integer",
+            "label": {
+              "en": "Maximum score: 1",
+              "nl": "Maximale score: 1"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Correct: 1 the correct function (within the tolerance), 0 not",
+              "nl": "Goed: 1 de goede functie (binnen de marge), 0 niet"
+            }
+          }
+        }
+      }
+    }
+  }
+}
