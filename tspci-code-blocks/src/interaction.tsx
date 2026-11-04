@@ -210,7 +210,9 @@ const Interaction = ({ s, store, texts: t, readOnly, author }: {
       if (!d.active && Math.hypot(ev.clientX - d.x0, ev.clientY - d.y0) < 6) return;
       d.active = true;
       ev.preventDefault();
-      setGhost({ x: ev.clientX, y: ev.clientY, text: d.text, category: d.category });
+      // relative to the root: the ghost is absolute in it, so it follows the pointer also in a player with a transform
+      const box = rootRef.current?.getBoundingClientRect();
+      setGhost({ x: ev.clientX - (box?.left ?? 0), y: ev.clientY - (box?.top ?? 0), text: d.text, category: d.category });
       last = targetAt(ev.clientX, ev.clientY, d.source);
       setTarget(last);
     };
@@ -352,7 +354,7 @@ const Interaction = ({ s, store, texts: t, readOnly, author }: {
   const overTail = target && !("remove" in target) && target.key === "tail";
 
   return (
-    <div ref={rootRef} className="cb-root @container flex max-w-full flex-col gap-4 font-sans text-slate-800">
+    <div ref={rootRef} className="cb-root @container relative flex max-w-full flex-col gap-4 font-sans text-slate-800">
       {!author && s.prompt && <p className="m-0 max-w-[70ch] text-[15px] leading-relaxed text-slate-700" data-testid="prompt">{s.prompt}</p>}
 
       <div className={`grid gap-4 ${readOnly ? "" : "@2xl:grid-cols-[minmax(13rem,17rem)_minmax(0,1fr)]"}`}>
@@ -474,8 +476,8 @@ const Interaction = ({ s, store, texts: t, readOnly, author }: {
       <p role="status" className="sr-only">{message}</p>
 
       {ghost && dragging && (
-        <div aria-hidden="true" className="cb-piece cb-ghost pointer-events-none fixed z-50 flex items-center px-3 py-2 text-[14px] font-semibold text-white"
-          style={{ ...colours(ghost.category), left: `${ghost.x + 8}px`, top: `${ghost.y + 8}px` }}>
+        <div aria-hidden="true" data-testid="drag-ghost" className="cb-piece cb-ghost pointer-events-none z-50 flex items-center px-3 py-2 text-[14px] font-semibold text-white"
+          style={{ ...colours(ghost.category), position: "absolute", left: `${ghost.x + 8}px`, top: `${ghost.y + 8}px` }}>
           {ghost.text.split("___").join("▢")}
         </div>
       )}

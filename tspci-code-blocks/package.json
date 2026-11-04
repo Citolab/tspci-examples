@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-code-blocks",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "the candidate builds a program from code blocks (set, input, print, if, if/else, while, repeat, for), fills in the blanks and runs it; a port of the Code Block Programming Interaction (rdncuee/CBP) with a safe interpreter of its own",
   "author": {
     "name": "Citolab",

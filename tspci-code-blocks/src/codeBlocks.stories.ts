@@ -216,6 +216,25 @@ export const DragAndDrop: Story = {
     const block = (name: string) => canvas.getByRole("button", { name: `Add block: ${name}` });
     const row = (n: number) => canvas.getByTestId(`line-${n}`);
 
+    await step("while dragging, the block follows the pointer", async () => {
+      const from = block("print i");
+      from.dispatchEvent(pointer("pointerdown", from));
+      await afterPaint();
+      const move = pointer("pointermove", row(1), "bottom");
+      window.dispatchEvent(move);
+      await afterPaint();
+      window.dispatchEvent(pointer("pointermove", row(1), "bottom"));
+      await afterPaint();
+      // the ghost sits just right of and below the pointer (not elsewhere on the page)
+      const ghost = canvas.getByTestId("drag-ghost").getBoundingClientRect();
+      expect(Math.abs(ghost.left - (move.clientX + 8))).toBeLessThan(4);
+      expect(Math.abs(ghost.top - (move.clientY + 8))).toBeLessThan(4);
+      window.dispatchEvent(new PointerEvent("pointercancel", { bubbles: true, composed: true, pointerId: 1 }));
+      await afterPaint();
+      expect(canvas.queryByTestId("drag-ghost")).toBeNull();
+      expect(lines(canvas)).toEqual(["read n"]);
+    });
+
     await step("drag a block from the palette below the last line", async () => {
       await dragTo(block("for i from ___ to ___"), row(1), "bottom");
       expect(lines(canvas)).toEqual(["read n", "for i from ___ to ___"]);
