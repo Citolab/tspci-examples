@@ -137,6 +137,8 @@ export const SkyDiagram = ({ day, minutes, place, declination, sun, today, t, la
       onPointerDown={onTime ? (e) => { dragging.current = true; (e.currentTarget as Element).setPointerCapture?.(e.pointerId); onTime(timeAt(e as unknown as PointerEvent), false); } : undefined}
       onPointerMove={onTime ? (e) => dragging.current && onTime(timeAt(e as unknown as PointerEvent), false) : undefined}
       onPointerUp={onTime ? (e) => { if (!dragging.current) return; dragging.current = false; onTime(timeAt(e as unknown as PointerEvent), true); } : undefined}
+      onPointerCancel={onTime ? () => { dragging.current = false; } : undefined}
+      onLostPointerCapture={onTime ? () => { dragging.current = false; } : undefined}
       style={{ cursor: onTime ? "pointer" : "default" }}>
       <defs>
         <pattern id="se-ground" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">

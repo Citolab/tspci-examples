@@ -265,11 +265,30 @@ const Board = ({
     const r = trackRef.current!.getBoundingClientRect();
     return positionAtX(clientX - r.left);
   };
+  // The drag follows the pointer on the window, not on the card: a card dragged along the line is not rendered there
+  // while it moves, and a card that leaves the DOM loses its pointer capture (and with it the move and the drop).
+  const dragHandlers = useRef({ move: (_e: PointerEvent) => {}, end: (_e: PointerEvent) => {}, cancel: () => {} });
+  const stopListening = useRef<(() => void) | null>(null);
+  useEffect(() => () => stopListening.current?.(), []);
   const startDrag = (e: PointerEvent, id: string, from: Drag["from"]) => {
     if (readOnly || e.button !== 0) return;
     e.stopPropagation();
+    stopListening.current?.();
     try { (e.currentTarget as Element).setPointerCapture?.(e.pointerId); } catch { /* not capturable */ }
     dragRef.current = { id, from, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, x: e.clientX, y: e.clientY, moved: false };
+    const win = (e.currentTarget as Element).ownerDocument?.defaultView ?? window;
+    const move = (ev: PointerEvent) => dragHandlers.current.move(ev);
+    const up = (ev: PointerEvent) => { stopListening.current?.(); dragHandlers.current.end(ev); };
+    const cancel = () => { stopListening.current?.(); dragHandlers.current.cancel(); };
+    win.addEventListener("pointermove", move);
+    win.addEventListener("pointerup", up);
+    win.addEventListener("pointercancel", cancel);
+    stopListening.current = () => {
+      win.removeEventListener("pointermove", move);
+      win.removeEventListener("pointerup", up);
+      win.removeEventListener("pointercancel", cancel);
+      stopListening.current = null;
+    };
   };
   const moveDrag = (e: PointerEvent) => {
     const d = dragRef.current;
@@ -301,6 +320,7 @@ const Board = ({
     dragRef.current = null;
     setDrag(null);
   };
+  dragHandlers.current = { move: moveDrag, end: endDrag, cancel: cancelDrag };
 
   const startPan = (e: PointerEvent) => {
     if (e.button !== 0) return;
@@ -361,9 +381,6 @@ const Board = ({
                     className={`touch-none select-none rounded-lg border bg-white px-2.5 py-1.5 text-left shadow-sm hover:border-sky-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-700 ${chosen === e.id ? "border-sky-600 ring-2 ring-sky-600" : "border-slate-300"} ${drag?.moved && drag.id === e.id ? "opacity-40" : ""}`}
                     style={{ width: `${CARD_W + 20}px` }}
                     onPointerDown={(ev) => startDrag(ev as PointerEvent, e.id, "tray")}
-                    onPointerMove={(ev) => moveDrag(ev as PointerEvent)}
-                    onPointerUp={(ev) => endDrag(ev as PointerEvent)}
-                    onPointerCancel={cancelDrag}
                     onKeyDown={(ev) => {
                       if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); placeByKeyboard(e.id); }
                     }}
@@ -497,9 +514,7 @@ const Board = ({
               style={{ left: `${it.cx - CARD_W / 2}px`, top: `${top}px`, width: `${CARD_W}px`, height: `${CARD_H}px` }}
               onKeyDown={(ev) => onSliderKey(ev as KeyboardEvent, it.id)}
               onPointerDown={(ev) => startDrag(ev as PointerEvent, it.id, "line")}
-              onPointerMove={(ev) => moveDrag(ev as PointerEvent)}
-              onPointerUp={(ev) => { endDrag(ev as PointerEvent); (ev.currentTarget as HTMLElement).focus(); }}
-              onPointerCancel={cancelDrag}>
+              onPointerUp={(ev) => (ev.currentTarget as HTMLElement).focus()}>
               {it.out < 0 && <span aria-hidden="true" className="mr-1 text-sky-800">◀</span>}
               <CardFace event={e} value={shown} compact />
               {it.out > 0 && <span aria-hidden="true" className="ml-auto pl-1 text-sky-800">▶</span>}

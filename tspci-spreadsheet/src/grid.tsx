@@ -308,8 +308,13 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
       if (skipped) setMessage(texts.skipped);
       focusGrid();
     };
+    const cancel = () => setFill(null); // a touch that turned into a scroll: no fill
     window.addEventListener("pointerup", done);
-    return () => window.removeEventListener("pointerup", done);
+    window.addEventListener("pointercancel", cancel);
+    return () => {
+      window.removeEventListener("pointerup", done);
+      window.removeEventListener("pointercancel", cancel);
+    };
   }, [fill, inputs, current]);
   const filling = useMemo(() => new Set(fill ? fillRange(fill.to) : []), [fill, current]);
 
@@ -397,7 +402,8 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
                       onPointerUp={() => {
                         if (resize?.col === c && resize.width !== resize.from) author.onResize(c, resize.width);
                         setResize(null);
-                      }} />
+                      }}
+                      onPointerCancel={() => setResize(null)} />
                   )}
                 </th>
               ))}
@@ -446,7 +452,7 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
                       {isSelected && !isEditing && (
                         <>
                           <span className="pointer-events-none absolute -inset-px z-[6] border-2" style={{ borderColor: EXCEL }} />
-                          <span className="absolute -right-1 -bottom-1 z-[7] size-2 cursor-crosshair border border-white" style={{ background: EXCEL }}
+                          <span className="absolute -right-1 -bottom-1 z-[7] size-2 cursor-crosshair touch-none border border-white" style={{ background: EXCEL }}
                             data-testid="fill-handle"
                             onMouseDown={(e) => e.stopPropagation()}
                             onPointerDown={(e) => {

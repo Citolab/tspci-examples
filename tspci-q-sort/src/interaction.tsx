@@ -4,7 +4,7 @@
 // Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
 
 import { IStore, useStore } from "@citolab/preact-store";
-import { useLayoutEffect, useRef, useState } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef, useState } from "preact/hooks";
 import { Actions, PILES, StateModel, UNSORTED } from "./store";
 import { Layout, formatValue, slotIndex, slotPosition } from "./qsort";
 import { Texts } from "./texts";
@@ -47,7 +47,7 @@ const Interaction = ({ layout, store, texts }: { layout: Layout; store: IStore<S
   const root = useRef<HTMLDivElement>(null);
   /** A card that is put down, and where: focus it once it is there. */
   const focusAfterRender = useRef<{ statement: number; at: number } | null>(null);
-  const press = useRef<{ statement: number; x: number; y: number; rect: DOMRect; started: boolean } | null>(null);
+  const press = useRef<{ statement: number; pointerId: number; x: number; y: number; rect: DOMRect; started: boolean } | null>(null);
   const suppressClick = useRef(false);
 
   const placeOf = (statement: number) => {
@@ -204,15 +204,38 @@ const Interaction = ({ layout, store, texts }: { layout: Layout; store: IStore<S
     if (!place || !root.current?.contains(place)) return null;
     return place.hasAttribute("data-pile") ? pileTarget(Number(place.dataset.pile)) : Number(place.dataset.slot);
   };
+  // The drag follows its own pointer on the window, not on the card: a pointerup that never reaches the card (a
+  // context menu, another app, a second finger) cannot leave a drag behind that a later hover picks up again.
+  const dragHandlers = useRef({ move: (_e: PointerEvent) => {}, up: (_e: PointerEvent) => {}, cancel: () => {} });
+  const stopListening = useRef<(() => void) | null>(null);
+  useEffect(() => () => stopListening.current?.(), []);
   const onPointerDown = (statement: number) => (e: PointerEvent) => {
-    if (e.button !== 0) return;
+    if (e.button !== 0 || e.ctrlKey) return; // ctrl+click is a context menu on a Mac
+    if (press.current) onPointerCancel(); // one drag at a time: a new press ends one left behind
     const el = e.currentTarget as HTMLElement;
-    press.current = { statement, x: e.clientX, y: e.clientY, rect: el.getBoundingClientRect(), started: false };
-    el.setPointerCapture?.(e.pointerId);
+    press.current = { statement, pointerId: e.pointerId, x: e.clientX, y: e.clientY, rect: el.getBoundingClientRect(), started: false };
+    try { el.setPointerCapture?.(e.pointerId); } catch { /* not capturable */ }
+    const win = el.ownerDocument?.defaultView ?? window;
+    const move = (ev: PointerEvent) => ev.pointerId === e.pointerId && dragHandlers.current.move(ev);
+    const up = (ev: PointerEvent) => { if (ev.pointerId !== e.pointerId) return; stopListening.current?.(); dragHandlers.current.up(ev); };
+    const cancel = (ev: PointerEvent) => { if (ev.pointerId !== e.pointerId) return; stopListening.current?.(); dragHandlers.current.cancel(); };
+    const blur = () => { stopListening.current?.(); dragHandlers.current.cancel(); };
+    win.addEventListener("pointermove", move);
+    win.addEventListener("pointerup", up);
+    win.addEventListener("pointercancel", cancel);
+    win.addEventListener("blur", blur);
+    stopListening.current = () => {
+      win.removeEventListener("pointermove", move);
+      win.removeEventListener("pointerup", up);
+      win.removeEventListener("pointercancel", cancel);
+      win.removeEventListener("blur", blur);
+      stopListening.current = null;
+    };
   };
   const onPointerMove = (e: PointerEvent) => {
     const p = press.current;
     if (!p) return;
+    if (e.pointerType === "mouse" && e.buttons === 0) return onPointerCancel(); // the button was released where we did not see it
     if (!p.started) {
       if (Math.hypot(e.clientX - p.x, e.clientY - p.y) < 5) return;
       p.started = true;
@@ -236,10 +259,12 @@ const Interaction = ({ layout, store, texts }: { layout: Layout; store: IStore<S
     if (place !== null) putDown(p.statement, place);
   };
   const onPointerCancel = () => {
+    stopListening.current?.();
     press.current = null;
     setDrag(null);
     setDragOver(null);
   };
+  dragHandlers.current = { move: onPointerMove, up: onPointerUp, cancel: onPointerCancel };
 
   const active = drag ? dragOver : grabbed !== null ? target : null; // the place that lights up
   const moving = drag?.statement ?? grabbed;
@@ -254,8 +279,7 @@ const Interaction = ({ layout, store, texts }: { layout: Layout; store: IStore<S
         aria-pressed={grabbed === statement}
         aria-describedby="q-sort-hint"
         onClick={() => onCardClick(statement)} onKeyDown={onKeyDown(statement)}
-        onPointerDown={onPointerDown(statement)} onPointerMove={onPointerMove} onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
+        onPointerDown={onPointerDown(statement)}
         className={`touch-none select-none rounded-md border bg-white text-left leading-snug text-slate-800 [overflow-wrap:anywhere] [hyphens:auto]
           transition-[transform,box-shadow,opacity,border-color] duration-150 ease-out
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-spreadsheet",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "a small spreadsheet with formulas: answer in a cell, or use it as a tool",
   "author": {
     "name": "Citolab",

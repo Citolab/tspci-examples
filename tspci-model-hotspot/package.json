@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-model-hotspot",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "click or label the parts of a rotatable 3D model (eye, flower, plant cell, bicycle, or a glTF): scored with MATCH_CORRECT on part identifiers or label pairs",
   "author": {
     "name": "Citolab",

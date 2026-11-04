@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-sun-earth",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "Sun, Earth and the seasons: a tilted Earth around the Sun in 3D and the sun's path in the sky of a place; set the date, the time and the place, scored with margins",
   "author": {
     "name": "Citolab",

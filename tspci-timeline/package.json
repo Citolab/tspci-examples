@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-timeline",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "place events on a timeline (tijdbalk): at a date with a margin, in a period (the ten Dutch tijdvakken or your own), or in the right order; years BC/AD, zoom and pan",
   "author": {
     "name": "Citolab",

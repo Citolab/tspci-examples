@@ -144,9 +144,18 @@ const Interaction = ({ prompt, settings, model, gltf, showNames, aids, store, te
       dragged.current = true;
       setDrag({ label, x: ev.clientX, y: ev.clientY });
     };
-    const up = (ev: PointerEvent) => {
+    const stop = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", cancel);
+    };
+    const cancel = () => {
+      stop();
+      setDrag(null);
+      dragged.current = false;
+    };
+    const up = (ev: PointerEvent) => {
+      stop();
       setDrag(null);
       if (!dragged.current) return;
       // the click that may follow this pointerup is not a pick; a later click (or Enter) is
@@ -162,6 +171,7 @@ const Interaction = ({ prompt, settings, model, gltf, showNames, aids, store, te
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
+    window.addEventListener("pointercancel", cancel);
   };
   const labelClick = (label: string) => {
     if (dragged.current) {

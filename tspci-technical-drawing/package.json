@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-technical-drawing",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "read and make technical drawings: a workpiece in 3D and its views in European projection, with visible and hidden lines, centre lines and dimensions; fill in dimensions, complete a view, name a view or choose the workpiece",
   "author": {
     "name": "Citolab",

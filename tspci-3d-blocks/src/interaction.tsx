@@ -334,6 +334,7 @@ class VoxelPainterClass {
 
   private onDocumentMouseMove(event) {
     event.preventDefault();
+    if (event.buttons === 0) this.isMouseDown = false; // released outside the canvas, where mouseup did not reach us
 
     const criteriaForMouseDownMovement =
       this.isMouseDown &&
@@ -402,6 +403,7 @@ class VoxelPainterClass {
   private onDocumentMouseDown(event) {
     event.preventDefault();
     this.isMouseDown = true;
+    this.isRotating = false;
   }
 
   private onDocumentMouseUp(event) {

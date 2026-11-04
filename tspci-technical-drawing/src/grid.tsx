@@ -184,7 +184,7 @@ export const GridLayer = (p: Props) => {
         tabIndex={p.readOnly ? -1 : 0} role="application" aria-roledescription={p.language === "nl" ? "tekenraster" : "drawing grid"}
         aria-label={t.gridOf(p.viewLabel)} data-testid="grid" className={p.erase ? "cursor-crosshair outline-none" : "cursor-crosshair outline-none"}
         style={{ touchAction: "none" }}
-        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerLeave={() => setHover(null)}
+        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => (dragRef.current = false)} onPointerLeave={() => setHover(null)}
         onKeyDown={onKeyDown} onFocus={() => setFocused(true)} onBlur={() => setFocused(false)} />
     </g>
   );
