@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-likert",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "a Likert scale: the candidate picks one of 2 to 10 levels between two labels",
   "author": {
     "name": "Citolab",

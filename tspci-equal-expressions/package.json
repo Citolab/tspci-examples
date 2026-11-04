@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-equal-expressions",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "find the number at which two expressions give the same result, with a table of tries",
   "author": {
     "name": "Citolab",

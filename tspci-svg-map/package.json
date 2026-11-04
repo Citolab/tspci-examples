@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-svg-map",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "draw a route on a map: the candidate follows the roads of an SVG map from point to point",
   "author": {
     "name": "Citolab",

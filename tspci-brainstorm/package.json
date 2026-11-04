@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-brainstorm",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "a simulated brainstorm chat with scripted participants; a port of the openPCI brainstorm PCI",
   "author": {
     "name": "Citolab",

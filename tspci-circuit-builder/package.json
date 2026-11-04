@@ -1,12 +1,15 @@
 {
   "name": "@citolab/pci-circuit-builder",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "description": "complete a circuit diagram on a grid: drag symbols, wires and test materials, break lamps; the PCI checks the circuit (closed, series, parallel, polarity, lamps lit)",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
   },
-  "license": "MIT",
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original Circuitpci and LampeDoublepci)"
+  ],
+  "license": "GPL-2.0-only",
   "homepage": "https://github.com/Citolab/tspci-examples#readme",
   "bugs": "https://github.com/Citolab/tspci-examples/issues",
   "keywords": [
@@ -35,6 +38,7 @@
     "dist/tao-pci-*.zip",
     "circuitBuilder.svg",
     "example.png",
+    "LICENSE",
     "README.md"
   ],
   "source": "src/index.tsx",

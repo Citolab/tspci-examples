@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-voxelcraft",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "build anything out of cubes in 3d, a port of openPCI's Voxelcraft",
   "author": {
     "name": "Citolab",

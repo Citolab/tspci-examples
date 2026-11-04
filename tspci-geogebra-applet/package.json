@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-geogebra-applet",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "a GeoGebra applet in a QTI item: the candidate constructs, the applet can score itself",
   "author": {
     "name": "Citolab",

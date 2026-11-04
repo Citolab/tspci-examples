@@ -235,7 +235,8 @@ response is shown (a record value with these fields, or a string), or else the s
 
 Inspired by the DEPP ChatBot PCI ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp),
 `Chatbotpci`), in which the candidate talks with a bot by choosing between answers, each with a meaning category,
-re-implemented here in the chat (no code of it is used). A chat script can mix three kinds of steps:
+re-implemented here in the chat (no code of it is used; see [Source and licence](#source-and-licence)). A chat script
+can mix three kinds of steps:
 
 ```json
 {
@@ -322,5 +323,21 @@ In a QTI 3 item, with `index.js` at `resources/pci/index.js` of the package:
 while writing and the formatting in the preview. The spellcheck is the browser's own: whether and how well it works
 depends on the browser and its installed dictionaries. The screens are in English and Dutch; the scenario's texts are
 in any language.
+
+## Source and licence
+
+The choice steps take their ideas from
+[`Chatbotpci`](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Chatbotpci) in
+[janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp), © DEPP (Ministère de l'Éducation
+nationale) / Jean-Philippe Rivière (Wiquid). That extension is licensed under the GNU General Public License version 2
+only (`GPL-2.0-only`, as stated in its `composer.json` and in the headers of its files).
+
+The ideas are re-implemented here from scratch; no code of the original is used. We still credit the original authors
+and take over their licence, so this PCI is `GPL-2.0-only` too: see [LICENSE](LICENSE). This differs from the MIT
+licence of most other examples in this repository.
+
+What is new compared with the original, by Stichting Cito Instituut voor Toetsontwikkeling (2026): see
+[Compared with the DEPP ChatBot PCI](#choice-steps) above, and the email, chat and post environments, which are not in
+the original.
 
 Source and the other examples: [Citolab/tspci-examples](https://github.com/Citolab/tspci-examples).

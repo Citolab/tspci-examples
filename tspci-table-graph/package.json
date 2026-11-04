@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-table-graph",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.0",
   "description": "find where two formulas meet, with a table and a graph of the values the candidate adds",
   "author": {
     "name": "Citolab",

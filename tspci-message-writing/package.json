@@ -1,12 +1,15 @@
 {
   "name": "@citolab/pci-message-writing",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "write in a realistic communication environment: reply to an email, chat in a class chat, post on a forum or social media; for a human rater, with optional checks the PCI scores",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
   },
-  "license": "MIT",
+  "contributors": [
+    "DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière, Wiquid (original Chatbotpci)"
+  ],
+  "license": "GPL-2.0-only",
   "homepage": "https://github.com/Citolab/tspci-examples#readme",
   "bugs": "https://github.com/Citolab/tspci-examples/issues",
   "keywords": [
@@ -37,6 +40,7 @@
     "dist/tao-pci-*.zip",
     "messageWriting.svg",
     "example.png",
+    "LICENSE",
     "README.md"
   ],
   "source": "src/index.tsx",

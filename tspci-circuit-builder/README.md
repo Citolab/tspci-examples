@@ -236,14 +236,23 @@ In a QTI 3 item, with `index.js` at `resources/pci/index.js` of the package:
 </qti-portable-custom-interaction>
 ```
 
-## Inspired by the DEPP Circuit and LampeDouble PCIs
+## Source and licence
 
-The test materials and the lamp tool (version 1.0.0-beta.2) take two ideas from PCIs of the French DEPP (Ministère de
-l'Éducation nationale, by Jean-Philippe Rivière / Wiquid), [janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)
-(`views/js/pciCreator/ims/Circuitpci` and `LampeDoublepci`): a circuit in which the pupil tests whether aluminium foil
-or cotton conducts, and two lamps in which the pupil blows one to see what happens to the other. They are re-implemented
-here from scratch in the circuit builder's own analysis (no code or images of the originals), so this package stays
-MIT. What is new compared with them: any material from a list, in any circuit the author builds; breaking any lamp,
-in series, parallel or mixed circuits; checks that score it; keyboard and screen reader access; Dutch and English.
+The test materials and the lamp tool (version 1.0.0-beta.2) take two ideas from
+[`Circuitpci`](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Circuitpci) and
+[`LampeDoublepci`](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/LampeDoublepci) in
+[janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp), © DEPP (Ministère de l'Éducation
+nationale) / Jean-Philippe Rivière (Wiquid): a circuit in which the pupil tests whether aluminium foil or cotton
+conducts, and two lamps in which the pupil blows one to see what happens to the other. That extension is licensed
+under the GNU General Public License version 2 only (`GPL-2.0-only`, as stated in its `composer.json` and in the headers
+of its files).
+
+The ideas are re-implemented here from scratch in the circuit builder's own analysis; no code or images of the
+originals are used. We still credit the original authors and take over their licence, so this PCI is `GPL-2.0-only`
+too: see [LICENSE](LICENSE). This differs from the MIT licence of most other examples in this repository.
+
+What is new compared with the originals, by Stichting Cito Instituut voor Toetsontwikkeling (2026): any material from
+a list, in any circuit the author builds; breaking any lamp, in series, parallel or mixed circuits; checks that score
+it; keyboard and screen reader access; Dutch and English.
 
 Source and the other examples: [Citolab/tspci-examples](https://github.com/Citolab/tspci-examples).

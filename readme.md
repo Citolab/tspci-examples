@@ -6,8 +6,9 @@ Example PCI's created with @citolab/tspci
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
 There are 57 examples in this repository that can give a head start while creating new Portable Custom Interactions.
-Twenty-one of them are ports of existing open-source PCIs and keep the licence of the original (see
-[Ports of open-source PCIs](#ports-of-open-source-pcis) and [Ports of the DEPP PCIs](#ports-of-the-depp-pcis)).
+Twenty-one of them are ports of existing open-source PCIs and two more take ideas from one; all 23 credit the
+original authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis)
+and [Ports of the DEPP PCIs](#ports-of-the-depp-pcis)).
 To run these examples go the to folder of the specific example and run:
 
 ``` sh
@@ -453,8 +454,8 @@ PCI in which the candidate completes a circuit diagram with symbols and wires on
 - New in 1.0.0-beta.2: materials to test (aluminium foil, copper, an iron nail and pencil lead conduct; cotton, wood, plastic,
   glass and rubber do not) with a `lit` check, and a tool to break and repair lamps to compare series and parallel
   (`data-lamp-tool`, off by default). Inspired by the DEPP Circuit and LampeDouble PCIs
-  ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)), written without their code, so
-  still MIT
+  ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)), written without their code, but
+  licensed **GPL-2.0-only** like the originals ([LICENSE](./tspci-circuit-builder/LICENSE))
 
 <p align="center">
   <img src="./tspci-circuit-builder/example.png" alt="example circuit builder" width="560">
@@ -580,6 +581,8 @@ of this repository: see the `LICENSE` file and the "Source and licence" section 
 | tspci-bronchiole | [DEPP Broncopci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Broncopci) | GPL-2.0-only |
 | tspci-reference-frames | [DEPP Trainpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Trainpci) and [Relatempci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Relatempci) | GPL-2.0-only |
 | tspci-volcano-model | [DEPP Volcanismepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Volcanismepci) | GPL-2.0-only |
+| tspci-circuit-builder (ideas only) | [DEPP Circuitpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Circuitpci) and [LampeDoublepci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/LampeDoublepci) | GPL-2.0-only |
+| tspci-message-writing (ideas only) | [DEPP Chatbotpci](https://github.com/janfix/extension-wiquid-depp/tree/master/views/js/pciCreator/ims/Chatbotpci) | GPL-2.0-only |
 
 The openPCI PCIs are by Elias J.T. Hansen, Anna Rusmann and Jeppe Bundsgaard (Aarhus University and Aalborg
 University). The DEPP PCIs are by Jean-Philippe Rivière (Wiquid) for the DEPP of the French Ministère de l'Éducation
@@ -764,8 +767,11 @@ settings, English, Dutch and French, keyboard and screen-reader access, a `recor
 a restorable state; its README explains how the response relates to what the original logged. They are
 `1.0.0-alpha.1`: the warning about the [alpha examples](#alpha-examples) applies to them too.
 
-Not ported: Circuit and LampeDouble (ideas merged into tspci-circuit-builder), ChatBot (ideas merged into
-tspci-message-writing), Snap (it bundles the whole Snap! application, AGPL), Explorer (a simulated file explorer that
+Not ported as their own example: Circuit and LampeDouble (ideas merged into tspci-circuit-builder) and ChatBot
+(ideas merged into tspci-message-writing). Those two are written without code of the originals but are licensed
+GPL-2.0-only as well, with the same credits, because their ideas come from GPL-2.0 work.
+
+Not ported at all: Snap (it bundles the whole Snap! application, AGPL), Explorer (a simulated file explorer that
 loads external images), Glips (a writing scenario with 2.6 MB of French audio and animations), and Cuisine and Berthold
 (image slideshows without interaction).
 
