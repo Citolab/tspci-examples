@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-math-entry",
-  "version": "1.0.0",
+  "version": "1.0.0-alpha.2",
   "description": "type a math formula, or fill in the gaps of one, with an on-screen toolbar and the MathLive virtual keyboard",
   "author": {
     "name": "Citolab",
