@@ -450,7 +450,7 @@ PCI in which the candidate completes a circuit diagram with symbols and wires on
   right way round, the same circuit as the solution; each check is a rubric line with its points
 - Reports a `record` with the score, a field per check, the circuit as a topology that does not depend on the layout,
   and the board for a rater
-- New in 1.1: materials to test (aluminium foil, copper, an iron nail and pencil lead conduct; cotton, wood, plastic,
+- New in 1.0.0-beta.2: materials to test (aluminium foil, copper, an iron nail and pencil lead conduct; cotton, wood, plastic,
   glass and rubber do not) with a `lit` check, and a tool to break and repair lamps to compare series and parallel
   (`data-lamp-tool`, off by default). Inspired by the DEPP Circuit and LampeDouble PCIs
   ([janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)), written without their code, so

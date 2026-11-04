@@ -238,7 +238,7 @@ In a QTI 3 item, with `index.js` at `resources/pci/index.js` of the package:
 
 ## Inspired by the DEPP Circuit and LampeDouble PCIs
 
-The test materials and the lamp tool (version 1.1) take two ideas from PCIs of the French DEPP (Ministère de
+The test materials and the lamp tool (version 1.0.0-beta.2) take two ideas from PCIs of the French DEPP (Ministère de
 l'Éducation nationale, by Jean-Philippe Rivière / Wiquid), [janfix/extension-wiquid-depp](https://github.com/janfix/extension-wiquid-depp)
 (`views/js/pciCreator/ims/Circuitpci` and `LampeDoublepci`): a circuit in which the pupil tests whether aluminium foil
 or cotton conducts, and two lamps in which the pupil blows one to see what happens to the other. They are re-implemented
