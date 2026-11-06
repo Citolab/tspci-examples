@@ -83,6 +83,28 @@ export const Cards: Story = {
   },
 };
 
+export const LayoutCards: Story = {
+  args: { properties: { layout: "cards" } },
+  play: async ({ canvasElement }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    // wide enough for the table, but the layout asks for cards
+    await waitFor(() => expect(root.querySelector('[data-testid="cards"]')).not.toBeNull());
+    expect(root.querySelector("table")).toBeNull();
+    expect(canvas.getAllByRole("radiogroup")).toHaveLength(9);
+  },
+};
+
+export const LayoutTable: Story = {
+  args: { properties: { layout: "table" }, width: 500 },
+  play: async ({ canvasElement }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    // too narrow for the table, but the layout asks for it
+    expect(canvas.getByRole("table", { name: "Answer table" })).toBeInTheDocument();
+    await new Promise((r) => setTimeout(r, 100));
+    expect(root.querySelector('[data-testid="cards"]')).toBeNull();
+  },
+};
+
 export const Multiple: Story = {
   args: { properties: { multiple: "true" } },
   play: async ({ canvasElement }) => {

@@ -22,6 +22,9 @@ export type Order = { topics: number[]; categories: number[]; items: number[] };
 /** The answers per choice key ("group1_item2"), always as a list; a radio choice holds at most one value. */
 export type Answers = Record<string, string[]>;
 
+/** auto: a table when it fits, cards when not; table or cards: always that one. */
+export type Layout = "auto" | "table" | "cards";
+
 export type Settings = {
   topics: Topic[];
   categories: Category[];
@@ -32,6 +35,7 @@ export type Settings = {
   randomizeTopics: boolean;
   randomizeCategories: boolean;
   randomizeItems: boolean;
+  layout: Layout;
 };
 
 const lines = (text: string) =>
@@ -72,6 +76,7 @@ export const parseSettings = (p: Record<string, string>): Settings => {
     randomizeTopics: bool(p.randomizetopics),
     randomizeCategories: bool(p.randomizecategories),
     randomizeItems: bool(p.randomizeitems),
+    layout: (["table", "cards"] as const).find((l) => l === String(p.layout ?? "").trim().toLowerCase()) ?? "auto",
   };
 };
 

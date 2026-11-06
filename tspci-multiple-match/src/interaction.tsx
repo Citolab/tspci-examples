@@ -10,9 +10,9 @@ import { Texts } from "./texts";
 
 // The matrix of the original: topics are column groups, under every topic the same categories, the items are rows.
 // Each topic × item is one choice: radio buttons (one category) or checkboxes (several). Wide enough, it is a table;
-// narrow, every item becomes a card with a row of answer buttons per topic. Either way every option is a real
-// radio button or checkbox (hidden behind its label): Tab goes from choice to choice, the arrow keys move within one,
-// and a screen reader hears the item, the topic and the category.
+// narrow, every item becomes a card with a row of answer buttons per topic (the layout setting can fix one of the two).
+// Either way every option is a real radio button or checkbox (hidden behind its label): Tab goes from choice to
+// choice, the arrow keys move within one, and a screen reader hears the item, the topic and the category.
 
 /** Alternating tints per topic, after the original's green and blue column groups. */
 const TINTS = [
@@ -206,7 +206,7 @@ const Interaction = ({ settings, store, texts, disabled }: {
         <p className="m-0">{multiple ? texts.chooseMany : texts.chooseOne}</p>
         <p className="m-0 tabular-nums" data-testid="progress">{texts.answered(done, total)}</p>
       </div>
-      {narrow ? cards : table}
+      {settings.layout === "cards" || (settings.layout === "auto" && narrow) ? cards : table}
     </div>
   );
 };

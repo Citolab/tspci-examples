@@ -63,6 +63,16 @@
     "editor": "boolean",
     "label": { "en": "Randomize the order of the items", "nl": "Volgorde van de items husselen" }
   },
+  "layout": {
+    "default": "auto",
+    "editor": "enum",
+    "options": [
+      { "value": "auto", "label": { "en": "Automatic: a table when it fits, cards when not", "nl": "Automatisch: een tabel als die past, anders kaarten" } },
+      { "value": "table", "label": { "en": "Always a table", "nl": "Altijd een tabel" } },
+      { "value": "cards", "label": { "en": "Always cards: one card per item", "nl": "Altijd kaarten: één kaart per item" } }
+    ],
+    "label": { "en": "Layout", "nl": "Weergave" }
+  },
   "language": {
     "default": "en",
     "editor": "enum",

@@ -19,7 +19,8 @@ mathematics and for reading?"). Made with [tspci](https://github.com/Citolab/tsp
 - **What changed** (Stichting Cito Instituut voor Toetsontwikkeling, 2026):
   - ported from TAO's older PCI format (AMD + jQuery, TAO creator widget) to the IMS PCI v1.0 API with tspci, Preact and
     Tailwind; the settings are `data-` attributes with the original's names, described in `src/config.json`;
-  - a new UI: a table with sticky row headers on wide screens, a card per item with answer buttons on narrow ones;
+  - a new UI: a table with sticky row headers on wide screens, a card per item with answer buttons on narrow ones
+    (or always one of the two, with *Layout*);
     keyboard and screen-reader accessible, texts in English and Dutch;
   - a radio choice can be taken back by choosing it again; a progress line ("5 of 6 answered");
   - the response keeps the original's JSON string, with the keys in a fixed order (see Scoring) and nothing (NULL)
@@ -38,7 +39,8 @@ mathematics and for reading?"). Made with [tspci](https://github.com/Citolab/tsp
   order and selection.
 - **Accessible**: every option is a real radio button or checkbox behind its label. Tab goes from choice to choice, the
   arrow keys move between the categories of one choice, Space chooses; a screen reader hears "Agree (I like this
-  subject, Mathematics)". The layout follows the width the PCI gets, not the window.
+  subject, Mathematics)". The layout follows the width the PCI gets, not the window: a table when it fits, a card per item when not; *Layout* can fix
+  one of the two.
 - **Delivery**: the answers and the order are saved as the item's state and restored. In review (`status: "solution"`)
   the PCI shows the correct response when the delivery system passes it.
 
@@ -61,6 +63,7 @@ systems. Lines in `topics`, `categories` and `items` are separated by newlines.
 | Reuse order and selection of topics | `data-reusetopics`    | `false`                                                  | the topic order of the first item in the session                           |
 | Randomize categories           | `data-randomizecategories` | `false`                                                  |                                                                            |
 | Randomize items                | `data-randomizeitems`      | `false`                                                  |                                                                            |
+| Layout                         | `data-layout`              | `auto`                                                   | `auto`: a table when it fits, cards when not; `table` or `cards`: always that one |
 | Language                       | `data-language`            | `en`                                                     | `en` or `nl`: the instructions and the texts for screen readers            |
 
 ## Scoring

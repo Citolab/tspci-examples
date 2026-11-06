@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-multiple-match",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "rate or classify several items on the same categories, for several topics at once (a port of openPCI multiplematch)",
   "author": {
     "name": "Citolab",
