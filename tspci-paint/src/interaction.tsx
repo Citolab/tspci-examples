@@ -5,7 +5,7 @@
 import { IStore, useStore } from "@citolab/preact-store";
 import { useEffect, useRef, useState } from "preact/hooks";
 import { Actions, StateModel, Stroke, isEmpty } from "./store";
-import { colorName, drawEnd, drawSegment, drawStart, pointCount, renderAll, strokeCount } from "./drawing";
+import { colorName, drawEnd, drawSegment, drawStart, fillCount, pointCount, renderAll, strokeCount } from "./drawing";
 import { Texts } from "./texts";
 
 // A toolbar (colours and brush sizes as radio groups, eraser, undo, redo, clear) above a canvas. The canvas draws with
@@ -35,6 +35,7 @@ const icons = {
   redo: "m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13",
   clear: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6",
   eraser: "m7 21-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21M22 21H7M5 11l9 9",
+  paintBucket: "M2 12h20M12 2v10M5.5 22h13a2.5 2.5 0 0 0 2.5-2.5V12H3v7.5A2.5 2.5 0 0 0 5.5 22Z",
 };
 
 const Interaction = ({ settings, store, texts }: { settings: Settings; store: IStore<StateModel, Actions>; texts: Texts }) => {
@@ -43,6 +44,7 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
   const [color, setColor] = useState(settings.defaultColor);
   const [size, setSize] = useState(settings.defaultStroke);
   const [eraser, setEraser] = useState(false);
+  const [fill, setFill] = useState(false);
   const [cursor, setCursor] = useState({ x: Math.round(width / 2), y: Math.round(height / 2), down: false });
   const [focused, setFocused] = useState(false);
   const [announcement, setAnnouncement] = useState("");
@@ -79,6 +81,20 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
     drawEnd(ctx(), s);
     store.dispatch({ type: "ADD", payload: { operation: s } });
   };
+  // the paint bucket: the replay after ADD draws it
+  const fillAt = (x: number, y: number) => {
+    const fx = Math.min(width - 1, Math.floor(x)), fy = Math.min(height - 1, Math.floor(y));
+    store.dispatch({ type: "ADD", payload: { operation: { kind: "fill", color, x: fx, y: fy } } });
+    setAnnouncement(texts.filled(colorName(color, texts), fx, fy));
+  };
+  const toggleEraser = () => {
+    setEraser(!eraser);
+    setFill(false);
+  };
+  const toggleFill = () => {
+    setFill(!fill);
+    setEraser(false);
+  };
 
   // pointer: mouse, pen, touch
   const position = (e: PointerEvent) => {
@@ -92,9 +108,13 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
   const onPointerDown = (e: PointerEvent) => {
     if (pointerId.current !== null || (e.pointerType === "mouse" && e.button !== 0)) return;
     e.preventDefault();
+    const { x, y, p } = position(e);
+    if (fill) {
+      fillAt(x, y);
+      return;
+    }
     pointerId.current = e.pointerId;
     canvas.current.setPointerCapture?.(e.pointerId);
-    const { x, y, p } = position(e);
     start(x, y, p);
   };
   const onPointerMove = (e: PointerEvent) => {
@@ -131,6 +151,8 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
       e.preventDefault();
       if (cursor.down) {
         penUp();
+      } else if (fill) {
+        fillAt(cursor.x, cursor.y);
       } else {
         start(cursor.x, cursor.y, 0.5);
         setCursor({ ...cursor, down: true });
@@ -167,6 +189,7 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
   };
 
   const count = strokeCount(state);
+  const fills = fillCount(state);
   const empty = isEmpty(state);
   const button =
     "inline-flex h-9 items-center gap-1.5 rounded-lg border border-slate-300 bg-white px-2.5 text-sm font-medium text-slate-700 " +
@@ -210,9 +233,13 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
           ))}
         </fieldset>
         <div className="flex flex-wrap items-center gap-1.5">
-          <button type="button" className={`${button} ${eraser ? "border-sky-600 bg-sky-100 hover:bg-sky-100" : ""}`}
-            aria-pressed={eraser} onClick={() => setEraser(!eraser)} data-testid="eraser">
+          <button type="button" className={`${button} ${eraser ? "border-sky-600 bg-sky-100 hover:bg-sky-100" : ""} focus:bg-sky-100 focus:border-sky-600`}
+            aria-pressed={eraser} onClick={toggleEraser} data-testid="eraser">
             <Icon d={icons.eraser} />{texts.eraser}
+          </button>
+          <button type="button" className={`${button} ${fill ? "border-sky-600 bg-sky-100 hover:bg-sky-100" : ""} focus:bg-sky-100 focus:border-sky-600`}
+            aria-pressed={fill} onClick={toggleFill} data-testid="paint-bucket">
+            <Icon d={icons.paintBucket} />{texts.fill}
           </button>
           <button type="button" className={button} onClick={undo} disabled={state.operations.length === 0}
             aria-keyshortcuts="Control+Z" data-testid="undo">
@@ -229,7 +256,7 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
       </div>
       <div id="canvas" tabIndex={0} role="application"
         aria-roledescription={texts.canvas}
-        aria-label={`${prompt || texts.canvas} (${empty ? texts.empty : texts.strokes(count)})`}
+        aria-label={`${prompt || texts.canvas} (${empty ? texts.empty : texts.strokes(count) + (fills ? `, ${texts.fills(fills)}` : "")})`}
         aria-describedby="help"
         onKeyDown={onCanvasKey}
         onFocus={() => setFocused(true)}
@@ -238,7 +265,7 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
           focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
         style={{ aspectRatio: `${width} / ${height}` }}>
         <canvas ref={canvas} width={width} height={height} data-testid="canvas"
-          className={`block h-full w-full touch-none select-none ${eraser ? "cursor-cell" : "cursor-crosshair"}`}
+          className={`block h-full w-full touch-none select-none ${eraser ? "cursor-cell" : fill ? "cursor-pointer" : "cursor-crosshair"}`}
           onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={onPointerUp}
           onContextMenu={(e) => e.preventDefault()} />
         {focused && (

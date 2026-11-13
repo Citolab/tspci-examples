@@ -67,6 +67,7 @@ export const parseSettings = (p: Record<string, string>): Settings => {
 
 const isOperation = (o: any): o is Operation =>
   o?.kind === "clear" ||
+  (o?.kind === "fill" && typeof o.color === "string" && Number.isFinite(o.x) && Number.isFinite(o.y)) ||
   (o?.kind === "stroke" && Array.isArray(o.points) && typeof o.size === "number" && (o.color === null || typeof o.color === "string"));
 
 class App implements IMSpci<PropTypes>, TAOpci {

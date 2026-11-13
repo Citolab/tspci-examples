@@ -1,7 +1,7 @@
 # @citolab/pci-paint
 
 A QTI 3 Portable Custom Interaction (PCI) in which the candidate draws the answer on a canvas: "draw a house with a
-tree next to it". Colours, brush sizes, an eraser, undo, redo and clear; mouse, pen (with pressure) and touch, and the
+tree next to it". Colours, brush sizes, an eraser, a fill (paint bucket), undo, redo and clear; mouse, pen (with pressure) and touch, and the
 keyboard. The response is the drawing as a PNG image. Made with [tspci](https://github.com/Citolab/tspci).
 
 <p align="center">
@@ -26,7 +26,7 @@ What changed, by Stichting Cito Instituut voor Toetsontwikkeling, 2026:
 - **Rewritten drawing**: pointer events instead of mouse events and simulated touch, smooth strokes (curves through
   the points instead of straight pieces), the width following a pen's pressure. The eraser really erases along the
   stroke instead of clearing squares.
-- **New**: undo and redo (also Ctrl+Z / Ctrl+Y), clear (undoable), drawing with the keyboard, labels and a live region
+- **New**: a fill (paint bucket) for closed areas, undo and redo (also Ctrl+Z / Ctrl+Y), clear (undoable), drawing with the keyboard, labels and a live region
   for screen readers, English and Dutch texts, a fixed canvas size that scales to the screen.
 - **State**: the original did not restore a drawing; this one saves the strokes (and undo history) as its state and
   restores them, and shows a response it is handed back.
@@ -37,7 +37,8 @@ What changed, by Stichting Cito Instituut voor Toetsontwikkeling, 2026:
 - **Draw**: with the mouse, a pen or a finger; the page does not scroll while drawing on the canvas. A pen draws
   thinner or thicker with less or more pressure.
 - **Toolbar**: the colours and the brush sizes are radio groups (arrow keys move within a group, each colour has a
-  name for screen readers: "dark grey"), the eraser is a toggle button, undo, redo and clear are buttons.
+  name for screen readers: "dark grey"), the eraser and fill are toggle buttons (a click, or Space at the keyboard
+  cursor, fills the area of about the same colour), undo, redo and clear are buttons.
 - **Keyboard**: the canvas is focusable. The arrow keys move a pen cursor (Shift: small steps), Space or Enter puts the
   pen down or lifts it, Escape lifts it; with the pen down, moving draws.
 - **Delivery**: the drawing is saved as the item's state (the strokes, not the image) and restored, with its undo
