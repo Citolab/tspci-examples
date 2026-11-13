@@ -107,6 +107,49 @@ export const Default: Story = {
   },
 };
 
+export const Fill: Story = {
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, root } = mounted;
+    const fill = canvas.getByRole("button", { name: "Fill" });
+    const eraser = canvas.getByRole("button", { name: "Eraser" });
+    // a closed black shape: a square from (100, 100) to (300, 300), its corners rounded by the smoothing
+    draw(canvasOf(root), [[100, 100], [300, 100], [300, 300], [100, 300], [100, 100]]);
+    await lastChange(mounted);
+
+    await step("fill and eraser are toggles that turn each other off", async () => {
+      await userEvent.click(eraser);
+      await userEvent.click(fill);
+      expect(fill).toHaveAttribute("aria-pressed", "true");
+      expect(eraser).toHaveAttribute("aria-pressed", "false");
+    });
+
+    await step("a click fills the area inside the lines, not outside, and the line stays", async () => {
+      await userEvent.click(canvas.getByRole("radio", { name: "blue" }));
+      expect(fill).toHaveAttribute("aria-pressed", "true");
+      draw(canvasOf(root), [[200, 200]]);
+      await lastChange(mounted, 2);
+      expect(operations(mounted)[1]).toEqual({ kind: "fill", color: "#007bff", x: 200, y: 200 });
+      const inside = await pixelOf(responseUrl(mounted), 200, 200);
+      expect(inside).toEqual([0, 123, 255, 255]);
+      expect(await pixelOf(responseUrl(mounted), 140, 200)).toEqual([0, 123, 255, 255]);
+      expect(await pixelOf(responseUrl(mounted), 400, 400)).toEqual([0, 0, 0, 0]);
+      expect((await pixelOf(responseUrl(mounted), 200, 100)).slice(0, 3)).toEqual([0, 0, 0]);
+      expect(canvas.getByRole("application")).toHaveAttribute("aria-label", "Make a drawing. (1 stroke, 1 fill)");
+      expect(root.querySelector('[aria-live="polite"]')).toHaveTextContent("Filled with blue at 200, 200");
+    });
+
+    await step("Space fills at the keyboard cursor; undo takes a fill back", async () => {
+      canvas.getByRole("application").focus();
+      await userEvent.keyboard(" "); // the cursor starts at (400, 300): outside the square
+      await lastChange(mounted, 3);
+      expect(await pixelOf(responseUrl(mounted), 600, 500)).toEqual([0, 123, 255, 255]);
+      await userEvent.click(canvas.getByRole("button", { name: "Undo" }));
+      expect(await pixelOf(responseUrl(mounted), 600, 500)).toEqual([0, 0, 0, 0]);
+    });
+  },
+};
+
 export const UndoRedoClear: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);
