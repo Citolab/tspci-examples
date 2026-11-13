@@ -14,7 +14,7 @@ recreate a building shown in the item from its front, side and top view. Made wi
   shows where it will land before you click.
 - **Remove**: click the side of a brick to take it away (a brick in the top layer goes with any click); the brick that
   would go is shown in see-through red first.
-- **Look around**: drag to turn the baseplate. The arrow and its label mark the front, so the candidate can tell
+- **Look around**: drag to turn the baseplate, scroll or use the + and − buttons to zoom in and out. The arrow and its label mark the front, so the candidate can tell
   front, side and top apart.
 - **Limits**: bricks stay on the plate, and a stack is at most as high as the grid is wide (5 × 5 × 5 by default).
 - **Colours**: a brick's colour follows from where it stands, so a build looks the same when the candidate comes back

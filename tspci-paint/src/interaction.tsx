@@ -35,7 +35,8 @@ const icons = {
   redo: "m15 14 5-5-5-5M20 9H9.5a5.5 5.5 0 0 0 0 11H13",
   clear: "M3 6h18M8 6V4h8v2M19 6l-1 14H6L5 6M10 11v6M14 11v6",
   eraser: "m7 21-4.3-4.3a1 1 0 0 1 0-1.4l10-10a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L11 21M22 21H7M5 11l9 9",
-  paintBucket: "M2 12h20M12 2v10M5.5 22h13a2.5 2.5 0 0 0 2.5-2.5V12H3v7.5A2.5 2.5 0 0 0 5.5 22Z",
+  paintBucket: "M6.5 6.5 3 10a1.4 1.4 0 0 0 0 2l7 7a1.4 1.4 0 0 0 2 0l7-7a1.4 1.4 0 0 0 0-2l-8-8v4M6.5 1.5 11 6M2.5 11h17" +
+    "M22 20a2 2 0 1 1-4 0c0-1.6 1.7-2.4 2-4 .3 1.6 2 2.4 2 4Z",
 };
 
 const Interaction = ({ settings, store, texts }: { settings: Settings; store: IStore<StateModel, Actions>; texts: Texts }) => {

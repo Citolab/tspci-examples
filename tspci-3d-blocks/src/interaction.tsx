@@ -1,4 +1,4 @@
-import { useEffect } from "preact/hooks";
+import { useEffect, useRef } from "preact/hooks";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { brickColor, createBaseplate, createBrickGeometry, DEFAULT_BRICK_COLORS, parseColors, plasticMaterial, srgb } from "./bricks";
@@ -12,12 +12,15 @@ type PropTypes = PciProperties<typeof configProps>;
 export const Interaction = (props: { config: PropTypes, store: IStore<StateModel, Actions> }) => {
   const { config, store } = props;
 
-  let voxel: VoxelPainterClass;
+  // the scene lives across renders, so the zoom buttons can reach it
+  const voxelRef = useRef<VoxelPainterClass | null>(null);
+  // the button labels follow the language of the page (English when it has none we know)
+  const labels = zoomLabels[(document.documentElement.lang ?? "").slice(0, 2).toLowerCase()] ?? zoomLabels.en;
 
   let dom: HTMLElement;
 
   useEffect(() => {
-    voxel = new VoxelPainterClass({
+    let voxel = new VoxelPainterClass({
       width: config.width,
       height: config.height,
       gridDivisions: config.gridDivisions,
@@ -28,6 +31,7 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       baseplateColor: config.baseplateColor,
       htmlElementToAppendTo: dom,
     });
+    voxelRef.current = voxel;
     let unsubscribe: Unsubscribe | undefined;
     // prevent a black box to appear when the page is loaded
     const timer = setTimeout(() => {
@@ -62,6 +66,7 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       unsubscribe?.();
       voxel?.destroy();
       voxel = null;
+      voxelRef.current = null;
     };
   }, [
     config.width,
@@ -74,15 +79,36 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
     config.baseplateColor,
   ]);
 
+  const zoomButton = "flex h-8 w-8 items-center justify-center rounded border border-gray-400 bg-white/90 text-lg leading-none text-gray-800 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-600 cursor-pointer";
+
   return (
-    <>
+    <div className="relative" style={{ width: `${config.width}px`, maxWidth: "100%" }}>
       {/* The scene gets the configured size (shrinking on a narrow screen), so the camera has a fixed frame to fill. */}
       <div
-        style={{ width: `${config.width}px`, maxWidth: "100%", height: `${config.height}px` }}
+        style={{ width: "100%", height: `${config.height}px` }}
         ref={(node) => { dom = node as HTMLElement; }}
       />
-    </>
+      {/* Beside the scene, not in it, so a click on a button does not place or remove a brick. */}
+      <div className="absolute right-2 top-2 flex flex-col gap-1">
+        <button type="button" className={zoomButton} aria-label={labels.zoomIn} title={labels.zoomIn}
+          onClick={() => voxelRef.current?.zoom(1 / ZOOM_STEP)}>+</button>
+        <button type="button" className={zoomButton} aria-label={labels.zoomOut} title={labels.zoomOut}
+          onClick={() => voxelRef.current?.zoom(ZOOM_STEP)}>−</button>
+        <button type="button" className={zoomButton} aria-label={labels.reset} title={labels.reset}
+          onClick={() => voxelRef.current?.resetView()}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw preview-icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </button>
+      </div>
+    </div>
   );
+};
+
+/** How much one click on a zoom button changes the distance to the camera. */
+const ZOOM_STEP = 1.25;
+
+const zoomLabels: Record<string, { zoomIn: string; zoomOut: string; reset: string }> = {
+  en: { zoomIn: "Zoom in", zoomOut: "Zoom out", reset: "Reset view" },
+  nl: { zoomIn: "Inzoomen", zoomOut: "Uitzoomen", reset: "Beginweergave" },
 };
 
 class VoxelPainterClass {
@@ -262,7 +288,9 @@ class VoxelPainterClass {
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enableKeys = false;
     this.controls.enablePan = false;
-    this.controls.enableZoom = false;
+    // the scroll wheel zooms, between the limits set in updateCameraFrame
+    this.controls.enableZoom = true;
+    this.controls.addEventListener("change", () => this.render());
     this.updateCameraFrame();
 
     this.handleMouseMove = (e) => this.onDocumentMouseMove(e);
@@ -297,6 +325,22 @@ class VoxelPainterClass {
     this.render()
   }
 
+  /** Moves the camera closer (factor below 1) or further away (above 1), within the zoom limits. */
+  public zoom(factor: number) {
+    const target = this.controls.target;
+    const offset = this.camera.position.clone().sub(target);
+    const distance = THREE.MathUtils.clamp(offset.length() * factor, this.controls.minDistance, this.controls.maxDistance);
+    this.camera.position.copy(target).add(offset.setLength(distance));
+    this.controls.update(); // fires "change", which renders
+  }
+
+  /** Back to the starting view: the starting direction, at the framed distance. */
+  public resetView() {
+    this.camera.position.copy(this.controls.target).add(new THREE.Vector3(200, 600, 1000));
+    this.updateCameraFrame(); // keeps the direction, sets the framed distance and updates the controls
+    this.render();
+  }
+
   private updateCameraFrame() {
     if (!this.framingObjects.length) {
       return;
@@ -321,6 +365,11 @@ class VoxelPainterClass {
 
     this.target.copy(center);
     this.camera.position.copy(center).add(direction.multiplyScalar(distance));
+    // zoom from about twice as close to about twice as far as the framed view
+    if (this.controls) {
+      this.controls.minDistance = distance * 0.5;
+      this.controls.maxDistance = distance * 2;
+    }
     this.camera.near = Math.max(0.1, distance / 100);
     this.camera.far = Math.max(10000, distance * 20);
     this.camera.lookAt(this.target);
