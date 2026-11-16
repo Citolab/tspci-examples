@@ -9,8 +9,10 @@ import { Store } from "@citolab/preact-store";
  * in canvas pixels.
  */
 export type Stroke = { kind: "stroke"; color: string | null; size: number; points: number[] };
+/** The paint bucket: the area around the point (x, y) that has about the same colour, filled with a colour. */
+export type Fill = { kind: "fill"; color: string; x: number; y: number };
 /** Clearing the canvas is an operation too, so it can be undone. */
-export type Operation = Stroke | { kind: "clear" };
+export type Operation = Stroke | Fill | { kind: "clear" };
 
 export type StateModel = {
   /** A drawing handed over as a response (a PNG data URL) that the operations are drawn on top of, or null. */

@@ -6,7 +6,7 @@
 // the pressure of a pen. The same functions draw a stroke while it is made and replay the whole drawing, so both look
 // the same.
 
-import { Operation, StateModel, Stroke } from "./store";
+import { Fill, Operation, StateModel, Stroke } from "./store";
 import { Texts } from "./texts";
 
 /** Pressure 0.5 (mouse, touch, a pen pressed normally) gives the brush size. */
@@ -68,6 +68,75 @@ export const drawStroke = (ctx: CanvasRenderingContext2D, s: Stroke) => {
   drawEnd(ctx, s);
 };
 
+// The paint bucket. Pixels are compared as they look on the white page (over white), so the transparent background
+// and a light, anti-aliased edge of a line count as the same area. The edge pixels of a line just outside the area get
+// the fill colour underneath them, so no light seam is left between the fill and the line.
+
+/** How far (0..255 per channel) a pixel may differ from the clicked one and still be filled. */
+const TOLERANCE = 48;
+
+const rgbCache = new Map<string, [number, number, number]>();
+/** The RGB of any CSS colour ("#dc3545", "red"). */
+const rgbOf = (color: string): [number, number, number] => {
+  let rgb = rgbCache.get(color);
+  if (!rgb) {
+    const c = document.createElement("canvas").getContext("2d");
+    c.canvas.width = c.canvas.height = 1;
+    c.fillStyle = color;
+    c.fillRect(0, 0, 1, 1);
+    const [r, g, b] = c.getImageData(0, 0, 1, 1).data;
+    rgb = [r, g, b];
+    rgbCache.set(color, rgb);
+  }
+  return rgb;
+};
+
+export const drawFill = (ctx: CanvasRenderingContext2D, f: Fill) => {
+  const { width, height } = ctx.canvas;
+  const x0 = Math.min(width - 1, Math.max(0, Math.floor(f.x)));
+  const y0 = Math.min(height - 1, Math.max(0, Math.floor(f.y)));
+  const image = ctx.getImageData(0, 0, width, height);
+  const data = image.data;
+  // a pixel's channel as it looks over white
+  const seen = (i: number, c: number) => 255 - (data[i + 3] * (255 - data[i + c])) / 255;
+  const s = (y0 * width + x0) * 4;
+  const target = [seen(s, 0), seen(s, 1), seen(s, 2)];
+  const [r, g, b] = rgbOf(f.color);
+  const matches = (p: number) => {
+    const i = p * 4;
+    return Math.abs(seen(i, 0) - target[0]) <= TOLERANCE && Math.abs(seen(i, 1) - target[1]) <= TOLERANCE &&
+      Math.abs(seen(i, 2) - target[2]) <= TOLERANCE;
+  };
+  // 1: in the area, 2: an edge pixel next to it
+  const mark = new Uint8Array(width * height);
+  const stack = [y0 * width + x0];
+  while (stack.length) {
+    const p = stack.pop();
+    if (mark[p] === 1) continue;
+    if (!matches(p)) {
+      mark[p] = 2;
+      continue;
+    }
+    mark[p] = 1;
+    const x = p % width;
+    if (x > 0 && mark[p - 1] !== 1) stack.push(p - 1);
+    if (x < width - 1 && mark[p + 1] !== 1) stack.push(p + 1);
+    if (p >= width && mark[p - width] !== 1) stack.push(p - width);
+    if (p < width * (height - 1) && mark[p + width] !== 1) stack.push(p + width);
+  }
+  for (let p = 0; p < mark.length; p++) {
+    if (!mark[p]) continue;
+    const i = p * 4;
+    // in the area: the fill colour; an edge pixel: drawn over the fill colour
+    const a = mark[p] === 1 ? 0 : data[i + 3] / 255;
+    data[i] = Math.round(data[i] * a + r * (1 - a));
+    data[i + 1] = Math.round(data[i + 1] * a + g * (1 - a));
+    data[i + 2] = Math.round(data[i + 2] * a + b * (1 - a));
+    data[i + 3] = 255;
+  }
+  ctx.putImageData(image, 0, 0);
+};
+
 // A drawing handed over as a response, decoded once.
 const images = new Map<string, HTMLImageElement>();
 /** The image of a data URL; onload is called once it is decoded (not when it was already). */
@@ -91,6 +160,7 @@ const visible = (state: StateModel): { base: string | null; operations: Operatio
 };
 
 export const strokeCount = (state: StateModel) => visible(state).operations.filter((o) => o.kind === "stroke" && o.color !== null).length;
+export const fillCount = (state: StateModel) => visible(state).operations.filter((o) => o.kind === "fill").length;
 
 export const renderAll = (ctx: CanvasRenderingContext2D, state: StateModel, onBaseLoaded?: () => void) => {
   const { width, height } = ctx.canvas;
@@ -101,7 +171,10 @@ export const renderAll = (ctx: CanvasRenderingContext2D, state: StateModel, onBa
     const img = imageFor(base, onBaseLoaded);
     if (img.complete && img.naturalWidth > 0) ctx.drawImage(img, 0, 0, width, height);
   }
-  operations.forEach((o) => o.kind === "stroke" && drawStroke(ctx, o));
+  operations.forEach((o) => {
+    if (o.kind === "stroke") drawStroke(ctx, o);
+    else if (o.kind === "fill") drawFill(ctx, o);
+  });
 };
 
 /** A PNG data URL of the drawing at the size of the canvas: the response. */

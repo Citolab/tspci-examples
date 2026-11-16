@@ -10,15 +10,19 @@ const en = {
   sizes: "Brush size",
   size: (px: number) => `${px} px`,
   eraser: "Eraser",
+  fill: "Fill",
   undo: "Undo",
   redo: "Redo",
   clear: "Clear",
   canvas: "Drawing canvas",
   empty: "empty",
   strokes: (n: number) => `${n} ${n === 1 ? "stroke" : "strokes"}`,
+  fills: (n: number) => `${n} ${n === 1 ? "fill" : "fills"}`,
   keyboardHelp:
     "Draw with the mouse, a pen or a finger. With the keyboard: the arrow keys move the pen (Shift: in small steps), " +
-    "Space puts the pen down or lifts it, Escape lifts it. Ctrl+Z undoes, Ctrl+Y redoes.",
+    "Space puts the pen down or lifts it, Escape lifts it. With Fill on, a click or Space fills the area. " +
+    "Ctrl+Z undoes, Ctrl+Y redoes.",
+  filled: (color: string, x: number, y: number) => `Filled with ${color} at ${x}, ${y}`,
   penDown: (x: number, y: number) => `Pen down at ${x}, ${y}`,
   penUp: "Pen lifted",
   erasing: "erasing",
@@ -36,15 +40,19 @@ const nl: typeof en = {
   sizes: "Penseeldikte",
   size: (px: number) => `${px} px`,
   eraser: "Gum",
+  fill: "Vullen",
   undo: "Ongedaan maken",
   redo: "Opnieuw",
   clear: "Wissen",
   canvas: "Tekenvlak",
   empty: "leeg",
   strokes: (n: number) => `${n} ${n === 1 ? "lijn" : "lijnen"}`,
+  fills: (n: number) => `${n} ${n === 1 ? "vlak" : "vlakken"} gevuld`,
   keyboardHelp:
     "Teken met de muis, een pen of een vinger. Met het toetsenbord: de pijltjestoetsen bewegen de pen (Shift: in kleine stapjes), " +
-    "Spatie zet de pen neer of tilt hem op, Escape tilt hem op. Ctrl+Z maakt ongedaan, Ctrl+Y doet opnieuw.",
+    "Spatie zet de pen neer of tilt hem op, Escape tilt hem op. Met Vullen aan vult een klik of Spatie het vlak. " +
+    "Ctrl+Z maakt ongedaan, Ctrl+Y doet opnieuw.",
+  filled: (color: string, x: number, y: number) => `Gevuld met ${color} op ${x}, ${y}`,
   penDown: (x: number, y: number) => `Pen neergezet op ${x}, ${y}`,
   penUp: "Pen opgetild",
   erasing: "gummen",
