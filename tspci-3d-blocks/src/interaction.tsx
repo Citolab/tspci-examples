@@ -1,8 +1,9 @@
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { brickColor, createBaseplate, createBrickGeometry, DEFAULT_BRICK_COLORS, parseColors, plasticMaterial, srgb } from "./bricks";
 import { Actions, StateModel } from "./store";
+import { Cube } from "./utils";
 import configProps from "./config.json";
 
 import { IStore, Unsubscribe } from "@citolab/preact-store";
@@ -15,11 +16,47 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
   // the scene lives across renders, so the zoom buttons can reach it
   const voxelRef = useRef<VoxelPainterClass | null>(null);
   // the button labels follow the language of the page (English when it has none we know)
-  const labels = zoomLabels[(document.documentElement.lang ?? "").slice(0, 2).toLowerCase()] ?? zoomLabels.en;
+  const labels = toolLabels[(document.documentElement.lang ?? "").slice(0, 2).toLowerCase()] ?? toolLabels.en;
+
+  // what the candidate did, one step per click, so it can be undone and redone
+  // (in a ref, so a quick click on undo always sees the latest step; the state only redraws the buttons)
+  const historyRef = useRef<{ undo: Step[]; redo: Step[] }>({ undo: [], redo: [] });
+  const [history, setHistoryState] = useState(historyRef.current);
+  const setHistory = (next: { undo: Step[]; redo: Step[] }) => {
+    historyRef.current = next;
+    setHistoryState(next);
+  };
+
+  /** Applies a step forwards (redo) or backwards (undo), through the store, so the scene and the log follow. */
+  const applyStep = (step: Step, forwards: boolean) => {
+    const has = (cube: Cube) => store.getState().cubes.some((c) => sameCube(c, cube));
+    const toRemove = forwards ? step.removed : step.added;
+    const toAdd = forwards ? step.added : step.removed;
+    // skip what is already so (e.g. after the item was reset), so a step never doubles or loses a brick
+    toRemove.filter(has).forEach((c) => store.dispatch({ type: "REMOVED_CUBE", payload: c }));
+    toAdd.filter((c) => !has(c)).forEach((c) => store.dispatch({ type: "ADDED_CUBE", payload: c }));
+  };
+
+  const undo = () => {
+    const { undo, redo } = historyRef.current;
+    const step = undo[undo.length - 1];
+    if (!step) return;
+    applyStep(step, false);
+    setHistory({ undo: undo.slice(0, -1), redo: [...redo, step] });
+  };
+
+  const redo = () => {
+    const { undo, redo } = historyRef.current;
+    const step = redo[redo.length - 1];
+    if (!step) return;
+    applyStep(step, true);
+    setHistory({ undo: [...undo, step], redo: redo.slice(0, -1) });
+  };
 
   let dom: HTMLElement;
 
   useEffect(() => {
+    setHistory({ undo: [], redo: [] }); // a new scene starts without history
     let voxel = new VoxelPainterClass({
       width: config.width,
       height: config.height,
@@ -59,6 +96,15 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
         cubesToRemove.forEach((c) => {
           store.dispatch({ type: "REMOVED_CUBE", payload: { x: c.x, y: c.y, z: c.z } });
         });
+
+        // a new step can be undone, and what was undone before can no longer be redone
+        if (cubesToAdd.length || cubesToRemove.length) {
+          const step: Step = {
+            added: cubesToAdd.map((c) => ({ x: c.x, y: c.y, z: c.z })),
+            removed: cubesToRemove.map((c) => ({ x: c.x, y: c.y, z: c.z })),
+          };
+          setHistory({ undo: [...historyRef.current.undo, step], redo: [] });
+        }
       }
     );
     return () => {
@@ -79,7 +125,7 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
     config.baseplateColor,
   ]);
 
-  const zoomButton = "flex h-8 w-8 items-center justify-center rounded border border-gray-400 bg-white/90 text-lg leading-none text-gray-800 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-600 cursor-pointer";
+  const toolButton = "flex h-8 w-8 items-center justify-center rounded border border-gray-400 bg-white/90 text-lg leading-none text-gray-800 shadow-sm hover:bg-white focus-visible:outline-2 focus-visible:outline-blue-600 cursor-pointer disabled:cursor-default disabled:opacity-40 disabled:hover:bg-white/90";
 
   return (
     <div className="relative" style={{ width: `${config.width}px`, maxWidth: "100%" }}>
@@ -90,25 +136,38 @@ export const Interaction = (props: { config: PropTypes, store: IStore<StateModel
       />
       {/* Beside the scene, not in it, so a click on a button does not place or remove a brick. */}
       <div className="absolute right-2 top-2 flex flex-col gap-1">
-        <button type="button" className={zoomButton} aria-label={labels.zoomIn} title={labels.zoomIn}
+        <button type="button" className={toolButton} aria-label={labels.zoomIn} title={labels.zoomIn}
           onClick={() => voxelRef.current?.zoom(1 / ZOOM_STEP)}>+</button>
-        <button type="button" className={zoomButton} aria-label={labels.zoomOut} title={labels.zoomOut}
+        <button type="button" className={toolButton} aria-label={labels.zoomOut} title={labels.zoomOut}
           onClick={() => voxelRef.current?.zoom(ZOOM_STEP)}>−</button>
-        <button type="button" className={zoomButton} aria-label={labels.reset} title={labels.reset}
-          onClick={() => voxelRef.current?.resetView()}>
-            <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw preview-icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
-          </button>
+        <button type="button" className={toolButton} aria-label={labels.reset} title={labels.reset}
+          onClick={() => voxelRef.current?.resetZoom()}>
+          <p className="text-[10px]">100%</p>
+        </button>
+        <button type="button" className={toolButton} aria-label={labels.undo} title={labels.undo}
+          disabled={!history.undo.length} onClick={undo}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-ccw preview-icon"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
+        </button>
+        <button type="button" className={toolButton} aria-label={labels.redo} title={labels.redo}
+          disabled={!history.redo.length} onClick={redo}>
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rotate-cw preview-icon"><path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/></svg>
+        </button>
       </div>
     </div>
   );
 };
 
+/** One click of the candidate: the bricks it added and the bricks it removed. */
+type Step = { added: Cube[]; removed: Cube[] };
+
+const sameCube = (a: Cube, b: Cube) => a.x === b.x && a.y === b.y && a.z === b.z;
+
 /** How much one click on a zoom button changes the distance to the camera. */
 const ZOOM_STEP = 1.25;
 
-const zoomLabels: Record<string, { zoomIn: string; zoomOut: string; reset: string }> = {
-  en: { zoomIn: "Zoom in", zoomOut: "Zoom out", reset: "Reset view" },
-  nl: { zoomIn: "Inzoomen", zoomOut: "Uitzoomen", reset: "Beginweergave" },
+const toolLabels: Record<string, { zoomIn: string; zoomOut: string; reset: string; undo: string; redo: string }> = {
+  en: { zoomIn: "Zoom in", zoomOut: "Zoom out", reset: "Reset zoom", undo: "Undo", redo: "Redo" },
+  nl: { zoomIn: "Inzoomen", zoomOut: "Uitzoomen", reset: "Zoom herstellen", undo: "Ongedaan maken", redo: "Opnieuw uitvoeren" },
 };
 
 class VoxelPainterClass {
@@ -334,9 +393,8 @@ class VoxelPainterClass {
     this.controls.update(); // fires "change", which renders
   }
 
-  /** Back to the starting view: the starting direction, at the framed distance. */
-  public resetView() {
-    this.camera.position.copy(this.controls.target).add(new THREE.Vector3(200, 600, 1000));
+  /** Back to the starting zoom: the camera keeps looking from where it is now, at the framed distance. */
+  public resetZoom() {
     this.updateCameraFrame(); // keeps the direction, sets the framed distance and updates the controls
     this.render();
   }
@@ -501,7 +559,7 @@ class VoxelPainterClass {
     const brick = new THREE.Mesh(this.brickGeo, material);
     brick.castShadow = true;
     brick.receiveShadow = true;
-    brick.raycast = () => {}; // clicks are for the box
+    brick.raycast = () => { }; // clicks are for the box
     cube.add(brick);
     cube.userData = { isCube: true, brick, material };
     return cube;

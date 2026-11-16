@@ -116,6 +116,61 @@ export const RemoveBrick: Story = {
   },
 };
 
+export const UndoAndRedo: Story = {
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const canvas = await sceneCanvas(mounted);
+    const button = (label: string) => mounted.root.querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+    const undo = button("Undo");
+    const redo = button("Redo");
+
+    await step("nothing to undo or redo yet", async () => {
+      expect(undo.disabled).toBe(true);
+      expect(redo.disabled).toBe(true);
+    });
+
+    click(canvas, ...FRONT_MIDDLE);
+    click(canvas, ...ON_TOP_OF_FRONT_MIDDLE);
+    const stack = [{ x: 2, y: 0, z: 4 }, { x: 2, y: 1, z: 4 }];
+    expect(bricks(mounted)).toEqual(stack);
+    await waitFor(() => expect(undo.disabled).toBe(false));
+
+    await step("undo takes the steps back, one at a time", async () => {
+      undo.click();
+      expect(bricks(mounted)).toEqual([{ x: 2, y: 0, z: 4 }]);
+      await waitFor(() => expect(redo.disabled).toBe(false));
+      undo.click();
+      expect(bricks(mounted)).toEqual([]);
+      await waitFor(() => expect(undo.disabled).toBe(true));
+      expect(mounted.pci.getResponse()).toEqual(views([]));
+    });
+
+    await step("redo does them again", async () => {
+      redo.click();
+      await waitFor(() => expect(bricks(mounted)).toEqual([{ x: 2, y: 0, z: 4 }]));
+      redo.click();
+      await waitFor(() => expect(bricks(mounted)).toEqual(stack));
+      await waitFor(() => expect(redo.disabled).toBe(true));
+      expect(mounted.pci.getResponse()).toEqual(views(stack));
+    });
+
+    await step("undoing the removal of a brick puts it back", async () => {
+      click(canvas, ...FRONT_MIDDLE); // the side of a brick in the stack: one brick goes
+      expect(bricks(mounted)).toHaveLength(1);
+      undo.click();
+      await waitFor(() => expect(bricks(mounted)).toEqual(stack));
+    });
+
+    await step("a new step after an undo clears what could be redone", async () => {
+      undo.click(); // the top brick goes
+      await waitFor(() => expect(redo.disabled).toBe(false));
+      click(canvas, ...FRONT_MIDDLE); // the side of the brick that is left: it goes too
+      expect(bricks(mounted)).toEqual([]);
+      await waitFor(() => expect(redo.disabled).toBe(true));
+    });
+  },
+};
+
 export const ClickBesideThePlate: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);

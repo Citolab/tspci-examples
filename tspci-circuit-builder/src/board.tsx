@@ -185,7 +185,9 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
     if (suppressClick.current) return;
     setCursor({ x, y });
     boardRef.current?.focus();
-    if (armed && !partAt(parts, x, y) && !partAt(locked, x, y)) placeAt(armed, x, y);
+    if (!armed || partAt(locked, x, y)) return;
+    // an empty cell gets the chosen part; a part of another type is replaced by it (the same type: just select it)
+    if (partAt(parts, x, y)?.type !== armed) placeAt(armed, x, y);
   };
 
   // --- keyboard on the board
