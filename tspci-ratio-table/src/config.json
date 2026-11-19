@@ -1,0 +1,12 @@
+{
+  "title": {
+    "default": "Going to school",
+    "editor": "text",
+    "label": { "en": "Title", "nl": "Titel" }
+  },
+  "question": {
+    "default": "Linus rides with his bicycle to school. He rides 3 km in 6 minutes. He is 7 kilometers away from school. How many minutes does he take to get to school?",
+    "editor": "textarea",
+    "label": { "en": "Question", "nl": "Vraag" }
+  }
+}

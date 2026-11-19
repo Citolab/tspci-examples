@@ -1,0 +1,26 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+  }
+}
+
+@layer components {
+  /* Add your custom component styles here */
+  input[type="text"] {
+    @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  input[type="number"] {
+    @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+}
