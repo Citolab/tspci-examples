@@ -1,29 +1,74 @@
 {
-  "name": "ratio-table",
-  "description": "Verhoudingstabel",
-  "version": "1.0.0",
+  "name": "@citolab/pci-ratio-table",
+  "version": "1.0.0-alpha.1",
+  "description": "a ratio table (verhoudingstabel): labels, numbers and × or : steps on arrows, columns inserted for a step in between; reports the answer and whether the working is a correct ratio table, whatever the route",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    {
+      "name": "Brian Li"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-ratio-table#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-ratio-table"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "ratioTable.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md",
+    "src/fonts/OFL.txt"
+  ],
+  "source": "src/index.tsx",
   "main": "dist/index.js",
-  "types": "dist/types.d.ts",
-  "private": true,
-  "dependencies": {
-    "preact": "^10.24.0",
-    "@citolab/preact-store": "latest"
-  },
   "devDependencies": {
-    "@citolab/tspci": "latest",
-    "@citolab/tspci-qti3": "latest",
-    "tslib": "^2.8.1",
-    "postcss-import": "^16.1.1",
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
-    "tailwindcss": "^4.1.18"
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
   },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "ratio-table",
+    "verhoudingstabel",
+    "ratio",
+    "proportion",
+    "math"
+  ],
   "scripts": {
     "dev": "tspci --dev",
+    "preprod": "npm run test:stories",
     "prod": "tspci",
-    "tspci": "tspci",
-    "package:qti3": "tspci --target qti3",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
     "storybook": "cd .. && TSPCI_STORIES=tspci-ratio-table npx storybook dev -p 6006",
     "test:stories": "cd .. && TSPCI_STORIES=tspci-ratio-table npx vitest run --project=storybook"
   },
@@ -31,31 +76,117 @@
     "tspci": {
       "typeIdentifier": "ratioTable",
       "label": "Verhoudingstabel",
-      "response": {
-        "cardinality": "record",
-        "fields": {
-          "answer": { "baseType": "float", "tolerance": "range", "label": { "en": "Answer", "nl": "Antwoord" }, "when": { "mode": ["answer", "working"] } },
-          "working": { "baseType": "boolean", "label": { "en": "The working is correct", "nl": "De uitwerking klopt" }, "when": { "mode": ["answer", "working"] } },
-          "answerCorrect": { "baseType": "boolean", "label": { "en": "The answer is correct", "nl": "Het antwoord is goed" }, "when": { "mode": ["working"] } },
-          "ratio": { "baseType": "boolean", "label": { "en": "Every column has the same ratio", "nl": "Elke kolom heeft dezelfde verhouding" }, "when": { "mode": ["working"] } },
-          "steps": { "baseType": "boolean", "label": { "en": "Every step on an arrow is right", "nl": "Elke stap bij een pijl klopt" }, "when": { "mode": ["working"] } },
-          "stepsMatch": { "baseType": "boolean", "label": { "en": "The steps below are the steps above", "nl": "De stappen onder zijn de stappen boven" }, "when": { "mode": ["working"] } }
-        }
-      },
-      "toolWhen": { "mode": ["tool"] },
-      "correctResponse": "properties",
-      "media": {
-        "roboto400": { "file": "src/fonts/roboto-latin-400-normal.woff2", "mode": "inline" },
-        "roboto500": { "file": "src/fonts/roboto-latin-500-normal.woff2", "mode": "inline" },
-        "roboto900": { "file": "src/fonts/roboto-latin-900-normal.woff2", "mode": "inline" }
-      },
+      "tags": [
+        "math",
+        "ratio",
+        "proportion"
+      ],
+      "short": "ratioTable",
       "scoring": [
         "custom",
         "match_correct",
         "human"
-      ]
+      ],
+      "correctResponse": "properties",
+      "toolWhen": {
+        "mode": [
+          "tool"
+        ]
+      },
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "answer": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Answer",
+              "nl": "Antwoord"
+            },
+            "when": {
+              "mode": [
+                "answer",
+                "working"
+              ]
+            }
+          },
+          "working": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The working is correct",
+              "nl": "De uitwerking klopt"
+            },
+            "when": {
+              "mode": [
+                "answer",
+                "working"
+              ]
+            }
+          },
+          "answerCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The answer is correct",
+              "nl": "Het antwoord is goed"
+            },
+            "when": {
+              "mode": [
+                "working"
+              ]
+            }
+          },
+          "ratio": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every column has the same ratio",
+              "nl": "Elke kolom heeft dezelfde verhouding"
+            },
+            "when": {
+              "mode": [
+                "working"
+              ]
+            }
+          },
+          "steps": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every step on an arrow is right",
+              "nl": "Elke stap bij een pijl klopt"
+            },
+            "when": {
+              "mode": [
+                "working"
+              ]
+            }
+          },
+          "stepsMatch": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The steps below are the steps above",
+              "nl": "De stappen onder zijn de stappen boven"
+            },
+            "when": {
+              "mode": [
+                "working"
+              ]
+            }
+          }
+        }
+      },
+      "media": {
+        "roboto400": {
+          "file": "src/fonts/roboto-latin-400-normal.woff2",
+          "mode": "inline"
+        },
+        "roboto500": {
+          "file": "src/fonts/roboto-latin-500-normal.woff2",
+          "mode": "inline"
+        },
+        "roboto900": {
+          "file": "src/fonts/roboto-latin-900-normal.woff2",
+          "mode": "inline"
+        }
+      }
     }
-  },
-  "source": "src/index.tsx",
-  "author": "45795"
+  }
 }

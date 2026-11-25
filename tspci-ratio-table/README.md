@@ -1,4 +1,4 @@
-# tspci-ratio-table
+# @citolab/pci-ratio-table
 
 > [!WARNING]
 > **Experimental (alpha). Just for inspiration.** This PCI is a technical showcase, made by software developers without
@@ -10,6 +10,10 @@ A QTI 3 Portable Custom Interaction (PCI) with a ratio table (Dutch: *verhouding
 teach it. The candidate fills in the table on screen as on paper: a label in front of each row, the numbers they know,
 an arrow from one column to the next with × or : and a number, and what they do above, they do below. The number in
 the answer cell (bottom right) is the answer, and shows again under the table. Made with [tspci](https://github.com/Citolab/tspci).
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/Citolab/tspci-examples/main/tspci-ratio-table/example.png" alt="A ratio table with km and minutes: 3, 1, 7 km and 6, 2, 14 minutes, with the steps :3 and ×7 on arrows above and below, and the answer 14 below the table" width="560">
+</p>
 
 The table follows the 8-step method of
 [Verhoudingstabellen: uitleg én een handig 8-stappenplan](https://wijzeroverdebasisschool.nl/uitleg/verhoudingstabellen)
