@@ -34,10 +34,15 @@
       "label": "Klok",
       "response": {
         "cardinality": "single",
-        "baseType": "integer"
+        "baseType": "string"
       },
       "media": {
         "digit": { "file": "src/fonts/DigitTech7.ttf", "mode": "inline"}
+      },
+      "authoring": {
+        "label": { "en": "Choose the clock…", "nl": "Klok kiezen…" },
+        "width": 900,
+        "height": 720
       },
       "scoring": [
         "match_correct",

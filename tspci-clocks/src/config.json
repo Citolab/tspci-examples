@@ -41,7 +41,7 @@
   },
   "typeOfClock": {
     "default": "analog",
-    "editor": "enum",
+    "editor": "pci",
     "label": {
       "en": "Type of clock",
       "nl": "Soort klok"
@@ -61,25 +61,26 @@
           "nl": "Digitaal"
         }
       }
-    ]
+    ],
+    "$comment": "Set in the authoring mode (authoring.tsx), with the skin: \"analog\" or \"digital\""
   },
-  "timezone": {
-    "default": "uk",
-    "editor": "enum",
+  "skin": {
+    "default": "classic",
+    "editor": "pci",
     "label": {
-      "en": "Timezones",
-      "nl": "Tijdzones"
+      "en": "Skin",
+      "nl": "Uiterlijk"
     },
-    "options": [
-      {
-        "value": "uk",
-        "label": "UK (1-12 13-24)"
-      },
-      {
-        "value": "us",
-        "label": "US (1-12)"
-      }
-    ]
+    "$comment": "Set in the authoring mode (authoring.tsx): analog \"classic\", \"learning\" or \"roman\"; digital \"classic\", \"alarm\" or \"lcd\". Unknown: \"classic\""
+  },
+  "twentyFourHour": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "24-hour clock (digital only)",
+      "nl": "24-uursklok (alleen digitaal)"
+    },
+    "$comment": "true: the hours run from 00 to 23; false: from 1 to 12 (13:05 shows as 01:05). The analog clock always has 12 hours."
   },
   "minutePerJumps": {
     "default": 1,
@@ -113,8 +114,8 @@
     ]
   },
   "initialtime": {
-    "default": "7:25",
-    "editor": "datetime",
+    "default": "07:25",
+    "editor": "time",
     "label": {
       "en": "Initial time",
       "nl": "Initiele tijd"
