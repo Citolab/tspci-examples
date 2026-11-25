@@ -1,0 +1,41 @@
+/** The PCI's own texts (the `language` setting); the title and question come from the item. */
+export const TEXTS = {
+  en: {
+    labelPlaceholder: "label",
+    labelOfRow: (row: number) => `Label of row ${row}`,
+    cell: (row: number, column: number) => `Row ${row}, column ${column}`,
+    operator: "Times or divided by",
+    multiply: "times",
+    divide: "divided by",
+    chooseAgain: "Choose × or : again",
+    arrowNumber: (side: string, from: number) => `Number on the arrow ${side} the table, from column ${from} to ${from + 1}`,
+    above: "above",
+    below: "below",
+    insertBetween: (column: number) => `Insert a column after column ${column}`,
+    insertEnd: "Add a column at the end",
+    remove: (column: number) => `Remove column ${column}`,
+    answer: "Answer",
+    answerCell: "the answer",
+    notANumber: "Enter a number, such as 14 or 8.40",
+  },
+  nl: {
+    labelPlaceholder: "omschrijving",
+    labelOfRow: (row: number) => `Omschrijving van rij ${row}`,
+    cell: (row: number, column: number) => `Rij ${row}, kolom ${column}`,
+    operator: "Keer of gedeeld door",
+    multiply: "keer",
+    divide: "gedeeld door",
+    chooseAgain: "Opnieuw kiezen: × of :",
+    arrowNumber: (side: string, from: number) => `Getal bij de pijl ${side} de tabel, van kolom ${from} naar ${from + 1}`,
+    above: "boven",
+    below: "onder",
+    insertBetween: (column: number) => `Kolom invoegen na kolom ${column}`,
+    insertEnd: "Kolom toevoegen aan het eind",
+    remove: (column: number) => `Kolom ${column} verwijderen`,
+    answer: "Antwoord",
+    answerCell: "het antwoord",
+    notANumber: "Vul een getal in, zoals 14 of 8,40",
+  },
+};
+export type Texts = (typeof TEXTS)["en"];
+export const textsFor = (language?: string): Texts => TEXTS[language as keyof typeof TEXTS] ?? TEXTS.en;

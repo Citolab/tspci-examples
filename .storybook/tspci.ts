@@ -8,6 +8,15 @@ type IMSpci = {
   getState: () => string;
   oncompleted?: () => void;
 };
+/**
+ * What a PCI module registers: an instance of its class (most examples), or a plain factory object whose getInstance
+ * returns a new instance on every call (tspci-ratio-table).
+ */
+type Registered = { getInstance: (dom: HTMLElement, config: any, state?: string) => unknown };
+
+/** A fresh object to call getInstance on: a new instance of the PCI's class, or the factory itself. */
+const freshInstance = <T,>(registered: Registered): T =>
+  (Object.getPrototypeOf(registered) === Object.prototype ? registered : new (registered.constructor as new () => unknown)()) as T;
 
 /**
  * The delivery system for the stories: it mounts a PCI the way a QTI player does (getInstance with a config, and
@@ -58,7 +67,7 @@ const running = new Set<MountedPci>();
  * Mounts a new instance of the PCI (the module's default export registers one; each story gets its own) and returns
  * its element. The PCI gets its getInstance once the element is in the page, as in a player.
  */
-export function mountPci(registered: IMSpci, args: PciArgs = {}): HTMLElement {
+export function mountPci(registered: Registered, args: PciArgs = {}): HTMLElement {
   const host = document.createElement("div");
   host.className = "tspci-host";
   host.style.width = `${args.width ?? 900}px`;
@@ -84,7 +93,7 @@ export function mountPci(registered: IMSpci, args: PciArgs = {}): HTMLElement {
             running.delete(other);
           }
         }
-        const instance = new (registered.constructor as new () => IMSpci)();
+        const instance = freshInstance<IMSpci>(registered);
         const config = {
           properties: { ...(args.properties ?? {}) },
           responseIdentifier: RESPONSE,
@@ -147,7 +156,7 @@ export const afterPaint = () => new Promise<void>((resolve) => requestAnimationF
  * Ends the PCI in this canvas and mounts a new one with the given args, as a player does when the candidate comes
  * back to the item: `await remountPci(canvasElement, pci, { state: first.pci.getState() })`.
  */
-export async function remountPci(canvasElement: HTMLElement, registered: IMSpci, args: PciArgs = {}) {
+export async function remountPci(canvasElement: HTMLElement, registered: Registered, args: PciArgs = {}) {
   const previous = canvasElement.querySelector<HTMLElement>(".tspci-host");
   previous?.remove();
   canvasElement.appendChild(mountPci(registered, args));
@@ -194,7 +203,7 @@ export type MountedAuthoring = {
 const authoring = new WeakMap<HTMLElement, Promise<MountedAuthoring>>();
 
 /** Mounts the authoring mode of a new instance of the PCI (getAuthoringInstance), as an authoring system does. */
-export function mountAuthoring(registered: IMSpci, args: AuthoringArgs = {}): HTMLElement {
+export function mountAuthoring(registered: Registered, args: AuthoringArgs = {}): HTMLElement {
   const host = document.createElement("div");
   host.className = "tspci-authoring";
   host.style.width = `${args.width ?? 900}px`;
@@ -208,7 +217,7 @@ export function mountAuthoring(registered: IMSpci, args: AuthoringArgs = {}): HT
     new Promise<MountedAuthoring>((resolve, reject) => {
       const start = () => {
         if (!host.isConnected) return requestAnimationFrame(start);
-        const instance = new (registered.constructor as new () => IMSpci & Record<string, any>)();
+        const instance = freshInstance<IMSpci & Record<string, any>>(registered);
         if (!instance.getAuthoringInstance) return reject(new Error("this PCI has no authoring mode (getAuthoringInstance)"));
         try {
           instance.getAuthoringInstance(host, {

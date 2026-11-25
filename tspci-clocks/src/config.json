@@ -1,0 +1,148 @@
+{
+  "title": {
+    "default": "Tell the time",
+    "editor": "text",
+    "label": {
+      "en": "Title",
+      "nl": "Titel"
+    }
+  },
+  "question": {
+    "default": "What time is it?",
+    "editor": "textarea",
+    "label": {
+      "en": "Question",
+      "nl": "Vraag"
+    }
+  },
+  "typeOfQuestion": {
+    "default": "askTime",
+    "editor": "enum",
+    "label": {
+      "en": "Type of question",
+      "nl": "Soort vraag"
+    },
+    "options": [
+      {
+        "value": "askTime",
+        "label": {
+          "en": "Answer with text",
+          "nl": "Antwoord met tekst"
+        }
+      },
+      {
+        "value": "setClock",
+        "label": {
+          "en": "Answer by setting the clock",
+          "nl": "Antwoord door klok te zetten"
+        }
+      }
+    ]
+  },
+  "typeOfClock": {
+    "default": "analog",
+    "editor": "pci",
+    "label": {
+      "en": "Type of clock",
+      "nl": "Soort klok"
+    },
+    "options": [
+      {
+        "value": "analog",
+        "label": {
+          "en": "Analog",
+          "nl": "Analoog"
+        }
+      },
+      {
+        "value": "digital",
+        "label": {
+          "en": "Digital",
+          "nl": "Digitaal"
+        }
+      }
+    ],
+    "$comment": "Set in the authoring mode (authoring.tsx), with the skin: \"analog\" or \"digital\""
+  },
+  "skin": {
+    "default": "classic",
+    "editor": "pci",
+    "label": {
+      "en": "Skin",
+      "nl": "Uiterlijk"
+    },
+    "$comment": "Set in the authoring mode (authoring.tsx): analog \"classic\", \"learning\" or \"roman\"; digital \"classic\", \"alarm\" or \"lcd\". Unknown: \"classic\""
+  },
+  "twentyFourHour": {
+    "default": "true",
+    "editor": "boolean",
+    "label": {
+      "en": "24-hour clock (digital only)",
+      "nl": "24-uursklok (alleen digitaal)"
+    },
+    "$comment": "true: the hours run from 00 to 23; false: from 1 to 12 (13:05 shows as 01:05). The analog clock always has 12 hours."
+  },
+  "minutePerJumps": {
+    "default": 1,
+    "editor": "enum",
+    "label": {
+      "en": "Minute per jump",
+      "nl": "Minuut per sprong"
+    },
+    "options": [
+      {
+        "value": 1,
+        "label": {
+          "en": "1 minute",
+          "nl": "1 minuut"
+        }
+      },
+      {
+        "value": 5,
+        "label": {
+          "en": "5 minutes",
+          "nl": "5 minuten"
+        }
+      },
+      {
+        "value": 15,
+        "label": {
+          "en": "15 minutes",
+          "nl": "15 minuten"
+        }
+      }
+    ]
+  },
+  "initialtime": {
+    "default": "07:25",
+    "editor": "time",
+    "label": {
+      "en": "Initial time",
+      "nl": "Initiele tijd"
+    }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      {
+        "value": "en",
+        "label": {
+          "en": "English",
+          "nl": "Engels"
+        }
+      },
+      {
+        "value": "nl",
+        "label": {
+          "en": "Dutch",
+          "nl": "Nederlands"
+        }
+      }
+    ],
+    "label": {
+      "en": "Language of the chat's own texts",
+      "nl": "Taal van de eigen teksten van de chat"
+    }
+  }
+}
