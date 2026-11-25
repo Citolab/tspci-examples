@@ -6,21 +6,95 @@
 @source "./**/*.{html,js,ts,jsx,tsx}";
 @source "../*.xml";
 
+/*
+ * The look of the explanation the table follows (wijzeroverdebasisschool.nl): Roboto, dark text, headings in the
+ * heaviest weight, teal as the accent. Roboto is bundled (index.tsx loads it as "RatioTable Roboto").
+ */
+@theme {
+  --font-sans: "RatioTable Roboto", Roboto, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --color-ink: #212529;
+  --color-paper: #f4f9f8;
+  --color-accent: #4db6ac;
+  --color-accent-strong: #00796b;
+  --color-tint: #e0f2f1;
+}
+
 @layer base {
   /* Reset the default styles of the shadow root */
   :host {
     all: initial;
     display: block;
+    font-size: 16px;
+    /* the width of a value column; an arrow runs from the middle of one column to the middle of the next */
+    --column: 8.5em;
   }
 }
 
 @layer components {
-  /* Add your custom component styles here */
-  input[type="text"] {
-    @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  /* An empty field the student writes in: tinted, so it is clear where to write; on paper, no box */
+  .cell,
+  .step,
+  .label {
+    @apply rounded-md bg-tint px-2 py-1 text-ink outline-none focus:ring-2 focus:ring-accent-strong disabled:cursor-not-allowed;
+    font: inherit;
+  }
+  .cell {
+    @apply w-full text-center text-[1.5em] font-medium;
+  }
+  .label {
+    @apply w-[10em] text-right;
+  }
+  .step {
+    @apply w-[3.2em] text-center font-medium;
+  }
+  /* The cell whose number is the answer: a teal outline, also when filled in; red while it is not a number */
+  .answer-cell {
+    @apply outline-2 outline-offset-1 outline-accent outline-dashed invalid:outline-solid invalid:outline-red-600;
+  }
+  /* The answer below the table: read-only, it shows the answer cell */
+  .answer {
+    @apply inline-flex h-[2.2em] min-w-[6em] items-center justify-center rounded-md border-2 border-accent px-3 text-[1.5em] font-medium;
+  }
+  /* What the author gave: plain text in the table, like the numbers in a worked example */
+  .given {
+    @apply bg-transparent focus:ring-0;
+  }
+  .label.given {
+    @apply font-medium;
   }
 
-  input[type="number"] {
-    @apply border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  /* × or :, both always visible; the chosen one filled */
+  .operator {
+    @apply h-[1.9em] w-[1.9em] cursor-pointer bg-white text-[1.1em] leading-none font-black text-accent-strong disabled:cursor-not-allowed;
+  }
+  .operator + .operator {
+    @apply border-l-2 border-accent;
+  }
+  .operator:focus-visible {
+    @apply relative z-10 outline-2 outline-offset-2 outline-accent-strong;
+  }
+
+  /* The chosen operator, as it is written on paper next to its number: ":5", "×3" */
+  .chosen-operator {
+    @apply min-w-[1em] text-center text-[1.4em] leading-none font-black;
+  }
+  .chosen-operator + .step {
+    @apply -ml-1 w-[2.8em] pl-1 text-left text-[1.1em];
+  }
+  /* A filled-in number on an arrow reads as text, until it gets the focus */
+  .step:not(:placeholder-shown):not(:focus) {
+    @apply bg-transparent;
+  }
+  /* Undo the choice of × or :, small and quiet next to the step */
+  .choose-again {
+    @apply cursor-pointer rounded-md p-1 text-slate-400 hover:bg-tint hover:text-ink focus-visible:outline-2 focus-visible:outline-accent-strong;
+  }
+
+  /* + on the crossing of the lines: a new column */
+  .insert {
+    @apply absolute bottom-0 z-10 flex h-[1.5em] w-[1.5em] -translate-x-1/2 translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-2 border-accent bg-white text-[1em] leading-none font-black text-accent-strong hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong;
+  }
+  .remove {
+    @apply cursor-pointer rounded-md p-1 text-slate-400 hover:bg-tint hover:text-ink focus-visible:outline-2 focus-visible:outline-accent-strong;
   }
 }

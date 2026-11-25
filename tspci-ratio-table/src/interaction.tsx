@@ -1,10 +1,10 @@
 import type { PciProperties } from "@citolab/tspci";
+import { Fragment } from "preact";
+import { useEffect, useRef } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
-import { useLayoutEffect, useRef, useState } from "preact/hooks";
 import configProps from "./config.json";
-import { Actions, ArrowSide, MAX_COLUMNS, Operator, MIN_COLUMNS, ROWS, StateModel, answerCell } from "./store";
-// Images are bundled too: `import logo from "./assets/logo.png"` gives a data URL for <img src={logo} />. Larger media
-// (video, sound): declare them in config.tspci.media and use `media(name, dom)` from "@citolab/tspci/media" (readme, "Media").
+import { Actions, ArrowSide, MAX_COLUMNS, MIN_COLUMNS, Operator, ROWS, StateModel, answerCell, answerOf, columnIsFixed } from "./store";
+import { Texts, textsFor } from "./texts";
 
 type PropTypes = PciProperties<typeof configProps>;
 
@@ -14,176 +14,295 @@ type Props = {
   readOnly: boolean; // review, solution, closed: show the answer, but do not change it
 };
 
-/** The interaction itself: Tailwind classes only, styles.css just loads Tailwind (into the shadow root). */
+/** A number as a student may write it: a whole number or a decimal, with a comma or a point (store.ts parseNumber). */
+export const NUMBER_PATTERN = "\\s*-?\\d+([.,]\\d+)?\\s*";
+
+/**
+ * The ratio table, drawn as on paper: a label in front of each row, a line under the top row and between the columns,
+ * and an arrow from one column to the next, above and below, with × or : and a number.
+ *
+ * Laid out as a CSS grid: column 1 the labels, then one equal column per value. An arrow spans the two columns it
+ * connects and runs from the middle of the one to the middle of the other, so nothing has to be measured.
+ */
 const Interaction = ({ config, store, readOnly }: Props) => {
   const state = useStore(store); // re-renders when the store changes
-  const { columns, cells, labels, arrowsTop, arrowsBottom, operatorsTop, operatorsBottom } = state;
+  const { columns, cells, given, labels, labelsGiven, arrowsTop, arrowsBottom, operatorsTop, operatorsBottom } = state;
+  const t = textsFor(config.language);
+  // In tool mode the table is scratch paper: no answer cell, no answer below it
+  const tool = config.mode === "tool";
   const answer = answerCell(state);
+  const isAnswer = (row: number, column: number) => !tool && row === answer.row && column === answer.column;
+  const canInsert = !readOnly && columns < MAX_COLUMNS;
+  const canRemove = (column: number) => !readOnly && columns > MIN_COLUMNS && !columnIsFixed(state, column);
 
-  // One arrow per line between two value columns (columns - 1 of them): the x of each line, relative to the table,
-  // is the right edge of the value cell to its left. Measured in the first row; cells[0] is the label (th).
-  const table = useRef<HTMLTableElement>(null);
-  const [arrowXs, setArrowXs] = useState<number[]>([]);
-  useLayoutEffect(() => {
-    const measure = () => {
-      const left = table.current.getBoundingClientRect().left;
-      const cells = Array.from(table.current.rows[0].cells).slice(1, -1); // every value cell but the last
-      setArrowXs(cells.map((cell) => cell.getBoundingClientRect().right - left));
-    };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(table.current);
-    return () => observer.disconnect();
-  }, [columns]); // another column changes the column widths, not the table's: measure again
-
-  /** The props of an arrow: its number and operator from the store, and every change back to it. */
-  const arrowInput = (side: ArrowSide, value = "", operator: Operator = "multiply") => ({
-    value,
-    operator,
+  const arrow = (side: ArrowSide, index: number) => ({
+    side,
+    index,
+    t,
     disabled: readOnly,
-    onChange: (index: number, value: string) => store.dispatch({ type: "SET_ARROW", payload: { side, index, value } }),
-    onToggle: (index: number) => store.dispatch({ type: "TOGGLE_OPERATOR", payload: { side, index } }),
+    value: (side === "top" ? arrowsTop : arrowsBottom)[index] ?? "",
+    operator: (side === "top" ? operatorsTop : operatorsBottom)[index] ?? "",
+    onValue: (value: string) => store.dispatch({ type: "SET_ARROW", payload: { side, index, value } }),
+    onOperator: (operator: Operator) => store.dispatch({ type: "SET_OPERATOR", payload: { side, index, operator } }),
   });
-
-  const tableHeader = "border-r-2 border-slate-400 pr-2 text-left"; // th is centred by default
-  const tableCell = "pl-2 border-l-2 border-slate-400";
-  const topRow = "border-b-2 border-slate-400";
+  const insert = (at: number) => store.dispatch({ type: "INSERT_COLUMN", payload: { at } });
 
   return (
-    <div >
-      <h2 className="text-xl font-semibold tracking-tight">{config.title}</h2>
-      <p className="text-slate-600">{config.question}</p>
-      <div className="mt-[1em]">
-        {/* flex + justify-center: the table and its arrows sit in the vertical middle of the dashed box. */}
-        <div className="relative flex w-[95%] h-[25em] flex-col justify-center border-dashed border-2 border-slate-400 p-6">
-          {/* pt/pb: room for the inputs that stick out of the arrow strips (top-[-25px] and top-[45px]), so the
-              group is centred as a whole and nothing touches the dashed border. */}
-          <div className="pt-6 pb-10">
-            {/* The header is the first column: each row starts with its label (th scope="row"), then its values. */}
-            {/* The arrows sit outside the table, in a strip above it, one at the x of each line between two value columns. */}
-            <div className="relative h-12">
-              {arrowXs.map((x, i) => <ArrowRatioTop key={i} x={x} i={i} {...arrowInput("top", arrowsTop[i], operatorsTop[i])} />)}
-            </div>
-            {/* Fixed input widths (labels w-48, numbers w-28): with few columns the table is 70% wide, with more it
-                grows past that (a table's width is a minimum), so the labels keep their size. */}
-            <table ref={table} className="w-[70%] h-[8em]">
-              <tbody>
-                {/* One row per ROWS, one value cell per column: both come from the store. */}
-                {Array.from({ length: ROWS }, (_, row) => (
-                  <tr key={row} className={row === 0 ? topRow : undefined}>
-                    <th scope="row" className={tableHeader}>
-                      <input
-                        id={`label-input-${row + 1}`}
-                        name={`label-input-${row + 1}`}
-                        className="w-48"
-                        type="text"
-                        placeholder="Label"
-                        value={labels[row]}
-                        disabled={readOnly}
-                        onInput={(e) => store.dispatch({ type: "SET_LABEL", payload: { row, value: e.currentTarget.value } })}
-                      ></input>
-                    </th>
-                    {Array.from({ length: columns }, (_, column) => (
-                      <td key={column} className={tableCell}>
-                        <input
-                          className="w-28"
-                          type="number"
-                          placeholder="Nummer"
-                          id={`number-${row + 1}-${column + 1}`}
-                          name={`number-${row + 1}-${column + 1}`}
-                          // data-answer: the cell whose value is the response (index.tsx finds it for validity)
-                          data-answer={row === answer.row && column === answer.column ? "" : undefined}
-                          value={cells[row][column]}
-                          disabled={readOnly}
-                          onInput={(e) => store.dispatch({ type: "SET_CELL", payload: { row, column, value: e.currentTarget.value } })}
-                        ></input>
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {/* The bottom arrow strip, below the table: a div is not allowed inside a <table>. */}
-            <div className="relative h-12">
-              {arrowXs.map((x, i) => <ArrowRatioBottom key={i} x={x} i={i} {...arrowInput("bottom", arrowsBottom[i], operatorsBottom[i])} />)}
-            </div>
-          </div>
-          {/* absolute: pinned to the bottom left of the dashed box (relative), outside the flow, so the table stays centred. */}
-          <div className="absolute bottom-4 left-4 flex gap-2">
-            <button type="button" title="Kolom toevoegen" aria-label="Kolom toevoegen" disabled={readOnly || columns >= MAX_COLUMNS}
-              onClick={() => store.dispatch({ type: "ADD_COLUMN", payload: null })}
-              className="bg-slate-700 text-white px-4 py-2 rounded disabled:opacity-40 cursor-pointer">+</button>
-            <button type="button" title="kolom verwijderen" aria-label="Kolom verwijderen" disabled={readOnly || columns <= MIN_COLUMNS}
-              onClick={() => store.dispatch({ type: "REMOVE_COLUMN", payload: null })}
-              className="bg-slate-700 text-white px-4 py-2 rounded disabled:opacity-40 cursor-pointer">−</button>
-          </div>
+    <div className="font-sans text-ink">
+      <h2 className="text-[1.5em] leading-tight font-black">{config.title}</h2>
+      <p className="mt-2 leading-[1.7]">{config.question}</p>
+
+      <div className="mt-6 overflow-x-auto rounded-xl bg-paper px-6 py-4">
+        <div className="mx-auto grid w-max" style={{ gridTemplateColumns: `auto repeat(${columns}, var(--column))` }}>
+          {/* Above the table: an arrow from every column to the next */}
+          {Array.from({ length: columns - 1 }, (_, i) => (
+            <Arrow key={`top-${i}`} {...arrow("top", i)} />
+          ))}
+
+          {Array.from({ length: ROWS }, (_, row) => (
+            <Fragment key={`row-${row}`}>
+              <div
+                className={`flex items-center justify-end border-r-2 border-ink py-2 pr-3 ${row === 0 ? "border-b-2" : ""}`}
+                style={{ gridColumn: 1, gridRow: row + 2 }}
+              >
+                <input
+                  id={`label-${row + 1}`}
+                  type="text"
+                  className={`label ${labelsGiven[row] ? "given" : ""}`}
+                  placeholder={labelsGiven[row] ? undefined : t.labelPlaceholder}
+                  aria-label={t.labelOfRow(row + 1)}
+                  value={labels[row]}
+                  readOnly={labelsGiven[row]}
+                  disabled={readOnly}
+                  onInput={(e) => store.dispatch({ type: "SET_LABEL", payload: { row, value: e.currentTarget.value } })}
+                />
+              </div>
+              {Array.from({ length: columns }, (_, column) => (
+                <div
+                  key={`cell-${row}-${column}`}
+                  className={`relative flex items-center px-2 py-2 ${column > 0 ? "border-l-2 border-ink" : ""} ${row === 0 ? "border-b-2 border-ink" : ""}`}
+                  style={{ gridColumn: column + 2, gridRow: row + 2 }}
+                >
+                  {/* The answer cell: marked, "?" until filled in, and only a number is valid (data-answer: index.tsx) */}
+                  <input
+                    id={`cell-${row + 1}-${column + 1}`}
+                    type="text"
+                    inputMode="decimal"
+                    autoComplete="off"
+                    className={`cell ${given[row][column] ? "given" : ""} ${isAnswer(row, column) ? "answer-cell" : ""}`}
+                    aria-label={isAnswer(row, column) ? `${t.cell(row + 1, column + 1)}: ${t.answerCell}` : t.cell(row + 1, column + 1)}
+                    placeholder={isAnswer(row, column) || (state.answerAt?.row === row && state.answerAt?.column === column) ? "?" : undefined}
+                    data-answer={isAnswer(row, column) ? "" : undefined}
+                    pattern={isAnswer(row, column) ? NUMBER_PATTERN : undefined}
+                    title={isAnswer(row, column) ? t.notANumber : undefined}
+                    value={cells[row][column]}
+                    readOnly={given[row][column]}
+                    disabled={readOnly}
+                    onInput={(e) => store.dispatch({ type: "SET_CELL", payload: { row, column, value: e.currentTarget.value } })}
+                  />
+                  {/* On the crossing of the lines: insert a column here, between this column and the previous one */}
+                  {row === 0 && column > 0 && canInsert && <InsertButton label={t.insertBetween(column)} className="left-0" onClick={() => insert(column)} />}
+                  {row === 0 && column === columns - 1 && canInsert && (
+                    <InsertButton label={t.insertEnd} className="left-full" onClick={() => insert(columns)} />
+                  )}
+                </div>
+              ))}
+            </Fragment>
+          ))}
+
+          {/* Below the table: the same arrows, to do below what you did above */}
+          {Array.from({ length: columns - 1 }, (_, i) => (
+            <Arrow key={`bottom-${i}`} {...arrow("bottom", i)} />
+          ))}
+
+          {/* A remove button under every column the student may remove */}
+          {Array.from({ length: columns }, (_, column) =>
+            canRemove(column) ? (
+              <div key={`remove-${column}`} className="flex justify-center pt-1" style={{ gridColumn: column + 2, gridRow: 5 }}>
+                <button
+                  type="button"
+                  className="remove"
+                  title={t.remove(column + 1)}
+                  aria-label={t.remove(column + 1)}
+                  onClick={() => store.dispatch({ type: "REMOVE_COLUMN", payload: { at: column } })}
+                >
+                  <TrashIcon />
+                </button>
+              </div>
+            ) : null,
+          )}
         </div>
       </div>
+
+      {/* The answer, read-only: what the student wrote in the answer cell (the label is a setting) */}
+      {!tool && (
+        <div className="mt-5 flex items-center gap-3">
+          <span id="answer-label" className="font-black">
+            {config.answerLabel?.trim() || t.answer}
+          </span>
+          <output aria-labelledby="answer-label" aria-live="polite" className="answer">
+            {answerOf(state)}
+          </output>
+        </div>
+      )}
     </div>
   );
 };
 
-/** An arrow between value columns i and i + 1, at x (px from the left of the table), with the input on it. */
 type ArrowProps = {
-  x: number;
-  i: number;
+  side: ArrowSide;
+  index: number;
+  t: Texts;
+  disabled: boolean;
   value: string;
   operator: Operator;
-  disabled: boolean;
-  onChange: (index: number, value: string) => void;
-  onToggle: (index: number) => void;
+  onValue: (value: string) => void;
+  onOperator: (operator: Operator) => void;
 };
 
-/** Arrow centred on x, at the bottom of the strip above the table. */
-function ArrowRatioTop({ x, i, value, operator, disabled, onChange, onToggle }: ArrowProps) {
-  const arrowStyle = "pointer-events-none absolute bottom-0 -translate-x-1/2 text-red-700";
+/**
+ * The arrow from value column `index` to the next, above (top) or below (bottom) the table: an arc from the middle of
+ * the one column to the middle of the other, and the step on it (× or :, and a number).
+ */
+function Arrow({ side, index, t, disabled, value, operator, onValue, onOperator }: ArrowProps) {
+  const top = side === "top";
+  const number = useRef<HTMLInputElement>(null);
+  const choices = useRef<HTMLDivElement>(null);
+  // After a choice the focus goes on to the number; after "choose again" back to the choice
+  const focusNext = useRef<"number" | "choices" | null>(null);
+  useEffect(() => {
+    if (focusNext.current === "number") number.current?.focus();
+    if (focusNext.current === "choices") choices.current?.querySelector("button")?.focus();
+    focusNext.current = null;
+  }, [operator]);
+  const choose = (option: Operator) => {
+    focusNext.current = option ? "number" : "choices";
+    onOperator(option);
+  };
 
-  return (
-    <div>
-      <div className="absolute top-[-25px] flex flex-row items-center" style={{ left: `${x - 30}px` }}>
-        <ToggleOperator id={"operator-a1-" + (i + 1)} operator={operator} disabled={disabled} onToggle={() => onToggle(i)} />
-        <input id={"input-a1-2-" + (i + 1)} name={"input-a1-2-" + (i + 1)} className="w-[70px]" type="number" value={value} disabled={disabled} onInput={(e) => onChange(i, e.currentTarget.value)}></input>
-      </div>
-      <svg className={arrowStyle} style={{ left: `${x}px` }} xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
-      </svg>
+  const step = (
+    // pointer-events-auto: only the step itself takes clicks (the strip around it overlaps the next arrow's step)
+    <div className="pointer-events-auto flex items-center gap-1">
+      {operator ? (
+        // Chosen: the step reads as on paper (":5", "×3"); the small button next to it undoes the choice
+        <span className="chosen-operator">
+          <span aria-hidden="true">{operator === "multiply" ? "×" : ":"}</span>
+          <span className="sr-only">{t[operator]}</span>
+        </span>
+      ) : (
+        // Not chosen yet: both, side by side
+        <div ref={choices} role="group" aria-label={t.operator} className="flex overflow-hidden rounded-md border-2 border-accent">
+          {(["multiply", "divide"] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              aria-label={t[option]}
+              title={t[option]}
+              disabled={disabled}
+              className="operator"
+              onClick={() => choose(option)}
+            >
+              {option === "multiply" ? "×" : ":"}
+            </button>
+          ))}
+        </div>
+      )}
+      <input
+        ref={number}
+        id={`arrow-${side}-${index + 1}`}
+        type="text"
+        inputMode="decimal"
+        autoComplete="off"
+        className="step"
+        placeholder=" " // for :placeholder-shown in styles.css: a filled-in number reads as text
+        aria-label={t.arrowNumber(top ? t.above : t.below, index + 1)}
+        value={value}
+        disabled={disabled}
+        onInput={(e) => onValue(e.currentTarget.value)}
+      />
+      {operator && !disabled && (
+        <button type="button" className="choose-again" title={t.chooseAgain} aria-label={t.chooseAgain} onClick={() => choose("")}>
+          <UndoIcon />
+        </button>
+      )}
     </div>
   );
-}
-
-function ArrowRatioBottom({ x, i, value, operator, disabled, onChange, onToggle }: ArrowProps) {
-  const arrowStyle = "pointer-events-none absolute bottom-0 -translate-x-1/2 text-red-700 rotate-y-180 rotate-z-180 top-[-10px]";
-
   return (
-    <div>
-      <svg className={arrowStyle} style={{ left: `${x}px` }} xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <path d="M21 7v6h-6" /><path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7" />
-      </svg>
-      <div className="absolute top-[25px] flex flex-row items-center" style={{ left: `${x - 30}px` }}>
-        <ToggleOperator id={"operator-a2-" + (i + 1)} operator={operator} disabled={disabled} onToggle={() => onToggle(i)} />
-        <input id={"input-a2-2-" + (i + 1)} name={"input-a2-2-" + (i + 1)} className="w-[70px]" type="number" value={value} disabled={disabled} onInput={(e) => onChange(i, e.currentTarget.value)}></input>
-      </div>
-    </div>
-  );
-}
-
-/** Switches an arrow between multiply (×) and divide (:). The label says what a click does, for a screen reader. */
-function ToggleOperator({ id, operator, disabled, onToggle }: { id: string; operator: Operator; disabled: boolean; onToggle: () => void }) {
-  const multiply = operator === "multiply";
-  return (
-    <button
-      type="button" // not "submit": a button in a form would submit it
-      id={id}
-      name={id}
-      className="w-[2em] h-[2em] border-1 border-slate-300 bg-slate-200 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-      disabled={disabled}
-      onClick={onToggle}
-      title={multiply ? "Keer, klik voor delen" : "Gedeeld door, klik voor keer"}
-      aria-label={multiply ? "Keer. Klik om te wisselen naar gedeeld door" : "Gedeeld door. Klik om te wisselen naar keer"}
+    <div
+      className={`pointer-events-none flex flex-col items-center ${top ? "justify-end pb-1" : "justify-start pt-1"}`}
+      style={{ gridColumn: `${index + 2} / span 2`, gridRow: top ? 1 : 4 }}
     >
-      {multiply ? "×" : ":"}
+      {top && step}
+      <ArcSvg top={top} />
+      {!top && step}
+    </div>
+  );
+}
+
+/** An arc one column wide (the span from middle to middle), with its arrowhead on the right. */
+function ArcSvg({ top }: { top: boolean }) {
+  // viewBox in px of a 16px em: the column is 8.5em wide (--column in styles.css), the arc 2em high
+  const [w, h] = [136, 32];
+  const [x1, x2] = [8, w - 8];
+  const [base, control] = top ? [h - 4, -10] : [4, h + 10];
+  // The arrowhead follows the direction the arc ends in: from the control point to the end
+  const dx = x2 - w / 2;
+  const dy = base - control;
+  const length = Math.hypot(dx, dy);
+  const [ux, uy] = [dx / length, dy / length];
+  const head = (angle: number) => {
+    const [cos, sin] = [Math.cos(angle), Math.sin(angle)];
+    return `${(x2 - 10 * (ux * cos - uy * sin)).toFixed(1)} ${(base - 10 * (ux * sin + uy * cos)).toFixed(1)}`;
+  };
+  return (
+    <svg
+      className="w-[var(--column)] text-ink"
+      viewBox={`0 0 ${w} ${h}`}
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.5"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d={`M ${x1} ${base} Q ${w / 2} ${control} ${x2} ${base}`} />
+      <path d={`M ${head(0.5)} L ${x2} ${base} L ${head(-0.5)}`} />
+    </svg>
+  );
+}
+
+/** A small round + on a line of the table: a new, empty column there. */
+function InsertButton({ label, className, onClick }: { label: string; className: string; onClick: () => void }) {
+  return (
+    <button type="button" className={`insert ${className}`} title={label} aria-label={label} onClick={onClick}>
+      +
     </button>
   );
 }
+
+const UndoIcon = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M9 14 4 9l5-5" />
+    <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+  </svg>
+);
+
+const TrashIcon = () => (
+  <svg
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3 6h18" />
+    <path d="M8 6V4h8v2" />
+    <path d="M6 6l1 14h10l1-14" />
+  </svg>
+);
 
 export default Interaction;

@@ -32,10 +32,25 @@
       "typeIdentifier": "ratioTable",
       "label": "Verhoudingstabel",
       "response": {
-        "cardinality": "single",
-        "baseType": "integer"
+        "cardinality": "record",
+        "fields": {
+          "answer": { "baseType": "float", "tolerance": "range", "label": { "en": "Answer", "nl": "Antwoord" }, "when": { "mode": ["answer", "working"] } },
+          "working": { "baseType": "boolean", "label": { "en": "The working is correct", "nl": "De uitwerking klopt" }, "when": { "mode": ["answer", "working"] } },
+          "answerCorrect": { "baseType": "boolean", "label": { "en": "The answer is correct", "nl": "Het antwoord is goed" }, "when": { "mode": ["working"] } },
+          "ratio": { "baseType": "boolean", "label": { "en": "Every column has the same ratio", "nl": "Elke kolom heeft dezelfde verhouding" }, "when": { "mode": ["working"] } },
+          "steps": { "baseType": "boolean", "label": { "en": "Every step on an arrow is right", "nl": "Elke stap bij een pijl klopt" }, "when": { "mode": ["working"] } },
+          "stepsMatch": { "baseType": "boolean", "label": { "en": "The steps below are the steps above", "nl": "De stappen onder zijn de stappen boven" }, "when": { "mode": ["working"] } }
+        }
+      },
+      "toolWhen": { "mode": ["tool"] },
+      "correctResponse": "properties",
+      "media": {
+        "roboto400": { "file": "src/fonts/roboto-latin-400-normal.woff2", "mode": "inline" },
+        "roboto500": { "file": "src/fonts/roboto-latin-500-normal.woff2", "mode": "inline" },
+        "roboto900": { "file": "src/fonts/roboto-latin-900-normal.woff2", "mode": "inline" }
       },
       "scoring": [
+        "custom",
         "match_correct",
         "human"
       ]

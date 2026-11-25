@@ -6,19 +6,25 @@
  * into `dom` and reports its answer through getResponse().
  *
  * This file is the PCI API; interaction.tsx is the UI, store.ts the state. A ratio table: two rows with a label and
- * values, arrows between the columns. The answer is the bottom-right cell, a whole number, reported as
- * { base: { integer: 21 } } (see config.tspci.response in package.json and AUTHORING.md). The labels, the other
- * cells and the arrows are the student's working: they are kept in the state, not in the response.
+ * values, arrows between the columns. The answer is the number in the answer cell (the bottom-right cell, or the one
+ * the author marked with "?"), shown again in the read-only answer below the table. The response is a record (see
+ * config.tspci.response in package.json and AUTHORING.md), by the `mode` setting:
+ * - answer: { answer: 8.4, working: true }; the item's correct response holds the answer
+ * - working: also answerCorrect (against the correctAnswer setting) and the checks of the working (working.ts)
+ * - tool: no response; the table is scratch paper, never scored (config.tspci.toolWhen)
+ * The table itself (labels, cells, arrows) is kept in the state, so a rater can see it.
  */
 import "preact/debug"; // readable warnings in the browser console while developing
 import { render } from "preact";
 import { Action, IStore, Listener } from "@citolab/preact-store";
-import { ConfigProperties, IMSpci, IMSpciFactory, PciProperties, QtiInteractionChangedDetail, QtiVariableJSON } from "@citolab/tspci";
+import { media } from "@citolab/tspci/media";
+import { ConfigProperties, IMSpci, IMSpciFactory, PciProperties, QtiInteractionChangedDetail, QtiRecordItem, QtiVariableJSON } from "@citolab/tspci";
 import * as ctx from "qtiCustomInteractionContext"; // provided by the delivery engine at runtime
 import configProps from "./config.json"; // the settings; the build passes only their defaults (AUTHORING.md)
 import style from "./styles.css"; // Tailwind, compiled to a string, added to the shadow root below
 import Interaction from "./interaction";
-import { Actions, StateModel, answerCell, answerOf, initStore, withDefaults } from "./store";
+import { Actions, StateModel, answerCell, answerOf, initStore, parseNumber, parseValues, startState } from "./store";
+import { checkWorking, sameNumber } from "./working";
 
 // Like every data- attribute, each setting arrives as a string.
 type PropTypes = PciProperties<typeof configProps>;
@@ -26,21 +32,51 @@ type PropTypes = PciProperties<typeof configProps>;
 /** What getState() saves: the state and the actions that led to it. */
 type PciStoredState = { state: StateModel; log: Action<unknown>[] };
 
-/** The response for the text in the answer cell (bottom right, store.ts answerCell): a whole number, or undefined while there is no answer. */
-function toResponse(value: string): QtiVariableJSON | undefined {
-  const trimmed = value.trim();
-  if (trimmed === "") return undefined; // nothing answered, nothing reported
-  const n = Number(trimmed);
-  // One answer, one response: "30", "030" and "30.0" all report 30.
-  return Number.isFinite(n) ? { base: { integer: Math.round(n) } } : undefined;
+const isTool = (properties: Partial<PropTypes>) => properties.mode === "tool";
+
+/**
+ * The response for the table: undefined while the answer cell has no number (nothing answered, nothing reported), and
+ * in tool mode. One answer, one response: "8,40", "8.4" and "8.40" all report 8.4, and the checks of the working do
+ * not depend on the route the student took.
+ */
+function toResponse(state: StateModel, properties: Partial<PropTypes>): QtiVariableJSON | undefined {
+  const answer = parseNumber(answerOf(state));
+  if (isTool(properties) || answer === undefined) return undefined;
+  const checks = checkWorking(state);
+  const record: QtiRecordItem[] = [
+    { name: "answer", base: { float: answer } },
+    { name: "working", base: { boolean: checks.working } },
+  ];
+  if (properties.mode === "working") {
+    const correct = parseNumber(properties.correctAnswer ?? "");
+    if (correct !== undefined) record.push({ name: "answerCorrect", base: { boolean: sameNumber(answer, correct) } });
+    for (const name of ["ratio", "steps", "stepsMatch"] as const) record.push({ name, base: { boolean: checks[name] } });
+  }
+  return { record };
 }
 
-/** The input text for a response (setResponse, boundTo) or a correct response (status "solution"). */
+/**
+ * The correct response for the settings (getCorrectResponse): only in "working" mode, with a correct answer. Then the
+ * answer is that number and every check is true. In "answer" mode the author answers the PCI (AUTHORING.md, section 4).
+ */
+function correctResponse(properties: Partial<PropTypes>): QtiVariableJSON | undefined {
+  const p = { ...(configProps as unknown as PropTypes), ...properties };
+  const correct = parseNumber(p.correctAnswer ?? "");
+  if (p.mode !== "working" || correct === undefined) return undefined;
+  const yes = (name: string): QtiRecordItem => ({ name, base: { boolean: true } });
+  return { record: [{ name: "answer", base: { float: correct } }, yes("working"), yes("answerCorrect"), yes("ratio"), yes("steps"), yes("stepsMatch")] };
+}
+
+/**
+ * The text for the answer cell from a response (setResponse, boundTo) or a correct response (status "solution"): the
+ * `answer` field of a record, or a plain number.
+ */
 function fromResponse(value: unknown): string {
   if (Array.isArray(value)) return fromResponse(value[0]);
   if (value && typeof value === "object") {
-    const base = (value as QtiVariableJSON).base;
-    return fromResponse(base?.integer ?? base?.float ?? base?.string);
+    const { record, base } = value as { record?: { name: string }[]; base?: QtiVariableJSON["base"] };
+    if (Array.isArray(record)) return fromResponse(record.find((field) => field.name === "answer"));
+    return fromResponse(base?.float ?? base?.integer ?? base?.string);
   }
   return value === undefined || value === null ? "" : String(value);
 }
@@ -50,7 +86,7 @@ class PciInstance implements IMSpci<PropTypes> {
   private config: ConfigProperties<PropTypes>;
   private dom: HTMLElement;
   private shadowdom: ShadowRoot;
-  private store: IStore<StateModel, Actions> = initStore();
+  private store: IStore<StateModel, Actions>;
   private customValidity = "";
 
   constructor(dom: HTMLElement, config: ConfigProperties<PropTypes>, stateString?: string) {
@@ -61,14 +97,24 @@ class PciInstance implements IMSpci<PropTypes> {
     this.config = config;
     // A closed shadow root keeps the item's CSS out and ours (Tailwind) in.
     this.shadowdom = dom.attachShadow({ mode: "closed" });
+    loadFonts(dom);
 
-    // 1. The state from a previous session (whatever getState() returned).
+    // 0. The table at the start: what the author gives (labels, numbers, columns) in place.
+    const p = config.properties;
+    this.store = initStore(
+      startState({
+        columns: Number.parseInt(p.columns, 10) || undefined,
+        labels: [p.labelTop, p.labelBottom],
+        values: [parseValues(p.valuesTop), parseValues(p.valuesBottom)],
+      })
+    );
+    // 1. The state from a previous session (whatever getState() returned) wins over the settings.
     if (stateString) {
       try {
         const { state, log } = JSON.parse(stateString) as PciStoredState;
-        if (typeof state?.columns === "number" && Array.isArray(state?.cells) && Array.isArray(log)) this.store.restoreState(withDefaults(state), log);
+        if (isState(state) && Array.isArray(log)) this.store.restoreState(state, log);
       } catch {
-        // not ours: start empty
+        // not ours: start from the settings
       }
     }
     // 2. A response the engine binds to the interaction (boundTo) wins over the state.
@@ -137,7 +183,7 @@ class PciInstance implements IMSpci<PropTypes> {
 
   // ---- the IMS PCI API ----
 
-  getResponse = () => toResponse(answerOf(this.store.getState()));
+  getResponse = () => toResponse(this.store.getState(), this.config.properties);
 
   getState = () => JSON.stringify({ state: this.store.getState(), log: this.store.getActions() } satisfies PciStoredState);
 
@@ -164,9 +210,31 @@ class PciInstance implements IMSpci<PropTypes> {
 const factory: IMSpciFactory<PropTypes> = {
   typeIdentifier: "ratioTable", // the same as config.tspci.typeIdentifier in package.json
   getInstance: (dom, config, state) => new PciInstance(dom, config, state),
-  // No getCorrectResponse: the question is free text, so the answer cannot be computed from the settings. The author
-  // gives the correct response in the item (AUTHORING.md, "Correct answers").
+  // From the settings in "working" mode (the correctAnswer setting); otherwise the author answers the PCI.
+  getCorrectResponse: (properties) => correctResponse(properties),
 };
+
+/** A saved state of this version of the PCI (an older or foreign one is ignored: the table starts from the settings). */
+const isState = (state: Partial<StateModel> | undefined): state is StateModel =>
+  typeof state?.columns === "number" &&
+  Array.isArray(state.cells) &&
+  Array.isArray(state.given) &&
+  Array.isArray(state.labelsGiven) &&
+  "answerAt" in state;
+
+/**
+ * Roboto, the font of the explanation the table follows, bundled (config.tspci.media). Fonts declared in a shadow root
+ * are not used, so the faces go to the document, under a name of our own that does not touch the page's fonts.
+ */
+let fontsLoaded = false; // once per page, also with several tables on it
+function loadFonts(dom: HTMLElement) {
+  if (fontsLoaded || typeof FontFace === "undefined") return;
+  fontsLoaded = true;
+  for (const [name, weight] of [["roboto400", "400"], ["roboto500", "500"], ["roboto900", "900"]] as const) {
+    const face = new FontFace("RatioTable Roboto", `url(${media(name, dom)})`, { weight });
+    face.load().then((loaded) => document.fonts.add(loaded)).catch(() => {}); // the fallback fonts will do
+  }
+}
 
 // Register with the engine: as an AMD module (qtiCustomInteractionContext), or through the global some engines set.
 type Context = { register: (factory: IMSpciFactory<PropTypes>) => void };

@@ -5,7 +5,7 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 61 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+There are 62 examples in this repository that can give a head start while creating new Portable Custom Interactions.
 Twenty-five of them are ports of existing PCIs and three more take ideas from one; all 28 credit the original
 authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis),
 [Ports of the DEPP PCIs](#ports-of-the-depp-pcis) and [Ports of the PARCC PCIs](#ports-of-the-parcc-pcis)).
@@ -123,6 +123,7 @@ scoring). Every example describes both in two files it already has:
 | tspci-contour-map | `textarea`, `pci`, `number`, `boolean`, `enum` | `record` (a score and a number per task) | `custom`, `human` |
 | tspci-sun-earth | `textarea`, `pci`, `enum`, `boolean` | `record` (date, time, place, sun position) | `custom`, `human` (its tool mode is not scored) |
 | tspci-number-line | `textarea`, `enum`, `pci`, `integer`, `boolean` | `ordered` `float`, `single` `string` (interval) or a `record` | `match_correct`, `custom`, `human` |
+| tspci-ratio-table | `text`, `textarea`, `enum`, `integer` | `record` (`answer`, `working`, `answerCorrect`, `ratio`, `steps`, `stepsMatch`) | `custom`, `match_correct`, `human` (its tool mode is not scored) |
 | tspci-fraction-model | `textarea`, `pci`, `enum`, `boolean` | `ordered` `string` (fractions in lowest terms) or a `record` | `match_correct`, `custom`, `human` |
 | tspci-chance-tools | `textarea`, `enum`, `pci`, `boolean`, `hidden` | `record` (design, tree), `single` `string` (tool) | `custom`, `human` (its tool mode is not scored) |
 | tspci-text-marker | `textarea`, `pci`, `enum`, `integer`, `boolean`, `text` | `record` (a field per target, the marks) | `custom`, `human` |
@@ -508,7 +509,7 @@ PCI with a bar, line or pie chart that shows its numbers on hover, focus or tap.
 
 ## Alpha examples
 
-The 22 examples below are new ideas for assessment (`1.0.0-alpha.1`, like tspci-table-select and tspci-spreadsheet);
+The 23 examples below are new ideas for assessment (`1.0.0-alpha.1`, like tspci-table-select and tspci-spreadsheet);
 the six above, based on interactions in the Dutch exams, are `1.0.0-beta.1`.
 
 > [!WARNING]
@@ -543,6 +544,7 @@ lists and 2D views.
 | example | what the candidate does | scoring |
 | --- | --- | --- |
 | [tspci-number-line](./tspci-number-line) | places points, marks an interval, draws jumps, or reads off values on a number line | values within a margin, the interval |
+| [tspci-ratio-table](./tspci-ratio-table) | fills in a ratio table (verhoudingstabel) with labels, numbers and × or : arrows, and inserts columns for a step in between | the answer, and whether the working is a correct ratio table, whatever the route |
 | [tspci-fraction-model](./tspci-fraction-model) | divides and shades bars, circles, grids and sets, or names the shaded fraction or percentage | the fraction in lowest terms (equivalent shadings count) |
 | [tspci-chance-tools](./tspci-chance-tools) | runs dice, spinner, bag and coin experiments, designs a spinner or bag, fills in a probability tree | exact probabilities, decimals within a margin |
 | [tspci-text-marker](./tspci-text-marker) | marks words and sentences in a source text with named categories | per target: overlap, all words or exact, with a tolerance |

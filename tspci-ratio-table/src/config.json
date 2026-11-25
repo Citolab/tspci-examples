@@ -8,5 +8,61 @@
     "default": "Linus rides with his bicycle to school. He rides 3 km in 6 minutes. He is 7 kilometers away from school. How many minutes does he take to get to school?",
     "editor": "textarea",
     "label": { "en": "Question", "nl": "Vraag" }
+  },
+  "mode": {
+    "default": "answer",
+    "editor": "enum",
+    "options": [
+      { "value": "answer", "label": { "en": "Score the answer (and whether the working is correct)", "nl": "Het antwoord scoren (en of de uitwerking klopt)" } },
+      { "value": "working", "label": { "en": "Score the answer and the working, with the correct answer below", "nl": "Het antwoord en de uitwerking scoren, met het goede antwoord hieronder" } },
+      { "value": "tool", "label": { "en": "A tool: not scored, no answer under the table", "nl": "Een hulpmiddel: niet gescoord, geen antwoord onder de tabel" } }
+    ],
+    "label": { "en": "What the table is", "nl": "Wat de tabel is" }
+  },
+  "correctAnswer": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Correct answer (for: score the answer and the working), e.g. 14 or 8,40", "nl": "Goede antwoord (bij: het antwoord en de uitwerking scoren), bijv. 14 of 8,40" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the table's own texts", "nl": "Taal van de eigen teksten van de tabel" }
+  },
+  "answerLabel": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Label of the answer (empty: Answer or Antwoord, by the language)", "nl": "Omschrijving van het antwoord (leeg: Answer of Antwoord, naar de taal)" }
+  },
+  "columns": {
+    "default": "2",
+    "editor": "integer",
+    "min": 2,
+    "max": 5,
+    "label": { "en": "Columns at the start", "nl": "Kolommen bij de start" }
+  },
+  "labelTop": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Given label of the top row (empty: the student writes it)", "nl": "Gegeven omschrijving van de bovenste rij (leeg: de leerling schrijft die)" }
+  },
+  "labelBottom": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Given label of the bottom row (empty: the student writes it)", "nl": "Gegeven omschrijving van de onderste rij (leeg: de leerling schrijft die)" }
+  },
+  "valuesTop": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Given numbers in the top row, separated by ; (e.g. 3; 7). ? marks the answer cell", "nl": "Gegeven getallen in de bovenste rij, gescheiden door ; (bijv. 3; 7). ? is de cel van het antwoord" }
+  },
+  "valuesBottom": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Given numbers in the bottom row, separated by ; (e.g. 6; ?). ? marks the answer cell", "nl": "Gegeven getallen in de onderste rij, gescheiden door ; (bijv. 6; ?). ? is de cel van het antwoord" }
   }
 }
