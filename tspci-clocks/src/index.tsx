@@ -64,7 +64,7 @@ function clockChoice(properties: Partial<PropTypes>): Choice {
 }
 
 class PciInstance implements IMSpci<PropTypes> {
-  typeIdentifier = "Clocks";
+  typeIdentifier = "clocks";
   private config: ConfigProperties<PropTypes>;
   private dom: HTMLElement;
   private shadowdom: ShadowRoot;
@@ -218,7 +218,7 @@ class PciInstance implements IMSpci<PropTypes> {
 }
 
 const factory: IMSpciAuthoringFactory<PropTypes> = {
-  typeIdentifier: "Clocks", // the same as config.tspci.typeIdentifier in package.json
+  typeIdentifier: "clocks", // the same as config.tspci.typeIdentifier in package.json
   getInstance: (dom, config, state) => new PciInstance(dom, config, state),
   // No getCorrectResponse: the author gives the correct response in the item (AUTHORING.md, "Correct answers").
 

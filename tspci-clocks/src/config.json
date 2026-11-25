@@ -141,8 +141,8 @@
       }
     ],
     "label": {
-      "en": "Language of the chat's own texts",
-      "nl": "Taal van de eigen teksten van de chat"
+      "en": "Language of the clock's own texts",
+      "nl": "Taal van de eigen teksten van de klok"
     }
   }
 }

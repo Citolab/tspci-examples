@@ -1,55 +1,109 @@
 {
-  "name": "clocks",
-  "description": "Klok kijken",
-  "version": "1.0.0",
+  "name": "@citolab/pci-clocks",
+  "version": "1.0.0-alpha.1",
+  "description": "telling the time (klok kijken): read an analog or digital clock and type the time, in digits or in words, or set the hands or digits yourself; several clock faces",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "contributors": [
+    {
+      "name": "Brian Li"
+    }
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-clocks#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-clocks"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "clocks.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
   "main": "dist/index.js",
-  "types": "dist/types.d.ts",
-  "private": true,
-  "dependencies": {
-    "preact": "^10.24.0",
-    "@citolab/preact-store": "latest"
-  },
   "devDependencies": {
-    "@citolab/tspci": "latest",
-    "@citolab/tspci-qti3": "latest",
-    "tslib": "^2.8.1",
-    "postcss-import": "^16.1.1",
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
     "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
     "autoprefixer": "10.4.23",
-    "tailwindcss": "^4.1.18"
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
   },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "clock",
+    "klok",
+    "klokkijken",
+    "telling-time",
+    "math"
+  ],
   "scripts": {
     "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
     "prod": "tspci",
-    "tspci": "tspci",
+    "watch": "tspci --watch",
     "test": "node --no-warnings --test \"test/*.test.ts\"",
-    "package:qti3": "tspci --target qti3",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
     "storybook": "cd .. && TSPCI_STORIES=tspci-clocks npx storybook dev -p 6006",
     "test:stories": "cd .. && TSPCI_STORIES=tspci-clocks npx vitest run --project=storybook"
   },
   "config": {
     "tspci": {
-      "typeIdentifier": "Clocks",
+      "typeIdentifier": "clocks",
       "label": "Klok",
+      "tags": [
+        "math",
+        "clock",
+        "telling time"
+      ],
+      "short": "clocks",
+      "scoring": [
+        "match_correct",
+        "human"
+      ],
       "response": {
         "cardinality": "single",
         "baseType": "string"
       },
       "media": {
-        "digit": { "file": "src/fonts/DigitTech7.ttf", "mode": "inline"}
+        "digit": {
+          "file": "src/fonts/DigitTech7.ttf",
+          "mode": "inline"
+        }
       },
       "authoring": {
-        "label": { "en": "Choose the clock…", "nl": "Klok kiezen…" },
+        "label": {
+          "en": "Choose the clock…",
+          "nl": "Klok kiezen…"
+        },
         "width": 900,
         "height": 720
-      },
-      "scoring": [
-        "match_correct",
-        "human"
-      ]
+      }
     }
-  },
-  "source": "src/index.tsx",
-  "author": "45795"
+  }
 }
