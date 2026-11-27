@@ -1,0 +1,74 @@
+{
+  "title": {
+    "default": "Pancakes for everyone",
+    "editor": "text",
+    "label": { "en": "Title", "nl": "Titel" }
+  },
+  "question": {
+    "default": "Tonight 6 people eat pancakes. The recipe is for 4 people.",
+    "editor": "textarea",
+    "label": { "en": "Question", "nl": "Vraag" }
+  },
+  "mode": {
+    "default": "recipe",
+    "editor": "enum",
+    "options": [
+      { "value": "recipe", "label": { "en": "Recipe: compute the amounts for more or fewer persons and measure them", "nl": "Recept: de hoeveelheden omrekenen voor meer of minder personen en afmeten" } },
+      { "value": "dosing", "label": { "en": "Dosing: choose a cleaning product, compute the dose and pour it", "nl": "Doseren: een schoonmaakmiddel kiezen, de dosis berekenen en afmeten" } }
+    ],
+    "label": { "en": "Mode", "nl": "Soort opdracht" }
+  },
+  "recipe": {
+    "default": "pancakes",
+    "editor": "pci",
+    "label": { "en": "Recipe (recipe)", "nl": "Recept (recept)" },
+    "hint": {
+      "en": "Set in the authoring mode, or typed: pancakes, stamppot, soup, fruitSalad, or the JSON of a recipe of your own.",
+      "nl": "In te stellen in de authoring-modus, of te typen: pancakes, stamppot, soup, fruitSalad, of de JSON van een eigen recept."
+    },
+    "$comment": "A preset id; { \"preset\": \"pancakes\", \"measure\": [true, false, …] } for other lines measured; or { \"name\": \"Omelette\", \"persons\": 2, \"lines\": [{ \"name\": \"eggs\", \"amount\": 4, \"unit\": \"piece\", \"measure\": true, \"icon\": \"egg\" }] }. unit: g, kg, ml, dl, l, tbsp, tsp, piece. At most 10 lines."
+  },
+  "persons": {
+    "default": "6",
+    "editor": "pci",
+    "label": { "en": "Cook for this many persons (recipe)", "nl": "Koken voor zoveel personen (recept)" },
+    "hint": { "en": "A whole number from 1 to 100.", "nl": "Een heel getal van 1 tot 100." }
+  },
+  "bowl": {
+    "default": "true",
+    "editor": "pci",
+    "label": { "en": "A bowl on the kitchen scale: the pupil uses tare (recipe)", "nl": "Een kom op de keukenweegschaal: de leerling gebruikt tarra (recept)" },
+    "hint": { "en": "true or false", "nl": "true of false" }
+  },
+  "cleaning": {
+    "default": "floor",
+    "editor": "pci",
+    "label": { "en": "Cleaning task (dosing)", "nl": "Schoonmaaktaak (doseren)" },
+    "hint": {
+      "en": "Set in the authoring mode, or typed: floor, worktop, sanitary, window, or the JSON of a task of your own.",
+      "nl": "In te stellen in de authoring-modus, of te typen: floor, worktop, sanitary, window, of de JSON van een eigen taak."
+    },
+    "$comment": "A preset id, or { \"surface\": \"floor\", \"volume\": 5, \"products\": [\"floor\", \"allPurpose\", \"sanitary\"], \"dosages\": { \"floor\": \"1:100\" }, \"choose\": true, \"cup\": 100 }. surface: floor, worktop, sanitary, window. products: floor, allPurpose, sanitary, glass. dosage: 1:100 or 20 ml/l. cup: 25, 50, 100 or 250 ml."
+  },
+  "amountMargin": {
+    "default": "0",
+    "editor": "pci",
+    "label": { "en": "Margin for a computed amount in g or ml, in % (besides rounding)", "nl": "Marge voor een berekende hoeveelheid in g of ml, in % (naast afronden)" },
+    "hint": { "en": "0: exact, or rounded to a whole gram or ml.", "nl": "0: precies, of afgerond op een hele gram of ml." }
+  },
+  "measureMargin": {
+    "default": "5",
+    "editor": "pci",
+    "label": { "en": "Margin for weighing and pouring, in %", "nl": "Marge voor afwegen en afmeten, in %" },
+    "hint": { "en": "Spoons and pieces are always counted exactly.", "nl": "Lepels en stuks worden altijd precies geteld." }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts and numbers", "nl": "Taal van de eigen teksten en getallen van de PCI" }
+  }
+}
