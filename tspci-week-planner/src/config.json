@@ -1,8 +1,20 @@
 {
+  "mode": {
+    "default": "plan",
+    "editor": "enum",
+    "options": [
+      { "value": "plan", "label": { "en": "Plan tasks in a week agenda", "nl": "Taken plannen in een weekagenda" } },
+      { "value": "readRota", "label": { "en": "Staff rota: read a rota and answer questions", "nl": "Dienstrooster: een rooster lezen en vragen beantwoorden" } },
+      { "value": "makeRota", "label": { "en": "Staff rota: make a rota that keeps to the rules", "nl": "Dienstrooster: een rooster maken dat aan de regels voldoet" } },
+      { "value": "hoursAndPay", "label": { "en": "Staff rota: work out hours and pay", "nl": "Dienstrooster: uren en loon uitrekenen" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
   "prompt": {
     "default": "You work for a home care team. Plan this week's tasks for Anna (nurse) and Bas (care assistant). Read the notes on the cards: they tell you the rules. Nobody works more than 8 hours a day, and after 4 hours of work there is a break of at least 30 minutes.",
     "editor": "textarea",
-    "label": { "en": "Instruction above the agenda", "nl": "Instructie boven de agenda" }
+    "label": { "en": "Instruction above the agenda", "nl": "Instructie boven de agenda" },
+    "$comment": "in a rota mode the default is replaced by the rota example's instruction"
   },
   "planner": {
     "default": "",
@@ -10,10 +22,16 @@
     "label": { "en": "Agenda, tasks and checks", "nl": "Agenda, taken en checks" },
     "$comment": "JSON written by the authoring mode (planner.ts): days, times, opening hours, resources, fixed blocks, tasks, the example solution and the checks; empty: the example"
   },
+  "rota": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Staff rota: shop, employees, shifts, rules, questions and pay", "nl": "Dienstrooster: winkel, medewerkers, diensten, regels, vragen en loon" },
+    "$comment": "JSON written by the authoring mode (rota.ts) for the modes readRota, makeRota and hoursAndPay; empty: the example (a corner shop)"
+  },
   "feedback": {
     "default": "true",
     "editor": "boolean",
-    "label": { "en": "Show conflicts while planning (overlaps, outside opening hours)", "nl": "Botsingen tonen tijdens het plannen (overlap, buiten openingstijden)" }
+    "label": { "en": "Show conflicts while planning (overlaps, outside opening hours; in a rota: the rules)", "nl": "Botsingen tonen tijdens het plannen (overlap, buiten openingstijden; in een rooster: de regels)" }
   },
   "language": {
     "default": "en",

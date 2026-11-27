@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-week-planner",
   "version": "1.0.0-alpha.2",
-  "description": "plan tasks in a week agenda of days, time slots and resources (people, rooms, vehicles); the PCI checks the author's rules (order, days, hours, breaks, overlaps, opening hours)",
+  "description": "plan tasks in a week agenda of days, time slots and resources (people, rooms, vehicles), or read, make and work out the hours and pay of a staff rota; the PCI checks the author's rules (order, days, hours, breaks, overlaps, opening hours, staffing, contract hours, rest)",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
@@ -19,7 +19,11 @@
     "schedule",
     "agenda",
     "roster",
-    "vocational"
+    "vocational",
+    "rota",
+    "dienstrooster",
+    "staff-rota",
+    "wages"
   ],
   "publishConfig": {
     "access": "public"
@@ -71,120 +75,195 @@
         "planning",
         "schedule",
         "agenda",
-        "roster"
+        "roster",
+        "rota",
+        "wages"
       ],
       "scoring": [
         "custom",
         "human"
       ],
+      "correctResponse": "properties",
       "short": "weekPlanner",
       "response": {
         "cardinality": "record",
-        "$comment": "The PCI evaluates the author's checks (data-planner); README",
+        "$comment": "The PCI evaluates the author's checks (data-planner) or the rota (data-rota): README",
         "fields": {
           "score": {
             "baseType": "integer",
             "label": {
-              "en": "Score: points of the passed checks",
-              "nl": "Score: punten van de checks die kloppen"
+              "en": "Score: points of the passed checks, rules, questions or boxes",
+              "nl": "Score: punten van de checks, regels, vragen of vakjes die kloppen"
             }
           },
           "maxscore": {
             "baseType": "integer",
             "label": {
-              "en": "Maximum score: points of all checks",
-              "nl": "Maximale score: punten van alle checks"
+              "en": "Maximum score: points of all checks, rules, questions or boxes",
+              "nl": "Maximale score: punten van alle checks, regels, vragen of vakjes"
             }
           },
           "correct": {
             "baseType": "integer",
             "label": {
-              "en": "Correct: 1 when every check passes",
-              "nl": "Goed: 1 als alle checks kloppen"
+              "en": "Correct: 1 when every check, rule, question or box is right",
+              "nl": "Goed: 1 als alle checks, regels, vragen of vakjes kloppen"
             }
           },
           "check1": {
             "baseType": "integer",
             "label": {
-              "en": "Check 1: 1 passed, 0 not",
-              "nl": "Check 1: 1 klopt, 0 niet"
+              "en": "Check 1 (the rule 1 of a rota): 1 passed, 0 not",
+              "nl": "Check 1 (regel 1 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check2": {
             "baseType": "integer",
             "label": {
-              "en": "Check 2: 1 passed, 0 not",
-              "nl": "Check 2: 1 klopt, 0 niet"
+              "en": "Check 2 (the rule 2 of a rota): 1 passed, 0 not",
+              "nl": "Check 2 (regel 2 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check3": {
             "baseType": "integer",
             "label": {
-              "en": "Check 3: 1 passed, 0 not",
-              "nl": "Check 3: 1 klopt, 0 niet"
+              "en": "Check 3 (the rule 3 of a rota): 1 passed, 0 not",
+              "nl": "Check 3 (regel 3 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check4": {
             "baseType": "integer",
             "label": {
-              "en": "Check 4: 1 passed, 0 not",
-              "nl": "Check 4: 1 klopt, 0 niet"
+              "en": "Check 4 (the rule 4 of a rota): 1 passed, 0 not",
+              "nl": "Check 4 (regel 4 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check5": {
             "baseType": "integer",
             "label": {
-              "en": "Check 5: 1 passed, 0 not",
-              "nl": "Check 5: 1 klopt, 0 niet"
+              "en": "Check 5 (the rule 5 of a rota): 1 passed, 0 not",
+              "nl": "Check 5 (regel 5 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check6": {
             "baseType": "integer",
             "label": {
-              "en": "Check 6: 1 passed, 0 not",
-              "nl": "Check 6: 1 klopt, 0 niet"
+              "en": "Check 6 (the rule 6 of a rota): 1 passed, 0 not",
+              "nl": "Check 6 (regel 6 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check7": {
             "baseType": "integer",
             "label": {
-              "en": "Check 7: 1 passed, 0 not",
-              "nl": "Check 7: 1 klopt, 0 niet"
+              "en": "Check 7 (the rule 7 of a rota): 1 passed, 0 not",
+              "nl": "Check 7 (regel 7 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check8": {
             "baseType": "integer",
             "label": {
-              "en": "Check 8: 1 passed, 0 not",
-              "nl": "Check 8: 1 klopt, 0 niet"
+              "en": "Check 8 (the rule 8 of a rota): 1 passed, 0 not",
+              "nl": "Check 8 (regel 8 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check9": {
             "baseType": "integer",
             "label": {
-              "en": "Check 9: 1 passed, 0 not",
-              "nl": "Check 9: 1 klopt, 0 niet"
+              "en": "Check 9 (the rule 9 of a rota): 1 passed, 0 not",
+              "nl": "Check 9 (regel 9 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check10": {
             "baseType": "integer",
             "label": {
-              "en": "Check 10: 1 passed, 0 not",
-              "nl": "Check 10: 1 klopt, 0 niet"
+              "en": "Check 10 (the rule 10 of a rota): 1 passed, 0 not",
+              "nl": "Check 10 (regel 10 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check11": {
             "baseType": "integer",
             "label": {
-              "en": "Check 11: 1 passed, 0 not",
-              "nl": "Check 11: 1 klopt, 0 niet"
+              "en": "Check 11 (the rule 11 of a rota): 1 passed, 0 not",
+              "nl": "Check 11 (regel 11 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "check12": {
             "baseType": "integer",
             "label": {
-              "en": "Check 12: 1 passed, 0 not",
-              "nl": "Check 12: 1 klopt, 0 niet"
+              "en": "Check 12 (the rule 12 of a rota): 1 passed, 0 not",
+              "nl": "Check 12 (regel 12 van een rooster): 1 klopt, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "plan",
+                "makeRota"
+              ]
             }
           },
           "planned": {
@@ -192,6 +271,11 @@
             "label": {
               "en": "Planned: the number of tasks in the agenda",
               "nl": "Gepland: het aantal taken in de agenda"
+            },
+            "when": {
+              "mode": [
+                "plan"
+              ]
             }
           },
           "schedule": {
@@ -199,14 +283,392 @@
             "label": {
               "en": "Schedule: every planned task with its day, start, end and resource (JSON)",
               "nl": "Planning: elke geplande taak met dag, begin, eind en uitvoerder (JSON)"
+            },
+            "when": {
+              "mode": [
+                "plan"
+              ]
+            }
+          },
+          "question1": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 1: 1 right, 0 not",
+              "nl": "Vraag 1: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question2": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 2: 1 right, 0 not",
+              "nl": "Vraag 2: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question3": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 3: 1 right, 0 not",
+              "nl": "Vraag 3: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question4": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 4: 1 right, 0 not",
+              "nl": "Vraag 4: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question5": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 5: 1 right, 0 not",
+              "nl": "Vraag 5: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question6": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 6: 1 right, 0 not",
+              "nl": "Vraag 6: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question7": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 7: 1 right, 0 not",
+              "nl": "Vraag 7: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question8": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 8: 1 right, 0 not",
+              "nl": "Vraag 8: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question9": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 9: 1 right, 0 not",
+              "nl": "Vraag 9: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "question10": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question 10: 1 right, 0 not",
+              "nl": "Vraag 10: 1 goed, 0 niet"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "answers": {
+            "baseType": "string",
+            "label": {
+              "en": "Answers: the answer to every question (JSON)",
+              "nl": "Antwoorden: het antwoord op elke vraag (JSON)"
+            },
+            "when": {
+              "mode": [
+                "readRota"
+              ]
+            }
+          },
+          "hours1": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 1, as the candidate worked them out",
+              "nl": "Uren van medewerker 1, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours2": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 2, as the candidate worked them out",
+              "nl": "Uren van medewerker 2, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours3": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 3, as the candidate worked them out",
+              "nl": "Uren van medewerker 3, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours4": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 4, as the candidate worked them out",
+              "nl": "Uren van medewerker 4, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours5": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 5, as the candidate worked them out",
+              "nl": "Uren van medewerker 5, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours6": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 6, as the candidate worked them out",
+              "nl": "Uren van medewerker 6, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours7": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 7, as the candidate worked them out",
+              "nl": "Uren van medewerker 7, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hours8": {
+            "baseType": "float",
+            "label": {
+              "en": "Hours of employee 8, as the candidate worked them out",
+              "nl": "Uren van medewerker 8, zoals de kandidaat ze uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay1": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 1 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 1 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay2": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 2 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 2 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay3": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 3 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 3 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay4": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 4 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 4 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay5": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 5 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 5 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay6": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 6 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 6 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay7": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 7 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 7 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "pay8": {
+            "baseType": "float",
+            "label": {
+              "en": "Pay of employee 8 in euros, as the candidate worked it out",
+              "nl": "Loon van medewerker 8 in euro, zoals de kandidaat het uitrekende"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "hoursCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every employee's hours are right",
+              "nl": "De uren van elke medewerker kloppen"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "payCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every employee's pay is right",
+              "nl": "Het loon van elke medewerker klopt"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "payFollows": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every pay follows from the candidate's own hours",
+              "nl": "Elk loon volgt uit de eigen uren van de kandidaat"
+            },
+            "when": {
+              "mode": [
+                "hoursAndPay"
+              ]
+            }
+          },
+          "rota": {
+            "baseType": "string",
+            "label": {
+              "en": "Rota: every shift with its employee, day, start, end and break (JSON)",
+              "nl": "Rooster: elke dienst met medewerker, dag, begin, eind en pauze (JSON)"
+            },
+            "when": {
+              "mode": [
+                "makeRota",
+                "hoursAndPay"
+              ]
             }
           }
         }
       },
       "authoring": {
         "label": {
-          "en": "Make the agenda…",
-          "nl": "Agenda maken…"
+          "en": "Make the agenda or rota…",
+          "nl": "Agenda of rooster maken…"
         },
         "width": 1100,
         "height": 800

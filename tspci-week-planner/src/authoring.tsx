@@ -50,7 +50,7 @@ const newCheck = (type: CheckType, p: Planner): Check => {
 };
 
 /** A number field that takes a decimal comma (Dutch) or point. */
-const NumberField = ({ value, onChange, language, testid, label, width = "w-16" }: {
+export const NumberField = ({ value, onChange, language, testid, label, width = "w-16" }: {
   value: number; onChange: (n: number) => void; language: string; testid?: string; label: string; width?: string;
 }) => (
   <input type="text" inputMode="decimal" className={`${field} ${width}`} value={formatNumber(value, language)} data-testid={testid} aria-label={label}
@@ -61,7 +61,7 @@ const NumberField = ({ value, onChange, language, testid, label, width = "w-16" 
     }} />
 );
 
-const TimeField = ({ value, onChange, label, testid, step }: { value: number; onChange: (m: number) => void; label: string; testid?: string; step: number }) => (
+export const TimeField = ({ value, onChange, label, testid, step }: { value: number; onChange: (m: number) => void; label: string; testid?: string; step: number }) => (
   <input type="time" className={`${field} w-28`} value={clock(value)} step={step * 60} aria-label={label} data-testid={testid}
     onChange={(e) => {
       const m = toMinutes((e.target as HTMLInputElement).value);
