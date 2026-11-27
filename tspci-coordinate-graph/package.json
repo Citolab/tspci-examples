@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-coordinate-graph",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "the candidate draws points, sets of points, lines, segments, rays and solution sets of inequalities on a coordinate grid, scored with the author's correct elements",
   "author": {
     "name": "Citolab",

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-oscilloscope",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "an oscilloscope screen: the candidate sets frequency and amplitude of a signal next to a reference signal",
   "author": {
     "name": "Citolab",

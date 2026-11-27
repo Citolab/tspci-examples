@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-volcano-model",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "a classroom volcano model: mashed potato in a U-tube, an effervescent tablet and a stopper; viscosity and gas decide between a lava flow, a dome and an explosion",
   "author": {
     "name": "Citolab",
@@ -95,7 +95,11 @@
           },
           "count": {
             "baseType": "integer",
-            "label": { "en": "Number of experiments run", "nl": "Aantal uitgevoerde experimenten", "fr": "Nombre d'expériences réalisées" }
+            "label": {
+              "en": "Number of experiments run",
+              "nl": "Aantal uitgevoerde experimenten",
+              "fr": "Nombre d'expériences réalisées"
+            }
           },
           "outcomes": {
             "baseType": "string",
@@ -107,7 +111,11 @@
           },
           "resets": {
             "baseType": "integer",
-            "label": { "en": "Times the candidate started again", "nl": "Aantal keer opnieuw begonnen", "fr": "Nombre de remises à zéro" }
+            "label": {
+              "en": "Times the candidate started again",
+              "nl": "Aantal keer opnieuw begonnen",
+              "fr": "Nombre de remises à zéro"
+            }
           },
           "answers": {
             "baseType": "string",
@@ -119,15 +127,27 @@
           },
           "score": {
             "baseType": "integer",
-            "label": { "en": "Task: outcomes matched as in the key", "nl": "Opdracht: uitkomsten gekoppeld zoals in de sleutel", "fr": "Tâche : résultats associés comme dans la clé" }
+            "label": {
+              "en": "Task: outcomes matched as in the key",
+              "nl": "Opdracht: uitkomsten gekoppeld zoals in de sleutel",
+              "fr": "Tâche : résultats associés comme dans la clé"
+            }
           },
           "maxscore": {
             "baseType": "integer",
-            "label": { "en": "Task: number of outcomes to match", "nl": "Opdracht: aantal te koppelen uitkomsten", "fr": "Tâche : nombre de résultats à associer" }
+            "label": {
+              "en": "Task: number of outcomes to match",
+              "nl": "Opdracht: aantal te koppelen uitkomsten",
+              "fr": "Tâche : nombre de résultats à associer"
+            }
           },
           "correct": {
             "baseType": "integer",
-            "label": { "en": "Task: 1 when every outcome is matched as in the key", "nl": "Opdracht: 1 als elke uitkomst goed gekoppeld is", "fr": "Tâche : 1 si chaque résultat est bien associé" }
+            "label": {
+              "en": "Task: 1 when every outcome is matched as in the key",
+              "nl": "Opdracht: 1 als elke uitkomst goed gekoppeld is",
+              "fr": "Tâche : 1 si chaque résultat est bien associé"
+            }
           }
         }
       }

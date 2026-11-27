@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-chance-tools",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "probability experiments with dice, a spinner, a bag of balls and coins: run trials, design a spinner or bag for a given probability, or fill in a probability tree",
   "author": {
     "name": "Citolab",

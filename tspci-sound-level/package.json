@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-sound-level",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "a sound source and a listener: choose the power and the distance and read the sound level in dB",
   "author": {
     "name": "Citolab",

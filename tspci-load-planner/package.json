@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-load-planner",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "load a van, a container or a pallet with boxes in 3D: stacking, this side up, fragile, weight, centre of gravity and unloading order, checked by the PCI",
   "author": {
     "name": "Citolab",

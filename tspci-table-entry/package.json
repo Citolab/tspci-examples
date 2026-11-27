@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-table-entry",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "fill in the table: given cells and input cells with expected values, scored per cell",
   "author": {
     "name": "Citolab",

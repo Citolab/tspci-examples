@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-ratio-table",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "a ratio table (verhoudingstabel): labels, numbers and × or : steps on arrows, columns inserted for a step in between; reports the answer and whether the working is a correct ratio table, whatever the route",
   "author": {
     "name": "Citolab",

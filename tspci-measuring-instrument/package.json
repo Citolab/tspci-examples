@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-measuring-instrument",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "read off or set measuring instruments drawn in SVG: thermometer, measuring cylinder, volt- and ammeter, kitchen scale, ruler, vernier caliper, clock, stopwatch and pressure gauge",
   "author": {
     "name": "Citolab",

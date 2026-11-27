@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-contour-map",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "contour lines and relief: a contour map and a 3D relief model of a terrain, with tasks: draw a cross-section, find the highest point, read heights, draw where a river flows",
   "author": {
     "name": "Citolab",

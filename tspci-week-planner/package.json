@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-week-planner",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "plan tasks in a week agenda of days, time slots and resources (people, rooms, vehicles); the PCI checks the author's rules (order, days, hours, breaks, overlaps, opening hours)",
   "author": {
     "name": "Citolab",

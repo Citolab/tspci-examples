@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-histogram",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "the candidate sets the heights of the bars of a histogram or bar chart from data, by dragging, with the keyboard or by typing",
   "author": {
     "name": "Citolab",

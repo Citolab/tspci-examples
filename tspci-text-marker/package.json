@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-text-marker",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "mark words and sentences in a source text with named marker categories; the PCI scores the marks against the author key with a tolerance",
   "author": {
     "name": "Citolab",

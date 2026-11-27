@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-net-folding",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "nets of solids: build a net that folds into a cube or a box, find opposite and adjacent faces, complete a net, pick the nets that fold; the net folds in 3D",
   "author": {
     "name": "Citolab",

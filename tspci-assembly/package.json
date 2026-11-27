@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-assembly",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "assemble or disassemble a product in 3D in the right order: parts with prerequisites, feedback on wrong steps, scored as an ordered list or by the PCI",
   "author": {
     "name": "Citolab",

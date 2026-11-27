@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-data-chart",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "an interactive data chart (bar, stacked, line, pie): the details on hover or focus, as a tool or to click the answer",
   "author": {
     "name": "Citolab",

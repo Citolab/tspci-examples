@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-force-vector",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "draw a force arrow from a point on a picture, with a force scale, a ruler and a live label; scored like the rubric",
   "author": {
     "name": "Citolab",

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-reference-frames",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "relativity of motion: a train or a motorbike seen from the ground, from the vehicle or from a second observer, with the trajectories of points traced as they move",
   "author": {
     "name": "Citolab",
@@ -87,23 +87,43 @@
         "fields": {
           "score": {
             "baseType": "integer",
-            "label": { "en": "Score: questions answered correctly", "nl": "Score: goed beantwoorde vragen", "fr": "Score : questions correctement répondues" }
+            "label": {
+              "en": "Score: questions answered correctly",
+              "nl": "Score: goed beantwoorde vragen",
+              "fr": "Score : questions correctement répondues"
+            }
           },
           "maxscore": {
             "baseType": "integer",
-            "label": { "en": "Maximum score: number of questions", "nl": "Maximale score: aantal vragen", "fr": "Score maximal : nombre de questions" }
+            "label": {
+              "en": "Maximum score: number of questions",
+              "nl": "Maximale score: aantal vragen",
+              "fr": "Score maximal : nombre de questions"
+            }
           },
           "correct": {
             "baseType": "integer",
-            "label": { "en": "Correct: 1 when every question is answered correctly", "nl": "Goed: 1 als elke vraag goed is", "fr": "Correct : 1 si toutes les réponses sont justes" }
+            "label": {
+              "en": "Correct: 1 when every question is answered correctly",
+              "nl": "Goed: 1 als elke vraag goed is",
+              "fr": "Correct : 1 si toutes les réponses sont justes"
+            }
           },
           "answers": {
             "baseType": "string",
-            "label": { "en": "Answers: point@frame=answer, separated by ;", "nl": "Antwoorden: punt@stelsel=antwoord, gescheiden door ;", "fr": "Réponses : point@référentiel=réponse, séparées par ;" }
+            "label": {
+              "en": "Answers: point@frame=answer, separated by ;",
+              "nl": "Antwoorden: punt@stelsel=antwoord, gescheiden door ;",
+              "fr": "Réponses : point@référentiel=réponse, séparées par ;"
+            }
           },
           "viewed": {
             "baseType": "string",
-            "label": { "en": "Viewed: the frames played, each with the traced points (ground:rim,hub;vehicle:rim)", "nl": "Bekeken: de afgespeelde stelsels, elk met de gevolgde punten (ground:rim,hub;vehicle:rim)", "fr": "Vu : les référentiels joués, chacun avec les points tracés (ground:rim,hub;vehicle:rim)" }
+            "label": {
+              "en": "Viewed: the frames played, each with the traced points (ground:rim,hub;vehicle:rim)",
+              "nl": "Bekeken: de afgespeelde stelsels, elk met de gevolgde punten (ground:rim,hub;vehicle:rim)",
+              "fr": "Vu : les référentiels joués, chacun avec les points tracés (ground:rim,hub;vehicle:rim)"
+            }
           }
         }
       }

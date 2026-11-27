@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-light-shadow",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "light and shadow in 3D: move lamps and an object in front of a screen; the PCI computes the shadow, umbra and penumbra exactly and scores them against the author's targets",
   "author": {
     "name": "Citolab",

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-clocks",
-  "version": "1.0.0-alpha.2",
+  "version": "1.0.0-alpha.3",
   "description": "telling the time (klok kijken): an analog or digital clock that the candidate sets with its hands or digits, or that only shows a time, as an image would; several clock faces, with a colour, hands and font the author picks",
   "author": {
     "name": "Citolab",

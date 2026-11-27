@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-molecule-builder",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "build molecules from atoms and bonds, in 3D (ball-and-stick, VSEPR) or as a structural formula; scored on a canonical SMILES or by checks",
   "author": {
     "name": "Citolab",

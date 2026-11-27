@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-measure-3d",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "measure in a 3D scene: lengths, angles and areas of a box, a ramp, a roof, a tank, stairs and a ladder, with a measuring tape, a protractor and an area tool",
   "author": {
     "name": "Citolab",

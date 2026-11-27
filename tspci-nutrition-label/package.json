@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-nutrition-label",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "compose a meal from products with EU nutrition labels: running totals against the daily reference intakes, checks set by the author; or choose a product, or use it as a tool",
   "author": {
     "name": "Citolab",

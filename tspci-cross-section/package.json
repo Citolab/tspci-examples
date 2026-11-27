@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-cross-section",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "cut a solid with a plane and see the cross-section: its true shape, side lengths and area; scorable against the author's target shape and size",
   "author": {
     "name": "Citolab",

@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-gravitation",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "description": "a star and a planet: change the distance, the mass and the radius of the planet and read the gravitational force (Newton's law), record measurements and say which quantities matter",
   "author": {
     "name": "Citolab",
@@ -82,16 +82,86 @@
         "cardinality": "record",
         "$comment": "The PCI computes the force and, with data-question=\"influence\", scores the ticked quantities against data-key (README)",
         "fields": {
-          "distance": { "baseType": "float", "label": { "en": "Distance planet–star (million km)", "nl": "Afstand planeet–ster (miljoen km)", "fr": "Distance planète–étoile (millions de km)" } },
-          "mass": { "baseType": "float", "label": { "en": "Mass of the planet (10²³ kg)", "nl": "Massa van de planeet (10²³ kg)", "fr": "Masse de la planète (10²³ kg)" } },
-          "radius": { "baseType": "float", "label": { "en": "Radius of the planet (km)", "nl": "Straal van de planeet (km)", "fr": "Rayon de la planète (km)" } },
-          "force": { "baseType": "float", "label": { "en": "Gravitational force (N), as shown", "nl": "Gravitatiekracht (N), zoals getoond", "fr": "Force de gravitation (N), telle qu'affichée" } },
-          "changed": { "baseType": "string", "label": { "en": "Quantities the candidate changed (distance;mass;radius)", "nl": "Grootheden die de kandidaat veranderde (distance;mass;radius)", "fr": "Grandeurs modifiées par le candidat (distance;mass;radius)" } },
-          "measurements": { "baseType": "string", "label": { "en": "Recorded measurements (JSON)", "nl": "Vastgelegde metingen (JSON)", "fr": "Mesures enregistrées (JSON)" } },
-          "measurementCount": { "baseType": "integer", "label": { "en": "Number of recorded measurements", "nl": "Aantal vastgelegde metingen", "fr": "Nombre de mesures enregistrées" } },
-          "answer": { "baseType": "string", "label": { "en": "Question: the ticked quantities", "nl": "Vraag: de aangevinkte grootheden", "fr": "Question : les grandeurs cochées" } },
-          "correct": { "baseType": "integer", "label": { "en": "Question: 1 when the ticked quantities are the key", "nl": "Vraag: 1 als de aangevinkte grootheden de sleutel zijn", "fr": "Question : 1 si les grandeurs cochées sont la clé" } },
-          "score": { "baseType": "integer", "label": { "en": "Score of the question (0 or 1)", "nl": "Score van de vraag (0 of 1)", "fr": "Score de la question (0 ou 1)" } }
+          "distance": {
+            "baseType": "float",
+            "label": {
+              "en": "Distance planet–star (million km)",
+              "nl": "Afstand planeet–ster (miljoen km)",
+              "fr": "Distance planète–étoile (millions de km)"
+            }
+          },
+          "mass": {
+            "baseType": "float",
+            "label": {
+              "en": "Mass of the planet (10²³ kg)",
+              "nl": "Massa van de planeet (10²³ kg)",
+              "fr": "Masse de la planète (10²³ kg)"
+            }
+          },
+          "radius": {
+            "baseType": "float",
+            "label": {
+              "en": "Radius of the planet (km)",
+              "nl": "Straal van de planeet (km)",
+              "fr": "Rayon de la planète (km)"
+            }
+          },
+          "force": {
+            "baseType": "float",
+            "label": {
+              "en": "Gravitational force (N), as shown",
+              "nl": "Gravitatiekracht (N), zoals getoond",
+              "fr": "Force de gravitation (N), telle qu'affichée"
+            }
+          },
+          "changed": {
+            "baseType": "string",
+            "label": {
+              "en": "Quantities the candidate changed (distance;mass;radius)",
+              "nl": "Grootheden die de kandidaat veranderde (distance;mass;radius)",
+              "fr": "Grandeurs modifiées par le candidat (distance;mass;radius)"
+            }
+          },
+          "measurements": {
+            "baseType": "string",
+            "label": {
+              "en": "Recorded measurements (JSON)",
+              "nl": "Vastgelegde metingen (JSON)",
+              "fr": "Mesures enregistrées (JSON)"
+            }
+          },
+          "measurementCount": {
+            "baseType": "integer",
+            "label": {
+              "en": "Number of recorded measurements",
+              "nl": "Aantal vastgelegde metingen",
+              "fr": "Nombre de mesures enregistrées"
+            }
+          },
+          "answer": {
+            "baseType": "string",
+            "label": {
+              "en": "Question: the ticked quantities",
+              "nl": "Vraag: de aangevinkte grootheden",
+              "fr": "Question : les grandeurs cochées"
+            }
+          },
+          "correct": {
+            "baseType": "integer",
+            "label": {
+              "en": "Question: 1 when the ticked quantities are the key",
+              "nl": "Vraag: 1 als de aangevinkte grootheden de sleutel zijn",
+              "fr": "Question : 1 si les grandeurs cochées sont la clé"
+            }
+          },
+          "score": {
+            "baseType": "integer",
+            "label": {
+              "en": "Score of the question (0 or 1)",
+              "nl": "Score van de vraag (0 of 1)",
+              "fr": "Score de la question (0 ou 1)"
+            }
+          }
         }
       }
     }

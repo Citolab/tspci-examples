@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-fraction-model",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "fractions and percentages with models: a bar (strip) with a percentage scale, a circle, a grid and a set; the candidate divides and shades parts, or names the shaded fraction",
   "author": {
     "name": "Citolab",

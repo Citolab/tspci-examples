@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-number-line",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "a number line (getallenlijn): place points, mark an interval, draw jumps for addition and subtraction, or read off values; integers, decimals, fractions and negatives; an empty number line and a double number line (procentenstrook)",
   "author": {
     "name": "Citolab",
