@@ -1,0 +1,63 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (empty: none)", "nl": "Titel (leeg: geen)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the PCI's own instruction, in its language)", "nl": "Vraag (leeg: de eigen instructie van de PCI, in haar taal)" }
+  },
+  "job": {
+    "default": "grinding",
+    "editor": "pci",
+    "label": { "en": "Job", "nl": "Werk" },
+    "options": [
+      { "value": "grinding", "label": { "en": "Grinding a steel beam with an angle grinder", "nl": "Een stalen balk slijpen met een haakse slijper" } },
+      { "value": "cleaning", "label": { "en": "Cleaning with a strong, corrosive cleaning agent", "nl": "Schoonmaken met een sterk, bijtend schoonmaakmiddel" } },
+      { "value": "roof", "label": { "en": "Working on a sloping roof without a guard rail", "nl": "Werken op een schuin dak zonder randbeveiliging" } },
+      { "value": "coldStore", "label": { "en": "Driving a forklift truck in a cold store", "nl": "Op een heftruck rijden in een vrieshuis" } },
+      { "value": "circularSaw", "label": { "en": "Sawing wood with a circular saw", "nl": "Hout zagen met een cirkelzaag" } },
+      { "value": "kitchen", "label": { "en": "Preparing food in a professional kitchen", "nl": "Eten klaarmaken in een professionele keuken" } },
+      { "value": "roadside", "label": { "en": "Repairing a pavement next to a busy road", "nl": "Een stoep herstellen langs een drukke weg" } },
+      { "value": "custom", "label": { "en": "Own job (customJob)", "nl": "Eigen werk (customJob)" } }
+    ],
+    "$comment": "Set in the authoring mode (authoring.tsx): a preset, or custom for the author's own job in customJob. Unknown: grinding"
+  },
+  "customJob": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Own job", "nl": "Eigen werk" },
+    "hint": {
+      "en": "Set in the authoring mode: the job's text, per item required, allowed or not needed, and the hazards.",
+      "nl": "In te stellen in de authoring-modus: de tekst van het werk, per middel verplicht, toegestaan of niet nodig, en de gevaren."
+    },
+    "$comment": "JSON, as the authoring mode writes it: { \"text\": \"…\", \"required\": [item ids], \"allowed\": [item ids], \"hazards\": [hazard ids] }; every item not listed is not needed (wrong). Only with job custom"
+  },
+  "explain": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "The pupil also says why, for each item worn", "nl": "De leerling zegt ook waarom, bij elk gedragen middel" }
+  },
+  "worker": {
+    "default": "choice",
+    "editor": "enum",
+    "options": [
+      { "value": "choice", "label": { "en": "The pupil chooses one of three workers", "nl": "De leerling kiest een van drie werkers" } },
+      { "value": "1", "label": { "en": "Worker 1", "nl": "Werker 1" } },
+      { "value": "2", "label": { "en": "Worker 2", "nl": "Werker 2" } },
+      { "value": "3", "label": { "en": "Worker 3", "nl": "Werker 3" } }
+    ],
+    "label": { "en": "Worker figure", "nl": "Figuur van de werker" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts and the preset jobs", "nl": "Taal van de eigen teksten van de PCI en de standaardwerken" }
+  }
+}

@@ -1,0 +1,198 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+/* A workshop: a light wall behind the worker, a rack of equipment, the blue of the mandatory signs as the accent. */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-ink: #1f2933;
+  --color-accent: #1d5fa6;
+  --color-accent-soft: #dbe8f6;
+  --color-wall: #eef2f6;
+  --color-wall-line: #cfd8e3;
+  --color-rack: #f4f1ea;
+  --color-rack-line: #d9d0bd;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .pbm {
+    container-type: inline-size;
+  }
+  .job-card {
+    @apply rounded-xl border-l-8 border-accent bg-accent-soft px-4 py-2;
+  }
+  .job-label {
+    @apply text-[0.8em] font-bold tracking-wide text-accent uppercase;
+  }
+  /* the worker above the rack; side by side when there is room */
+  .layout {
+    @apply flex flex-col items-center gap-4;
+  }
+  @container (min-width: 620px) {
+    .layout {
+      @apply flex-row items-start;
+    }
+  }
+  .worker-panel {
+    @apply flex w-[min(100%,17em)] shrink-0 flex-col items-stretch;
+  }
+  .figure {
+    @apply block h-auto w-full;
+  }
+  .figure-back {
+    fill: var(--color-wall);
+    stroke: var(--color-wall-line);
+    stroke-width: 2;
+    transition: stroke 0.15s;
+  }
+  .figure-over .figure-back {
+    stroke: var(--color-accent);
+    stroke-width: 4;
+  }
+  /* where the dragged item goes: a dashed outline, solid and filled over the worker */
+  .zone-box {
+    fill: none;
+    stroke: var(--color-accent);
+    stroke-width: 2;
+    stroke-dasharray: 5 4;
+    pointer-events: none;
+  }
+  .zone-box-over {
+    fill: color-mix(in srgb, var(--color-accent) 15%, transparent);
+    stroke-width: 3;
+    stroke-dasharray: none;
+  }
+  /* an item snaps onto the worker */
+  .worn-item {
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: snap 0.22s ease-out;
+  }
+  @keyframes snap {
+    from {
+      transform: scale(1.12);
+      opacity: 0.4;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .worn-item {
+      animation: none;
+    }
+  }
+  /* only with a mouse: on a touchscreen a hover sticks after a tap */
+  @media (hover: hover) {
+    .worn-item.cursor-pointer:hover {
+      opacity: 0.8;
+    }
+  }
+  .worker-choice {
+    @apply flex h-11 w-11 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-slate-300 bg-wall p-0 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+  .worker-choice-on {
+    @apply border-accent ring-3 ring-accent-soft;
+  }
+
+  .rack {
+    @apply flex min-w-0 flex-1 flex-wrap content-start gap-2 self-stretch rounded-2xl border-2 border-rack-line bg-rack p-2;
+  }
+  .zone {
+    @apply max-w-full rounded-xl bg-white/70 px-1.5 pt-1 pb-1.5;
+  }
+  .zone-name {
+    @apply mb-1 px-0.5 text-[0.78em] font-bold tracking-wide text-slate-600 uppercase;
+  }
+  .rack-item {
+    @apply relative flex h-full w-[6.4em] cursor-grab flex-col items-center gap-0.5 rounded-lg border-2 border-slate-300 bg-white px-1 pt-1.5 pb-1 text-center hover:border-slate-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+  /* worn: a check, a blue border and ring, a tinted tile (not the colour alone) */
+  .rack-item-on {
+    @apply border-accent bg-accent-soft ring-2 ring-accent hover:border-accent;
+  }
+  .rack-pic {
+    @apply block;
+  }
+  .rack-sign {
+    @apply shrink-0;
+  }
+  .rack-check {
+    @apply absolute -top-2 -left-2 flex border-2 border-white h-[1.4em] w-[1.4em] items-center justify-center rounded-full bg-accent text-[0.8em] leading-none font-black text-white;
+  }
+  .rack-name {
+    @apply text-[0.74em] leading-tight font-semibold break-words hyphens-manual;
+  }
+  .worn-list {
+    @apply min-w-0 flex-1 self-start rounded-2xl border-2 border-rack-line bg-rack p-3;
+  }
+  .why {
+    @apply rounded-2xl border-2 border-accent-soft p-3;
+  }
+  .why-row {
+    @apply grid grid-cols-[auto_1fr] items-center gap-x-2 gap-y-1;
+  }
+  @container (min-width: 620px) {
+    .why-row {
+      @apply grid-cols-[auto_minmax(10em,16em)_1fr];
+    }
+  }
+  .why-select {
+    @apply col-span-full min-h-11 rounded-md border-2 border-slate-400 bg-white px-2 text-ink focus:border-accent focus:ring-2 focus:ring-accent-soft focus:outline-none disabled:opacity-80;
+    font: inherit;
+  }
+  @container (min-width: 620px) {
+    .why-select {
+      @apply col-span-1;
+    }
+  }
+  .drag-ghost {
+    @apply pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 opacity-90 drop-shadow-lg;
+  }
+
+  /* the authoring mode (authoring.tsx) */
+  .authoring {
+    @apply p-1;
+  }
+  .author-input {
+    @apply min-h-9 rounded-md border-2 border-slate-300 bg-white px-2 py-1 text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft;
+    font: inherit;
+  }
+  .author-row {
+    @apply flex flex-wrap items-center justify-between gap-2 rounded-xl border-2 border-slate-200 bg-white px-3 py-1;
+  }
+  .author-row-required {
+    @apply border-accent;
+  }
+  .author-row-wrong {
+    @apply bg-slate-50;
+  }
+  .status-option {
+    @apply min-h-8 cursor-pointer rounded-md border-2 border-slate-300 bg-white px-2.5 py-1 text-sm text-slate-700 hover:border-slate-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent;
+  }
+  .status-on {
+    @apply font-semibold ring-2;
+  }
+  .status-required.status-on {
+    @apply border-accent bg-accent-soft text-accent ring-accent-soft;
+  }
+  .status-allowed.status-on {
+    @apply border-slate-600 bg-slate-100 text-slate-800 ring-slate-200;
+  }
+  .status-wrong.status-on {
+    @apply border-slate-500 bg-white text-slate-800 ring-slate-200;
+  }
+  input[type="checkbox"]:focus-visible {
+    @apply outline-3 outline-offset-2 outline-accent;
+  }
+}
