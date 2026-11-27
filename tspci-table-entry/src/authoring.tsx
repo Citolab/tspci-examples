@@ -56,7 +56,7 @@ const Authoring = ({ initial, rules, language, onChange }: {
           {(["given", "input"] as const).map((kind) => (
             <button key={kind} type="button" aria-pressed={cell.kind === kind} data-testid={`${kind}-toggle-${testid}`}
               title={kind === "input" ? t.makeInput : t.makeGiven}
-              className={`flex-1 rounded px-2 py-0.5 focus-visible:outline-2 focus-visible:outline-sky-600 ${cell.kind === kind ? "bg-white font-semibold text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
+              className={`min-h-6 flex-1 rounded px-2 py-0.5 focus-visible:outline-2 focus-visible:outline-sky-600 ${cell.kind === kind ? "bg-white font-semibold text-slate-900 shadow-sm" : "text-slate-600 hover:text-slate-900"}`}
               onClick={() => commit(updateCell(table, row, column, { kind }))}>
               {kind === "input" ? t.input : t.given}
             </button>

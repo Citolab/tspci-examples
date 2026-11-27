@@ -282,7 +282,7 @@ const Slider = ({ label, range, step, value, disabled, testid, t, display, onLiv
       <div className="flex items-center gap-2">
         <button type="button" className={button} aria-label={t.less(label)} disabled={disabled || value <= lo + 1e-9} onClick={() => onCommit(value - step)}>−</button>
         <input id={`ls-${testid}`} type="range" min={lo} max={hi} step="any" value={value} disabled={disabled} data-testid={testid}
-          aria-valuetext={display(value)} className="ls-range h-2 w-full cursor-pointer accent-sky-700"
+          aria-valuetext={display(value)} className="ls-range h-6 w-full cursor-pointer accent-sky-700"
           onInput={(e) => onLive(Number((e.currentTarget as HTMLInputElement).value))}
           onChange={(e) => onCommit(Number((e.currentTarget as HTMLInputElement).value))}
           onKeyDown={(e) => {

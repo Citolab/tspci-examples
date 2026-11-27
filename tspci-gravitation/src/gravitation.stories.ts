@@ -4,7 +4,7 @@
 // Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
 
 import type { Meta, StoryObj } from "@storybook/html-vite";
-import { expect, fireEvent, userEvent } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor } from "storybook/test";
 import { afterPaint, lastChange, mountPci, openPci, remountPci, type MountedPci, type PciArgs } from "../../.storybook/tspci";
 import pci from "./index";
 
@@ -312,5 +312,27 @@ export const Solution: Story = {
     expect(canvas.getByRole("checkbox", { name: "Mass of the planet" })).toBeChecked();
     expect(canvas.getByRole("checkbox", { name: "Radius of the planet" })).not.toBeChecked();
     expect(canvas.getByRole("checkbox", { name: "Mass of the planet" })).toBeDisabled();
+  },
+};
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: the sliders, the table and the question. */
+export const ToTry: Story = {
+  name: "Gravitation, to try",
+};
+
+/** Removing a measurement keeps the focus of the keyboard: on the remove button in its place, or else on Record. */
+export const RemoveKeepsFocus: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    const focused = () => (root as ShadowRoot).activeElement;
+    await userEvent.click(canvas.getByRole("button", { name: "Record measurement" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Mass of the planet larger" }));
+    await userEvent.click(canvas.getByRole("button", { name: "Record measurement" }));
+    const last = canvas.getByRole("button", { name: "Remove measurement 2" });
+    last.focus();
+    last.click();
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Remove measurement 1" })));
+    canvas.getByRole("button", { name: "Remove measurement 1" }).click();
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Record measurement" })));
   },
 };

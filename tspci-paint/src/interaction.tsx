@@ -188,6 +188,13 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
     store.dispatch({ type: "CLEAR", payload: null });
     setAnnouncement(texts.cleared);
   };
+  // a button that becomes disabled by its own press (nothing left to undo) would drop the focus: give it to the canvas
+  const area = useRef<HTMLDivElement>(null);
+  const andKeepFocus = (action: () => void) => (e: MouseEvent) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    action();
+    setTimeout(() => button.disabled && area.current?.focus());
+  };
 
   const count = strokeCount(state);
   const fills = fillCount(state);
@@ -242,20 +249,20 @@ const Interaction = ({ settings, store, texts }: { settings: Settings; store: IS
             aria-pressed={fill} onClick={toggleFill} data-testid="paint-bucket">
             <Icon d={icons.paintBucket} />{texts.fill}
           </button>
-          <button type="button" className={button} onClick={undo} disabled={state.operations.length === 0}
+          <button type="button" className={button} onClick={andKeepFocus(undo)} disabled={state.operations.length === 0}
             aria-keyshortcuts="Control+Z" data-testid="undo">
             <Icon d={icons.undo} /><span className="sr-only sm:not-sr-only">{texts.undo}</span>
           </button>
-          <button type="button" className={button} onClick={redo} disabled={state.undone.length === 0}
+          <button type="button" className={button} onClick={andKeepFocus(redo)} disabled={state.undone.length === 0}
             aria-keyshortcuts="Control+Y" data-testid="redo">
             <Icon d={icons.redo} /><span className="sr-only sm:not-sr-only">{texts.redo}</span>
           </button>
-          <button type="button" className={button} onClick={clear} disabled={empty} data-testid="clear">
+          <button type="button" className={button} onClick={andKeepFocus(clear)} disabled={empty} data-testid="clear">
             <Icon d={icons.clear} /><span className="sr-only sm:not-sr-only">{texts.clear}</span>
           </button>
         </div>
       </div>
-      <div id="canvas" tabIndex={0} role="application"
+      <div ref={area} id="canvas" tabIndex={0} role="application"
         aria-roledescription={texts.canvas}
         aria-label={`${prompt || texts.canvas} (${empty ? texts.empty : texts.strokes(count) + (fills ? `, ${texts.fills(fills)}` : "")})`}
         aria-describedby="help"

@@ -73,6 +73,9 @@ const Drawing = (p: DrawingProps) => {
     const x = cm.x + d.dx, v = cm.v + d.dv;
     p.onDrag(d.picked, view === "side" ? { x, y: v } : { x, z: v });
   };
+  // a finger on a lamp or the object drags it; elsewhere the drawing scrolls the page (touch-action: none only on what
+  // is dragged, and the touch start cancelled too, for browsers that do not apply touch-action to SVG elements)
+  const noScroll = (e: TouchEvent) => e.cancelable && e.preventDefault();
   const up = () => {
     const d = drag.current;
     drag.current = null;
@@ -173,8 +176,8 @@ const Drawing = (p: DrawingProps) => {
     const can = p.movable(picked);
     const x = X(l.x), v = V(vOf(l));
     return (
-      <g key={`l${i}`} data-testid={`drawing-lamp-${i}`} className={can ? "cursor-grab" : ""}
-        onPointerDown={down(picked, { x: l.x, v: vOf(l) }) as any}>
+      <g key={`l${i}`} data-testid={`drawing-lamp-${i}`} className={can ? "cursor-grab touch-none" : ""}
+        onPointerDown={down(picked, { x: l.x, v: vOf(l) }) as any} onTouchStart={can ? noScroll : undefined}>
         {view === "side" && <line x1={x + (lamp.size > 0 ? 3 : 0)} x2={x + (lamp.size > 0 ? 3 : 0)} y1={v} y2={V(0)} className="stroke-slate-400" stroke-width={1} />}
         {lamp.size > 0 ? (
           <>
@@ -193,7 +196,7 @@ const Drawing = (p: DrawingProps) => {
 
   const objectPicked: Picked = { kind: "object", index: 0 };
   return (
-    <svg ref={svg} viewBox={`${-MARGIN} 0 ${width} ${height}`} className="block h-auto w-full select-none touch-none" role="img"
+    <svg ref={svg} viewBox={`${-MARGIN} 0 ${width} ${height}`} className="block h-auto w-full select-none" role="img"
       aria-label={view === "side" ? t.sideViewLabel : t.topViewLabel} data-testid={`drawing-${view}`}
       onPointerMove={move as any} onPointerUp={up} onPointerCancel={up}>
       <defs>
@@ -219,8 +222,8 @@ const Drawing = (p: DrawingProps) => {
       <line x1={sx} x2={sx} y1={V(screenLo)} y2={V(screenHi)} className="stroke-slate-800" stroke-width={2.2} />
       <text x={sx} y={view === "side" ? V(screenHi) - 3 : V(screenLo) - 3} text-anchor="middle" className="fill-slate-600 text-[6.5px]">{t.screen}</text>
       {marks}
-      <g data-testid="drawing-object" className={`fill-sky-700 stroke-sky-900 ${p.movable(objectPicked) ? "cursor-grab" : ""}`} stroke-width={0.6}
-        onPointerDown={down(objectPicked, { x: positions.objectX, v: centreV }) as any}>
+      <g data-testid="drawing-object" className={`fill-sky-700 stroke-sky-900 ${p.movable(objectPicked) ? "cursor-grab touch-none" : ""}`} stroke-width={0.6}
+        onPointerDown={down(objectPicked, { x: positions.objectX, v: centreV }) as any} onTouchStart={p.movable(objectPicked) ? noScroll : undefined}>
         {view === "side" && o.elevation > 0 && <line x1={X(positions.objectX)} x2={X(positions.objectX)} y1={V(o.elevation)} y2={V(0)} className="stroke-slate-400" stroke-width={0.8} />}
         {objectShape}
         <rect x={X(positions.objectX) - 9} y={V(view === "side" ? o.elevation + o.height : o.width / 2) - 3} width={18}

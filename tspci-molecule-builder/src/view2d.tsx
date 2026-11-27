@@ -46,7 +46,8 @@ const View2D = ({ molecule: m, selected, connectFrom, showValence, texts: t, lab
   const pointerMove = (e: PointerEvent) => {
     if (!drag || readOnly) return;
     const dx = e.clientX - drag.startX, dy = e.clientY - drag.startY;
-    if (!drag.moved && Math.hypot(dx, dy) < 6) return;
+    // a finger wobbles a little during a tap: more slack for touch, so a tap still picks the atom
+    if (!drag.moved && Math.hypot(dx, dy) < (e.pointerType === "touch" ? 10 : 6)) return;
     setDrag({ ...drag, dx, dy, moved: true });
   };
   const pointerUp = (e: PointerEvent) => {

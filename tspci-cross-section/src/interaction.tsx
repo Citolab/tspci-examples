@@ -102,6 +102,7 @@ const View3D = ({ model, plane, section, hide, handles, pickEdges, labels, point
         onPickEdge: (p) => callbacks.current.onPickEdge(p),
       });
       onScene?.(scene.current);
+      (host.current as any).__scene = scene.current; // for tests
     } catch {
       setFailed(true);
     }

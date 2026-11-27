@@ -34,6 +34,19 @@ const slide = async (canvas: Canvas, value: number, name = "Fold") => {
   return range;
 };
 
+/** Without a play function: to try by hand (mouse, keyboard or touch); with the fold in 3D. */
+export const ToTry: Story = { name: "Net folding, to try", args: { properties: { showResult: "true" } } };
+
+/** A face to choose, without a play function: to try by hand. */
+export const OppositeFaceToTry: Story = { name: "Opposite face, to try", args: { properties: { puzzle: puzzle("opposite") } } };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);

@@ -229,3 +229,9 @@ export const RestoresState: Story = {
     expect(response(second.pci)).toMatch(new RegExp(`^${said.replace(/\|/g, "\\|")}\\|00:0\\d;You;Idea two$`));
   },
 };
+
+/** Without a test, to try by hand (also on a tablet): five minutes, and two bots that join in. */
+export const ToTry: Story = {
+  name: "Brainstorm, to try",
+  args: { properties: { timeLimit: "300", messages: "5;Anne;red;What about a film?\n12;Lars;green;Or a game, with points!" } },
+};

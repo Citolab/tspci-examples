@@ -56,6 +56,12 @@ const Interaction = ({ prompt, settings: s, store, texts, clock, readOnly }: {
     setHours(t);
   };
 
+  // The focus stays on the clock's buttons when they change: start, pause and resume are one button, and when the
+  // clock stops at the end (that button goes away) or after a reset (Reset goes away), the focus goes to the other one
+  const primaryButton = useRef<HTMLButtonElement>(null);
+  const resetButton = useRef<HTMLButtonElement>(null);
+  const focusAfter = useRef<"primary" | "reset" | null>(null);
+
   // a reset, a restore or a pause puts the store's hours on the clock
   useEffect(() => {
     if (state.phase !== "running") setLive(state.elapsed);
@@ -83,6 +89,9 @@ const Interaction = ({ prompt, settings: s, store, texts, clock, readOnly }: {
       setLive(to);
       if (to >= stop) {
         events.push(texts.finished(n(to)));
+        // Pause goes away when the clock stops: a focus on it goes to Reset
+        const button = primaryButton.current;
+        if (button && (button.getRootNode() as Document | ShadowRoot).activeElement === button) focusAfter.current = "reset";
         store.dispatch({ type: "FINISH", payload: { elapsed: to, results: containers.map((c) => resultAt(c, to)) } });
       } else {
         frame = requestAnimationFrame(tick);
@@ -110,7 +119,20 @@ const Interaction = ({ prompt, settings: s, store, texts, clock, readOnly }: {
     store.dispatch({ type: "RESET", payload: { elapsed: t, results: t > 0 ? state.containers.map((c) => resultAt(c, t)) : null } });
     setLive(0);
     setAnnouncement(texts.wasReset);
+    // Reset goes away with the reset: the focus goes to Start, not to the page
+    focusAfter.current = "primary";
   };
+
+  useEffect(() => {
+    if (focusAfter.current === "primary") primaryButton.current?.focus();
+    else if (focusAfter.current === "reset") resetButton.current?.focus();
+    focusAfter.current = null;
+  }, [state.phase]);
+  const primaryAction =
+    state.phase === "setup" ? { icon: "▶", label: texts.start, act: start }
+    : state.phase === "running" ? { icon: "❚❚", label: texts.pause, act: pause }
+    : state.phase === "paused" ? { icon: "▶", label: texts.resume, act: resume }
+    : null;
 
   const editable = !readOnly && state.phase === "setup";
   const button =
@@ -143,17 +165,13 @@ const Interaction = ({ prompt, settings: s, store, texts, clock, readOnly }: {
             <span className="text-lg font-semibold tabular-nums text-slate-900" data-testid="time">{texts.time(n(hours), n(s.duration, decimalsOf(s.duration)))}</span>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            {state.phase === "setup" && (
-              <button type="button" className={primary} disabled={readOnly} onClick={start}><span aria-hidden="true">▶</span> {texts.start}</button>
-            )}
-            {state.phase === "running" && (
-              <button type="button" className={primary} disabled={readOnly} onClick={pause}><span aria-hidden="true">❚❚</span> {texts.pause}</button>
-            )}
-            {state.phase === "paused" && (
-              <button type="button" className={primary} disabled={readOnly} onClick={resume}><span aria-hidden="true">▶</span> {texts.resume}</button>
+            {primaryAction && (
+              <button type="button" ref={primaryButton} className={primary} disabled={readOnly} onClick={primaryAction.act}>
+                <span aria-hidden="true">{primaryAction.icon}</span> {primaryAction.label}
+              </button>
             )}
             {state.phase !== "setup" && (
-              <button type="button" className={secondary} disabled={readOnly} onClick={reset}><span aria-hidden="true">↺</span> {texts.reset}</button>
+              <button type="button" ref={resetButton} className={secondary} disabled={readOnly} onClick={reset}><span aria-hidden="true">↺</span> {texts.reset}</button>
             )}
           </div>
           <fieldset className="m-0 ml-auto flex items-center gap-2 border-0 p-0" disabled={readOnly}>

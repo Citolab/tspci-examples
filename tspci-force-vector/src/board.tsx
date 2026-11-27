@@ -281,19 +281,22 @@ const Board = ({ settings: s, defs, arrows, fixed, active, onActive, onCommit, c
       e.preventDefault();
       return;
     }
-    if (!(e.key in keys)) return;
+    // Page Up and Page Down, as on a slider: a big step longer or shorter (Shift with ↑ and ↓)
+    const page = e.key === "PageUp" ? "ArrowUp" : e.key === "PageDown" ? "ArrowDown" : null;
+    const key = page ?? e.key;
+    if (!(key in keys) || (page && !v)) return;
     e.preventDefault();
-    const big = e.shiftKey;
+    const big = e.shiftKey || !!page;
     if (!v) {
       const start = fixed[i] && defs[i].start ? defs[i].start : { x: o.bounds.width / 2, y: o.bounds.height / 2 };
-      next = firstVector(start, keys[e.key], o);
-    } else if (e.altKey && !fixed[i]) {
-      const d = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+      next = firstVector(start, keys[key], o);
+    } else if (e.altKey && !fixed[i] && !page) {
+      const d = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[key];
       next = nudge(v, { kind: "move", dx: d[0], dy: d[1] }, o, big);
-    } else if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
-      next = nudge(v, { kind: "rotate", direction: e.key === "ArrowLeft" ? 1 : -1 }, o, big);
+    } else if (key === "ArrowLeft" || key === "ArrowRight") {
+      next = nudge(v, { kind: "rotate", direction: key === "ArrowLeft" ? 1 : -1 }, o, big);
     } else {
-      next = nudge(v, { kind: "length", direction: e.key === "ArrowUp" ? 1 : -1 }, o, big);
+      next = nudge(v, { kind: "length", direction: key === "ArrowUp" ? 1 : -1 }, o, big);
     }
     if (next && next.length > 0 && JSON.stringify(next) !== JSON.stringify(v)) {
       onCommit(i, next);
@@ -359,6 +362,8 @@ const Board = ({ settings: s, defs, arrows, fixed, active, onActive, onCommit, c
               if (e.button !== 0) return;
               begin(e, { kind: "ruler-rotate" });
             }}>
+            {/* a larger, invisible target around the handle, for a finger */}
+            <circle cx={(rulerLength + 0.4) * ppc + 16} cy={RULER_HEIGHT / 2} r={18} fill="transparent" />
             <circle cx={(rulerLength + 0.4) * ppc + 16} cy={RULER_HEIGHT / 2} r={11} fill="white" stroke="#a16207" stroke-width={1.5} />
             <path d={`M ${(rulerLength + 0.4) * ppc + 11} ${RULER_HEIGHT / 2 - 3} a 5.5 5.5 0 1 1 3 7`} fill="none" stroke="#a16207"
               stroke-width={1.6} stroke-linecap="round" aria-hidden="true" />

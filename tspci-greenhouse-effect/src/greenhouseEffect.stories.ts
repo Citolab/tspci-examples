@@ -246,3 +246,9 @@ export const ResetResponse: Story = {
     expect(pci.getResponse()).toBeUndefined();
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: the slider, the buttons and a question. */
+export const ToTry: Story = {
+  name: "Greenhouse effect, to try",
+  args: { properties: { question: "direction", direction: "more" } },
+};

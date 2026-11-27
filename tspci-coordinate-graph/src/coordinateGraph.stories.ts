@@ -63,6 +63,9 @@ const dragPoint = async (canvas: Canvas, id: string, index: number, to: { client
 const tool = (canvas: Canvas, name: RegExp) => within(canvas.getByTestId("tools")).getByRole("button", { name });
 const status = (canvas: Canvas) => canvas.getByRole("status");
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Coordinate graph, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -202,6 +205,8 @@ export const KeyboardAndScreenReader: Story = {
       expect(canvas.queryByRole("checkbox", { name: /^Area/ })).toBeNull();
       await userEvent.click(canvas.getByRole("button", { name: "Clear Boundary line" }));
       expect(pci.getResponse()).toBeUndefined(); // back where it started
+      // the button is gone: the focus goes to the grid, not nowhere
+      await waitFor(() => expect(focusedIn(root)).toBe(board));
     });
   },
 };

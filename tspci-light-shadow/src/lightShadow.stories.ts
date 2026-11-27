@@ -45,6 +45,16 @@ const ROUND_LAMP = JSON.stringify({
   solution: null,
 });
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "Light and shadow, to try" };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -122,6 +132,9 @@ export const DragInTheDrawing: Story = {
     expect(canvas.queryByRole("application")).toBeNull();
     const lamp = canvas.getByTestId("drawing-lamp-0");
     const svg = canvas.getByRole("img", { name: /^Side view/ }) as unknown as SVGSVGElement;
+    // on a tablet a finger on the lamp drags it, a finger elsewhere on the drawing scrolls the page
+    expect(getComputedStyle(lamp).touchAction).toBe("none");
+    expect(getComputedStyle(svg).touchAction).toBe("auto");
     const r = lamp.getBoundingClientRect();
     const perCm = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
     const at = (dx: number) => ({ clientX: r.left + r.width / 2 + dx, clientY: r.top + r.height / 2, bubbles: true, composed: true, pointerId: 1, button: 0 });

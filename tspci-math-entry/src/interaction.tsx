@@ -145,21 +145,24 @@ export const useKeyboard = (field: () => MathfieldElement | undefined, enabled: 
   const layouts = () => {
     if (window.mathVirtualKeyboard) window.mathVirtualKeyboard.layouts = keyboardLayouts(enabled, texts);
   };
-  const toggle = () => {
+  const show = () => {
     const mf = field();
     const keyboard = window.mathVirtualKeyboard;
     if (!mf || !keyboard) return;
+    mf.focus();
+    layouts();
+    keyboard.show({ animate: true });
+    setOpen(true);
+  };
+  const toggle = () => {
+    const keyboard = window.mathVirtualKeyboard;
+    if (!field() || !keyboard) return;
     if (open) {
       keyboard.hide();
       setOpen(false);
-    } else {
-      mf.focus();
-      layouts();
-      keyboard.show({ animate: true });
-      setOpen(true);
-    }
+    } else show();
   };
-  return { open, toggle, layouts, close: () => setOpen(false) };
+  return { open, toggle, show, layouts, close: () => setOpen(false) };
 };
 
 const Interaction = ({ settings, store, texts, readOnly, uid }: {
@@ -208,13 +211,31 @@ const Interaction = ({ settings, store, texts, readOnly, uid }: {
         if (range && mf.position >= range[0] && mf.position <= range[1]) activeGap.current = i;
       }
     };
+    // a tablet has no keys, and MathLive never brings up the tablet's own keyboard: a tap on the field shows the
+    // on-screen keyboard (a finger that scrolls the page does not)
+    let touchDown: { id: number; x: number; y: number } | null = null;
+    const onPointerDown = (e: PointerEvent) => {
+      touchDown = e.pointerType === "touch" ? { id: e.pointerId, x: e.clientX, y: e.clientY } : null;
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      const tap = touchDown && touchDown.id === e.pointerId && Math.hypot(e.clientX - touchDown.x, e.clientY - touchDown.y) < 10;
+      touchDown = null;
+      if (tap && !readOnly && !window.mathVirtualKeyboard?.visible) keyboard.show();
+    };
+    const onPointerCancel = () => (touchDown = null);
     mf.addEventListener("input", onInput);
     mf.addEventListener("selection-change", onSelection);
     mf.addEventListener("focusin", keyboard.layouts);
+    mf.addEventListener("pointerdown", onPointerDown);
+    mf.addEventListener("pointerup", onPointerUp);
+    mf.addEventListener("pointercancel", onPointerCancel);
     return () => {
       mf.removeEventListener("input", onInput);
       mf.removeEventListener("selection-change", onSelection);
       mf.removeEventListener("focusin", keyboard.layouts);
+      mf.removeEventListener("pointerdown", onPointerDown);
+      mf.removeEventListener("pointerup", onPointerUp);
+      mf.removeEventListener("pointercancel", onPointerCancel);
       mf.remove();
       field.current = undefined;
     };

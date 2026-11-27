@@ -1,4 +1,4 @@
-import { useMemo, useState } from "preact/hooks";
+import { useMemo, useRef, useState } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
 import { Measurement, PointRef, Target, Tool, Vec3, positionOf } from "./geometry";
 import { acceptableNumberText, decimalsOf, formatNumber, parseNumber } from "./format";
@@ -55,6 +55,14 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly, correctTe
   const current = s.tools.includes(tool) ? tool : s.tools[0];
   const [pending, setPending] = useState<PointRef[]>([]);
   const [chosen, setChosen] = useState<string[]>(["", "", ""]);
+  // after a removal the focus goes to the next measurement's remove button (or the one before), and when none is left
+  // to the first list, where the pupil measures again: it is never lost with the button that went away
+  const lists = useRef<HTMLFormElement>(null);
+  const measurementsBox = useRef<HTMLDivElement>(null);
+  const focusAfterRemoval = (index: number) => setTimeout(() => {
+    const buttons = [...(measurementsBox.current?.querySelectorAll<HTMLButtonElement>("ol button") ?? [])];
+    (buttons[index] ?? buttons[index - 1] ?? lists.current?.querySelector<HTMLElement>("select, button"))?.focus();
+  });
   const [announcement, setAnnouncement] = useState("");
   const [message, setMessage] = useState("");
   const reducedMotion = usePrefersReducedMotion();
@@ -156,7 +164,7 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly, correctTe
           reducedMotion={reducedMotion} />
 
         <div className="grid gap-3 md:grid-cols-2">
-          <form onSubmit={measureFromLists} aria-label={t.lists} className="flex flex-col gap-2 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
+          <form ref={lists} onSubmit={measureFromLists} aria-label={t.lists} className="flex flex-col gap-2 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200">
             <h3 className="m-0 flex items-center gap-1.5 text-sm font-semibold text-slate-700">
               <span style={{ color: COLOURS[current] }}><ToolIcon tool={current} /></span>{t.lists}: {t.tool[current].toLowerCase()}
             </h3>
@@ -187,11 +195,11 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly, correctTe
             </div>
           </form>
 
-          <div className="flex flex-col gap-2 rounded-xl p-3 ring-1 ring-slate-200">
+          <div ref={measurementsBox} className="flex flex-col gap-2 rounded-xl p-3 ring-1 ring-slate-200">
             <div className="flex items-center justify-between gap-2">
               <h3 className="m-0 text-sm font-semibold text-slate-700">{t.measurements}</h3>
               {state.measurements.length > 0 && !readOnly && (
-                <button type="button" onClick={() => { store.dispatch({ type: "CLEAR", payload: {} }); setAnnouncement(t.cleared); }}
+                <button type="button" onClick={() => { store.dispatch({ type: "CLEAR", payload: {} }); setAnnouncement(t.cleared); focusAfterRemoval(0); }}
                   className="cursor-pointer rounded-md px-2 py-1 text-xs text-slate-600 underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-sky-700">
                   {t.clear}
                 </button>
@@ -209,7 +217,7 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly, correctTe
                       <span style={{ color: COLOURS[m.tool] }}><ToolIcon tool={m.tool} /></span>
                       <span className="min-w-0 flex-1 tabular-nums" data-testid="measurement">{text}</span>
                       {!readOnly && (
-                        <button type="button" aria-label={t.remove(text)} onClick={() => { store.dispatch({ type: "REMOVE", payload: { index: i } }); setAnnouncement(t.removed(text)); }}
+                        <button type="button" aria-label={t.remove(text)} onClick={() => { store.dispatch({ type: "REMOVE", payload: { index: i } }); setAnnouncement(t.removed(text)); focusAfterRemoval(i); }}
                           className="grid size-7 cursor-pointer place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-sky-700">
                           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" /></svg>
                         </button>

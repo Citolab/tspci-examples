@@ -596,3 +596,6 @@ export const AuthoringLitCheck: StoryObj<AuthoringArgs> = {
     expect(canvas.getByRole("checkbox", { name: "In the palette: Glass" })).toBeChecked();
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Circuit builder, to try" };

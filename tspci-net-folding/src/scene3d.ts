@@ -143,6 +143,9 @@ export class FoldScene {
   private watch: ReturnType<typeof setInterval>;
   private disposed = false;
   private down: { x: number; y: number; az: number; el: number; moved: boolean } | null = null;
+  /** The fingers on the canvas: two of them pinch to zoom. */
+  private pointers = new Map<number, { x: number; y: number }>();
+  private pinch = 0;
   private raycaster = new Raycaster();
 
   constructor(private host: HTMLElement, private onPick: (face: number) => void) {
@@ -170,7 +173,7 @@ export class FoldScene {
     canvas.addEventListener("pointerdown", this.pointerDown);
     canvas.addEventListener("pointermove", this.pointerMove);
     canvas.addEventListener("pointerup", this.pointerUp);
-    canvas.addEventListener("pointercancel", () => (this.down = null));
+    canvas.addEventListener("pointercancel", this.pointerCancel);
     canvas.addEventListener("wheel", this.wheel, { passive: false });
 
     this.observer = new ResizeObserver(() => this.resize());
@@ -280,14 +283,31 @@ export class FoldScene {
   }
 
   private pointerDown = (e: PointerEvent) => {
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (this.pointers.size === 2) {
+      // a second finger: a pinch, not a turn or a pick
+      const [a, b] = [...this.pointers.values()];
+      this.pinch = Math.hypot(a.x - b.x, a.y - b.y);
+      this.down = null;
+      return;
+    }
     this.down = { x: e.clientX, y: e.clientY, az: this.azimuth, el: this.elevation, moved: false };
     try { this.renderer.domElement.setPointerCapture(e.pointerId); } catch { /* a synthetic event */ }
   };
 
   private pointerMove = (e: PointerEvent) => {
+    if (this.pointers.has(e.pointerId)) this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (this.pointers.size === 2 && this.pinch > 0) {
+      const [a, b] = [...this.pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d > 0) this.zoom(this.pinch / d);
+      this.pinch = d;
+      return;
+    }
     if (!this.down) return;
     const dx = e.clientX - this.down.x, dy = e.clientY - this.down.y;
-    if (Math.abs(dx) + Math.abs(dy) > 4) this.down.moved = true;
+    // a finger wobbles a little during a tap: more slack for touch, so a tap still picks a face
+    if (Math.abs(dx) + Math.abs(dy) > (e.pointerType === "touch" ? 10 : 4)) this.down.moved = true;
     if (!this.down.moved) return;
     this.azimuth = this.down.az - dx * 0.01;
     this.elevation = Math.max(-1.45, Math.min(1.45, this.down.el + dy * 0.01));
@@ -295,12 +315,20 @@ export class FoldScene {
   };
 
   private pointerUp = (e: PointerEvent) => {
+    this.pointers.delete(e.pointerId);
+    if (this.pointers.size < 2) this.pinch = 0;
     const down = this.down;
     this.down = null;
     if (down && !down.moved) {
       const face = this.pick(e.clientX, e.clientY);
       if (face >= 0) this.onPick(face);
     }
+  };
+
+  private pointerCancel = (e: PointerEvent) => {
+    this.pointers.delete(e.pointerId);
+    this.pinch = 0;
+    this.down = null;
   };
 
   private wheel = (e: WheelEvent) => {

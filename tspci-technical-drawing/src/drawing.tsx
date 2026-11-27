@@ -114,7 +114,10 @@ export const Drawing = (p: Props) => {
   const fs = 3.4 * k;
   return (
     <svg viewBox={`0 0 ${layout.width} ${layout.height}`} role="group" aria-label={p.label} data-testid="drawing"
-      className="block h-auto w-full select-none rounded-lg border border-slate-200 bg-white" style={{ maxWidth: `${p.maxWidth ?? 860}px` }}>
+      className="block h-auto w-full select-none rounded-lg border border-slate-200 bg-white"
+      // a finger draws on the grid: browsers ignore touch-action on the SVG's own elements (the grid's rect), so it is
+      // set here, and only when there is a grid; otherwise a drag over the drawing scrolls the page
+      style={{ maxWidth: `${p.maxWidth ?? 860}px`, touchAction: p.gridView && p.grid ? "none" : undefined }}>
       {p.show.map((name) => {
         const view = p.views[name];
         const o = layout.origin[name];

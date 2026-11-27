@@ -14,6 +14,9 @@ import { RATES, Settings, formatNumber } from "./settings";
 import { Actions, StateModel } from "./store";
 import { Texts } from "./texts";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
 // The candidate's view: the instruction, the scene in SVG as one observer sees it, the controls of the animation, the
 // point of view, the trajectories to trace and the questions.
 
@@ -128,6 +131,25 @@ const Interaction = ({ prompt, settings: s, store, texts, readOnly }: Props) => 
     setT(clamped);
     store.dispatch({ type: "TIME", payload: { time: clamped, how } });
   };
+  // a button that is disabled by its own press (step back to 0, step forward to the end, back to the start) would drop
+  // the keyboard focus on the page: it goes to Play
+  const playButton = useRef<HTMLButtonElement>(null);
+  const refocus = useRef<HTMLButtonElement | null>(null);
+  const keepFocus = (e: Event) => {
+    const from = e.currentTarget as HTMLButtonElement;
+    refocus.current = hasFocus(from) ? from : null;
+  };
+  useEffect(() => {
+    const from = refocus.current;
+    if (!from || !playButton.current) return;
+    const active = (playButton.current.getRootNode() as Document | ShadowRoot).activeElement;
+    if (!from.disabled) {
+      if (active !== from) refocus.current = null; // the candidate went on elsewhere
+      return;
+    }
+    refocus.current = null;
+    if (!active || active === from) playButton.current.focus();
+  });
   const play = () => {
     if (t >= end) setT(0);
     setPlaying(true);
@@ -158,23 +180,23 @@ const Interaction = ({ prompt, settings: s, store, texts, readOnly }: Props) => 
 
         <div className="flex flex-wrap items-center gap-2 border-t border-slate-100 px-4 py-3">
           {playing ? (
-            <button type="button" className={primary} disabled={readOnly} onClick={() => stopAt(t, "pause")} data-testid="pause">
+            <button type="button" className={primary} disabled={readOnly} onClick={() => stopAt(t, "pause")} data-testid="pause" ref={playButton}>
               <Icon d="M6 4h4v16H6zM14 4h4v16h-4z" /> {texts.pause}
             </button>
           ) : (
-            <button type="button" className={primary} disabled={readOnly} onClick={play} data-testid="play">
+            <button type="button" className={primary} disabled={readOnly} onClick={play} data-testid="play" ref={playButton}>
               <Icon d="M7 4l13 8-13 8z" /> {texts.play}
             </button>
           )}
           <button type="button" className={button} aria-label={texts.stepBack} title={texts.stepBack} disabled={readOnly || t <= 0}
-            onClick={() => stopAt(Math.ceil(t / STEP - 1e-6) * STEP - STEP, "step")} data-testid="step-back">
+            onClick={(e) => { keepFocus(e); stopAt(Math.ceil(t / STEP - 1e-6) * STEP - STEP, "step"); }} data-testid="step-back">
             <Icon d="M18 5v14l-9-7zM6 5h2v14H6z" />
           </button>
           <button type="button" className={button} aria-label={texts.stepForward} title={texts.stepForward} disabled={readOnly || t >= end}
-            onClick={() => stopAt(Math.floor(t / STEP + 1e-6) * STEP + STEP, "step")} data-testid="step-forward">
+            onClick={(e) => { keepFocus(e); stopAt(Math.floor(t / STEP + 1e-6) * STEP + STEP, "step"); }} data-testid="step-forward">
             <Icon d="M6 5v14l9-7zM16 5h2v14h-2z" />
           </button>
-          <button type="button" className={button} disabled={readOnly || (t <= 0 && !playing)} onClick={() => stopAt(0, "reset")} data-testid="reset">
+          <button type="button" className={button} disabled={readOnly || (t <= 0 && !playing)} onClick={(e) => { keepFocus(e); stopAt(0, "reset"); }} data-testid="reset">
             <Icon d="M12 5a7 7 0 1 1-6.6 4.7l1.9.6A5 5 0 1 0 12 7v3L7.5 6 12 2z" /> {texts.reset}
           </button>
           <label className="ml-auto flex items-center gap-2 text-sm text-slate-600">

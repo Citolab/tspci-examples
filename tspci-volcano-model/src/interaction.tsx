@@ -12,6 +12,9 @@ import { Actions, StateModel } from "./store";
 import { Texts, formatInteger } from "./texts";
 import { Scene } from "./scene";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
 /** Durations of the smooth animation, in ms. */
 export const POUR_MS = 900;
 export const ERUPT_MS = 3600;
@@ -51,6 +54,36 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
   const [anim, setAnim] = useState<{ count: number; progress: number } | null>(null);
   const [announcement, setAnnouncement] = useState("");
   const frame = useRef(0);
+  // the button a step was taken with is disabled next (or goes away): the focus moves on to the next step, so a
+  // keyboard user does not lose it to the page
+  const root = useRef<HTMLDivElement>(null);
+  const focusNext = useRef<{ from: Element; to: string[] } | null>(null);
+  const moveFocusOn = (e: Event | undefined, ...to: string[]) => {
+    const from = e?.currentTarget as Element | null;
+    if (from && hasFocus(from)) focusNext.current = { from, to };
+  };
+  useEffect(() => {
+    const pending = focusNext.current;
+    if (!pending || !root.current) return;
+    const active = (root.current.getRootNode() as Document | ShadowRoot).activeElement;
+    const from = pending.from as HTMLButtonElement;
+    if (!from.disabled && from.isConnected) {
+      if (active !== from) focusNext.current = null; // the candidate went on elsewhere
+      return;
+    }
+    if (active && active !== from) {
+      focusNext.current = null; // the focus is somewhere else already
+      return;
+    }
+    for (const selector of pending.to) {
+      const el = root.current.querySelector<HTMLElement>(`${selector}:not(:disabled)`);
+      if (el) {
+        focusNext.current = null;
+        el.focus();
+        return;
+      }
+    }
+  });
 
   const last = state.experiments[state.experiments.length - 1];
   const outcome = state.phase === "erupted" && last ? last.outcome : null;
@@ -73,7 +106,8 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
     frame.current = requestAnimationFrame(tick);
   };
 
-  const onPour = (viscosity: Viscosity) => {
+  const onPour = (viscosity: Viscosity, e?: Event) => {
+    moveFocusOn(e, "input[name=tablets]:checked", "[data-focus=start]");
     store.dispatch({ type: "POUR", payload: { viscosity } });
     const said = t.narrate.poured(t.viscosity[viscosity]);
     if (stepMode) {
@@ -90,8 +124,9 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
     return `${t.outcome[o]}: ${t.outcomeLong[o]}` + (s.showEruption ? ` ${t.eruption[eruption]}.` : "");
   };
 
-  const onStart = () => {
+  const onStart = (e?: Event) => {
     if (!state.viscosity) return;
+    moveFocusOn(e, "[data-focus=next]", "[data-focus=again]");
     const experiment = runExperiment(s, state.viscosity, tablets);
     store.dispatch({ type: "ERUPT", payload: { experiment } });
     const count = store.getState().experiments.length;
@@ -106,14 +141,16 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
     }
   };
 
-  const onNext = () => {
+  const onNext = (e?: Event) => {
+    moveFocusOn(e, "[data-focus=next]", "[data-focus=again]");
     const next = Math.min(3, stage + 1);
     setAnim({ count: state.experiments.length, progress: STAGES[next] });
     const said = [t.narrate.tablet(tablets), t.narrate.gas, t.narrate.rise, outcome ? outcomeText(outcome) : ""][next];
     setAnnouncement(`${t.stage(next + 1, 4)}. ${said}`);
   };
 
-  const onReset = () => {
+  const onReset = (e?: Event) => {
+    moveFocusOn(e, "[data-focus=pour]");
     cancelAnimationFrame(frame.current);
     store.dispatch({ type: "RESET", payload: {} });
     setPour(1);
@@ -136,7 +173,7 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
       : ERUPTIONS.map((e) => ({ value: e, label: t.eruption[e] }));
 
   return (
-    <div class="font-sans text-slate-900 flex flex-col gap-4" lang={s.language}>
+    <div ref={root} class="font-sans text-slate-900 flex flex-col gap-4" lang={s.language}>
       {prompt && <div class="text-base" dangerouslySetInnerHTML={{ __html: prompt }} />}
       <section aria-label={t.simulation} class="grid gap-4 md:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] items-start">
         <div class="rounded-xl border border-slate-200 bg-sky-50/40 p-2">
@@ -152,7 +189,7 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
               {s.viscosities.map((v) => (
                 <button type="button" class={state.viscosity === v && state.phase !== "empty" ? `${primary} disabled:opacity-100` : secondary} key={v}
                   aria-pressed={state.viscosity === v && state.phase !== "empty"}
-                  disabled={readOnly || state.phase !== "empty"} onClick={() => onPour(v)}>
+                  disabled={readOnly || state.phase !== "empty"} onClick={(e) => onPour(v, e)} data-focus="pour">
                   {t.pour(t.viscosity[v])}
                 </button>
               ))}
@@ -173,18 +210,18 @@ const Interaction = ({ prompt, settings: s, store, texts: t, readOnly }: {
               </fieldset>
             )}
             <div class="flex flex-wrap gap-2">
-              <button type="button" class={primary} disabled={readOnly || state.phase !== "poured"} onClick={onStart}>
+              <button type="button" class={primary} disabled={readOnly || state.phase !== "poured"} onClick={onStart} data-focus="start">
                 {t.start(tablets)}
               </button>
               {stepMode && running && (
-                <button type="button" class={primary} disabled={readOnly} onClick={onNext}>
+                <button type="button" class={primary} disabled={readOnly} onClick={onNext} data-focus="next">
                   {t.next} ({t.stage(stage + 2, 4)})
                 </button>
               )}
             </div>
           </div>
           <div>
-            <button type="button" class={secondary} disabled={readOnly || state.phase === "empty"} onClick={onReset}>{t.again}</button>
+            <button type="button" class={secondary} disabled={readOnly || state.phase === "empty"} onClick={onReset} data-focus="again">{t.again}</button>
           </div>
           <p role="status" aria-live="polite" class="min-h-6 text-sm text-slate-700">{announcement}</p>
           {outcome && progress >= 1 && (

@@ -25,6 +25,16 @@ const status = (canvas: Canvas) => canvas.getByRole("status").textContent;
 const CABINET = ["Base", "Left side", "Right side", "Back panel", "Top", "Shelf", "Hinges", "Door", "Knob", "Hinge screws"];
 const CABINET_IDS = "base,sideLeft,sideRight,back,top,shelf,hinges,door,knob,screws";
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "Assembly order, to try" };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);

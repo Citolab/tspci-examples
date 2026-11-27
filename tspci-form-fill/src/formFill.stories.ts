@@ -35,6 +35,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Form fill, to try" };
+
 export const FillInTheWaybill: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

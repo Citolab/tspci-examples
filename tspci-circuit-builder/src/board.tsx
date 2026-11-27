@@ -6,6 +6,9 @@ import {
 import { CELL_UNITS, PartSymbol, sidePoint } from "./symbols";
 import { Texts } from "./texts";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
 // The board with the palette and the tools: used by the candidate (interaction.tsx) and the author (authoring.tsx).
 // Parts are placed by dragging from the palette, or by choosing a palette part and then a cell; the keyboard does
 // everything too. Open ends and joints are marked from the analysis (circuit.ts).
@@ -310,7 +313,13 @@ const Board = ({ circuit, locked, parts, start, onChange, texts, showOpenEnds = 
               <button type="button" className={iconButton} disabled={!selected} onClick={() => turn(cursor.x, cursor.y)} data-testid="rotate">
                 <span aria-hidden="true">⟳</span>{t.rotate}
               </button>
-              <button type="button" className={iconButton} disabled={!selected} onClick={() => removeAt(cursor.x, cursor.y)} data-testid="delete">
+              <button type="button" className={iconButton} disabled={!selected} data-testid="delete"
+                onClick={(e) => {
+                  // the button is disabled once the part is gone: the focus goes back to the board, not to the page
+                  const back = hasFocus(e.currentTarget as Element) && !!partAt(parts, cursor.x, cursor.y) && !partAt(locked, cursor.x, cursor.y);
+                  removeAt(cursor.x, cursor.y);
+                  if (back) setTimeout(() => boardRef.current?.focus()); // after the key event: an Enter must not also reach the board
+                }}>
                 <span aria-hidden="true">✕</span>{t.remove}
               </button>
               {lampTool && (

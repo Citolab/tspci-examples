@@ -211,6 +211,8 @@ const Board = ({
     if (key === "Delete" || key === "Backspace") {
       e.preventDefault();
       remove(id);
+      // the focus goes with the card, back in the list (it would be lost with the slider)
+      setTimeout(() => rootRef.current?.querySelector<HTMLElement>(`[data-testid="tray"] [data-event="${CSS.escape(id)}"]`)?.focus());
       return;
     }
     const dir = key === "ArrowLeft" || key === "ArrowDown" ? -1 : key === "ArrowRight" || key === "ArrowUp" ? 1 : 0;
@@ -518,9 +520,10 @@ const Board = ({
               {it.out < 0 && <span aria-hidden="true" className="mr-1 text-sky-800">◀</span>}
               <CardFace event={e} value={shown} compact />
               {it.out > 0 && <span aria-hidden="true" className="ml-auto pl-1 text-sky-800">▶</span>}
+              {/* remove: on hover, and on the card with the focus (a tap focuses it: a touchscreen has no hover) */}
               {!readOnly && (
                 <button type="button" tabIndex={-1} aria-label={`${texts.remove}: ${e.text || e.id}`} title={texts.remove}
-                  className="absolute -right-2 -top-2 hidden h-5 w-5 items-center justify-center rounded-full border border-slate-300 bg-white text-xs leading-none text-slate-600 hover:bg-rose-50 group-hover:flex group-focus-visible:flex"
+                  className="absolute -right-2.5 -top-2.5 hidden size-6 items-center justify-center rounded-full border border-slate-300 bg-white text-xs leading-none text-slate-600 hover:bg-rose-50 group-hover:flex group-focus-visible:flex group-focus-within:flex"
                   onPointerDown={(ev) => ev.stopPropagation()} onClick={(ev) => { ev.stopPropagation(); remove(it.id); }}>
                   ×
                 </button>

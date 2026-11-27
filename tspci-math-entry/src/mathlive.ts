@@ -52,7 +52,42 @@ export const createMathfield = (host: HTMLElement, options: { whiteSpace: boolea
   const style = document.createElement("style");
   style.textContent = ".ML__placeholder-selected + .ML__caret::after { left: -0.7em; }";
   mf.shadowRoot?.appendChild(style);
+  tabOutOfShadowRoots(mf);
   return mf;
+};
+
+/**
+ * Tab and Shift+Tab out of the field. MathLive moves the focus itself when Tab leaves the field, but it only looks at
+ * the page outside shadow roots: from a field inside the PCI's shadow root, Tab jumped to the first control of the page
+ * and Shift+Tab did not leave. This moves the focus to the control before or after the field instead, shadow roots
+ * included (Tab between the slots of a fraction stays MathLive's).
+ */
+const tabOutOfShadowRoots = (mf: MathfieldElement) => {
+  let tab = false;
+  mf.addEventListener("keydown", (e) => (tab = e.key === "Tab"), { capture: true });
+  mf.addEventListener("move-out", (e) => {
+    if (!tab) return;
+    tab = false;
+    const backward = (e as CustomEvent<{ direction: string }>).detail?.direction === "backward";
+    const all = tabbables(document.body);
+    const next = all[all.indexOf(mf) + (backward ? -1 : 1)];
+    if (!next) return; // the first or last control of the page: MathLive's own way
+    e.preventDefault();
+    next.focus();
+  });
+};
+
+/** The controls Tab reaches, in the order of the page, inside open shadow roots too (a math field is one control). */
+const tabbables = (root: Element | ShadowRoot): HTMLElement[] => {
+  const out: HTMLElement[] = [];
+  for (const el of Array.from(root.children) as HTMLElement[]) {
+    const focusable = el.tagName === "MATH-FIELD" || (el.matches("a[href], button, input, select, textarea, [tabindex]") && el.tabIndex >= 0);
+    if (focusable && !(el as HTMLButtonElement).disabled && el.getClientRects().length && getComputedStyle(el).visibility !== "hidden") out.push(el);
+    if (el.tagName === "MATH-FIELD") continue;
+    if (el.shadowRoot) out.push(...tabbables(el.shadowRoot));
+    out.push(...tabbables(el));
+  }
+  return out;
 };
 
 /**

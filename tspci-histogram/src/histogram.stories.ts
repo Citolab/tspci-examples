@@ -48,6 +48,9 @@ const drag = async (canvas: Canvas, label: string, value: number, max = 10) => {
   await afterPaint();
 };
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Histogram, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -150,6 +153,25 @@ export const DragAndType: Story = {
       expect(box(canvas, "10–20")).toHaveValue("9");
       expect(canvas.getByRole("status")).toHaveTextContent("10–20: 9 (rounded to the grid).");
       expect(heights(pci.getResponse())).toEqual([4, 9, 8, 6, 3]);
+    });
+
+    await step("a quick tap (let go before the next render) sets one bar, and the next drag moves only its own bar", async () => {
+      const column = slider(canvas, "0–10").querySelector("rect")!;
+      const r = column.getBoundingClientRect();
+      const plotH = r.height - 14;
+      const x = r.left + r.width / 2;
+      const y = r.bottom - (2 / 10) * plotH;
+      column.dispatchEvent(pointer("pointerdown", y, x));
+      window.dispatchEvent(pointer("pointerup", y, x)); // no paint in between, as a finger tap can be
+      await afterPaint();
+      expect(slider(canvas, "0–10")).toHaveAttribute("aria-valuenow", "2");
+      // a finger that moves afterwards (to drag something else) does not move this bar any more
+      window.dispatchEvent(pointer("pointermove", r.top, x));
+      window.dispatchEvent(pointer("pointerup", r.top, x));
+      await afterPaint();
+      expect(slider(canvas, "0–10")).toHaveAttribute("aria-valuenow", "2");
+      await drag(canvas, "40–50", 5);
+      expect(values(canvas)).toEqual([2, 9, 8, 6, 5]);
     });
   },
 };

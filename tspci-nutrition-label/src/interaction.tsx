@@ -94,7 +94,7 @@ const ProductCard = ({ product, plan, settings, texts, uid, open, onToggle, read
         <GroupChip product={product} texts={texts} />
       </div>
       {product.portion > 0 && <p className="m-0 text-xs text-slate-600">{texts.portionOf(product.portionLabel, formatNumber(product.portion, lang, 1))}</p>}
-      <button type="button" className="self-start text-sm font-medium text-sky-800 underline decoration-sky-800/40 underline-offset-2 hover:decoration-sky-800"
+      <button type="button" className="min-h-6 self-start text-sm font-medium text-sky-800 underline decoration-sky-800/40 underline-offset-2 hover:decoration-sky-800"
         aria-label={`${texts.openLabel}: ${product.name}`} aria-expanded={open} aria-controls={labelId} onClick={onToggle} data-testid={`toggle-${product.id}`}>
         <span aria-hidden="true" className="inline-block w-3">{open ? "▾" : "▸"}</span> {open ? texts.hideLabel : texts.openLabel}
       </button>
@@ -280,6 +280,12 @@ const Interaction = ({ prompt, plan, settings, store, texts, readOnly }: {
   const kj = (c: Record<string, number>) => formatNumber(totals(c, products).energyKj ?? 0, lang, 0);
   const amountLabel = (e: Entry) => `${amountText(e.amount, lang)} ${e.unit === "g" ? texts.grams : texts.portions(e.amount)}`;
   const setEntries = (next: Entry[]) => store.dispatch({ type: "SET_ENTRIES", payload: { entries: next } });
+  // after removing from the meal the focus is not lost: it goes to the next product's remove button, or the heading
+  const mealRef = useRef<HTMLElement>(null);
+  const focusInMeal = (product: string | null) => setTimeout(() => {
+    const next = product ? mealRef.current?.querySelector<HTMLElement>(`[data-testid="remove-${CSS.escape(product)}"]`) : null;
+    (next ?? mealRef.current?.querySelector<HTMLElement>("h2"))?.focus();
+  });
   const name = (id: string) => products.find((p) => p.id === id)?.name ?? id;
   const refuse = (message: string) => { setHint(message); setStatus(message); };
   const allOpen = products.every((p) => open[p.id]);
@@ -293,7 +299,7 @@ const Interaction = ({ prompt, plan, settings, store, texts, readOnly }: {
         <section className="flex min-w-0 flex-col gap-2" aria-labelledby={`${uid}-products`}>
           <div className="flex flex-wrap items-center gap-2">
             <h2 id={`${uid}-products`} className="m-0 mr-auto text-sm font-semibold tracking-wide text-slate-600 uppercase">{texts.products}</h2>
-            <button type="button" className="text-xs font-medium text-sky-800 underline underline-offset-2" data-testid="toggle-all"
+            <button type="button" className="min-h-6 text-xs font-medium text-sky-800 underline underline-offset-2" data-testid="toggle-all"
               onClick={() => setOpen(Object.fromEntries(products.map((p) => [p.id, !allOpen])))}>
               {allOpen ? texts.hideAll : texts.openAll}
             </button>
@@ -316,16 +322,16 @@ const Interaction = ({ prompt, plan, settings, store, texts, readOnly }: {
         </section>
 
         {!select && (
-          <section className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 @3xl:sticky @3xl:top-2" aria-labelledby={`${uid}-meal`}>
+          <section ref={mealRef} className="flex min-w-0 flex-col gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 @3xl:sticky @3xl:top-2" aria-labelledby={`${uid}-meal`}>
             <div className="flex flex-wrap items-baseline gap-2">
-              <h2 id={`${uid}-meal`} className="m-0 mr-auto text-base font-semibold text-slate-900">{texts.meal}</h2>
+              <h2 id={`${uid}-meal`} tabIndex={-1} className="m-0 mr-auto text-base font-semibold text-slate-900">{texts.meal}</h2>
               <span className="text-xs text-slate-600" data-testid="count">{texts.products1(Object.keys(comp).length)}</span>
             </div>
             {entries.length === 0 ? (
               <p className="m-0 text-sm text-slate-600">{texts.mealEmpty}</p>
             ) : (
               <ul className="m-0 list-none rounded-lg bg-white px-3 p-0 ring-1 ring-slate-200" data-testid="meal">
-                {entries.map((e) => {
+                {entries.map((e, i) => {
                   const product = products.find((p) => p.id === e.product);
                   if (!product) return null;
                   return (
@@ -340,6 +346,7 @@ const Interaction = ({ prompt, plan, settings, store, texts, readOnly }: {
                         const next = entries.filter((x) => x.product !== e.product);
                         setEntries(next);
                         setStatus(texts.status.removed(product.name, kj(composition(next, products))));
+                        focusInMeal((entries[i + 1] ?? entries[i - 1])?.product ?? null);
                       }} />
                   );
                 })}
@@ -348,7 +355,7 @@ const Interaction = ({ prompt, plan, settings, store, texts, readOnly }: {
             {hint && <p className="m-0 text-xs font-medium text-rose-800" data-testid="hint"><span aria-hidden="true">⚠ </span>{hint}</p>}
             {!readOnly && entries.length > 0 && (
               <button type="button" className={`${secondary} self-start`} data-testid="clear"
-                onClick={() => { setEntries([]); setStatus(texts.status.cleared); }}>{texts.clear}</button>
+                onClick={() => { setEntries([]); setStatus(texts.status.cleared); focusInMeal(null); }}>{texts.clear}</button>
             )}
             {settings.showTotals && (
               <>

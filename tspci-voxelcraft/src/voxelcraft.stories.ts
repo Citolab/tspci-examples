@@ -253,6 +253,13 @@ export const StartingFigureAndStartOver: Story = {
     await userEvent.click(within(dialog).getByRole("button", { name: "Cancel" }));
     expect(canvas.queryByRole("alertdialog")).not.toBeInTheDocument();
     expect(count(mounted)).toBe("3 cubes");
+    // the focus goes back to the button that opened it, also with Escape
+    const startOver = canvas.getByRole("button", { name: "Start over" });
+    await waitFor(() => expect((mounted.root as ShadowRoot).activeElement).toBe(startOver));
+    await userEvent.click(startOver);
+    canvas.getByRole("alertdialog").dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true }));
+    await waitFor(() => expect(canvas.queryByRole("alertdialog")).not.toBeInTheDocument());
+    await waitFor(() => expect((mounted.root as ShadowRoot).activeElement).toBe(startOver));
 
     await userEvent.click(canvas.getByRole("button", { name: "Start over" }));
     dialog = canvas.getByRole("alertdialog");
@@ -514,3 +521,6 @@ export const Authoring: Story = {
     expect(host.shadowRoot!.querySelector('[role="tablist"]')).toBeNull();
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Voxelcraft, to try" };

@@ -345,3 +345,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     ]);
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Sun, Earth and seasons, to try" };

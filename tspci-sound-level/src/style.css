@@ -30,17 +30,18 @@
 .range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
-  margin-top: -7px;
+  /* at least 24 px, for a finger; centred on the track: (8 - 26) / 2 */
+  width: 26px;
+  height: 26px;
+  margin-top: -9px;
   border-radius: 9999px;
   background: #fff;
   border: 3px solid #0f766e;
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.3);
 }
 .range::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   border-radius: 9999px;
   background: #fff;
   border: 3px solid #0f766e;

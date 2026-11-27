@@ -29,14 +29,14 @@ export function DigitalClock({ config, store, readOnly }: Props) {
 
     const display = (
         <>
-            <EditHour config={config} hour={hour}></EditHour>
+            {EditHour({ config, hour })}
             <p className="text-[5em] leading-none m-0">
                 <Digits font={font} skinGhost={skin.ghost} className={skin.hour[mode]}>{displayTime("hour", hour, is12Hour)}</Digits>
                 {/* the colon of the display font sits low: lift it to the middle of the digits */}
                 <span className={`relative ${font ? "top-[-0.08em] font-bold" : "top-[-0.19em]"} ${skin.colon[mode]}`} style={{ fontFamily: font ?? undefined }}>:</span>
                 <Digits font={font} skinGhost={skin.ghost} className={skin.minute}>{displayTime("minute", minute, is12Hour)}</Digits>
             </p>
-            <EditMinute config={config} minute={minute}></EditMinute>
+            {EditMinute({ config, minute })}
         </>
     );
 
@@ -81,12 +81,15 @@ export function DigitalClock({ config, store, readOnly }: Props) {
 
     }
 
+    // EditHour, EditMinute, ArrowUp and ArrowDown are called as functions, not used as components (<ArrowUp />): a
+    // component defined in here is a new one on every render, so its buttons would be replaced, and lose the focus,
+    // with every press.
     function EditHour({ config, hour }: { config: PropTypes, hour: number }) {
         if (config.typeOfQuestion === "askTime") return null;
         return (
             <div className="flex flex-col">
-                <ArrowUp type="hour" digit={hour}></ArrowUp>
-                <ArrowDown type="hour" digit={hour}></ArrowDown>
+                {ArrowUp({ type: "hour", digit: hour })}
+                {ArrowDown({ type: "hour", digit: hour })}
             </div>
         )
     }
@@ -95,8 +98,8 @@ export function DigitalClock({ config, store, readOnly }: Props) {
         if (config.typeOfQuestion === "askTime") return null;
         return (
             <div className="flex flex-col">
-                <ArrowUp type="minute" digit={minute}></ArrowUp>
-                <ArrowDown type="minute" digit={minute}></ArrowDown>
+                {ArrowUp({ type: "minute", digit: minute })}
+                {ArrowDown({ type: "minute", digit: minute })}
             </div>
         )
     }
@@ -105,7 +108,7 @@ export function DigitalClock({ config, store, readOnly }: Props) {
         const arrowColour = type === "hour" ? skin.hourArrow : skin.minuteArrow;
         let jumps = type === "minute" ? Number(config.minutePerJumps) : 1;
         return (
-            <button disabled={readOnly} className="disabled:opacity-40" onClick={() => wrapTime(type, digit + jumps)}>
+            <button type="button" disabled={readOnly} className="disabled:opacity-40" aria-label={type === "hour" ? "Hour up" : "Minutes up"} onClick={() => wrapTime(type, digit + jumps)}>
                 <svg className={arrowColour + (readOnly ? "" : " cursor-pointer")} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m18 15-6-6-6 6" />
                 </svg>
@@ -117,7 +120,7 @@ export function DigitalClock({ config, store, readOnly }: Props) {
         const arrowColour = type === "hour" ? skin.hourArrow : skin.minuteArrow;
         let jumps = type === "minute" ? Number(config.minutePerJumps) : 1;
         return (
-            <button disabled={readOnly} className="disabled:opacity-40" onClick={() => wrapTime(type, digit - jumps)}>
+            <button type="button" disabled={readOnly} className="disabled:opacity-40" aria-label={type === "hour" ? "Hour down" : "Minutes down"} onClick={() => wrapTime(type, digit - jumps)}>
                 <svg className={arrowColour + (readOnly ? "" : " cursor-pointer")} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="m6 9 6 6 6-6" />
                 </svg>

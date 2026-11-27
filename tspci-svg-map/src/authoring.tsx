@@ -109,7 +109,7 @@ const Authoring = ({ initial, layer, resolution, language, onChange }: {
       <div className="flex flex-wrap items-start gap-4">
         <div className="min-w-[280px] flex-[3_1_420px] overflow-hidden rounded-lg border border-slate-200 bg-white">
           {map && (
-            <MapCanvas map={map} maxHeight={70} aria-label={t.map} className="mx-auto block h-auto cursor-crosshair touch-none select-none"
+            <MapCanvas map={map} maxHeight={70} aria-label={t.map} className="mx-auto block h-auto cursor-crosshair touch-manipulation select-none"
               onPointerMove={(e, at, px) => setHover(at ? nearestNode(map, at.x, at.y, 16 * px) : null)}
               onPointerLeave={() => setHover(null)}
               onPointerUp={(e, at, px) => {
@@ -171,7 +171,7 @@ const Authoring = ({ initial, layer, resolution, language, onChange }: {
               {Object.entries(poi).map(([n, id]) => (
                 <li key={n} className="flex items-center gap-2">
                   <span className={`size-3 shrink-0 rounded-full ${n === "start" ? "bg-green-700" : "bg-amber-500"}`} />
-                  <button type="button" className="truncate text-left hover:underline" onClick={() => { setSelected(id); setName(n === "start" ? "" : n); }}>
+                  <button type="button" className="min-h-6 truncate text-left hover:underline" onClick={() => { setSelected(id); setName(n === "start" ? "" : n); }}>
                     {n === "start" ? t.start : n}
                   </button>
                   <span className="text-xs text-slate-500 tabular-nums">#{id}</span>
@@ -193,7 +193,7 @@ const Authoring = ({ initial, layer, resolution, language, onChange }: {
                     </>
                   )}
                   <button type="button" aria-label={t.remove(n === "start" ? t.start : n)} title={t.remove(n === "start" ? t.start : n)}
-                    className={`${n === "start" ? "ml-auto " : ""}grid size-6 place-items-center rounded-md text-slate-500 hover:bg-slate-200 hover:text-slate-800`}
+                    className={`${n === "start" ? "ml-auto " : ""}grid size-6 shrink-0 place-items-center rounded-md text-slate-500 hover:bg-slate-200 hover:text-slate-800`}
                     onClick={() => {
                       const next = { ...poi };
                       delete next[n];

@@ -86,6 +86,8 @@ const Interaction = ({ session, store, texts, nickname, startText, endText, read
   const send = () => {
     session.say(draft);
     setDraft("");
+    // sent with the button (a tap on a tablet): back to the input, so the next idea can be typed right away
+    input.current?.focus({ preventScroll: true });
   };
   const percent = Math.round(session.remaining * 100);
   const low = session.remaining < 0.2;

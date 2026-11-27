@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/html-vite";
 import { expect, userEvent, waitFor } from "storybook/test";
-import { lastChange, mountPci, openPci, remountPci, retype, type PciArgs } from "../../.storybook/tspci";
+import { focusedIn, lastChange, mountPci, openPci, remountPci, retype, type PciArgs } from "../../.storybook/tspci";
 import pci from "./index";
 
 const meta = {
@@ -13,6 +13,9 @@ type Story = StoryObj<PciArgs>;
 /** The x values in the table, top to bottom (the newest first). */
 const tableValues = (root: ShadowRoot | HTMLElement) =>
   [...root.querySelectorAll("tbody button[aria-pressed]")].map((b) => b.textContent);
+
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Table and graph, to try" };
 
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
@@ -39,6 +42,8 @@ export const Default: Story = {
       await userEvent.click(canvas.getByRole("button", { name: "Remove 40" }));
       expect(tableValues(root)).toEqual(["60", "50", "30"]);
       expect(pci.getResponse()).toEqual({ list: { float: [30, 50, 60] } });
+      // the focus is not lost: it goes to the remove button of the row that took its place
+      await waitFor(() => expect(focusedIn(root)).toBe(canvas.getByRole("button", { name: "Remove 30" })));
     });
 
     await step("a value is selected (and the graph shows it)", async () => {

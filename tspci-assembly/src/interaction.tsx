@@ -1,4 +1,4 @@
-import { useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
 import { Assembly, assembledAfter, blockersOfTakeBack, checkStep, nameOf, textIn, violationsOf } from "./assembly";
 import { Actions, StateModel } from "./store";
@@ -87,6 +87,16 @@ const Interaction = ({ prompt, assembly: a, store, texts: t, language, readOnly,
     setStatus(t.cleared);
   };
 
+  // Undo and Start again turn disabled when nothing is left: the focus then goes to the first part in the list, where
+  // the pupil goes on, instead of being lost
+  const list = useRef<HTMLUListElement>(null);
+  const keepFocus = (run: () => void) => (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const had = (button.getRootNode() as Document | ShadowRoot).activeElement === button;
+    run();
+    if (had) setTimeout(() => button.disabled && list.current?.querySelector<HTMLButtonElement>("button")?.focus());
+  };
+
   const onKeyDown = (e: KeyboardEvent) => {
     if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === "z") {
       e.preventDefault();
@@ -114,7 +124,7 @@ const Interaction = ({ prompt, assembly: a, store, texts: t, language, readOnly,
           <div className="h-1.5 overflow-hidden rounded-full bg-slate-100" aria-hidden="true">
             <div className="asm-bar h-full rounded-full bg-sky-600" style={{ width: `${a.parts.length ? (100 * sequence.length) / a.parts.length : 0}%` }} />
           </div>
-          <ul className="m-0 flex max-h-[420px] list-none flex-col gap-1 overflow-y-auto p-0" aria-label={t.parts}>
+          <ul ref={list} className="m-0 flex max-h-[420px] list-none flex-col gap-1 overflow-y-auto p-0" aria-label={t.parts}>
             {a.parts.map((part) => {
               const n = sequence.indexOf(part.id) + 1;
               const done = n > 0;
@@ -169,11 +179,11 @@ const Interaction = ({ prompt, assembly: a, store, texts: t, language, readOnly,
 
       {!readOnly && (
         <div className="flex flex-wrap items-center gap-2">
-          <button type="button" className={button} onClick={undo} disabled={!sequence.length}>
+          <button type="button" className={button} onClick={keepFocus(undo)} disabled={!sequence.length}>
             <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true"><path d="M7 4 3 8l4 4M3.5 8H12a5 5 0 0 1 0 10H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
             {t.undo}
           </button>
-          <button type="button" className={button} onClick={clear} disabled={!sequence.length}>{t.clear}</button>
+          <button type="button" className={button} onClick={keepFocus(clear)} disabled={!sequence.length}>{t.clear}</button>
           <button type="button" className={`${button} ml-auto`} aria-expanded={showHelp} onClick={() => setShowHelp(!showHelp)}>{t.showHelp}</button>
         </div>
       )}

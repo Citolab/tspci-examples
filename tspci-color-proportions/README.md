@@ -28,7 +28,7 @@ systems.
 
 | setting                  | attribute          | default                              | what                                                   |
 | ------------------------ | ------------------ | ------------------------------------ | ------------------------------------------------------ |
-| Instruction              | `data-instruction` | `Colour the shapes with your mouse.` | the text above the shape                               |
+| Instruction              | `data-instruction` | `Colour the shapes: tap or click them.` | the text above the shape                               |
 | Colours to choose from   | `data-colors`      | `#dc2626, #2563eb, #16a34a`          | a list of CSS colours: one button per colour           |
 | Text of the reset button | `data-reset-label` | `Start over`                         | for the item's language                                |
 | Width, height            | `data-width`, `data-height` | `360`, `500`                | size of the interaction in pixels (at least 200)       |

@@ -74,9 +74,21 @@ export const Interaction = ({ config, store, t, readOnly }: {
     setError(message);
     input.current?.focus();
   };
+  const table = useRef<HTMLTableElement>(null);
   const remove = (x: number) => {
     if (selected === x) setSelected(null);
+    // with the focus on the remove button (the keyboard; Safari does not focus a tapped button, and a tablet should
+    // not get its keyboard up): the focus goes to the remove button of the row that takes its place (or the one
+    // above), else to the input
+    const root = table.current?.getRootNode() as Document | ShadowRoot | undefined;
+    const keep = !!root?.activeElement && table.current?.contains(root.activeElement);
+    const index = rows.indexOf(x);
+    const next = rows[index + 1] ?? rows[index - 1];
     store.dispatch({ type: "REMOVE", payload: { x } });
+    if (keep) requestAnimationFrame(() => {
+      const button = next === undefined ? null : table.current?.querySelector<HTMLElement>(`[data-remove="${next}"]`);
+      (button ?? input.current)?.focus();
+    });
   };
   const select = (x: number) => setSelected(selected === x ? null : x);
 
@@ -114,7 +126,7 @@ export const Interaction = ({ config, store, t, readOnly }: {
           ))}
 
           <div className="max-h-96 overflow-auto rounded-xl border border-slate-200 bg-white">
-            <table className="w-full border-separate border-spacing-0 text-left tabular-nums">
+            <table ref={table} className="w-full border-separate border-spacing-0 text-left tabular-nums">
               <caption className="sr-only">{t.table}</caption>
               <thead className="sticky top-0 z-10 bg-slate-50 text-sm text-slate-600">
                 <tr>
@@ -139,7 +151,7 @@ export const Interaction = ({ config, store, t, readOnly }: {
                   return (
                     <tr key={x} className={`group cursor-pointer transition-colors ${isSelected ? "bg-sky-50" : index === 0 ? "animate-pop" : "hover:bg-slate-50"}`} onClick={() => select(x)}>
                       <td className={`border-b border-slate-100 px-3 py-2 font-semibold ${isSelected ? "shadow-[inset_3px_0_0_var(--color-sky-600)]" : ""}`}>
-                        <button type="button" className="cursor-pointer border-0 bg-transparent p-0 font-semibold text-slate-900 tabular-nums focus-visible:underline focus-visible:outline-none"
+                        <button type="button" className="-mx-1 min-h-6 min-w-6 cursor-pointer rounded border-0 bg-transparent px-1 py-0 font-semibold text-slate-900 tabular-nums focus-visible:underline focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-sky-600"
                           aria-pressed={isSelected} aria-label={t.select(xFormat.format(x))}
                           onClick={(e) => { e.stopPropagation(); select(x); }}>
                           {xFormat.format(x)}
@@ -154,7 +166,7 @@ export const Interaction = ({ config, store, t, readOnly }: {
                         );
                       })}
                       <td className="border-b border-slate-100 px-1 text-right">
-                        <button type="button" disabled={readOnly} aria-label={t.remove(xFormat.format(x))} title={t.remove(xFormat.format(x))}
+                        <button type="button" disabled={readOnly} data-remove={x} aria-label={t.remove(xFormat.format(x))} title={t.remove(xFormat.format(x))}
                           className="grid h-8 w-8 cursor-pointer place-items-center rounded-full border-0 bg-transparent text-slate-400 opacity-60 transition group-hover:opacity-100 hover:bg-rose-50 hover:text-rose-600 focus-visible:opacity-100 disabled:hidden"
                           onClick={(e) => { e.stopPropagation(); remove(x); }}>
                           <svg className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">

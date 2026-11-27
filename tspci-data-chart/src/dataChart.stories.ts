@@ -22,6 +22,9 @@ const chosen = (canvas: MountedPci["canvas"]) =>
 /** The part that has the focus in the PCI's shadow root. */
 const focused = (mounted: MountedPci) => focusedIn(mounted.root)?.getAttribute("aria-label");
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Data chart, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -391,7 +394,7 @@ export const AuthoringMode: StoryObj<AuthoringArgs> = {
   render: (args) => mountAuthoring(pci, args),
   args: { language: "en", width: 1040 },
   play: async ({ canvasElement, step }) => {
-    const { canvas, instance, changes } = await openAuthoring(canvasElement);
+    const { canvas, instance, changes, root } = await openAuthoring(canvasElement);
     const data = () => JSON.parse(instance.getProperties().data!);
 
     await step("starts from the example, with its correct answer", async () => {
@@ -412,6 +415,21 @@ export const AuthoringMode: StoryObj<AuthoringArgs> = {
       await userEvent.click(canvas.getByRole("button", { name: "Colour of Cycling" }));
       await userEvent.click(canvas.getByRole("button", { name: "Vermillion" }));
       expect(data().series[0].color).toBe("#D55E00");
+    });
+
+    await step("the palette closes on a tap outside it (no focus change on a tablet), and on Escape back to its button", async () => {
+      const colour = canvas.getByRole("button", { name: "Colour of Cycling" });
+      await userEvent.click(colour);
+      expect(canvas.getByTestId("palette")).toBeInTheDocument();
+      await afterPaint(); // the listener for a tap outside goes on after the palette is drawn
+      canvas.getByTestId("summary").dispatchEvent(new PointerEvent("pointerdown", { bubbles: true, composed: true, pointerType: "touch" }));
+      await afterPaint();
+      expect(canvas.queryByTestId("palette")).toBeNull();
+      await userEvent.click(colour);
+      canvas.getByRole("button", { name: "Vermillion" }).dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, composed: true }));
+      await afterPaint();
+      expect(canvas.queryByTestId("palette")).toBeNull();
+      expect(focusedIn(root)).toBe(colour);
     });
 
     await step("removing the series of the correct answer asks for a new one", async () => {

@@ -3,7 +3,7 @@
 // © DEPP (Ministère de l'Éducation nationale) / Jean-Philippe Rivière (Wiquid)
 // Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
 
-import { useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
 import { AxisKey, GraphState, Settings, formatPoint, formatValue, parseNumber, validScale } from "./graph";
 import { Actions, StateModel } from "./store";
@@ -97,9 +97,23 @@ const Interaction = ({ s, store, texts, readOnly }: {
   // a point removed elsewhere (restore, clear) is no longer selected
   const current = selected !== null && selected < state.points.length ? selected : null;
 
+  const section = useRef<HTMLElement>(null);
+  /**
+   * A removal with the focus on its button (the keyboard; Safari does not focus a tapped button): when that button is
+   * gone or disabled afterwards, the focus goes to the graph instead of nowhere.
+   */
+  const keepFocus = () => {
+    const root = section.current?.getRootNode() as Document | ShadowRoot | undefined;
+    const had = root?.activeElement as HTMLButtonElement | null | undefined;
+    if (!had || !section.current?.contains(had)) return;
+    requestAnimationFrame(() => {
+      if (!had.isConnected || had.disabled) section.current?.querySelector<SVGElement>('[data-testid="plot"]')?.focus();
+    });
+  };
   const removePoint = (index: number) => {
     const p = state.points[index];
     if (!p) return;
+    keepFocus();
     dispatch("REMOVE_POINT", { index });
     setSelected(null);
     setAnnouncement(texts.removed(pointText(p.x, p.y)));
@@ -147,7 +161,7 @@ const Interaction = ({ s, store, texts, readOnly }: {
         </section>
       )}
 
-      <section className="flex flex-col gap-2" aria-labelledby="step2">
+      <section ref={section} className="flex flex-col gap-2" aria-labelledby="step2">
         <h3 id="step2" className="m-0 text-[16px] font-semibold">{s.tableStep ? texts.step2 : texts.graphHeading}</h3>
         <div className="flex flex-wrap items-start gap-4">
           <div className="flex w-[17rem] max-w-full flex-col gap-3">
@@ -178,6 +192,7 @@ const Interaction = ({ s, store, texts, readOnly }: {
               </button>
               <button type="button" className={button} disabled={readOnly || state.points.length === 0}
                 onClick={() => {
+                  keepFocus();
                   dispatch("CLEAR_POINTS", {});
                   setSelected(null);
                   setAnnouncement(texts.cleared);
@@ -193,7 +208,7 @@ const Interaction = ({ s, store, texts, readOnly }: {
                   {state.points.map((p, i) => (
                     <li key={i} className={`flex items-center gap-1 rounded border px-2 py-0.5 ${current === i ? "border-blue-600 bg-blue-50" : "border-slate-300"}`}>
                       <span className="tabular-nums">{pointText(p.x, p.y)}{outside(p.x, p.y) ? ` – ${texts.outside}` : ""}</span>
-                      <button type="button" className="rounded px-1 text-red-700 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 disabled:opacity-50"
+                      <button type="button" className="inline-grid min-h-6 min-w-6 place-items-center rounded px-1 text-red-700 hover:bg-red-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-teal-600 disabled:opacity-50"
                         aria-label={texts.deletePointAt(pointText(p.x, p.y))} disabled={readOnly} onClick={() => removePoint(i)}>✕</button>
                     </li>
                   ))}

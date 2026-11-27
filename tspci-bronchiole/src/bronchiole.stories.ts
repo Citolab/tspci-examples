@@ -250,3 +250,9 @@ export const TwoInstances: Story = {
     expect(second.changes).toHaveLength(1);
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: the slider, the buttons and a question. */
+export const ToTry: Story = {
+  name: "Bronchiole, to try",
+  args: { properties: THRESHOLD },
+};

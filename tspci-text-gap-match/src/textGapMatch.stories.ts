@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/html-vite";
 import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
-import { lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, retype, type AuthoringArgs, type MountedPci, type PciArgs } from "../../.storybook/tspci";
+import { focusedIn, lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, retype, type AuthoringArgs, type MountedPci, type PciArgs } from "../../.storybook/tspci";
 import pci from "./index";
 
 // The defaults: the example plant with four drop zones, five labels, one label per zone
@@ -111,6 +111,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Text gap match, to try" };
+
 export const Keyboard: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);
@@ -122,6 +125,8 @@ export const Keyboard: Story = {
     await userEvent.keyboard("{Enter}");
     const zone = canvas.getByRole("button", { name: "Drop zone 2 of 4, empty" });
     await waitFor(() => expect(zone).toHaveAttribute("tabindex", "0"));
+    // the zones come before the labels: picking with the keyboard takes the focus to the first zone that takes it
+    await waitFor(() => expect(focusedIn(mounted.root)).toBe(canvas.getByRole("button", { name: /^Drop zone 1 of 4/ })));
     zone.focus();
     await userEvent.keyboard("{Enter}");
     await waitFor(() => expect(inZone(mounted, "dropzone_2")).toEqual(["Stem"]));
@@ -134,6 +139,7 @@ export const Keyboard: Story = {
     await waitFor(() => expect(canvas.getByRole("button", { name: "Seed" })).toHaveAttribute("aria-pressed", "true"));
     await userEvent.keyboard("{Escape}");
     await waitFor(() => expect(canvas.getByRole("button", { name: "Seed" })).toHaveAttribute("aria-pressed", "false"));
+    expect(focusedIn(mounted.root)).toBe(canvas.getByRole("button", { name: "Seed" })); // the focus back to the label
     expect(live(mounted)).toHaveTextContent("Cancelled.");
 
     // Delete puts a placed label back

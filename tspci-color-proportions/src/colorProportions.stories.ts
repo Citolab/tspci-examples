@@ -30,13 +30,18 @@ const pressAt = async (root: ShadowRoot | HTMLElement, part: Element) => {
   await userEvent.pointer({ keys: "[MouseLeft]", target: target!, coords: { clientX: x, clientY: y } });
 };
 
+/** The proportions to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+export const ToTry: Story = {
+  name: "Proportions, to try",
+};
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);
     const { canvas, pci, root } = mounted;
 
     await step("the standard shape: six white parts, the first colour chosen, no response", async () => {
-      expect(canvas.getByText("Colour the shapes with your mouse.")).toBeInTheDocument();
+      expect(canvas.getByText("Colour the shapes: tap or click them.")).toBeInTheDocument();
       await waitFor(() => expect(fills(root)).toEqual(["#fff", "#fff", "#fff", "#fff", "#fff", "#fff"]));
       expect(canvas.getAllByRole("radio").map((r) => r.getAttribute("aria-label"))).toEqual([RED, BLUE, GREEN, "eraser"]);
       expect(canvas.getByRole("radio", { name: RED })).toHaveAttribute("aria-checked", "true");

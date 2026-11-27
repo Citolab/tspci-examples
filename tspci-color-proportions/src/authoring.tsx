@@ -255,15 +255,19 @@ const Authoring = ({ initial, colors, language, onChange }: {
             <line x1={draft[0] * cellW} y1={draft[1] * cellH} x2={draft[2] * cellW} y2={draft[3] * cellH}
               stroke="#2563eb" stroke-width="3" stroke-dasharray="6 4" pointer-events="none" />
           )}
-          <rect x={partition.width - HANDLE / 2} y={partition.height - HANDLE / 2} width={HANDLE} height={HANDLE} rx="3"
-            fill="#fff" stroke="#2563eb" stroke-width="2" className="cursor-nwse-resize" data-testid="resize"
+          {/* the corner to drag: drawn small, with an invisible area around it big enough for a finger */}
+          <g className="cursor-nwse-resize" data-testid="resize"
             onPointerDown={(e) => {
               e.stopPropagation();
               (e.currentTarget as SVGElement).ownerSVGElement?.setPointerCapture(e.pointerId);
               setSelected(null);
               const frame = { width: Math.min(SIZE.max, partition.width * 1.5), height: Math.min(SIZE.max, partition.height * 1.5) };
               setDrag({ kind: "resize", frame, before: partition });
-            }} />
+            }}>
+            <rect x={partition.width - HANDLE * 1.5} y={partition.height - HANDLE * 1.5} width={HANDLE * 3} height={HANDLE * 3} fill="transparent" />
+            <rect x={partition.width - HANDLE / 2} y={partition.height - HANDLE / 2} width={HANDLE} height={HANDLE} rx="3"
+              fill="#fff" stroke="#2563eb" stroke-width="2" />
+          </g>
         </g>
       </svg>
 

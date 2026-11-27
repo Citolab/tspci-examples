@@ -9,6 +9,18 @@ import { stopColor, stopInk } from "./colors";
 import { SideView, TopView } from "./views";
 import { LoadScene, Pick } from "./scene3d";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
+/** A button that its own press disables would drop the keyboard focus on the page: then it goes to `to` instead. */
+const keepFocus = (e: Event, to: (root: ParentNode) => Element | null) => {
+  const b = e.currentTarget as HTMLButtonElement;
+  if (!hasFocus(b)) return;
+  setTimeout(() => {
+    if (b.disabled || !b.isConnected) (to(b.getRootNode() as ParentNode) as HTMLElement | null)?.focus();
+  });
+};
+
 // The candidate's view: the boxes to load, the 3D view, the top and side view, the buttons for the chosen box, the
 // live metrics (volume, weight, centre of gravity, axle loads) and, when the item wants it, the checks.
 
@@ -247,8 +259,8 @@ const Interaction = ({ prompt, plan, store, t, view, showMetrics, showChecks, re
               <button type="button" class={button} disabled={!chosen} onClick={() => act("up")}>▲ {t.layerUp}</button>
               <button type="button" class={button} disabled={!chosen} onClick={() => act("down")}>▼ {t.layerDown}</button>
               <span class="mx-1 h-6 w-px bg-slate-200" aria-hidden="true" />
-              <button type="button" class={button} disabled={!history.current.length} onClick={undo}>↶ {t.undo}</button>
-              <button type="button" class={button} disabled={!placed.length} onClick={clear}>{t.clear}</button>
+              <button type="button" class={button} disabled={!history.current.length} onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=box-list] button")); undo(); }}>↶ {t.undo}</button>
+              <button type="button" class={button} disabled={!placed.length} onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=box-list] button")); clear(); }}>{t.clear}</button>
               <details class="text-sm">
                 <summary class="cursor-pointer rounded-md px-2 py-1 text-sky-800 hover:bg-sky-50 focus-visible:outline-2 focus-visible:outline-sky-600">{t.help}</summary>
                 <p class="m-0 mt-1 max-w-[70ch] text-xs text-slate-600">{t.boxesHint} {t.viewHelp} {view === "3d" ? t.view3dHelp : ""}</p>

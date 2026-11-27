@@ -390,3 +390,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(instance.validate!()).toEqual(["De kandidaat kan alleen een draaischijf of een zak ontwerpen."]);
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Chance tools, to try" };

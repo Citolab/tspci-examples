@@ -39,6 +39,9 @@ const press = async (element: Element, ...keys: string[]) => {
 /** Thermometer: the y of a temperature on the drawing (−10 °C at 450, 50 °C at 70). */
 const thermoY = (c: number) => 450 - ((c + 10) / 60) * 380;
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Measuring instrument, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -86,6 +89,19 @@ export const Magnifier: Story = {
       await afterPaint();
       expect(canvas.getByTestId("lens")).toBeInTheDocument();
       fireEvent.pointerLeave(svg);
+      await afterPaint();
+      expect(canvas.queryByTestId("lens")).toBeNull();
+    });
+    await step("on a tablet (no hover): a tap puts it where the finger tapped, and it stays when the finger lifts", async () => {
+      const r = svg.getBoundingClientRect();
+      const at = { pointerType: "touch", clientX: r.left + r.width / 2, clientY: r.top + r.height * 0.3 };
+      fireEvent.pointerDown(svg, at);
+      fireEvent.pointerUp(svg, at);
+      fireEvent.pointerLeave(svg, { pointerType: "touch" });
+      await afterPaint();
+      const [, , , h] = svg.getAttribute("viewBox")!.split(" ").map(Number);
+      expect(Number(canvas.getByTestId("lens").querySelector("circle")!.getAttribute("cy"))).toBeCloseTo(h * 0.3, 0);
+      fireEvent.pointerLeave(svg, { pointerType: "mouse" }); // a mouse that leaves takes it away again
       await afterPaint();
       expect(canvas.queryByTestId("lens")).toBeNull();
     });

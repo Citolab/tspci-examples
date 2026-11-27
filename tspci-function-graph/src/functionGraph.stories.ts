@@ -72,6 +72,9 @@ const coordinates = (canvas: Canvas, name: RegExp | string) =>
 
 const family = (canvas: Canvas, name: string) => canvas.getByRole("button", { name });
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Function graph, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const { canvas, pci } = await openPci(canvasElement);

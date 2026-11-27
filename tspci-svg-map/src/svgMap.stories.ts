@@ -368,3 +368,6 @@ export const AuthoringOwnMap: StoryObj<AuthoringArgs> = {
     expect(instance.validate()).toEqual([]);
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "SVG map, to try" };

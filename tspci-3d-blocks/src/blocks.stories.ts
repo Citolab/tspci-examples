@@ -58,6 +58,9 @@ const click = (canvas: HTMLCanvasElement, fx: number, fy: number) => {
 const FRONT_MIDDLE: [number, number] = [0.5, 0.7];
 const ON_TOP_OF_FRONT_MIDDLE: [number, number] = [0.5, 0.655];
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "3D blocks, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);

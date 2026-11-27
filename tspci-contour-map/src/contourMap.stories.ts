@@ -484,3 +484,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(instance.validate()).toEqual(["Er zijn geen opdrachten."]);
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Contour map, to try" };

@@ -304,3 +304,32 @@ export const Review: Story = {
     expect(field(mounted, "score")).toBe(1);
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Volcano model, to try" };
+
+/** Each step's button is disabled once pressed: the keyboard focus moves on to the next step, not to the page. */
+export const FocusFollowsTheSteps: Story = {
+  args: { properties: { animation: "steps" } },
+  play: async ({ canvasElement }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    const focused = () => (root as ShadowRoot).activeElement;
+    /** Enter on a focused button: a click while it has the focus */
+    const enter = (button: HTMLElement) => {
+      button.focus();
+      button.click();
+    };
+    enter(canvas.getByRole("button", { name: "Pour runny mashed potato" }));
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("radio", { name: "1 tablet" })));
+    enter(canvas.getByRole("button", { name: "Put in the tablet and close" }));
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Next step (Stage 2 of 4)" })));
+    for (const stage of [2, 3]) {
+      enter(canvas.getByRole("button", { name: `Next step (Stage ${stage} of 4)` }));
+      await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: `Next step (Stage ${stage + 1} of 4)` })));
+    }
+    enter(canvas.getByRole("button", { name: "Next step (Stage 4 of 4)" }));
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Start again" })));
+    enter(canvas.getByRole("button", { name: "Start again" }));
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Pour runny mashed potato" })));
+  },
+};

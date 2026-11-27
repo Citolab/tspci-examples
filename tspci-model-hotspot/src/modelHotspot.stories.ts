@@ -22,6 +22,19 @@ const slide = async (input: HTMLElement, value: number) => {
 /** The 3D scene, when the browser has WebGL (for picking by raycasting); null without. */
 const sceneOf = (canvas: Canvas) => (canvas.getByTestId("model") as any).hotspotScene ?? null;
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "3D model hotspot, to try" };
+
+/** Labelling, without a play function: to try by hand. */
+export const LabelModeToTry: Story = { name: "Label mode, to try", args: { properties: { model: "flower", mode: "label" } } };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -72,6 +85,32 @@ export const ClickInTheModel: Story = {
     await afterPaint();
     expect(pci.getResponse()).toEqual({ base: { identifier: "cornea" } });
     expect(part(canvas, "Part A")).toHaveAttribute("aria-pressed", "true");
+  },
+};
+
+/** A finger tap moves a little: up to 10 px it still picks the part; a mouse that moves that far turns the model. */
+export const TapWithAWobblyFinger: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    const scene = sceneOf(canvas);
+    if (!scene) return; // no WebGL here: the list is the way
+    await waitFor(() => expect(scene.pointOn("cornea")).not.toBeNull());
+    const at = scene.pointOn("cornea");
+    const target = scene.canvas as HTMLCanvasElement;
+    const tap = (pointerType: string) => {
+      const event = (dx: number) => ({ clientX: at.x + dx, clientY: at.y, bubbles: true, pointerId: 1, button: 0, isPrimary: true, pointerType });
+      target.dispatchEvent(new PointerEvent("pointerdown", event(0)));
+      target.dispatchEvent(new PointerEvent("pointermove", event(7)));
+      target.dispatchEvent(new PointerEvent("pointerup", event(7)));
+    };
+    tap("mouse");
+    await afterPaint();
+    expect(pci.getResponse()).toBeUndefined();
+    scene.resetView();
+    await waitFor(() => expect(scene.pointOn("cornea")).not.toBeNull());
+    tap("touch");
+    await afterPaint();
+    expect(pci.getResponse()).toEqual({ base: { identifier: "cornea" } });
   },
 };
 

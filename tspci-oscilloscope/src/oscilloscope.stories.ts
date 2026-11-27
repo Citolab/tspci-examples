@@ -28,6 +28,9 @@ const press = async (button: HTMLElement, times: number) => {
   for (let i = 0; i < times; i++) await userEvent.click(button);
 };
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Oscilloscope, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);

@@ -62,6 +62,11 @@ const hit = (mounted: MountedPci, element: Element) => {
   return (mounted.root as ShadowRoot).elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
 };
 
+/** The ratio table to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+export const ToTry: Story = {
+  name: "Ratio table, to try",
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);
@@ -158,6 +163,13 @@ export const Columns: Story = {
       await userEvent.click(removeButton(mounted, 3)!);
       expect(values(mounted)).toEqual(["20", "12", "", ""]);
       expect(removeButton(mounted, 1)).toBeNull();
+    });
+
+    await step("after adding or removing a column the focus goes to a box, not lost with the button", async () => {
+      await userEvent.click(addAtEnd(mounted));
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(cell(mounted, 1, 3)));
+      await userEvent.click(removeButton(mounted, 3)!);
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(cell(mounted, 1, 2)));
     });
   },
 };

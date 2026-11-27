@@ -229,13 +229,22 @@ const Builder = ({ molecule: m, onChange, elements, texts: t, showFormula, showV
   const effectiveView: View = noWebgl ? "2d" : view;
   const labelSuffix = prompt ? `: ${prompt}` : "";
 
+  // a button that turns disabled by its own action (Delete, Undo, Start again) would lose the focus: it goes to the
+  // first atom of the palette instead, where the pupil goes on
+  const palette = useRef<HTMLDivElement>(null);
+  const keepFocus = (run: () => void) => (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const had = (button.getRootNode() as Document | ShadowRoot).activeElement === button;
+    run();
+    if (had) setTimeout(() => button.disabled && palette.current?.querySelector<HTMLButtonElement>("button")?.focus());
+  };
   const button = "inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm text-slate-700 shadow-sm hover:bg-slate-50 disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-sky-600 aria-pressed:border-amber-500 aria-pressed:bg-amber-50 aria-pressed:text-amber-900";
 
   return (
     <div className="flex flex-col gap-2.5" data-testid="builder">
       {!readOnly && (
         <div className="flex flex-wrap items-center gap-2">
-          <div role="group" aria-label={t.palette} className="flex flex-wrap gap-1.5" data-testid="palette">
+          <div ref={palette} role="group" aria-label={t.palette} className="flex flex-wrap gap-1.5" data-testid="palette">
             {elements.map((el) => {
               const e = ELEMENTS[el];
               const label = t.add(t.name[el], el, e.valence);
@@ -254,9 +263,9 @@ const Builder = ({ molecule: m, onChange, elements, texts: t, showFormula, showV
           <button type="button" className={button} aria-pressed={connectFrom !== null} disabled={!m.atoms.length} onClick={connect} data-testid="connect">
             <span aria-hidden="true">⌁</span>{t.connect}
           </button>
-          <button type="button" className={button} disabled={selected === null} onClick={removeSelected} data-testid="remove">{t.remove}</button>
-          <button type="button" className={button} disabled={!history.current.length} onClick={undo} data-testid="undo">{t.undo}</button>
-          <button type="button" className={button} disabled={!m.atoms.length} onClick={clear} data-testid="clear">{t.clear}</button>
+          <button type="button" className={button} disabled={selected === null} onClick={keepFocus(removeSelected)} data-testid="remove">{t.remove}</button>
+          <button type="button" className={button} disabled={!history.current.length} onClick={keepFocus(undo)} data-testid="undo">{t.undo}</button>
+          <button type="button" className={button} disabled={!m.atoms.length} onClick={keepFocus(clear)} data-testid="clear">{t.clear}</button>
           <button type="button" className={button} aria-expanded={help} onClick={() => setHelp(!help)} data-testid="help">{t.help}</button>
         </div>
       )}

@@ -21,7 +21,7 @@ const en = {
   pointAt: (name: string) => `point ${name}`,
   help:
     "Drag from the point to draw the arrow; drag the arrow head to change it. With the keyboard: Tab to an arrow, " +
-    "← and → turn it, ↑ and ↓ make it longer or shorter, Shift for bigger steps; the first arrow key draws a 1 cm arrow " +
+    "← and → turn it, ↑ and ↓ make it longer or shorter (Page Up and Page Down: a bigger step), Shift for bigger steps; the first arrow key draws a 1 cm arrow " +
     "in that direction. Delete removes the arrow.",
   helpFree: "Alt with the arrow keys moves the start of the arrow.",
   helpRuler: "The ruler: drag it, or turn it with the round handle. With the keyboard: the arrow keys move it, Page Up and Page Down turn it.",
@@ -72,7 +72,7 @@ const nl: typeof en = {
   pointAt: (name: string) => `punt ${name}`,
   help:
     "Sleep vanaf het punt om de pijl te tekenen; sleep de punt van de pijl om hem te veranderen. Met het toetsenbord: Tab " +
-    "naar een pijl, ← en → draaien hem, ↑ en ↓ maken hem langer of korter, Shift voor grotere stappen; de eerste pijltjestoets " +
+    "naar een pijl, ← en → draaien hem, ↑ en ↓ maken hem langer of korter (Page Up en Page Down: een grotere stap), Shift voor grotere stappen; de eerste pijltjestoets " +
     "tekent een pijl van 1 cm in die richting. Delete verwijdert de pijl.",
   helpFree: "Alt met de pijltjestoetsen verplaatst het begin van de pijl.",
   helpRuler: "De meetlat: sleep hem, of draai hem met het ronde handvat. Met het toetsenbord: de pijltjestoetsen verplaatsen hem, Page Up en Page Down draaien hem.",

@@ -36,6 +36,16 @@ const shapeName = (canvas: Canvas) => canvas.getByTestId("shape-name").textConte
 const planeRecord = (plane: { offset: number; tilt: number; turn: number }) => ({ record: [{ name: "plane", base: { string: JSON.stringify(plane) } }] });
 const HEX_TILT = "54.7356";
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "Cross-section, to try" };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en" },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);

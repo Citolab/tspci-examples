@@ -294,3 +294,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(instance.getProperties()).toEqual({ customImage: "" });
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Equal expressions, to try" };

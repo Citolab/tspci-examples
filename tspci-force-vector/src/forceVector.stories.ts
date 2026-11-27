@@ -40,6 +40,9 @@ const press = async (element: HTMLElement | SVGElement, ...keys: string[]) => {
   await afterPaint();
 };
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Force vector, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -100,6 +103,12 @@ export const Keyboard: Story = {
       await press(arrow, "{ArrowLeft}", "{Shift>}{ArrowRight}{/Shift}");
       expect(values(mounted)).toEqual([7, 4.75, 256, 2.9]);
       expect(mounted.canvas.getByTestId("announce")).toHaveTextContent("Fg: 29 N (2.9 cm), direction 256°, point P");
+    });
+    await step("Page Up and Page Down, as on a slider: 1 cm longer or shorter", async () => {
+      await press(arrow, "{PageUp}");
+      expect(values(mounted)).toEqual([7, 4.75, 256, 3.9]);
+      await press(arrow, "{PageDown}", "{PageDown}");
+      expect(values(mounted)).toEqual([7, 4.75, 256, 1.9]);
     });
     await step("Delete removes it", async () => {
       await press(arrow, "{Delete}");

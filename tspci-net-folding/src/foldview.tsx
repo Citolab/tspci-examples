@@ -62,17 +62,32 @@ export const FoldView = ({ faces, solid, looks, t, language, description, onPick
     scene.current?.setProgress(progress / 100);
   }, [progress]);
 
-  const animateTo = (target: number) => {
+  const animateTo = (target: number, done?: () => void) => {
     cancelAnimationFrame(animation.current);
-    if (reduced) return setProgress(target);
+    if (reduced) {
+      setProgress(target);
+      if (done) setTimeout(done);
+      return;
+    }
     const from = progress, start = performance.now(), duration = 1100 * Math.abs(target - from) / 100;
     const step = (now: number) => {
       const k = duration ? Math.min(1, (now - start) / duration) : 1;
       const eased = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
       setProgress(Math.round((from + (target - from) * eased) * 10) / 10);
       if (k < 1) animation.current = requestAnimationFrame(step);
+      else if (done) setTimeout(done);
     };
     animation.current = requestAnimationFrame(step);
+  };
+
+  // Fold up and Unfold turn disabled once the net is folded or flat: the focus then goes to the other one, instead of
+  // being lost with the disabled button
+  const foldButton = useRef<HTMLButtonElement>(null);
+  const unfoldButton = useRef<HTMLButtonElement>(null);
+  const go = (target: number) => (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const had = (button.getRootNode() as Document | ShadowRoot).activeElement === button;
+    animateTo(target, had ? () => button.disabled && (target >= 100 ? unfoldButton : foldButton).current?.focus() : undefined);
   };
 
   const keydown = (e: KeyboardEvent) => {
@@ -104,12 +119,12 @@ export const FoldView = ({ faces, solid, looks, t, language, description, onPick
       <div className="flex flex-wrap items-center gap-2">
         <label className="flex w-full items-center gap-2 text-sm text-slate-700">
           <span>{t.foldSlider}</span>
-          <input type="range" min={0} max={100} step={1} value={rounded} className="nf-range flex-1 accent-sky-700" aria-valuetext={t.foldValue(rounded, language)}
+          <input type="range" min={0} max={100} step={1} value={rounded} className="nf-range h-6 flex-1 accent-sky-700" aria-valuetext={t.foldValue(rounded, language)}
             onInput={(e) => { cancelAnimationFrame(animation.current); setProgress(Number((e.target as HTMLInputElement).value)); }} />
           <span className="w-12 text-right tabular-nums text-slate-500" aria-hidden="true">{rounded}%</span>
         </label>
-        <button type="button" className={button} onClick={() => animateTo(100)} disabled={rounded >= 100}>{t.foldAll}</button>
-        <button type="button" className={button} onClick={() => animateTo(0)} disabled={rounded <= 0}>{t.unfold}</button>
+        <button ref={foldButton} type="button" className={button} onClick={go(100)} disabled={rounded >= 100}>{t.foldAll}</button>
+        <button ref={unfoldButton} type="button" className={button} onClick={go(0)} disabled={rounded <= 0}>{t.unfold}</button>
         <button type="button" className={button} onClick={() => scene.current?.resetView()} disabled={!webgl}>{t.resetView}</button>
       </div>
     </div>

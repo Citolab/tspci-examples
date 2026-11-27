@@ -3,6 +3,9 @@ import { Experiment, MAX_ROWS, MAX_TRIALS, RUNS, Row, Setup, formatNumber, forma
 import type { Texts } from "./texts";
 import { ToolView, fillOf, keyName, reducedMotion, useReducedMotion } from "./view";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
 // Doing the experiment: the tool with the last trial, the buttons for 1, 10 and 100 trials, and the frequency table
 // and bar chart. A run animates its last trial once (not with reduced motion); the table follows when it stops.
 
@@ -116,6 +119,25 @@ export const ExperimentPanel = ({ setup, experiment, t, language, showTheory, re
   const recent = visible.slice(-10);
   const sum = (setup.tool === "dice" && setup.dice.combine === "sum") ? t.sum : setup.tool === "coins" && setup.coins.combine === "sum" ? t.heads_ : t.outcome;
   const full = total >= MAX_TRIALS;
+  // a button disabled by its own press (Start again; a run that reaches the maximum) would drop the keyboard focus on
+  // the page: it goes to the other buttons
+  const panel = useRef<HTMLDivElement>(null);
+  const refocus = useRef<{ from: HTMLButtonElement; to: string } | null>(null);
+  const keepFocus = (e: Event, to: string) => {
+    const from = e.currentTarget as HTMLButtonElement;
+    if (hasFocus(from)) refocus.current = { from, to };
+  };
+  useEffect(() => {
+    const pending = refocus.current;
+    if (!pending || !panel.current) return;
+    const active = (panel.current.getRootNode() as Document | ShadowRoot).activeElement;
+    if (!pending.from.disabled && pending.from.isConnected) {
+      if (active !== pending.from) refocus.current = null; // the candidate went on elsewhere
+      return;
+    }
+    refocus.current = null;
+    if (!active || active === pending.from) panel.current.querySelector<HTMLButtonElement>(`${pending.to}:not(:disabled)`)?.focus();
+  });
   const run = (n: number) => {
     if (full) return say(t.maxTrials(MAX_TRIALS));
     runRef.current = Math.min(n, MAX_TRIALS - total);
@@ -124,17 +146,18 @@ export const ExperimentPanel = ({ setup, experiment, t, language, showTheory, re
 
   return (
     <section className="flex flex-wrap items-start gap-6 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm" aria-label={title ?? t.run} data-testid={testid}>
-      <div className="flex w-60 max-w-full flex-col items-center gap-3">
+      <div ref={panel} className="flex w-60 max-w-full flex-col items-center gap-3">
         {title && <h3 className="self-start text-sm font-semibold text-slate-700">{title}</h3>}
         <ToolView setup={setup} trial={last} trialIndex={total} t={t} animate={animating} />
         <div role="group" aria-label={t.run} className="flex flex-wrap justify-center gap-2">
           {RUNS.map((n) => (
-            <button key={n} type="button" className={primary} aria-label={t.timesLabel(n)} disabled={readOnly || full} onClick={() => run(n)}>
+            <button key={n} type="button" data-run className={primary} aria-label={t.timesLabel(n)} disabled={readOnly || full} onClick={(e) => { keepFocus(e, "[data-again]"); run(n); }}>
               {t.times(n)}
             </button>
           ))}
         </div>
-        <button type="button" className={button} disabled={readOnly || total === 0} onClick={() => { onNew(); say(t.resetStatus); }}>{t.again}</button>
+        <button type="button" className={button} disabled={readOnly || total === 0} data-again
+          onClick={(e) => { keepFocus(e, "[data-run]"); onNew(); say(t.resetStatus); }}>{t.again}</button>
         <p className="text-sm font-medium text-slate-700 tabular-nums" data-testid="trials">{t.trials(visible.length)}</p>
         {recent.length > 0 && (
           <p className="text-center text-xs text-slate-500" data-testid="recent">

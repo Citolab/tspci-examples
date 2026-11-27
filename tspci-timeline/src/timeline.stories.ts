@@ -124,6 +124,8 @@ export const Keyboard: Story = {
       await userEvent.keyboard("{Delete}");
       expect(pci.getResponse()).toBeUndefined();
       expect(canvas.getByRole("status")).toHaveTextContent("is back in the list");
+      // the focus goes with the card, back in the list
+      await waitFor(() => expect(canvasElement.querySelector(".tspci-host")!.shadowRoot!.activeElement).toBe(card(canvas, /Bastille/)));
     });
   },
 };
@@ -397,3 +399,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(canvas.getByRole("tab", { name: "Gebeurtenissen" })).toHaveAttribute("aria-selected", "true");
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "Timeline, to try" };

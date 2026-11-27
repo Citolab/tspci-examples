@@ -180,3 +180,8 @@ export const RestoresState: Story = {
     expect(second.pci.getResponse()).toEqual({ base: { integer: 45 } });
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard. */
+export const ToTry: Story = {
+  name: "Percentages, to try",
+};

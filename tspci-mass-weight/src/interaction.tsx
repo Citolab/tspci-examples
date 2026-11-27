@@ -198,6 +198,10 @@ const Interaction = ({ prompt, s, store, t, readOnly, uid }: {
                     );
                   })}
                 </div>
+                {/* why the cylinder button is off, in view: a title only shows on hover, and a touchscreen has none */}
+                {s.instruments.includes("cylinder") && !thing.fits && (
+                  <span class="text-xs text-slate-600" data-testid={`too-big-${thing.id}`}>{capital(t.tooBig(theOf(s, t, thing)))}</span>
+                )}
               </li>
             );
           })}

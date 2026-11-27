@@ -480,7 +480,10 @@ export class CrossSectionScene {
       if (e.pointerType === "mouse") this.canvas.style.cursor = this.pickHandle(e) ? "grab" : "default";
       return;
     }
-    if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > 3) d.moved = true;
+    // a finger wobbles a little during a tap: more slack for touch, so a tap on an edge still picks it
+    const slop = e.pointerType === "touch" ? 10 : 3;
+    if (Math.abs(e.clientX - d.x) + Math.abs(e.clientY - d.y) > slop) d.moved = true;
+    if (!d.moved) return;
     if (d.kind === "orbit") {
       this.orbit(-(e.clientX - d.x) * 0.01, (e.clientY - d.y) * 0.01);
       d.x = e.clientX;

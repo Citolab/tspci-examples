@@ -10,6 +10,19 @@ import { formatNumber } from "./format";
 import { DayLine, EarthDiagram, SkyDiagram } from "./diagrams";
 import { Focus, SunEarthScene } from "./scene3d";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
+/** A button that its own press disables would drop the keyboard focus on the page: then it goes to `to` instead. */
+const keepFocus = (e: Event, to: (root: ParentNode) => Element | null) => {
+  const b = e.currentTarget as HTMLButtonElement;
+  if (!hasFocus(b)) return;
+  const target = to(b.getRootNode() as ParentNode) as HTMLElement | null; // now: the event's currentTarget is gone later
+  setTimeout(() => {
+    if (b.disabled || !b.isConnected) target?.focus();
+  });
+};
+
 // The candidate's view: the instruction, the 3D Sun and Earth (or the Earth from the side), the sky of the chosen
 // place, and the controls: the place, the date and the time. Everything the mouse can drag, the controls do with the
 // keyboard.
@@ -310,9 +323,10 @@ const Slider = ({ label, min, max, step, big, value, disabled, testid, t, displa
         <output htmlFor={`se-${testid}`} className="tabular-nums font-semibold text-slate-900" data-testid={`${testid}-value`}>{shown}</output>
       </div>
       <div className="flex items-center gap-2">
-        <button type="button" className={button} aria-label={t.less(label)} disabled={disabled || value <= min + 1e-9} onClick={() => onCommit(value - step)}>−</button>
+        <button type="button" className={button} aria-label={t.less(label)} disabled={disabled || value <= min + 1e-9}
+          onClick={(e) => { keepFocus(e, () => (e.currentTarget as Element).nextElementSibling); onCommit(value - step); }}>−</button>
         <input id={`se-${testid}`} type="range" min={min} max={max} step="any" value={value} disabled={disabled} data-testid={testid}
-          aria-valuetext={shown} className="h-2 w-full cursor-pointer accent-sky-700"
+          aria-valuetext={shown} className="h-8 w-full cursor-pointer accent-sky-700" // tall enough for a finger; the track stays thin
           onInput={(e) => onLive(Number((e.currentTarget as HTMLInputElement).value))}
           onChange={(e) => onCommit(Number((e.currentTarget as HTMLInputElement).value))}
           onKeyDown={(e) => {
@@ -326,7 +340,8 @@ const Slider = ({ label, min, max, step, big, value, disabled, testid, t, displa
               onCommit(e.key === "Home" ? min : max);
             }
           }} />
-        <button type="button" className={button} aria-label={t.more(label)} disabled={disabled || value >= max - 1e-9} onClick={() => onCommit(value + step)}>+</button>
+        <button type="button" className={button} aria-label={t.more(label)} disabled={disabled || value >= max - 1e-9}
+          onClick={(e) => { keepFocus(e, () => (e.currentTarget as Element).previousElementSibling); onCommit(value + step); }}>+</button>
       </div>
     </div>
   );

@@ -25,6 +25,19 @@ const guard = (percent: boolean, onRefuse: (why: string) => void, t: Texts) => (
   } else onRefuse("");
 };
 
+
+/**
+ * − at the fewest parts and + at the most are disabled by their own click: a button that had the focus would lose it,
+ * so it goes to the other one (by its data-testid).
+ */
+function keepFocus(button: HTMLButtonElement, other: string) {
+  const root = button.getRootNode() as Document | ShadowRoot;
+  if (root.activeElement !== button) return;
+  setTimeout(() => {
+    if (button.disabled) root.querySelector<HTMLElement>(`[data-testid="${other}"]`)?.focus();
+  }, 0);
+}
+
 const Interaction = ({ prompt, setup, store, texts, language, readOnly, showReadout, solution }: {
   prompt: string;
   setup: Setup;
@@ -75,7 +88,10 @@ const Interaction = ({ prompt, setup, store, texts, language, readOnly, showRead
         {divide && (
           <div className="flex items-center gap-2" role="group" aria-label={`${texts.parts}: ${name}`}>
             <button type="button" className={button} aria-label={`${texts.fewer}: ${name}`} disabled={s.parts <= m.min}
-              onClick={() => changeParts(s.parts - 1)} data-testid={`fewer-${i}`}>−</button>
+              onClick={(e) => {
+                keepFocus(e.currentTarget as HTMLButtonElement, `more-${i}`);
+                changeParts(s.parts - 1);
+              }} data-testid={`fewer-${i}`}>−</button>
             <label className="flex items-center gap-2 text-sm text-slate-600">
               <span>{texts.parts}</span>
               <input type="number" className={`${input} w-16 py-0.5 text-base`} min={m.min} max={m.max} value={s.parts} data-testid={`parts-${i}`}
@@ -89,7 +105,10 @@ const Interaction = ({ prompt, setup, store, texts, language, readOnly, showRead
                 }} />
             </label>
             <button type="button" className={button} aria-label={`${texts.more}: ${name}`} disabled={s.parts >= m.max}
-              onClick={() => changeParts(s.parts + 1)} data-testid={`more-${i}`}>+</button>
+              onClick={(e) => {
+                keepFocus(e.currentTarget as HTMLButtonElement, `fewer-${i}`);
+                changeParts(s.parts + 1);
+              }} data-testid={`more-${i}`}>+</button>
           </div>
         )}
 

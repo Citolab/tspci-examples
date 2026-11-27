@@ -161,7 +161,7 @@ const Composer = ({ env, onSend }: { env: Env; onSend: () => void }) => {
               <li key={n} className="inline-flex items-center gap-1.5 rounded-full border border-slate-300 bg-white py-0.5 pl-2.5 pr-1 text-[13px]">
                 <FileIcon name={n} /> {n}
                 {!readOnly && (
-                  <button type="button" className="rounded-full px-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-sky-600"
+                  <button type="button" className="min-h-6 min-w-6 rounded-full px-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-900 focus-visible:outline-2 focus-visible:outline-sky-600"
                     aria-label={t.remove(n)} onClick={() => toggle(n, false)}>✕</button>
                 )}
               </li>

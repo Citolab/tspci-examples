@@ -114,6 +114,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Math entry, to try" };
+
 export const Tools: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);
@@ -196,6 +199,14 @@ export const OnScreenKeyboardButton: Story = {
     await userEvent.click(hide);
     expect(canvas.getByRole("button", { name: "Show the on-screen keyboard" })).toHaveAttribute("aria-pressed", "false");
     expect(pci.getResponse()).toBeUndefined();
+
+    // a tablet has no keys: a tap with a finger on the field shows the on-screen keyboard (a mouse click does not)
+    const mf = canvasElement.querySelector(".tspci-host")!.shadowRoot!.querySelector("math-field")!;
+    const r = mf.getBoundingClientRect();
+    const finger = { clientX: r.left + 10, clientY: r.top + r.height / 2, bubbles: true, composed: true, pointerId: 7, pointerType: "touch", isPrimary: true };
+    mf.dispatchEvent(new PointerEvent("pointerdown", finger));
+    mf.dispatchEvent(new PointerEvent("pointerup", finger));
+    await waitFor(() => expect(canvas.getByRole("button", { name: "Hide the on-screen keyboard" })).toHaveAttribute("aria-pressed", "true"));
   },
 };
 

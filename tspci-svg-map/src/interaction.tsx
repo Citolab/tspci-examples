@@ -89,6 +89,18 @@ const Interaction = ({ map, poi, store, texts, prompt, showPoi, history, problem
     store.dispatch({ type: "CLEAR", payload: { path: start } });
     setMessage(texts.cleared);
   };
+  // a button that becomes disabled by its own press (nothing left to undo) would drop the focus: give it to the map
+  const andKeepFocus = (action: () => void) => (e: MouseEvent) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    action();
+    setTimeout(() => {
+      if (!button.disabled) return;
+      quietFocus.current = true; // the map keeps saying what the button did ("Route cleared.")
+      (button.getRootNode() as ParentNode).querySelector<SVGElement>('[data-testid="map"]')?.focus();
+      quietFocus.current = false;
+    });
+  };
+  const quietFocus = useRef(false);
 
   const reach = (e: PointerEvent, px: number) => (REACH[e.pointerType] ?? REACH.mouse) * px;
   const nodeAt = (e: PointerEvent, at: MapPoint | null, px: number) => (at ? nearestNode(map, at.x, at.y, reach(e, px)) : null);
@@ -188,6 +200,7 @@ const Interaction = ({ map, poi, store, texts, prompt, showPoi, history, problem
   };
 
   const onFocus = () => {
+    if (quietFocus.current) return;
     const at = here();
     if (at !== null) setMessage(describe(at));
   };
@@ -256,12 +269,12 @@ const Interaction = ({ map, poi, store, texts, prompt, showPoi, history, problem
       </div>
       {problem && <p className="m-0 text-sm text-red-700" role="alert">{problem}</p>}
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" data-testid="undo" onClick={undo} disabled={!history.length}
+        <button type="button" data-testid="undo" onClick={andKeepFocus(undo)} disabled={!history.length}
           className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-600 disabled:opacity-40">
           <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true"><path d="M7 4 3 8l4 4M3.5 8H12a5 5 0 0 1 0 10H9" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
           {texts.undo}
         </button>
-        <button type="button" data-testid="clear" onClick={clear} disabled={sameRoute(path, start)}
+        <button type="button" data-testid="clear" onClick={andKeepFocus(clear)} disabled={sameRoute(path, start)}
           className="inline-flex items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-sky-600 disabled:opacity-40">
           <svg viewBox="0 0 20 20" className="size-4" aria-hidden="true"><path d="M4 6h12M8 6V4h4v2M6 6l1 11h6l1-11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
           {texts.clear}

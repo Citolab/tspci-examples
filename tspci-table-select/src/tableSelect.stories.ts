@@ -37,6 +37,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Table select, to try" };
+
 export const SelectRow: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

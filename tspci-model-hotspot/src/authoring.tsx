@@ -254,14 +254,14 @@ const Authoring = ({ initial, language, onChange }: { initial: AuthoringConfig; 
                         className={`border-t border-slate-100 ${p.id === focus ? "bg-sky-50" : ""}`}>
                         <td className="p-1 font-mono text-xs text-slate-600" title={`${t.aId}: ${p.id}`}>{p.letter || "–"}</td>
                         <td className="p-1 text-center">
-                          <input type="checkbox" checked={p.selectable} aria-label={`${t.aSelectable}: ${p.id}`} onFocus={() => setFocus(p.id)}
+                          <input type="checkbox" className="size-6 accent-sky-700" checked={p.selectable} aria-label={`${t.aSelectable}: ${p.id}`} onFocus={() => setFocus(p.id)}
                             onChange={() => updatePart(p.id, { selectable: !p.selectable })} />
                         </td>
                         <td className="p-1"><input className={field} value={p.name.en} aria-label={`${t.aNameEn}: ${p.id}`} onFocus={() => setFocus(p.id)} onInput={(e) => updatePart(p.id, { en: (e.target as HTMLInputElement).value })} /></td>
                         <td className="p-1"><input className={field} value={p.name.nl} aria-label={`${t.aNameNl}: ${p.id}`} onFocus={() => setFocus(p.id)} onInput={(e) => updatePart(p.id, { nl: (e.target as HTMLInputElement).value })} /></td>
                         {!labelMode && (
                           <td className="p-1 text-center">
-                            <input type={settings.cardinality === "single" ? "radio" : "checkbox"} name="authoring-correct" checked={settings.correct.includes(p.id)}
+                            <input type={settings.cardinality === "single" ? "radio" : "checkbox"} className="size-6 accent-sky-700" name="authoring-correct" checked={settings.correct.includes(p.id)}
                               aria-label={`${t.aCorrect}: ${p.id}`} onFocus={() => setFocus(p.id)} onChange={() => toggleCorrect(p.id)}
                               onClick={(e) => settings.cardinality === "single" && settings.correct.includes(p.id) && (e.preventDefault(), toggleCorrect(p.id))} />
                           </td>

@@ -74,10 +74,10 @@ const Interaction = ({ config, partition, store }: { config: PropTypes; partitio
             {parts.map((part, i) => {
               const fill = state.vlakken.find((v) => v.id === part.id)?.color || "#fff";
               return (
-                <g key={part.id} data-name={part.id} role="button" tabIndex={0} aria-label={`part ${i + 1}`} fill={fill} stroke={fill} stroke-width="1"
+                <g key={part.id} data-name={part.id} role="button" tabindex={0} aria-label={`part ${i + 1}`} fill={fill} stroke={fill} stroke-width="1"
                   onMouseDown={() => paint(part.id)}
                   onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), paint(part.id))}
-                  className="outline-none focus-visible:[&>rect]:opacity-80">
+                  className="focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber-500 focus-visible:[&>rect]:opacity-80">
                   {regionRuns(part).map((run) => (
                     <rect key={`${run.x},${run.y}`} x={run.x * cellW} y={run.y * cellH} width={run.w * cellW} height={cellH} />
                   ))}

@@ -350,7 +350,7 @@ const Authoring = ({ initial, language, candidateLanguage, onChange }: { initial
                     const on = x.after.includes(y.id);
                     return (
                       <button key={y.id} type="button" aria-pressed={on} onClick={() => toggleAfter(x.id, y.id)}
-                        className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs ${on ? "border-sky-700 bg-sky-700 text-white" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>
+                        className={`inline-flex min-h-6 items-center gap-1 rounded-full border px-2 py-1 text-xs ${on ? "border-sky-700 bg-sky-700 text-white" : "border-slate-300 bg-white text-slate-600 hover:bg-slate-50"}`}>
                         <span aria-hidden="true">{on ? "✓" : "+"}</span>{nameOf(y, language)}
                       </button>
                     );

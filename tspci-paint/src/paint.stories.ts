@@ -345,3 +345,6 @@ export const BoundResponse: Story = {
     });
   },
 };
+
+/** Without a test, to try by hand (also with a finger or a pen on a tablet). */
+export const ToTry: Story = { name: "Paint, to try" };

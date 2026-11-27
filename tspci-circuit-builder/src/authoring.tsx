@@ -118,12 +118,12 @@ const Authoring = ({ initial, language, onChange }: { initial: Circuit; language
             <RefSelect value={r} options={options.includes(r) ? options : [r, ...options]} t={t} testid={`check-${i}-part-${j}`}
               onChange={(v) => setCheck(i, { ...check, parts: list.map((x, k) => (k === j ? v : x)) } as Check)} />
             {list.length > min && (
-              <button type="button" className="px-1 text-slate-400 hover:text-rose-600" aria-label={t.removeCheck}
+              <button type="button" className="inline-grid size-7 place-items-center rounded-md text-slate-400 hover:text-rose-600" aria-label={t.removeCheck}
                 onClick={() => setCheck(i, { ...check, parts: list.filter((_, k) => k !== j) } as Check)}>×</button>
             )}
           </span>
         ))}
-        <button type="button" className="rounded-md px-1.5 text-sky-700 hover:bg-sky-50" aria-label="+" data-testid={`check-${i}-add`}
+        <button type="button" className="inline-grid size-7 place-items-center rounded-md text-sky-700 hover:bg-sky-50" aria-label="+" data-testid={`check-${i}-add`}
           onClick={() => setCheck(i, { ...check, parts: [...list, options[0]] } as Check)}>+</button>
       </div>
     );

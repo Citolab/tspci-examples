@@ -25,6 +25,9 @@ const slide = async (slider: HTMLElement, value: number) => {
 /** The settings the candidate tried, from the tool mode's response. */
 const tried = (mounted: MountedPci) => JSON.parse(mounted.pci.getResponse()!.base.string).tried;
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Sound level, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

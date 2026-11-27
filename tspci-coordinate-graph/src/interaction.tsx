@@ -4,7 +4,7 @@
 // © 2014-2017 Parcc, Inc. (Open Assessment Technologies, for Parcc, Inc.)
 // Modified by Stichting Cito Instituut voor Toetsontwikkeling, 2026
 
-import { useState } from "preact/hooks";
+import { useRef, useState } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
 import { ElementDef, ElementValue, Settings, equationText, formatPoint, isLineType, linesOf, regionsOf, insidePolygon, labelPoint } from "./model";
 import { Actions, Dispatch, StateModel } from "./store";
@@ -60,11 +60,22 @@ const Interaction = ({ s, store, texts, readOnly }: {
     const e = s.elements.find((d) => d.id === id);
     if (e) setAnnouncement(texts.active(e.label, texts.types[e.type]));
   };
+  // after a removal from the list with the focus on its button (the keyboard; Safari does not focus a tapped button):
+  // when that button is gone, the focus goes to the grid instead of nowhere
+  const root = useRef<HTMLDivElement>(null);
+  const keepFocus = () => {
+    const doc = root.current?.getRootNode() as Document | ShadowRoot | undefined;
+    const had = doc?.activeElement as HTMLElement | null | undefined;
+    if (!had || !root.current?.contains(had)) return;
+    requestAnimationFrame(() => {
+      if (!had.isConnected) root.current?.querySelector<SVGElement>('[role="application"]')?.focus();
+    });
+  };
   const toolHint = (e: ElementDef) =>
     e.type === "solutionSet" && !hasLine ? texts.needLine : e.type === "points" ? `${texts.toolHint.points} (${texts.count(state.values[e.id]?.points.length ?? 0, e.max)})` : texts.toolHint[e.type];
 
   return (
-    <div class="flex max-w-full flex-col gap-3 font-sans text-[15px] text-slate-800">
+    <div ref={root} class="flex max-w-full flex-col gap-3 font-sans text-[15px] text-slate-800">
       {s.prompt && <p class="m-0 max-w-[75ch] text-slate-700" data-testid="prompt">{s.prompt}</p>}
 
       {!readOnly && (
@@ -135,6 +146,7 @@ const Interaction = ({ s, store, texts, readOnly }: {
                     <span class="font-medium">{e.label}</span>
                     {!readOnly && (v?.points.length || v?.regions?.length) ? (
                       <button type="button" class={`${small} ml-auto text-slate-600`} onClick={() => {
+                        keepFocus();
                         dispatch("CLEAR", { id: e.id });
                         setAnnouncement(texts.cleared(e.label));
                       }}>{texts.clear(e.label)}</button>
@@ -146,6 +158,7 @@ const Interaction = ({ s, store, texts, readOnly }: {
                       {v.points.map((p, i) => (
                         <button key={i} type="button" class={`${small} border border-slate-200 text-red-700`} aria-label={texts.deletePoint(e.label, formatPoint(p, s.language))}
                           onClick={() => {
+                            keepFocus();
                             dispatch("REMOVE_POINT", { id: e.id, index: i });
                             setAnnouncement(texts.removed(e.label, formatPoint(p, s.language)));
                           }}>

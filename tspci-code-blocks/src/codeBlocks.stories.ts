@@ -787,3 +787,20 @@ export const Nesting: Story = {
     });
   },
 };
+
+/** A click or a tap on the handle of a block that is not selected selects it (the focus of the press must not undo it). */
+export const ClickAHandle: Story = {
+  args: { properties: { reuse: "true" } },
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    await buildSum(canvas);
+    await userEvent.click(handle(canvas, 4));
+    expect(handle(canvas, 4)).toHaveAttribute("aria-pressed", "true");
+    expect(canvas.getByTestId("toolbar")).toBeInTheDocument();
+    await userEvent.click(handle(canvas, 4));
+    expect(handle(canvas, 4)).toHaveAttribute("aria-pressed", "false");
+  },
+};
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "Code blocks, to try" };

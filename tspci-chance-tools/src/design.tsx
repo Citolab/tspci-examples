@@ -1,8 +1,11 @@
-import { useRef, useState } from "preact/hooks";
+import { useEffect, useRef, useState } from "preact/hooks";
 import { Design, Item, MAX_BALLS, MAX_SECTORS, Setup, paletteOf } from "./chance";
 import { button } from "./experiment";
 import type { Texts } from "./texts";
 import { Bag, Ball, fillOf, sectorPath } from "./view";
+
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
 
 // Design mode: the candidate makes a spinner of equal sectors (choose a colour, colour sectors) or fills a bag
 // (a count per colour). The design is the answer; its probabilities are not shown.
@@ -12,12 +15,32 @@ const point = (r: number, deg: number) => {
   return [110 + r * Math.sin(a), 110 - r * Math.cos(a)];
 };
 
+/**
+ * A − or + button that its own press disables (no balls left, one sector, the maximum) would drop the keyboard focus
+ * on the page: it goes to the element next to it instead.
+ */
+const useKeepFocus = () => {
+  const pending = useRef<{ from: HTMLButtonElement; to: Element | null } | null>(null);
+  useEffect(() => {
+    const p = pending.current;
+    pending.current = null;
+    if (p?.from.disabled) (p.to as HTMLElement | null)?.focus();
+  });
+  return (e: Event, to: (from: Element) => Element | null) => {
+    const from = e.currentTarget as HTMLButtonElement;
+    if (hasFocus(from)) pending.current = { from, to: to(from) };
+  };
+};
+const before = (el: Element) => el.previousElementSibling;
+const after = (el: Element) => el.nextElementSibling;
+
 const SpinnerDesign = ({ setup, design: shown, latest, t, readOnly, onChange, say }: {
   setup: Setup; design: Design; latest: () => Design; t: Texts; readOnly: boolean; onChange: (d: Design) => void; say: (m: string) => void;
 }) => {
   const palette = paletteOf(setup);
   const [paint, setPaint] = useState(palette[0]?.label ?? "");
   const [focus, setFocus] = useState(0);
+  const keepFocus = useKeepFocus();
   const svg = useRef<SVGSVGElement>(null);
   const n = shown.sectors.length;
   const item = (label: string): Item => palette.find((p) => p.label === label) ?? palette[0];
@@ -73,9 +96,9 @@ const SpinnerDesign = ({ setup, design: shown, latest, t, readOnly, onChange, sa
           <circle cx="110" cy="110" r="6" fill="#0f172a" />
         </svg>
         <div className="flex items-center gap-2">
-          <button type="button" className={button} aria-label={t.fewer} disabled={readOnly || n <= 1} onClick={() => resize(n - 1)}>−</button>
+          <button type="button" className={button} aria-label={t.fewer} disabled={readOnly || n <= 1} onClick={(e) => { keepFocus(e, (b) => after(after(b)!)); resize(n - 1); }}>−</button>
           <span className="min-w-20 text-center text-sm font-medium tabular-nums text-slate-700" data-testid="sector-count">{t.sectors(n)}</span>
-          <button type="button" className={button} aria-label={t.moreSectors} disabled={readOnly || n >= MAX_SECTORS} onClick={() => resize(n + 1)}>+</button>
+          <button type="button" className={button} aria-label={t.moreSectors} disabled={readOnly || n >= MAX_SECTORS} onClick={(e) => { keepFocus(e, (b) => before(before(b)!)); resize(n + 1); }}>+</button>
         </div>
       </div>
       <div className="flex max-w-xs flex-col gap-3">
@@ -100,6 +123,7 @@ const BagDesign = ({ setup, design, latest, t, readOnly, onChange, say }: {
 }) => {
   const palette = paletteOf(setup);
   const total = design.counts.reduce((a, b) => a + b, 0);
+  const keepFocus = useKeepFocus();
   const set = (i: number, value: number) => {
     const now = latest(); // from the store, not this render
     const others = now.counts.reduce((a, b) => a + b, 0) - now.counts[i];
@@ -120,11 +144,11 @@ const BagDesign = ({ setup, design, latest, t, readOnly, onChange, say }: {
           <li key={p.label} className="flex items-center gap-2">
             <Ball item={p} size={28} />
             <span className="w-24 text-sm text-slate-800">{p.label}</span>
-            <button type="button" className={button} aria-label={t.oneLess(p.label)} disabled={readOnly || !design.counts[i]} onClick={() => set(i, latest().counts[i] - 1)}>−</button>
+            <button type="button" className={button} aria-label={t.oneLess(p.label)} disabled={readOnly || !design.counts[i]} onClick={(e) => { keepFocus(e, after); set(i, latest().counts[i] - 1); }}>−</button>
             <input type="number" min={0} max={MAX_BALLS} value={design.counts[i]} disabled={readOnly} aria-label={t.howMany(p.label)}
               className="w-16 rounded-md border border-slate-300 px-2 py-1 text-center tabular-nums focus-visible:outline-2 focus-visible:outline-sky-700"
               onChange={(e) => set(i, Number((e.target as HTMLInputElement).value))} />
-            <button type="button" className={button} aria-label={t.oneMore(p.label)} disabled={readOnly || total >= MAX_BALLS} onClick={() => set(i, latest().counts[i] + 1)}>+</button>
+            <button type="button" className={button} aria-label={t.oneMore(p.label)} disabled={readOnly || total >= MAX_BALLS} onClick={(e) => { keepFocus(e, before); set(i, latest().counts[i] + 1); }}>+</button>
           </li>
         ))}
       </ul>

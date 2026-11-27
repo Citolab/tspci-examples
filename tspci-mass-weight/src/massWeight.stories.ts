@@ -200,6 +200,9 @@ export const DragAndDrop: Story = {
       await drag(mounted, "meteorite", 785, 300);
       expect(mounted.root.querySelector('[data-testid="object-meteorite"]')).toHaveAttribute("data-at", "table");
       expect(canvas.getByRole("status")).toHaveTextContent("The meteorite does not fit in the cylinder.");
+      // also in view, next to its buttons: the title of the Cylinder button only shows on hover, not on a touchscreen
+      expect(canvas.getByTestId("too-big-meteorite")).toHaveTextContent("The meteorite does not fit in the cylinder.");
+      expect(canvas.queryByTestId("too-big-statuette")).toBeNull();
     });
 
     await step("the meteorite dragged onto the dynamometer pushes the statuette back to the table", async () => {
@@ -380,4 +383,10 @@ export const Review: Story = {
     expect(mounted.root.querySelector('[data-testid="object-statuette"]')).toHaveAttribute("data-at", "scale");
     expect(mounted.changes).toHaveLength(0);
   },
+};
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: drag the objects, pour water, answer. */
+export const ToTry: Story = {
+  name: "Mass and weight, to try",
+  args: { properties: ANSWERS },
 };

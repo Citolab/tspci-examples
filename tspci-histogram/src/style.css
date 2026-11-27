@@ -17,3 +17,9 @@
   stroke-width: 3;
   stroke-dasharray: 6 3;
 }
+/* the column too: a bar of height 0 has no rectangle to show the focus on */
+.hg-bar:focus-visible .hg-column {
+  stroke: #2563eb;
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}

@@ -84,6 +84,16 @@ const Interaction = ({ store, colors, preset, texts, readOnly = false, emptyColo
   const host = useRef<HTMLDivElement>(null);
   const frame = useRef<HTMLDivElement>(null);
   const confirmButton = useRef<HTMLButtonElement>(null);
+  const cancelButton = useRef<HTMLButtonElement>(null);
+  const resetButton = useRef<HTMLButtonElement>(null);
+  /**
+   * Closes the confirmation without starting over: the focus goes back to the button that opened it, after the key
+   * event (focused during an Enter on Cancel, the button would take that Enter and open the confirmation again).
+   */
+  const cancelReset = () => {
+    setConfirming(false);
+    setTimeout(() => resetButton.current?.focus());
+  };
   const sceneRef = useRef<VoxelScene | null>(null);
   const announceNext = useRef<"added" | "removed" | "painted" | null>(null);
 
@@ -250,7 +260,7 @@ const Interaction = ({ store, colors, preset, texts, readOnly = false, emptyColo
               <button type="button" className={button} onClick={undo} disabled={!past.length} title={texts.undo} aria-label={texts.undo} data-testid="undo">
                 <Icon d={ICONS.undo} />
               </button>
-              <button type="button" className={button} onClick={() => setConfirming(true)} title={texts.reset} aria-label={texts.reset} data-testid="reset">
+              <button type="button" className={button} onClick={() => setConfirming(true)} title={texts.reset} aria-label={texts.reset} data-testid="reset" ref={resetButton}>
                 <Icon d={ICONS.reset} />
               </button>
             </div>
@@ -314,12 +324,20 @@ const Interaction = ({ store, colors, preset, texts, readOnly = false, emptyColo
 
       {confirming && (
         <div className="absolute inset-0 z-10 grid place-items-center bg-slate-900/30 p-4"
-          onKeyDown={(e) => e.key === "Escape" && setConfirming(false)}>
+          onKeyDown={(e) => {
+            if (e.key === "Escape") cancelReset();
+            // a modal dialog: Tab stays on its two buttons
+            else if (e.key === "Tab") {
+              e.preventDefault();
+              const active = (e.currentTarget.getRootNode() as Document | ShadowRoot).activeElement;
+              (active === confirmButton.current ? cancelButton : confirmButton).current?.focus();
+            }
+          }}>
           <div role="alertdialog" aria-modal="true" aria-labelledby={`${id}-confirm`} className="max-w-sm rounded-xl bg-white p-4 shadow-xl">
             <p id={`${id}-confirm`} className="m-0 mb-3 text-sm">{texts.resetConfirm}</p>
             <div className="flex justify-end gap-2">
               <button type="button" className="rounded-lg px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-sky-600"
-                onClick={() => setConfirming(false)}>{texts.resetNo}</button>
+                ref={cancelButton} onClick={cancelReset}>{texts.resetNo}</button>
               <button type="button" ref={confirmButton} data-testid="reset-confirm"
                 className="rounded-lg bg-sky-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-sky-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-600"
                 onClick={() => {

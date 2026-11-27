@@ -1,6 +1,6 @@
 {
   "instruction": {
-    "default": "Colour the shapes with your mouse.",
+    "default": "Colour the shapes: tap or click them.",
     "editor": "textarea",
     "label": { "en": "Instruction", "nl": "Instructie" }
   },

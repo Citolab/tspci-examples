@@ -25,6 +25,16 @@ const measure = async (canvas: MountedPci["canvas"], names: string[], button = "
 const addTape = (mounted: MountedPci, a: string, b: string) =>
   mounted.pci.store.dispatch({ type: "ADD", payload: { measurement: { tool: "tape", points: [{ id: a }, { id: b }] } } });
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "Measure in 3D, to try" };
+
+/** The authoring mode without a play function, to try by hand. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", width: 1100 },
+};
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

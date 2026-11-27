@@ -69,7 +69,8 @@ class FakeApi {
 
 type FakeApplet = { parameters: Record<string, any>; api: FakeApi };
 const ggb = {
-  mode: "load" as "load" | "fail" | "never" | "hold",
+  /** "real": no stand-in, GeoGebra itself from geogebra.org (only in the story to try by hand) */
+  mode: "load" as "load" | "fail" | "never" | "hold" | "real",
   applets: [] as FakeApplet[],
   /** "hold": the applets wait for release(), so a story can see the PCI while GeoGebra is still loading */
   held: [] as (() => void)[],
@@ -105,7 +106,7 @@ const installFakeGeoGebra = () => {
     configurable: true,
     get(this: HTMLIFrameElement) {
       const win = original.get!.call(this) as (Window & { GGBApplet?: unknown }) | null;
-      if (win && this.srcdoc.includes('<div id="ggb">')) win.GGBApplet = FakeGGBApplet;
+      if (win && ggb.mode !== "real" && this.srcdoc.includes('<div id="ggb">')) win.GGBApplet = FakeGGBApplet;
       return win;
     },
   });
@@ -385,6 +386,8 @@ export const Authoring: StoryObj<AuthoringArgs> = {
     await step("the author gets every tool, in the app of the item", async () => {
       expect(instance.validate()).toEqual(["The applet is not loaded yet."]);
       expect(instance.getProperties()).toEqual({});
+      // the warning is in view, not only in the buttons' title (no hover on a touchscreen)
+      expect(canvas.getByRole("button", { name: "Start empty" })).toHaveAccessibleDescription("Load material and Start empty replace the applet you are building.");
       ggb.release();
       const applet = await loaded(root);
       expect(applet.parameters).toMatchObject({ appName: "graphing", showToolBar: true, showMenuBar: true, allowStyleBar: true });
@@ -438,5 +441,27 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(canvas.getByTestId("reported")).toHaveTextContent("In het antwoord: score");
     expect(instance.getProperties()).toEqual({ ggbBase64: 'ggb:{"score":{"value":1,"type":"numeric"}}' });
     expect(canvas.getByRole("button", { name: "Leeg beginnen" })).toBeInTheDocument();
+  },
+};
+
+/**
+ * To try by hand, with a mouse, a touchscreen or the keyboard: GeoGebra itself, loaded from geogebra.org. No test runs
+ * on it (the tests do not use the network).
+ */
+export const ToTry: Story = {
+  name: "GeoGebra applet, to try",
+  tags: ["!test"],
+  beforeEach: () => {
+    ggb.mode = "real";
+  },
+};
+
+/** The authoring mode to try by hand, with GeoGebra itself from geogebra.org. No test runs on it (network). */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  tags: ["!test"],
+  beforeEach: () => {
+    ggb.mode = "real";
   },
 };

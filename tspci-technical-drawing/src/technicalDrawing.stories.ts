@@ -120,6 +120,8 @@ export const CompleteAView: Story = {
   play: async ({ canvasElement, step }) => {
     const m = await openPci(canvasElement);
     const grid = m.canvas.getByRole("application", { name: /^Grid of the front view/ });
+    // a finger draws on the grid: the drawing does not let the page scroll (touch-action on the grid's rect alone is ignored)
+    expect(getComputedStyle(m.root.querySelector("[data-testid=drawing]")!).touchAction).toBe("none");
     await step("the step's three visible lines with the mouse (click, click)", async () => {
       await clickGrid(m, "front", 40, 15);
       await clickGrid(m, "front", 40, 30);
@@ -323,3 +325,6 @@ export const AuthoringMode: StoryObj<AuthoringArgs> = {
     });
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Technical drawing, to try" };

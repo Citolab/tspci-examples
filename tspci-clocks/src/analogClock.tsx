@@ -6,6 +6,7 @@ import { angleDiff, Hand, HandName, pickHand, pointerOnFace } from "./hands";
 import ClockFace from "./img/clockface.png";
 import { analogLook, DrawnFace, DrawnHands } from "./skins";
 import { Actions, StateModel } from "./store";
+import { clockString } from "./timeText";
 
 type PropTypes = PciProperties<typeof configProps>;
 
@@ -40,9 +41,14 @@ export function AnalogClock({ config, store, readOnly }: Props) {
   const snap = (angle: number) =>
     snapAngles ? snapAngles.reduce((best, a) => (angleDiff(angle, a) < angleDiff(angle, best) ? a : best)) : angle;
 
+  /** The time now, from the store: keys pressed faster than the screen redraws build on each other. */
+  const currentTotal = () => {
+    const now = store.getState();
+    return (now.hour ?? Number(initialHour ?? 12)) * 60 + (now.minute ?? Number(initialMinute ?? 0));
+  };
   const setTotal = (t: number) => {
     const next = ((Math.round(t) % 720) + 720) % 720;
-    if (next === total && hour !== null) return;
+    if (next === currentTotal() % 720) return;
     store.dispatch({ type: "SET_TIME", payload: { hour: Math.floor(next / 60), minute: next % 60 } });
   };
 
@@ -71,10 +77,27 @@ export function AnalogClock({ config, store, readOnly }: Props) {
 
   const onPointerUp = () => (dragging.current = null);
 
+  // The keyboard: the clock is a slider of the time. Arrow keys move the long hand one step (minutePerJumps), Page Up
+  // and Page Down an hour, Home sets 12:00 and End the last step before it.
+  const settable = !readOnly && config.typeOfQuestion === "setClock";
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (!settable) return;
+    const moves: Record<string, number> = { ArrowUp: step, ArrowRight: step, ArrowDown: -step, ArrowLeft: -step, PageUp: 60, PageDown: -60 };
+    if (e.key in moves) setTotal(currentTotal() + moves[e.key]);
+    else if (e.key === "Home") setTotal(0);
+    else if (e.key === "End") setTotal(720 - step);
+    else return;
+    e.preventDefault();
+  };
+  const slider = settable
+    ? { role: "slider" as const, tabIndex: 0, "aria-label": "Clock", "aria-valuemin": 0, "aria-valuemax": 719, "aria-valuenow": total, "aria-valuetext": clockString(total), onKeyDown }
+    : {};
+
   return (
       <div
         ref={face}
-        className={`relative w-[20em] h-[20em] touch-none select-none ${readOnly ? "" : "cursor-pointer"}`}
+        {...slider}
+        className={`relative w-[20em] h-[20em] touch-none select-none rounded-full focus-visible:outline-3 focus-visible:outline-offset-4 focus-visible:outline-blue-600 ${readOnly ? "" : "cursor-pointer"}`}
         onPointerDown={onPointerDown}
         onPointerMove={onPointerMove}
         onPointerUp={onPointerUp}

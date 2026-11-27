@@ -306,3 +306,6 @@ export const Solution: Story = {
     expect(pci.getResponse()).toEqual(response("2/3 - 4/3;5/3 - 6/3;9/3", [[1, 2, 3], [4, 5], [8]]));
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "Gantt chart, to try" };

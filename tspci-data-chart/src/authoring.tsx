@@ -86,6 +86,26 @@ const Authoring = ({ initial, settings, mode, maxChoices, language, onChange }: 
     const r = button.getBoundingClientRect();
     setPaletteState({ index, x: r.left, y: r.bottom + 4 });
   };
+  // a tap or click outside the colours closes them (Safari on a tablet does not move the focus on a tap), and so does a
+  // scroll of the page: the colours are fixed to where the button was
+  const open = palette !== null;
+  useEffect(() => {
+    if (!open) return;
+    const away = (e: PointerEvent) => {
+      const inside = e.composedPath().some((el) => {
+        const id = (el as Element)?.getAttribute?.("data-testid") ?? "";
+        return id === "palette" || id.startsWith("color-");
+      });
+      if (!inside) setPaletteState(null);
+    };
+    const scrolled = () => setPaletteState(null);
+    document.addEventListener("pointerdown", away);
+    window.addEventListener("scroll", scrolled);
+    return () => {
+      document.removeEventListener("pointerdown", away);
+      window.removeEventListener("scroll", scrolled);
+    };
+  }, [open]);
   const [note, setNote] = useState("");
   const commit = (next: ChartData) => {
     setData(next);
@@ -104,7 +124,11 @@ const Authoring = ({ initial, settings, mode, maxChoices, language, onChange }: 
   };
 
   return (
-    <div className="flex flex-col gap-3 font-sans text-sm text-slate-800" onKeyDown={(e) => e.key === "Escape" && setPalette(null)}>
+    <div className="flex flex-col gap-3 font-sans text-sm text-slate-800" onKeyDown={(e) => {
+      if (e.key !== "Escape" || !palette) return;
+      (e.currentTarget as HTMLElement).querySelector<HTMLElement>(`[data-testid="color-${palette.index}"]`)?.focus();
+      setPalette(null);
+    }}>
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" className={button} onClick={() => commit(addCategory(data))} data-testid="add-category">{t.addCategory}</button>
         <button type="button" className={button} onClick={() => commit(addSeries(data))} data-testid="add-series">{t.addSeries}</button>

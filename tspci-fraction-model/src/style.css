@@ -16,7 +16,11 @@
 .fm-shade { fill: var(--fm-shade); }
 .fm-hatch { stroke: #fff; stroke-opacity: 0.55; }
 .fm-interactive .fm-part { cursor: pointer; outline: none; transition: fill 120ms ease; }
-.fm-interactive .fm-part:not(.fm-on):hover { fill: #e0f2fe; }
+/* a hover hint only with a mouse: on a touchscreen the hover sticks after a tap, and a part just made white again
+   would look light blue, as if still shaded */
+@media (hover: hover) {
+  .fm-interactive .fm-part:not(.fm-on):hover { fill: #e0f2fe; }
+}
 .fm-focus {
   stroke: var(--fm-focus);
   stroke-width: 4;

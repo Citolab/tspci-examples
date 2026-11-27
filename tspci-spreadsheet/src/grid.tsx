@@ -62,6 +62,8 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
   /** The name a click inserted in the formula: the next click replaces it. */
   const pointed = useRef<{ start: number; end: number } | null>(null);
   const caret = useRef<number | null>(null);
+  /** The kind of pointer of the last press: on touch, tapping the selected cell again edits it (no double-click needed). */
+  const lastPointer = useRef("mouse");
 
   const values = useMemo(() => evaluateSheet(inputs, sheet, locale), [inputs, sheet.columns, sheet.rows, locale]);
   const at = parseRef(selected) ?? { row: 0, col: 0 };
@@ -328,6 +330,10 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
     if (edit && ref === edit.ref && !edit.inBar) return; // a click in the cell being edited
     if (edit) commit();
     e.preventDefault();
+    if (!edit && ref === current && lastPointer.current === "touch") {
+      startEdit(ref, localize(inputs[ref] ?? "", locale), false);
+      return;
+    }
     onSelect(ref);
     focusGrid();
   };
@@ -379,6 +385,7 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
         <table ref={table} role="grid" aria-label={label} tabIndex={0} aria-activedescendant={`cell-${current}`} data-testid="grid"
           className="table-fixed border-separate border-spacing-0 outline-none select-none"
           style={{ width: ROW_HEADER + widths.reduce((a, b) => a + b, 0) }}
+          onPointerDown={(e) => (lastPointer.current = e.pointerType)}
           onKeyDown={gridKeys} onCopy={onCopy} onPaste={onPaste} onCut={(e) => onCopy(e, true)}>
           <colgroup>
             <col style={{ width: ROW_HEADER }} />
@@ -391,7 +398,7 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
                 <th key={c} scope="col" className={`relative sticky top-0 z-20 h-6 border-r border-b border-slate-300 font-normal ${c === pos.col ? "bg-emerald-100 text-emerald-900 shadow-[inset_0_-2px_0_#217346]" : "bg-slate-100 text-slate-600"}`}>
                   {columnName(c)}
                   {author && (
-                    <span className="absolute top-0 -right-1 z-10 h-full w-2 cursor-col-resize" data-testid={`resize-${c}`}
+                    <span className="absolute top-0 -right-1 z-10 h-full w-2 cursor-col-resize touch-none before:absolute before:inset-y-0 before:-inset-x-2 before:content-['']" data-testid={`resize-${c}`}
                       onPointerDown={(e) => {
                         e.preventDefault();
                         (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -452,12 +459,16 @@ const Grid = ({ sheet, inputs, locale, texts, selected, onSelect, editable, onCh
                       {isSelected && !isEditing && (
                         <>
                           <span className="pointer-events-none absolute -inset-px z-[6] border-2" style={{ borderColor: EXCEL }} />
-                          <span className="absolute -right-1 -bottom-1 z-[7] size-2 cursor-crosshair touch-none border border-white" style={{ background: EXCEL }}
+                          <span className="absolute -right-1 -bottom-1 z-[7] size-2 cursor-crosshair touch-none border border-white before:absolute before:-inset-2 before:content-['']" style={{ background: EXCEL }}
                             data-testid="fill-handle"
                             onMouseDown={(e) => e.stopPropagation()}
                             onPointerDown={(e) => {
                               e.preventDefault();
                               e.stopPropagation();
+                              lastPointer.current = e.pointerType;
+                              // a finger is captured by what it touched: let it go, so the cells it moves over see it
+                              const handle = e.currentTarget as HTMLElement;
+                              if (handle.hasPointerCapture?.(e.pointerId)) handle.releasePointerCapture(e.pointerId);
                               setFill({ to: ref });
                             }} />
                         </>

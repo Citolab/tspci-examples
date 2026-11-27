@@ -75,6 +75,12 @@ const View = ({ m, value, editable, readOnly, plugged, label, sliderLabel, value
     onChange?.(v);
   };
 
+  /** A tap of a finger (no hover on a touchscreen) puts the magnifier where it tapped; a drag still scrolls the page. */
+  const onPointerUp = (e: PointerEvent) => {
+    if (m.zoom && !editable && e.pointerType === "touch") setLens(local(e));
+    finish();
+  };
+
   const onSliderKey = (e: KeyboardEvent) => {
     if (!canEdit) return;
     const next = stepValue(m, shown, e.key, e.shiftKey);
@@ -109,8 +115,8 @@ const View = ({ m, value, editable, readOnly, plugged, label, sliderLabel, value
     <svg ref={svg} viewBox={`0 0 ${g.width} ${g.height}`} width={g.width} height={g.height} data-testid={testid}
       class={`mi-figure block h-auto max-w-full select-none outline-none ${canEdit ? "cursor-pointer touch-none" : ""}`}
       style={{ fontFamily: "ui-sans-serif, system-ui, sans-serif" }} {...figureProps}
-      onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={finish} onPointerCancel={finish}
-      onPointerLeave={() => dragging.current === null && setLens(null)}>
+      onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={finish}
+      onPointerLeave={(e) => e.pointerType !== "touch" && dragging.current === null && setLens(null)}>
       <Defs uid={uid} />
       <g aria-hidden="true">{drawing}</g>
       {editable && (

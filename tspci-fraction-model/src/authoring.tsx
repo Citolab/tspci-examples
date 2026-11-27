@@ -66,7 +66,13 @@ const Authoring = ({ initial, language, onChange }: { initial: Setup; language: 
           )}
           <button type="button" className="ml-auto rounded-md px-2 py-1 text-xs text-slate-500 hover:bg-rose-50 hover:text-rose-700"
             disabled={setup.models.length < 2} data-testid={`remove-${i}`}
-            onClick={() => commit({ models: setup.models.filter((_, j) => j !== i) })}>{t.removeModel}</button>
+            onClick={(e) => {
+              // the button of the last model goes with it: the focus goes on to "+ Add a model", not lost
+              const root = (e.currentTarget as HTMLElement).getRootNode() as Document | ShadowRoot;
+              const hadFocus = root.activeElement === e.currentTarget;
+              commit({ models: setup.models.filter((_, j) => j !== i) });
+              if (hadFocus) setTimeout(() => { if (!root.activeElement || root.activeElement === document.body) root.querySelector<HTMLElement>('[data-testid="add-model"]')?.focus(); }, 0);
+            }}>{t.removeModel}</button>
         </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-2">

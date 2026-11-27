@@ -636,7 +636,7 @@ const Canvas = ({ settings, chart, start, onChange, texts, perms, readOnly = fal
           <div className="max-w-full overflow-x-auto rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
             <div ref={gridRef} role="grid" tabIndex={0} aria-label={label ?? t.chart} aria-activedescendant={cellId(cursor.x, cursor.y)} data-testid={testid}
               aria-readonly={readOnly ? "true" : undefined} onKeyDown={onKeyDown}
-              className="group relative grid touch-none select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-4"
+              className="group relative grid select-none rounded-md outline-none focus-visible:ring-2 focus-visible:ring-sky-200 focus-visible:ring-offset-4"
               style={{
                 // exactly the cells wide: the arrow layer (viewBox) and the pointer maths assume the grid is columns × CW
                 width: `${columns * CW}px`,
@@ -654,7 +654,8 @@ const Canvas = ({ settings, chart, start, onChange, texts, perms, readOnly = fal
                       <div role="gridcell" id={cellId(x, y)} key={x} aria-label={cellLabel(x, y)} aria-selected={isCursor}
                         aria-readonly={n && !canFill(n) && !canMove(n) ? "true" : undefined}
                         data-testid={`cell-${x}-${y}`} data-node={n ? n.id : undefined} data-fill={n ? n.card ?? (n.text ? `"${n.text}"` : "") : undefined}
-                        className={"relative " + (isTarget ? "rounded-lg bg-sky-100/70 " : "") + (isCursor ? "z-10 " : "") + (grabbable ? "cursor-grab " : "")}
+                        // only what can be dragged takes the finger: elsewhere a finger scrolls the page (and the chart, when it is wider)
+                        className={"relative " + (isTarget ? "rounded-lg bg-sky-100/70 " : "") + (isCursor ? "z-10 " : "") + (grabbable ? "cursor-grab touch-none " : "")}
                         onClick={() => clickCell(x, y)}
                         onDblClick={() => n && editRef.current?.focus()}
                         onPointerDown={(e) => grabbable && startDrag(e, { kind: "block", id: n!.id })}>
@@ -663,7 +664,7 @@ const Canvas = ({ settings, chart, start, onChange, texts, perms, readOnly = fal
                         {isCursor && !readOnly && <span aria-hidden="true" className="pointer-events-none absolute inset-1 rounded-lg ring-1 ring-sky-300 group-focus:hidden" />}
                         {n && isCursor && perms.arrows && !readOnly && (
                           <span aria-hidden="true" data-testid="handle" title={t.connectTo}
-                            className="absolute left-1/2 z-20 size-4 -translate-x-1/2 cursor-crosshair rounded-full border-2 border-white bg-sky-600 shadow ring-1 ring-sky-700"
+                            className="absolute left-1/2 z-20 size-4 -translate-x-1/2 cursor-crosshair touch-none rounded-full border-2 border-white bg-sky-600 shadow ring-1 ring-sky-700 before:absolute before:-inset-2.5 before:content-['']"
                             style={{ top: `${CH / 2 + 34}px` }}
                             onPointerDown={(e) => startDrag(e, { kind: "connect", id: n.id })} />
                         )}

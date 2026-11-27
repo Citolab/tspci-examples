@@ -374,3 +374,26 @@ export const TwoInstances: Story = {
     expect(second.changes).toHaveLength(1);
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: the sliders, the table and a question. */
+export const ToTry: Story = {
+  name: "Bee colony, to try",
+  args: { properties: { question: "largestEffect" } },
+};
+
+/** Removing a trial keeps the focus of the keyboard: on the remove button in its place, or else on Record trial. */
+export const RemoveKeepsFocus: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    const focused = () => (root as ShadowRoot).activeElement;
+    await userEvent.click(canvas.getByRole("button", { name: "Record trial" }));
+    await slide(canvas.getByRole("slider", { name: "Asian hornet" }), 1);
+    await userEvent.click(canvas.getByRole("button", { name: "Record trial" }));
+    const last = canvas.getByRole("button", { name: "Remove trial 2" });
+    last.focus();
+    last.click();
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Remove trial 1" })));
+    canvas.getByRole("button", { name: "Remove trial 1" }).click();
+    await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: "Record trial" })));
+  },
+};

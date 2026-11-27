@@ -42,6 +42,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Message writing, to try" };
+
 export const ReplyToAnEmail: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

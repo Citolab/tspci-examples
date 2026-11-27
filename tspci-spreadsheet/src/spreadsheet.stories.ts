@@ -35,6 +35,31 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Spreadsheet, to try" };
+
+/** On a tablet: tap a cell to select it, tap it again to type in it (no double tap needed). */
+export const TapToEdit: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    const tapCell = async (ref: string) => {
+      const cell = canvas.getByTestId(ref);
+      const r = cell.getBoundingClientRect();
+      const at = { clientX: r.left + 5, clientY: r.top + 5, bubbles: true, composed: true, button: 0 };
+      cell.dispatchEvent(new PointerEvent("pointerdown", { ...at, pointerId: 8, pointerType: "touch", isPrimary: true }));
+      cell.dispatchEvent(new PointerEvent("pointerup", { ...at, pointerId: 8, pointerType: "touch", isPrimary: true }));
+      cell.dispatchEvent(new MouseEvent("mousedown", at)); // the mouse events a browser sends after a tap
+      cell.dispatchEvent(new MouseEvent("mouseup", at));
+      cell.dispatchEvent(new MouseEvent("click", at));
+    };
+    await tapCell("E1");
+    await waitFor(() => expect(canvas.getByTestId("E1")).toHaveAttribute("aria-selected", "true"));
+    expect(canvas.queryByTestId("cell-input")).toBeNull();
+    await tapCell("E1");
+    await waitFor(() => expect(canvas.getByTestId("cell-input")).toBeInTheDocument());
+  },
+};
+
 export const Answering: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

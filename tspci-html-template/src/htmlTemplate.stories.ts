@@ -335,3 +335,15 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(instance.validate()).toEqual(["Er is nog geen antwoordelement: geef een input, textarea of select een name en data-response."]);
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: the example fact sheet. */
+export const ToTry: Story = {
+  name: "HTML template, to try",
+};
+
+/** The authoring mode to try by hand (no test runs on it): edit the template, add fields, see the preview. */
+export const AuthoringToTry: StoryObj<AuthoringArgs> = {
+  name: "Authoring, to try",
+  render: (args) => mountAuthoring(pci, args),
+  args: { width: 1100 },
+};

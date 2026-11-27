@@ -49,6 +49,11 @@ const NAME = JSON.stringify({ models: [
   { type: "circle", parts: 8, shaded: [0, 1, 2], task: "name", entry: "percent", target: "37.5%" },
 ] });
 
+/** The fraction model to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+export const ToTry: Story = {
+  name: "Fraction model, to try",
+};
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);

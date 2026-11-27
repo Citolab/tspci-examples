@@ -362,3 +362,36 @@ export const TwoInstances: Story = {
     expect(second.canvas.getByRole("button", { name: "Start de proef" })).toBeInTheDocument();
   },
 };
+
+/** To try by hand (no test runs on it), with a mouse, a touchscreen or the keyboard: set up the containers, run, pause. */
+export const ToTry: Story = {
+  name: "Evaporation, to try",
+  args: { properties: { runSeconds: "20" } },
+};
+
+/** The focus of the keyboard stays on the clock's buttons: Start becomes Pause and Continue, and Reset gives it to Start. */
+export const KeepsFocusOnTheClock: Story = {
+  args: { properties: { runSeconds: "40" } },
+  play: async ({ canvasElement, step }) => {
+    const { canvas, root } = await openPci(canvasElement);
+    const focused = () => (root as ShadowRoot).activeElement;
+    const press = async (name: RegExp) => {
+      const button = canvas.getByRole("button", { name });
+      button.focus();
+      button.click();
+      await afterPaint();
+    };
+
+    await step("start, pause and continue are one button", async () => {
+      await press(/Start the experiment/);
+      await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: /Pause/ })));
+      await press(/Pause/);
+      await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: /Continue/ })));
+    });
+
+    await step("after a reset the focus goes to Start, not to the page", async () => {
+      await press(/Reset/);
+      await waitFor(() => expect(focused()).toBe(canvas.getByRole("button", { name: /Start the experiment/ })));
+    });
+  },
+};

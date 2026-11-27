@@ -313,9 +313,11 @@ const Agenda = ({ planner: p, placements, onChange, texts: t, feedback = true, r
       .filter(Boolean).join(", ");
     return (
       <li key={task.id}>
+        {/* side by side (sm), the list of tasks scrolls: a finger that moves up or down scrolls it, one that moves
+            sideways drags the card to the agenda (and a tap picks it) */}
         <button type="button" data-testid={`card-${task.id}`} aria-pressed={picked === task.id} disabled={readOnly} aria-label={name}
           aria-describedby={task.notes ? `${testid}-notes-${task.id}` : undefined}
-          className={"flex w-full touch-none select-none flex-col items-start gap-0.5 rounded-lg border px-2.5 py-1.5 text-left text-xs " +
+          className={"flex w-full touch-none select-none flex-col items-start gap-0.5 rounded-lg border sm:touch-pan-y px-2.5 py-1.5 text-left text-xs " +
             "border-slate-200 bg-white text-slate-700 hover:border-sky-400 hover:bg-sky-50 disabled:cursor-default disabled:hover:border-slate-200 disabled:hover:bg-white " +
             "aria-pressed:border-sky-600 aria-pressed:bg-sky-50 aria-pressed:ring-2 aria-pressed:ring-sky-200 focus-visible:outline-2 focus-visible:outline-sky-600 " +
             (readOnly ? "" : "cursor-grab ") + (at ? "border-l-4 border-l-sky-600" : "border-l-4 border-l-slate-300 border-dashed")}

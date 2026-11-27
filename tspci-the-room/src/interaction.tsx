@@ -108,6 +108,7 @@ export const Interaction = (props: Props) => {
       },
     });
     view.current = v;
+    (host.current as any).__view = v; // for tests
     setWebgl(v.ok);
     const unsubscribe = store.subscribe((s) => {
       const objects = s.objects ?? model.start;
@@ -147,6 +148,16 @@ export const Interaction = (props: Props) => {
   const removeSelected = () => {
     const uid = selectedRef.current;
     if (uid) view.current?.remove(uid);
+  };
+  /**
+   * For a button whose action takes it away (Take out, Deselect) or disables it (Undo, Start over): the focus goes to
+   * the room, where the keys work, instead of being lost.
+   */
+  const thenFocusRoom = (run: () => void) => (e: Event) => {
+    const button = e.currentTarget as HTMLButtonElement;
+    const had = (button.getRootNode() as Document | ShadowRoot).activeElement === button;
+    run();
+    if (had) setTimeout(() => (!button.isConnected || button.disabled) && host.current?.focus({ preventScroll: true }));
   };
 
   const remaining = model.status === "ready" ? model.remaining(layout) : {};
@@ -228,13 +239,13 @@ export const Interaction = (props: Props) => {
 
             {status === "ready" && (
               <div class="pointer-events-none absolute inset-x-2 top-2 flex flex-wrap items-start justify-end gap-1.5">
-                <button type="button" class={`${button} pointer-events-auto`} onClick={undo} disabled={disabled || !canUndo}>
+                <button type="button" class={`${button} pointer-events-auto`} onClick={thenFocusRoom(undo)} disabled={disabled || !canUndo}>
                   <Icon d={icons.undo} /><span class="hidden sm:inline">{texts.undo}</span><span class="sr-only sm:hidden">{texts.undo}</span>
                 </button>
                 <button type="button" class={`${button} pointer-events-auto`} onClick={resetView} disabled={!webgl}>
                   <Icon d={icons.view} /><span class="hidden sm:inline">{texts.resetView}</span><span class="sr-only sm:hidden">{texts.resetView}</span>
                 </button>
-                <button type="button" class={`${button} pointer-events-auto`} onClick={startOver} disabled={disabled || atStart}>
+                <button type="button" class={`${button} pointer-events-auto`} onClick={thenFocusRoom(startOver)} disabled={disabled || atStart}>
                   <Icon d={icons.restart} /><span class="hidden sm:inline">{texts.startOver}</span><span class="sr-only sm:hidden">{texts.startOver}</span>
                 </button>
               </div>
@@ -254,10 +265,10 @@ export const Interaction = (props: Props) => {
                   <button type="button" class={button} onClick={() => view.current?.rotate(selected, -1)} disabled={disabled}>
                     <Icon d={icons.right} /><span class="sr-only sm:not-sr-only">{texts.rotateRight}</span>
                   </button>
-                  <button type="button" class={`${button} text-red-700`} onClick={removeSelected} disabled={disabled}>
+                  <button type="button" class={`${button} text-red-700`} onClick={thenFocusRoom(removeSelected)} disabled={disabled}>
                     <Icon d={icons.remove} /><span class="sr-only sm:not-sr-only">{texts.remove}</span>
                   </button>
-                  <button type="button" class={button} onClick={() => select(null)} aria-label={texts.deselect} title={texts.deselect}>
+                  <button type="button" class={button} onClick={thenFocusRoom(() => select(null))} aria-label={texts.deselect} title={texts.deselect}>
                     <Icon d={icons.close} />
                   </button>
                 </span>

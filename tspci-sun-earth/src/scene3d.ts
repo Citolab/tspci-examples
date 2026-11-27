@@ -178,6 +178,8 @@ export class SunEarthScene {
   private pointers = new Map<number, { x: number; y: number; startX: number; startY: number }>();
   private drag: { plane: Plane } | null = null;
   private pinch = 0;
+  /** two fingers were down in this gesture: lifting them is no tap (a pinch with one still finger picked a place) */
+  private multi = false;
 
   constructor(private host: HTMLElement, private events: SceneEvents) {
     // throws without WebGL: the caller shows the drawing only
@@ -448,7 +450,9 @@ export class SunEarthScene {
   private onPointerDown = (e: PointerEvent) => {
     this.renderer.domElement.setPointerCapture?.(e.pointerId);
     this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY, startX: e.clientX, startY: e.clientY });
+    if (this.pointers.size === 1) this.multi = false;
     if (this.pointers.size === 2) {
+      this.multi = true;
       this.drag = null;
       const [a, b] = [...this.pointers.values()];
       this.pinch = Math.hypot(a.x - b.x, a.y - b.y);
@@ -489,7 +493,7 @@ export class SunEarthScene {
     const p = this.pointers.get(e.pointerId);
     this.pointers.delete(e.pointerId);
     if (this.pointers.size < 2) this.pinch = 0;
-    const click = p && Math.hypot(e.clientX - p.startX, e.clientY - p.startY) < 5;
+    const click = p && !this.multi && Math.hypot(e.clientX - p.startX, e.clientY - p.startY) < 5;
     if (this.drag) {
       const day = click ? null : this.dayAt({ clientX: e.clientX, clientY: e.clientY }) ?? this.input?.setting.day;
       this.drag = null;

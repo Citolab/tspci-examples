@@ -73,13 +73,15 @@ const Authoring = ({ initial, initialMaterialId, settings, language, onApi, onCh
             className="rounded-md border border-slate-300 px-2 py-1.5"
             onInput={(e) => setIdText((e.target as HTMLInputElement).value)} />
         </label>
-        <button type="submit" className={button} title={t.replaceWarning} data-testid="load">{t.load}</button>
-        <button type="button" className={button} title={t.replaceWarning} data-testid="empty"
+        <button type="submit" className={button} title={t.replaceWarning} aria-describedby="replace-note" data-testid="load">{t.load}</button>
+        <button type="button" className={button} title={t.replaceWarning} aria-describedby="replace-note" data-testid="empty"
           onClick={() => start(null)}>{t.startEmpty}</button>
       </form>
       <p id="material-hint" className={`m-0 text-xs ${invalid ? "text-red-600" : "text-slate-500"}`}>
         {invalid ? t.invalidId : t.materialHint}
       </p>
+      {/* in view, not only in the buttons' title: a title only shows on hover, and a touchscreen has none */}
+      <p id="replace-note" className="m-0 text-xs text-slate-500">{t.replaceNote}</p>
       <p className="m-0 text-xs text-slate-500">{t.authoringHint}</p>
 
       <Applet key={round} settings={full} source={source} texts={t} label={t.region}

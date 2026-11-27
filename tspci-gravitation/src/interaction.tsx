@@ -93,10 +93,18 @@ const Interaction = ({ prompt, settings: s, store, texts, disabled }: {
 
         {s.record && (
           <Records settings={s} records={state.records} texts={texts} disabled={disabled} valueText={valueText} onRecord={record}
-            onRemove={(index) => {
+            onRemove={(index, button) => {
               if (disabled) return;
+              const records = button.closest("[data-records]");
               store.dispatch({ type: "REMOVE", payload: { index } });
               setAnnouncement(texts.removed(index + 1));
+              // the removed row took the focus with it: to the remove button in its place, the one before it, or Record
+              requestAnimationFrame(() => {
+                const root = records?.getRootNode() as Document | ShadowRoot | undefined;
+                if (!records || !root || (root.activeElement && root.activeElement !== document.body)) return;
+                const buttons = records.querySelectorAll<HTMLButtonElement>("tbody button");
+                (buttons[Math.min(index, buttons.length - 1)] ?? records.querySelector<HTMLButtonElement>("[data-testid=record]"))?.focus();
+              });
             }} />
         )}
       </section>
@@ -144,9 +152,9 @@ const Records = ({ settings: s, records, texts, disabled, valueText, onRecord, o
   disabled: boolean;
   valueText: (v: Variable, value: number) => string;
   onRecord: () => void;
-  onRemove: (index: number) => void;
+  onRemove: (index: number, button: HTMLElement) => void;
 }) => (
-  <div className="flex flex-col gap-2 border-t border-slate-100 p-4">
+  <div className="flex flex-col gap-2 border-t border-slate-100 p-4" data-records>
     <div className="flex flex-wrap items-center justify-between gap-2">
       <h3 className="m-0 text-sm font-semibold text-slate-700">{texts.measurements}</h3>
       <button type="button" onClick={onRecord} disabled={disabled} data-testid="record"
@@ -178,7 +186,7 @@ const Records = ({ settings: s, records, texts, disabled, valueText, onRecord, o
                   <td className="py-1.5 pr-3">{p.mantissa} × 10<sup>{p.exponent}</sup></td>
                   <td className="py-1.5 text-right">
                     {!disabled && (
-                      <button type="button" aria-label={texts.remove(i + 1)} onClick={() => onRemove(i)} data-testid={`remove-${i + 1}`}
+                      <button type="button" aria-label={texts.remove(i + 1)} onClick={(e) => onRemove(i, e.currentTarget as HTMLElement)} data-testid={`remove-${i + 1}`}
                         className="h-8 w-8 rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400">
                         ×
                       </button>

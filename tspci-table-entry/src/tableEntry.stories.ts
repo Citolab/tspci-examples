@@ -49,6 +49,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Table entry, to try" };
+
 export const Typing: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);

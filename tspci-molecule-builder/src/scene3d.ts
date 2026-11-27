@@ -102,6 +102,9 @@ export class MoleculeScene {
   private observer: ResizeObserver;
   private disposed = false;
   private drag: { x: number; y: number; moved: boolean; id: number } | null = null;
+  /** The fingers on the canvas: two of them pinch to zoom. */
+  private pointers = new Map<number, { x: number; y: number }>();
+  private pinch = 0;
   private raycaster = new Raycaster();
   onPick: (pick: Pick) => void = () => {};
 
@@ -129,7 +132,7 @@ export class MoleculeScene {
     canvas.addEventListener("pointerdown", this.pointerDown);
     canvas.addEventListener("pointermove", this.pointerMove);
     canvas.addEventListener("pointerup", this.pointerUp);
-    canvas.addEventListener("pointercancel", () => (this.drag = null));
+    canvas.addEventListener("pointercancel", this.pointerCancel);
     canvas.addEventListener("wheel", this.wheel, { passive: false });
 
     this.observer = new ResizeObserver(() => this.resize());
@@ -330,6 +333,14 @@ export class MoleculeScene {
   }
 
   private pointerDown = (e: PointerEvent) => {
+    this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (this.pointers.size === 2) {
+      // a second finger: a pinch, not a turn or a pick
+      const [a, b] = [...this.pointers.values()];
+      this.pinch = Math.hypot(a.x - b.x, a.y - b.y);
+      this.drag = null;
+      return;
+    }
     this.drag = { x: e.clientX, y: e.clientY, moved: false, id: e.pointerId };
     try {
       this.renderer.domElement.setPointerCapture(e.pointerId);
@@ -339,9 +350,18 @@ export class MoleculeScene {
   };
 
   private pointerMove = (e: PointerEvent) => {
+    if (this.pointers.has(e.pointerId)) this.pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+    if (this.pointers.size === 2 && this.pinch > 0) {
+      const [a, b] = [...this.pointers.values()];
+      const d = Math.hypot(a.x - b.x, a.y - b.y);
+      if (d > 0) this.zoomBy(d / this.pinch);
+      this.pinch = d;
+      return;
+    }
     if (!this.drag || this.drag.id !== e.pointerId) return;
     const dx = e.clientX - this.drag.x, dy = e.clientY - this.drag.y;
-    if (!this.drag.moved && Math.hypot(dx, dy) < 4) return;
+    // a finger wobbles a little during a tap: more slack for touch, so a tap still picks an atom
+    if (!this.drag.moved && Math.hypot(dx, dy) < (e.pointerType === "touch" ? 10 : 4)) return;
     this.drag.moved = true;
     this.drag.x = e.clientX;
     this.drag.y = e.clientY;
@@ -349,9 +369,17 @@ export class MoleculeScene {
   };
 
   private pointerUp = (e: PointerEvent) => {
+    this.pointers.delete(e.pointerId);
+    if (this.pointers.size < 2) this.pinch = 0;
     const drag = this.drag;
     this.drag = null;
     if (drag && !drag.moved) this.onPick(this.pick(e.clientX, e.clientY));
+  };
+
+  private pointerCancel = (e: PointerEvent) => {
+    this.pointers.delete(e.pointerId);
+    this.pinch = 0;
+    this.drag = null;
   };
 
   private wheel = (e: WheelEvent) => {

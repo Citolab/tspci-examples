@@ -137,11 +137,14 @@ const Scale = ({ cx, text, on, onPower, onTare, uid, showButtons, tareLabel }: {
       text-anchor="end" fill="#1a2e05" data-testid="scale-display">{on ? text : ""}</text>
     {showButtons && (
       <g style={{ cursor: onPower ? "pointer" : "default" }} onClick={onPower}>
+        {/* a larger hit area than the drawing, for a finger */}
+        <circle cx={cx + 36} cy={FLOOR - 27} r={15} fill="transparent" />
         <circle cx={cx + 36} cy={FLOOR - 27} r={10} fill="#1e293b" stroke="#94a3b8" stroke-width={1.5} />
         <circle cx={cx + 36} cy={FLOOR - 27} r={4} fill={on ? "#22c55e" : "#ef4444"} />
       </g>
     )}
     <g style={{ cursor: onTare ? "pointer" : "default" }} onClick={onTare}>
+      <rect x={cx + 52} y={FLOOR - 43} width={32} height={30} fill="transparent" />
       <rect x={cx + 52} y={FLOOR - 37} width={28} height={18} rx={4} fill="#e2e8f0" stroke="#94a3b8" />
       <text x={cx + 66} y={FLOOR - 24.5} font-size={7} font-weight="700" text-anchor="middle" fill={INK}>{tareLabel}</text>
     </g>

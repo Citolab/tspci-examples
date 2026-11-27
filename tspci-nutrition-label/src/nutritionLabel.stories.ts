@@ -130,6 +130,10 @@ export const EditAndKeyboard: Story = {
       expect(comp(pci.getResponse())).toEqual({ egg: 60 });
       expect(canvas.getByRole("status")).toHaveTextContent("Boiled egg: 60 g.");
     });
+    await step("after removing the last product the focus is not lost: it goes to the meal's heading", async () => {
+      await userEvent.click(canvas.getByTestId("remove-egg"));
+      await waitFor(() => expect(canvasElement.querySelector(".tspci-host")!.shadowRoot!.activeElement).toBe(canvas.getByRole("heading", { name: "Your meal" })));
+    });
   },
 };
 

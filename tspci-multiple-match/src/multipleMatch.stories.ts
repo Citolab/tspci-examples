@@ -68,6 +68,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Multiple match, to try" };
+
 export const Cards: Story = {
   args: { width: 500 },
   play: async ({ canvasElement }) => {

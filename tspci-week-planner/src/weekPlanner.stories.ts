@@ -413,3 +413,6 @@ export const AuthoringInDutch: StoryObj<AuthoringArgs> = {
     expect(JSON.parse(instance.getProperties().planner!).fixed[0].label).toBe("Teamoverleg");
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "Week planner, to try" };

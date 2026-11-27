@@ -113,10 +113,19 @@ const Interaction = ({ prompt, settings: s, store, texts, readOnly, uid }: {
     setAnnouncement(texts.recorded(state.trials.length + 1, beesText(population)));
   };
 
+  const recordButton = useRef<HTMLButtonElement>(null);
+  const trialsTable = useRef<HTMLTableElement>(null);
   const remove = (index: number) => {
     if (readOnly) return;
     store.dispatch({ type: "REMOVE", payload: { index } });
     setAnnouncement(texts.removed(index + 1));
+    // the removed row took the focus with it: to the remove button in its place, the one before it, or Record trial
+    requestAnimationFrame(() => {
+      const root = recordButton.current?.getRootNode() as Document | ShadowRoot | undefined;
+      if (!root || (root.activeElement && root.activeElement !== document.body)) return;
+      const buttons = trialsTable.current?.querySelectorAll<HTMLButtonElement>("tbody button") ?? [];
+      (buttons[Math.min(index, buttons.length - 1)] ?? recordButton.current)?.focus();
+    });
   };
 
   const fraction = (id: FactorId) => {
@@ -161,13 +170,13 @@ const Interaction = ({ prompt, settings: s, store, texts, readOnly, uid }: {
             <div className="flex min-w-0 flex-col gap-2">
               <div className="flex items-center justify-between gap-2">
                 <h3 className="m-0 text-xs font-semibold uppercase tracking-wide text-slate-500" id={`${uid}-trials`}>{texts.trials}</h3>
-                <button type="button" onClick={record} disabled={readOnly}
+                <button type="button" ref={recordButton} onClick={record} disabled={readOnly}
                   className="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-amber-700 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2">
                   {texts.record}
                 </button>
               </div>
               <div className="overflow-x-auto">
-                <table className="w-full border-collapse text-sm tabular-nums" aria-labelledby={`${uid}-trials`} data-testid="trials">
+                <table ref={trialsTable} className="w-full border-collapse text-sm tabular-nums" aria-labelledby={`${uid}-trials`} data-testid="trials">
                   <thead>
                     <tr className="border-b border-slate-200 text-left text-xs text-slate-500">
                       <th scope="col" className="py-1 pr-2 font-medium">{texts.trial}</th>

@@ -1,6 +1,6 @@
 import type { PciProperties } from "@citolab/tspci";
 import { Fragment } from "preact";
-import { useEffect, useRef } from "preact/hooks";
+import { useEffect, useLayoutEffect, useRef } from "preact/hooks";
 import { IStore, useStore } from "@citolab/preact-store";
 import configProps from "./config.json";
 import { Actions, ArrowSide, MAX_COLUMNS, MIN_COLUMNS, Operator, ROWS, StateModel, answerCell, answerOf, columnIsFixed } from "./store";
@@ -45,10 +45,33 @@ const Interaction = ({ config, store, readOnly }: Props) => {
     onValue: (value: string) => store.dispatch({ type: "SET_ARROW", payload: { side, index, value } }),
     onOperator: (operator: Operator) => store.dispatch({ type: "SET_OPERATOR", payload: { side, index, operator } }),
   });
-  const insert = (at: number) => store.dispatch({ type: "INSERT_COLUMN", payload: { at } });
+  // After a column is inserted or removed with the keyboard or a mouse (the button had the focus), the focus goes to the
+  // top box of the new column, or of the column that took the place of the removed one: not lost with a button that is
+  // gone. Not after a tap: that would open the on-screen keyboard.
+  const rootRef = useRef<HTMLDivElement>(null);
+  const focusCell = useRef<string | null>(null);
+  // a layout effect: right after the render, before what the candidate does next (a later effect would take the focus
+  // away from a box they already clicked)
+  useLayoutEffect(() => {
+    if (!focusCell.current) return;
+    rootRef.current?.querySelector<HTMLInputElement>(`#${focusCell.current}`)?.focus();
+    focusCell.current = null;
+  });
+  const hadFocus = (e: Event) => {
+    const button = e.currentTarget as HTMLElement;
+    return (e as PointerEvent).pointerType !== "touch" && (button.getRootNode() as Document | ShadowRoot).activeElement === button;
+  };
+  const insert = (at: number, e: Event) => {
+    if (hadFocus(e)) focusCell.current = `cell-1-${at + 1}`;
+    store.dispatch({ type: "INSERT_COLUMN", payload: { at } });
+  };
+  const remove = (at: number, e: Event) => {
+    if (hadFocus(e)) focusCell.current = `cell-1-${Math.min(at, columns - 2) + 1}`;
+    store.dispatch({ type: "REMOVE_COLUMN", payload: { at } });
+  };
 
   return (
-    <div className="font-sans text-ink">
+    <div ref={rootRef} className="font-sans text-ink">
       <h2 className="text-[1.5em] leading-tight font-black">{config.title}</h2>
       <p className="mt-2 leading-[1.7]">{config.question}</p>
 
@@ -101,9 +124,9 @@ const Interaction = ({ config, store, readOnly }: Props) => {
                     onInput={(e) => store.dispatch({ type: "SET_CELL", payload: { row, column, value: e.currentTarget.value } })}
                   />
                   {/* On the crossing of the lines: insert a column here, between this column and the previous one */}
-                  {row === 0 && column > 0 && canInsert && <InsertButton label={t.insertBetween(column)} className="left-0" onClick={() => insert(column)} />}
+                  {row === 0 && column > 0 && canInsert && <InsertButton label={t.insertBetween(column)} className="left-0" onClick={(e) => insert(column, e)} />}
                   {row === 0 && column === columns - 1 && canInsert && (
-                    <InsertButton label={t.insertEnd} className="left-full" onClick={() => insert(columns)} />
+                    <InsertButton label={t.insertEnd} className="left-full" onClick={(e) => insert(columns, e)} />
                   )}
                 </div>
               ))}
@@ -124,7 +147,7 @@ const Interaction = ({ config, store, readOnly }: Props) => {
                   className="remove"
                   title={t.remove(column + 1)}
                   aria-label={t.remove(column + 1)}
-                  onClick={() => store.dispatch({ type: "REMOVE_COLUMN", payload: { at: column } })}
+                  onClick={(e) => remove(column, e)}
                 >
                   <TrashIcon />
                 </button>
@@ -272,7 +295,7 @@ function ArcSvg({ top }: { top: boolean }) {
 }
 
 /** A small round + on a line of the table: a new, empty column there. */
-function InsertButton({ label, className, onClick }: { label: string; className: string; onClick: () => void }) {
+function InsertButton({ label, className, onClick }: { label: string; className: string; onClick: (e: Event) => void }) {
   return (
     <button type="button" className={`insert ${className}`} title={label} aria-label={label} onClick={onClick}>
       +

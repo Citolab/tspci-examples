@@ -609,7 +609,8 @@ export class HotspotScene {
     }
     if (this.drag.id !== e.pointerId) return;
     const dx = e.clientX - this.drag.x, dy = e.clientY - this.drag.y;
-    if (!this.drag.moved && Math.hypot(dx, dy) < 4) return;
+    // a finger wobbles a little during a tap: more slack for touch, so a tap still picks a part
+    if (!this.drag.moved && Math.hypot(dx, dy) < (e.pointerType === "touch" ? 10 : 4)) return;
     this.drag.moved = true;
     this.drag.x = e.clientX;
     this.drag.y = e.clientY;

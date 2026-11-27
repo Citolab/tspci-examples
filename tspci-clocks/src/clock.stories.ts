@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from "@storybook/html-vite";
 import { expect, userEvent, waitFor } from "storybook/test";
-import { afterPaint, lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, type AuthoringArgs, type MountedPci, type PciArgs } from "../../.storybook/tspci";
+import { afterPaint, focusedIn, lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, type AuthoringArgs, type MountedPci, type PciArgs } from "../../.storybook/tspci";
 import pci from "./index";
 
 const meta = {
@@ -90,6 +90,11 @@ const arrows = (mounted: MountedPci) => {
 
 // ---- a clock that only shows the time (askTime, the default): it stands in for an image, the answer is given elsewhere
 // in the item (a qti-text-entry-interaction), so the PCI has no field of its own and no response
+
+/** The clock to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+export const ToTry: Story = {
+  name: "Clock, to try",
+};
 
 export const Default: Story = {
   play: async ({ canvasElement }) => {
@@ -212,6 +217,44 @@ export const MinuteSteps: Story = {
 };
 
 // ---- answering by setting the digital clock (setClock)
+
+/** The keyboard on the analog clock: it is a slider of the time (arrow keys a step, Page Up and Page Down an hour). */
+export const KeyboardOnTheAnalogClock: Story = {
+  args: { properties: { ...SET_ANALOG, minutePerJumps: "5" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const clock = mounted.canvas.getByRole("slider", { name: "Clock" });
+    expect(clock).toHaveAttribute("aria-valuetext", "12:00");
+    // userEvent.keyboard does not reach into the shadow root: the key events go to the clock itself
+    const key = (key: string) => clock.dispatchEvent(new KeyboardEvent("keydown", { key, bubbles: true, composed: true }));
+    clock.focus();
+    key("ArrowRight");
+    key("ArrowUp");
+    await waitFor(() => expect(clock).toHaveAttribute("aria-valuetext", "12:10"));
+    key("PageUp");
+    await waitFor(() => expect(clock).toHaveAttribute("aria-valuetext", "01:10"));
+    key("ArrowLeft");
+    await waitFor(() => expect(mounted.pci.getResponse()).toEqual(time("01:05")));
+    key("End");
+    await waitFor(() => expect(clock).toHaveAttribute("aria-valuetext", "11:55"));
+  },
+};
+
+/** The arrows of the digital clock keep the focus: Enter, Enter on "Hour up" is two hours on. */
+export const DigitalArrowsKeepTheFocus: Story = {
+  args: { properties: SET_DIGITAL },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const hourUp = mounted.canvas.getByRole("button", { name: "Hour up" });
+    hourUp.focus();
+    hourUp.click();
+    await waitFor(() => expect(display(mounted)).toBe("13:00"));
+    expect(focusedIn(mounted.root)).toBe(hourUp);
+    hourUp.click();
+    await waitFor(() => expect(display(mounted)).toBe("14:00"));
+    expect(focusedIn(mounted.root)).toBe(hourUp);
+  },
+};
 
 export const SetDigitalClock: Story = {
   args: { properties: SET_DIGITAL },

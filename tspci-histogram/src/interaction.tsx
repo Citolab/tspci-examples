@@ -159,23 +159,35 @@ const Interaction = ({ s, store, texts, readOnly, solution }: {
     return ((g.baseline - (clientY - r.top) / k) / g.plotH) * s.max;
   };
 
-  // dragging: the window follows the pointer until it is let go
-  useEffect(() => {
-    if (dragging === null) return;
-    const move = (e: PointerEvent) => setHeight(dragging, valueAt(e.clientY), "drag", false);
+  // dragging: the window follows the pointer until it is let go. The listeners go on in the pointerdown itself, not in
+  // an effect after the next render: a quick tap of a finger can be let go before that, and the bar then kept following
+  // the next drag elsewhere.
+  const latest = useRef({ setHeight, valueAt });
+  latest.current = { setHeight, valueAt };
+  const stopDrag = useRef<(() => void) | null>(null);
+  useEffect(() => () => stopDrag.current?.(), []);
+  const startDrag = (bar: number) => {
+    stopDrag.current?.();
+    setDragging(bar);
+    const move = (e: PointerEvent) => latest.current.setHeight(bar, latest.current.valueAt(e.clientY), "drag", false);
     const up = (e: PointerEvent) => {
-      setHeight(dragging, valueAt(e.clientY), "drag");
+      stop();
+      // a cancelled drag (the browser took the gesture) has no position: keep the height it had
+      const value = e.type === "pointercancel" ? store.getState().heights[bar] : latest.current.valueAt(e.clientY);
+      latest.current.setHeight(bar, value, "drag");
       setDragging(null);
+    };
+    const stop = () => {
+      window.removeEventListener("pointermove", move);
+      window.removeEventListener("pointerup", up);
+      window.removeEventListener("pointercancel", up);
+      stopDrag.current = null;
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     window.addEventListener("pointercancel", up);
-    return () => {
-      window.removeEventListener("pointermove", move);
-      window.removeEventListener("pointerup", up);
-      window.removeEventListener("pointercancel", up);
-    };
-  }, [dragging, width, s]);
+    stopDrag.current = stop;
+  };
 
   const onKey = (bar: number, e: KeyboardEvent) => {
     const h = state.heights[bar];
@@ -261,10 +273,10 @@ const Interaction = ({ s, store, texts, readOnly, solution }: {
                       e.preventDefault();
                       (e.currentTarget as SVGGElement).focus();
                       setHeight(i, valueAt(e.clientY), "drag", false);
-                      setDragging(i);
+                      startDrag(i);
                     }}>
                     {/* the whole column is the target: a large one for a finger */}
-                    <rect x={g.left + i * g.slot} y={g.top - 14} width={g.slot} height={g.plotH + 14} fill="transparent" />
+                    <rect className="hg-column" x={g.left + i * g.slot + 1} y={g.top - 14} width={g.slot - 2} height={g.plotH + 14} rx={4} fill="transparent" />
                     <rect className="hg-focus" x={x} y={y} width={w} height={Math.max(0, g.baseline - y)} fill={b.color}
                       stroke="white" stroke-width={s.chartType === "histogram" ? 1 : 0} fill-opacity={dragging === i ? 0.85 : 1} />
                     {b.locked && <rect x={x} y={y} width={w} height={Math.max(0, g.baseline - y)} fill="url(#hg-locked)" pointer-events="none" />}

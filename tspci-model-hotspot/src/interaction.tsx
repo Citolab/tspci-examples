@@ -185,15 +185,19 @@ const Interaction = ({ prompt, settings, model, gltf, showNames, aids, store, te
   };
 
   const toggleHidden = (id: string) => setHidden((h) => (h.includes(id) ? h.filter((x) => x !== id) : [...h, id]));
-  const restart = () => {
+  const restart = (e: Event) => {
+    // the button turns disabled: the focus goes to the first part in the list instead of being lost
+    const button = e.currentTarget as HTMLButtonElement;
+    const had = (button.getRootNode() as Document | ShadowRoot).activeElement === button;
     set({ selected: [], placed: {} });
     setPicked(null);
     setStatus(t.cleared);
+    if (had) setTimeout(() => button.disabled && listRef.current?.querySelector<HTMLButtonElement>("button")?.focus());
   };
 
   const keysHelp = labelMode ? t.keys.label : t.keys.click;
   const modelName = model ? nameOf(model.name, lang) : t.model3d;
-  const slider = "w-full accent-sky-700";
+  const slider = "h-6 w-full accent-sky-700"; // 24 px high: a target a finger can hit
   const empty = !answer.selected.length && !Object.keys(answer.placed).length;
 
   return (

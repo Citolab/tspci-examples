@@ -129,6 +129,14 @@ export const PlayAndPause: Story = {
       expect(canvas.getByTestId("turns")).toHaveTextContent("2.00 turns of the wheel");
       expect(canvas.getByRole("button", { name: "Step forward" })).toBeDisabled();
     });
+
+    await step("back to the start with the keyboard: that button is disabled then, the focus goes to Play", async () => {
+      const reset = canvas.getByRole("button", { name: "Back to the start" });
+      reset.focus();
+      reset.click();
+      await waitFor(() => expect(reset).toBeDisabled());
+      await waitFor(() => expect((mounted.root as ShadowRoot).activeElement).toBe(canvas.getByRole("button", { name: "Play" })));
+    });
   },
 };
 
@@ -291,3 +299,6 @@ export const Solution: Story = {
     expect(option(canvas, Q_TRAIN, "A circle")).toBeDisabled();
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Reference frames, to try" };

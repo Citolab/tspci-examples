@@ -402,3 +402,9 @@ export const AuthoringDutchPciScoring: StoryObj<AuthoringArgs> = {
     expect(canvas.getByRole("tab", { name: "Schema" })).toBeInTheDocument();
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet). */
+export const ToTry: Story = { name: "Flowchart, to try" };
+
+/** Free building without a test, to try by hand: blocks, arrows and text of the pupil's own. */
+export const FreeBuildToTry: Story = { name: "Flowchart, free build to try", args: { properties: { flowchart: FREE, scoring: "pci", prompt: "Make a flowchart for making tea." } } };

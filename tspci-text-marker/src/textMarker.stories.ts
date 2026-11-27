@@ -57,6 +57,9 @@ export const Default: Story = {
   },
 };
 
+/** No play function: to try it by hand (with a mouse, a keyboard or a finger). */
+export const ToTry: Story = { name: "Text marker, to try" };
+
 export const MarkWithTheMouse: Story = {
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);
@@ -150,6 +153,13 @@ export const Keyboard: Story = {
 export const Touch: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);
+    // a finger that lands on a word and then scrolls the page (pointercancel) selects nothing
+    const r = word(mounted, 50).getBoundingClientRect();
+    const finger = { clientX: r.left + 2, clientY: r.top + r.height / 2, bubbles: true, composed: true, pointerId: 6, pointerType: "touch", isPrimary: true };
+    word(mounted, 50).dispatchEvent(new PointerEvent("pointerdown", finger));
+    word(mounted, 50).dispatchEvent(new PointerEvent("pointercancel", finger));
+    await afterPaint();
+    expect(mounted.root.querySelectorAll(".tm-sel")).toHaveLength(0);
     await tap(word(mounted, 93));
     await tap(word(mounted, 110));
     expect(mounted.pci.getResponse()).toBeUndefined();

@@ -54,6 +54,8 @@ const MarkerView = (p: Props) => {
   const textRef = useRef<HTMLDivElement>(null);
   const drag = useRef<{ id: number; moved: boolean; start: number } | null>(null);
   const pendingTap = useRef(false);
+  /** A finger on a word: it counts as a tap when it is lifted there, not when the page scrolls under it. */
+  const touchDown = useRef<{ id: number; x: number; y: number; w: number } | null>(null);
   const lastPointer = useRef("mouse");
   const total = doc.words.length;
   const num = (n: number) => formatNumber(t, n);
@@ -161,17 +163,13 @@ const MarkerView = (p: Props) => {
     lastPointer.current = e.pointerType;
     const w = wordOf(e);
     if (w === null || e.button > 0) return;
+    // touch: wait for the finger to lift, so that a finger scrolling the page does not select or mark
+    if (e.pointerType === "touch") {
+      touchDown.current = { id: e.pointerId, x: e.clientX, y: e.clientY, w };
+      return;
+    }
     e.preventDefault();
     textRef.current?.focus({ preventScroll: true });
-    if (e.pointerType === "touch") {
-      if (!readOnly && pendingTap.current && cursor !== null) {
-        const r = snapRange(doc, anchor ?? cursor, cursor, snap);
-        if (w >= r.start && w <= r.end) return markRange(anchor ?? cursor, cursor);
-        return moveTo(w, true);
-      }
-      pendingTap.current = true;
-      return moveTo(w, false);
-    }
     if (e.shiftKey && cursor !== null) return moveTo(w, true);
     moveTo(w, false);
     if (readOnly) return;
@@ -182,7 +180,22 @@ const MarkerView = (p: Props) => {
       // a synthetic event without an active pointer
     }
   };
+  const onTap = (w: number) => {
+    textRef.current?.focus({ preventScroll: true });
+    if (!readOnly && pendingTap.current && cursor !== null) {
+      const r = snapRange(doc, anchor ?? cursor, cursor, snap);
+      if (w >= r.start && w <= r.end) return markRange(anchor ?? cursor, cursor);
+      return moveTo(w, true);
+    }
+    pendingTap.current = true;
+    return moveTo(w, false);
+  };
+  const isTap = (e: PointerEvent) => {
+    const d = touchDown.current;
+    return !!d && d.id === e.pointerId && Math.hypot(e.clientX - d.x, e.clientY - d.y) < 10;
+  };
   const onPointerMove = (e: PointerEvent) => {
+    if (touchDown.current && !isTap(e)) touchDown.current = null;
     if (!drag.current || drag.current.id !== e.pointerId) return;
     const w = wordAt(e.clientX, e.clientY) ?? wordOf(e);
     if (w === null || (w === drag.current.start && !drag.current.moved)) return;
@@ -190,6 +203,12 @@ const MarkerView = (p: Props) => {
     setCursor(w);
   };
   const onPointerUp = (e: PointerEvent) => {
+    if (e.pointerType === "touch") {
+      const tap = isTap(e) ? touchDown.current : null;
+      touchDown.current = null;
+      if (tap) onTap(tap.w);
+      return;
+    }
     const d = drag.current;
     drag.current = null;
     if (!d || d.id !== e.pointerId) return;
@@ -417,7 +436,7 @@ const MarkerView = (p: Props) => {
         aria-describedby={`${uid}-help ${uid}-limits`} lang={p.textLanguage || undefined} dir={direction}
         className={`tm-text ${readOnly ? "tm-readonly" : ""}`} data-testid="text"
         style={p.maxHeight ? { maxHeight: `${p.maxHeight}px`, overflowY: "auto" } : undefined}
-        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => (drag.current = null)}
+        onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={onPointerUp} onPointerCancel={() => { drag.current = null; touchDown.current = null; }}
         onDblClick={onDblClick} onKeyDown={onKeyDown} onFocus={onFocus}>
         {paragraphs}
       </div>
@@ -444,7 +463,7 @@ const MarkerView = (p: Props) => {
                 <li key={`${m.start}-${m.end}`} className="flex flex-wrap items-center gap-2 text-sm">
                   <span className="w-5 text-end tabular-nums text-slate-500" aria-hidden="true">{num(i + 1)}.</span>
                   {c && <Swatch category={c} t={t} />}
-                  <button type="button" className="min-w-0 flex-1 truncate rounded px-1 text-start text-slate-800 hover:bg-white focus-visible:outline-2 focus-visible:outline-sky-700"
+                  <button type="button" className="min-h-6 min-w-0 flex-1 truncate rounded px-1 text-start text-slate-800 hover:bg-white focus-visible:outline-2 focus-visible:outline-sky-700"
                     aria-label={t.goTo(num(i + 1), nameOf(m.category), excerpt(doc, m))} dir="auto"
                     onClick={() => {
                       textRef.current?.focus({ preventScroll: true });
@@ -456,7 +475,7 @@ const MarkerView = (p: Props) => {
                     <span className="text-slate-600"> · “{excerpt(doc, m)}” · {t.words(num(words), words !== 1)}</span>
                   </button>
                   {!readOnly && (
-                    <button type="button" className="rounded-md px-2 py-0.5 text-slate-500 hover:bg-white hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-sky-700"
+                    <button type="button" className="min-h-6 min-w-6 rounded-md px-2 py-0.5 text-slate-500 hover:bg-white hover:text-rose-700 focus-visible:outline-2 focus-visible:outline-sky-700"
                       aria-label={t.removeN(num(i + 1), excerpt(doc, m))}
                       onClick={() => {
                         onChangeMarks(marks.filter((x) => x !== m));

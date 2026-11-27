@@ -70,6 +70,9 @@ const setAxis = async (canvas: Canvas, name: string, quantity: string, unit: str
 
 const points = (canvas: Canvas) => canvas.queryAllByRole("button", { name: /^Delete point \(/ }).map((b) => b.getAttribute("aria-label")!.slice("Delete point ".length));
 
+/** The example as it opens, without a test: to try it by hand (also on a tablet). */
+export const ToTry: Story = { name: "Graph builder, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement, step }) => {
     const { canvas, pci } = await openPci(canvasElement);
@@ -199,6 +202,8 @@ export const BuildTheGraph: Story = {
       expect(points(canvas)).toEqual([]);
       expect(canvas.queryByTestId("line")).toBeNull();
       expect(graph(pci.getResponse())).toMatchObject({ points: [], line: false });
+      // the button is disabled now: the focus goes to the graph, not nowhere
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(canvas.getByTestId("plot")));
     });
   },
 };

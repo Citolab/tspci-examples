@@ -368,3 +368,6 @@ export const AuthoringDutch: StoryObj<AuthoringArgs> = {
     expect(instance.validate()).toEqual(["Er is nog geen oplossing."]);
   },
 };
+
+/** The example with its default settings and no test, to try by hand (with a mouse, a finger or the keyboard). */
+export const ToTry: Story = { name: "Load planner, to try" };

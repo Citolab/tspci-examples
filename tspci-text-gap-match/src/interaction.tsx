@@ -130,7 +130,7 @@ const Interaction = ({ labels, zones, image, rules, numbering, droppedStyle, sto
   };
 
   /** Pressing a label: pick it up, put it down again, or put the picked one here. */
-  const onLabelClick = (here: Source) => {
+  const onLabelClick = (here: Source, byKeyboard = false) => {
     if (suppressClick.current) {
       suppressClick.current = false; // the click that ends a drag
       return;
@@ -150,6 +150,12 @@ const Interaction = ({ labels, zones, image, rules, numbering, droppedStyle, sto
     }
     setPicked(here);
     setMessage(t.picked(labels[here.label]));
+    // with the keyboard, the next step is a drop zone: the zones lie before the labels in the tab order, so go there
+    if (byKeyboard) {
+      const zone = zones.find((z) => z.id !== here.zone && accepts(placed, rules, here, z.id));
+      const root = listRef.current?.parentElement;
+      if (zone && root) setTimeout(() => root.querySelector<HTMLElement>(`[data-dropzone="${zone.id}"] > button`)?.focus());
+    }
   };
 
   const onZoneClick = (zone: string) => {
@@ -167,6 +173,11 @@ const Interaction = ({ labels, zones, image, rules, numbering, droppedStyle, sto
     suppressClick.current = false;
     if (e.key === "Escape" && (picked || drag)) {
       e.preventDefault();
+      // the focus back to the label that was picked up
+      if (picked) {
+        const testid = picked.zone === null ? `label-${picked.label}` : `placed-${picked.zone}-${picked.label}`;
+        listRef.current?.parentElement?.querySelector<HTMLElement>(`[data-testid="${testid}"]`)?.focus();
+      }
       setPicked(null);
       setMessage(t.cancelled);
     }
@@ -197,7 +208,7 @@ const Interaction = ({ labels, zones, image, rules, numbering, droppedStyle, sto
         } ${isDragged ? "opacity-40" : ""} cursor-grab active:cursor-grabbing`}
         onPointerDown={onPointerDown(from)} onPointerMove={onPointerMove}
         onPointerUp={(e) => endPointer(e, false)} onPointerCancel={(e) => endPointer(e, true)}
-        onClick={() => onLabelClick(from)}
+        onClick={(e) => onLabelClick(from, e.detail === 0)}
         onKeyDown={(e) => {
           if (inZone && (e.key === "Delete" || e.key === "Backspace")) {
             e.preventDefault();

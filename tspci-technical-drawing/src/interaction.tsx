@@ -8,6 +8,18 @@ import { Drawing as DrawingSettings, LETTERS, TaskType, allowedInput } from "./t
 import { Texts, dimLabel } from "./texts";
 import { ModelViewer } from "./viewer";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
+/** A button that its own press disables would drop the keyboard focus on the page: then it goes to `to` instead. */
+const keepFocus = (e: Event, to: (root: ParentNode) => Element | null) => {
+  const b = e.currentTarget as HTMLButtonElement;
+  if (!hasFocus(b)) return;
+  setTimeout(() => {
+    if (b.disabled || !b.isConnected) (to(b.getRootNode() as ParentNode) as HTMLElement | null)?.focus();
+  });
+};
+
 // The candidate's view: the instruction, the drawing (with the fields, the grid or the view to name) and the 3D model,
 // and below it what the task needs: questions, drawing tools, or the choices.
 
@@ -136,9 +148,9 @@ const Interaction = ({ prompt, prepared, store, texts: t, language, showModel, s
               <button type="button" role="radio" aria-checked={erase} disabled={readOnly} data-testid="erase" className={erase ? pressed : button} onClick={() => setErase(true)}>{t.erase}</button>
             </div>
             <button type="button" className={button} disabled={readOnly || !state.lines.length} data-testid="undo"
-              onClick={() => { const last = state.lines[state.lines.length - 1]; setLines(state.lines.slice(0, -1)); announce(t.lineRemoved(lineText(t, last, language))); }}>{t.undo}</button>
+              onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=grid]")); const last = state.lines[state.lines.length - 1]; setLines(state.lines.slice(0, -1)); announce(t.lineRemoved(lineText(t, last, language))); }}>{t.undo}</button>
             <button type="button" className={button} disabled={readOnly || !state.lines.length} data-testid="clear"
-              onClick={() => { setLines([]); announce(t.cleared); }}>{t.clear}</button>
+              onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=grid]")); setLines([]); announce(t.cleared); }}>{t.clear}</button>
           </div>
           <details className="text-sm">
             <summary className="td-focus cursor-pointer text-slate-700">{t.yourLines} ({state.lines.length})</summary>

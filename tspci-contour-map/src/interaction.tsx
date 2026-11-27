@@ -10,6 +10,18 @@ import { ContourMap, Legend, Marker, Projection, linePath } from "./map";
 import { ProfileGraph } from "./profile";
 import { Overlay, ReliefScene } from "./scene3d";
 
+/** Whether the element has the focus in its document or shadow root (also when the page itself is not focused). */
+const hasFocus = (el: Element | null) => !!el && (el.getRootNode() as Document | ShadowRoot).activeElement === el;
+
+/** A button that its own press disables would drop the keyboard focus on the page: then it goes to `to` instead. */
+const keepFocus = (e: Event, to: (root: ParentNode) => Element | null) => {
+  const b = e.currentTarget as HTMLButtonElement;
+  if (!hasFocus(b)) return;
+  setTimeout(() => {
+    if (b.disabled || !b.isConnected) (to(b.getRootNode() as ParentNode) as HTMLElement | null)?.focus();
+  });
+};
+
 // The candidate's view: the contour map and the 3D relief model side by side (linked: the pointer on one shows on the
 // other), and below them the tasks, each in a tab, with what the task needs (the cross-section graph, the heights).
 
@@ -304,7 +316,7 @@ const TaskControls = (p: InteractionProps & {
             {!readOnly && (
               <div>
                 <button type="button" className={button} disabled={heights.every((h) => h === null)}
-                  onClick={() => set({ ...answer, heights: heights.map(() => null) })}>{t.clearProfile}</button>
+                  onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=profile] [role=slider]")); set({ ...answer, heights: heights.map(() => null) }); }}>{t.clearProfile}</button>
               </div>
             )}
           </>
@@ -346,8 +358,8 @@ const TaskControls = (p: InteractionProps & {
       {!readOnly && (
         <>
           <button type="button" className={button} disabled={path.length < 2}
-            onClick={() => set({ path: path.length > 2 ? path.slice(0, -1) : [] }, t.pathUndone)}>{t.undoPoint}</button>
-          <button type="button" className={button} disabled={path.length < 2} onClick={() => set({ path: [] }, t.pathCleared)}>{t.clearPath}</button>
+            onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=map]")); set({ path: path.length > 2 ? path.slice(0, -1) : [] }, t.pathUndone); }}>{t.undoPoint}</button>
+          <button type="button" className={button} disabled={path.length < 2} onClick={(e) => { keepFocus(e, (r) => r.querySelector("[data-testid=map]")); set({ path: [] }, t.pathCleared); }}>{t.clearPath}</button>
         </>
       )}
     </div>
@@ -464,7 +476,7 @@ const Relief = (p: {
         {control(t.resetView, "⟲", (s) => s.reset(), "reset-view")}
         <label className="ml-auto flex min-w-[10rem] flex-1 items-center gap-2 text-xs text-slate-600">
           <span className="whitespace-nowrap">{t.exaggeration}</span>
-          <input type="range" min="1" max="6" step="0.5" value={e} className="w-full accent-sky-700" data-testid="exaggeration"
+          <input type="range" min="1" max="6" step="0.5" value={e} className="h-8 w-full accent-sky-700" data-testid="exaggeration"
             aria-valuetext={t.times(formatNumber(e, e % 1 ? 1 : 0, p.language))}
             onInput={(ev) => p.setExaggeration(Number((ev.currentTarget as HTMLInputElement).value))} />
           <span className="w-8 text-right font-semibold tabular-nums text-slate-800" aria-hidden="true">{t.times(formatNumber(e, e % 1 ? 1 : 0, p.language))}</span>

@@ -94,6 +94,8 @@ const Interaction = ({ s, store, texts: t, readOnly, author }: {
   rowsRef.current = rows;
   const drag = useRef<{ source: Source; x0: number; y0: number; active: boolean; text: string; category: Category } | null>(null);
   const suppressClick = useRef(false);
+  /** Whether the block was selected when the handle was pressed: the press focuses the handle, and its focus selects it. */
+  const selectedAtPress = useRef<boolean | null>(null);
   const programRef = useRef<HTMLDivElement>(null);
   const selectedNode = selected ? findNode(program, selected) : null;
   const errorLine = run?.error?.line ?? 0;
@@ -280,8 +282,13 @@ const Interaction = ({ s, store, texts: t, readOnly, author }: {
             ) : (
               <button type="button" data-handle={node.id} aria-label={t.handle(number, text)} aria-describedby="cb-keys" aria-pressed={isSelected}
                 className={`${pieceButton} cursor-grab touch-none text-white/90 active:cursor-grabbing`}
-                onPointerDown={(e) => startDrag(e as unknown as PointerEvent, { id: node.id }, text, category)}
-                onClick={() => !suppressClick.current && setSelected(isSelected ? null : node.id)}
+                onPointerDown={(e) => { selectedAtPress.current = isSelected; startDrag(e as unknown as PointerEvent, { id: node.id }, text, category); }}
+                onClick={() => {
+                  // a click or tap switches the selection as it was before the press (the focus of the press selected it already)
+                  const was = selectedAtPress.current ?? isSelected;
+                  selectedAtPress.current = null;
+                  if (!suppressClick.current) setSelected(was ? null : node.id);
+                }}
                 onFocus={() => setSelected(node.id)}
                 onKeyDown={(e) => onHandleKey(e as unknown as KeyboardEvent, node.id)}>
                 <Grip />

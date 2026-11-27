@@ -329,3 +329,6 @@ export const Solution: Story = {
     expect(mounted.pci.getResponse()).toEqual(response({ sort: [0, 1, -1, 0] }));
   },
 };
+
+/** Without a test, to try by hand (also with a finger on a tablet): the default sixteen statements. */
+export const ToTry: Story = { name: "Q-sort, to try" };

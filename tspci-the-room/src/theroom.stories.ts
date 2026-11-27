@@ -62,6 +62,9 @@ const restaurantScore = {
 };
 const withFirstTable = (pos: number[], y: number) => [{ id: "table", pos, rot: rot(y) }, ...restaurant.slice(1)];
 
+/** Without a play function: to try by hand (mouse, keyboard or touch). */
+export const ToTry: Story = { name: "The room, to try" };
+
 export const Default: Story = {
   play: async ({ canvasElement }) => {
     const mounted = await openRoom(canvasElement);

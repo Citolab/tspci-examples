@@ -17,6 +17,7 @@ const en = {
     "toolbar, menu and other parts set in the settings. Objects named correct, answer, score and maxscore are " +
     "reported in the response.",
   replaceWarning: "This replaces the applet you are building.",
+  replaceNote: "Load material and Start empty replace the applet you are building.",
   found: (names: string[]) => (names.length ? `Reported in the response: ${names.join(", ")}` : "No objects named correct, answer, score or maxscore yet."),
   notReady: "The applet is not loaded yet.",
 };
@@ -36,6 +37,7 @@ const nl: typeof en = {
     "kandidaat krijgt de gereedschapsbalk, het menu en de andere onderdelen uit de instellingen. Objecten met de naam " +
     "correct, answer, score en maxscore komen in het antwoord.",
   replaceWarning: "Dit vervangt de applet die je aan het maken bent.",
+  replaceNote: "Materiaal laden en Leeg beginnen vervangen de applet die je aan het maken bent.",
   found: (names: string[]) => (names.length ? `In het antwoord: ${names.join(", ")}` : "Nog geen objecten met de naam correct, answer, score of maxscore."),
   notReady: "De applet is nog niet geladen.",
 };
