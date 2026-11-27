@@ -1,0 +1,73 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (empty: none)", "nl": "Titel (leeg: geen)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the instruction, in the language of the PCI)", "nl": "Vraag (leeg: de instructie, in de taal van de PCI)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts", "nl": "Taal van de eigen teksten van de PCI" }
+  },
+  "scene": {
+    "default": "scaffold",
+    "editor": "pci",
+    "options": [
+      { "value": "scaffold", "label": { "en": "Building site with a mobile scaffold", "nl": "Bouwplaats met een rolsteiger" } },
+      { "value": "warehouse", "label": { "en": "Warehouse with a forklift", "nl": "Magazijn met een heftruck" } },
+      { "value": "kitchen", "label": { "en": "Kitchen", "nl": "Keuken" } },
+      { "value": "workshop", "label": { "en": "Workshop", "nl": "Werkplaats" } }
+    ],
+    "label": { "en": "Scene", "nl": "Plaat" },
+    "$comment": "Set in the authoring mode (authoring.tsx), or typed: scaffold, warehouse, kitchen or workshop. Unknown: scaffold"
+  },
+  "hazards": {
+    "default": "all",
+    "editor": "pci",
+    "label": { "en": "Hazards that count", "nl": "Gevaren die meetellen" },
+    "hint": {
+      "en": "all, none, or the ids of the scene's hazards separated by commas (README). A hazard that does not count is drawn safe.",
+      "nl": "all, none, of de id's van de gevaren van de plaat, gescheiden door komma's (README). Een gevaar dat niet meetelt, staat veilig op de plaat."
+    },
+    "$comment": "Set in the authoring mode (authoring.tsx): \"all\", \"none\" or e.g. \"railing, wheels, ladder\". A list without any id of the scene: all"
+  },
+  "extraHazards": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Extra areas that count as a hazard", "nl": "Extra gebieden die als gevaar tellen" },
+    "hint": {
+      "en": "Drawn in the authoring mode: a JSON list of rectangles with a name, a label and an explanation (README).",
+      "nl": "Getekend in de auteursmodus: een JSON-lijst van rechthoeken met een naam, een omschrijving en een uitleg (README)."
+    },
+    "$comment": "Set in the authoring mode (authoring.tsx): [{\"name\":\"…\",\"label\":\"…\",\"why\":\"…\",\"x\":100,\"y\":80,\"w\":120,\"h\":60}] in scene units (800 × 500). At most 8 hazards count in all"
+  },
+  "maxMarks": {
+    "default": "0",
+    "editor": "integer",
+    "min": 0,
+    "max": 20,
+    "label": { "en": "Marks the pupil may place (0: no limit)", "nl": "Markeringen die de leerling mag zetten (0: geen grens)" },
+    "hint": {
+      "en": "With a number the pupil is told how many unsafe situations to find, and cannot place more marks.",
+      "nl": "Met een getal hoort de leerling hoeveel onveilige situaties er te vinden zijn, en kan hij niet meer markeringen zetten."
+    }
+  },
+  "penalty": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "A mark on a safe spot costs a point", "nl": "Een markering op een veilige plek kost een punt" },
+    "hint": {
+      "en": "The pupil is told so. Off: such marks do not matter for `correct`. The item's scoring decides the points (README).",
+      "nl": "De leerling krijgt dat te horen. Uit: zulke markeringen tellen niet mee voor `correct`. De scoring van het item bepaalt de punten (README)."
+    }
+  }
+}

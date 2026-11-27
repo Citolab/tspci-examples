@@ -1,0 +1,195 @@
+{
+  "name": "@citolab/pci-hazard-spotting",
+  "version": "1.0.0-alpha.1",
+  "description": "hazard spotting (gevaren herkennen) for VCA safety training and praktijkonderwijs: the pupil taps every unsafe situation in a drawn workplace (building site, warehouse, kitchen, workshop); reports which hazards were found and the marks on safe spots, and explains each hazard after answering",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-hazard-spotting#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-hazard-spotting"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "hazardSpotting.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "hazard-spotting",
+    "gevaren-herkennen",
+    "vca",
+    "safety",
+    "praktijkonderwijs"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-hazard-spotting npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-hazard-spotting npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "hazardSpotting",
+      "label": "Hazard spotting",
+      "tags": [
+        "safety",
+        "vca",
+        "hazard spotting",
+        "praktijkonderwijs"
+      ],
+      "short": "hazardSpotting",
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "found": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Hazards found",
+              "nl": "Gevaren gevonden"
+            }
+          },
+          "total": {
+            "baseType": "integer",
+            "label": {
+              "en": "Hazards to find",
+              "nl": "Te vinden gevaren"
+            }
+          },
+          "wrong": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Marks on a safe spot",
+              "nl": "Markeringen op een veilige plek"
+            }
+          },
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every hazard found, no mark on a safe spot",
+              "nl": "Elk gevaar gevonden, geen markering op een veilige plek"
+            }
+          },
+          "h1": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 1 found",
+              "nl": "Gevaar 1 gevonden"
+            }
+          },
+          "h2": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 2 found",
+              "nl": "Gevaar 2 gevonden"
+            }
+          },
+          "h3": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 3 found",
+              "nl": "Gevaar 3 gevonden"
+            }
+          },
+          "h4": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 4 found",
+              "nl": "Gevaar 4 gevonden"
+            }
+          },
+          "h5": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 5 found",
+              "nl": "Gevaar 5 gevonden"
+            }
+          },
+          "h6": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 6 found",
+              "nl": "Gevaar 6 gevonden"
+            }
+          },
+          "h7": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 7 found",
+              "nl": "Gevaar 7 gevonden"
+            }
+          },
+          "h8": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Hazard 8 found",
+              "nl": "Gevaar 8 gevonden"
+            }
+          },
+          "marks": {
+            "baseType": "string",
+            "label": {
+              "en": "The marks",
+              "nl": "De markeringen"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Choose the scene and the hazards…",
+          "nl": "Plaat en gevaren kiezen…"
+        },
+        "width": 960,
+        "height": 900
+      }
+    }
+  }
+}

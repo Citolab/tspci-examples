@@ -1,0 +1,70 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-ink: #1f2937;
+  --color-mark: #0072b2;
+  --color-found: #009e73;
+  --color-missed: #e69f00;
+  --color-wrong: #d55e00;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  /* The picture: as wide as the item, never wider than it is drawn for a big screen */
+  .scene-frame {
+    @apply overflow-hidden rounded-xl border-2 border-ink bg-white;
+    max-width: 960px;
+  }
+  .scene {
+    @apply block h-auto w-full select-none;
+    /* a finger can still scroll and zoom the page; no delay for a double tap */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  .scene-frame:has(.scene:focus-visible) {
+    @apply outline-3 outline-offset-2 outline-mark;
+  }
+
+  /* The number of a mark in the list, as on the marker */
+  .mark-badge {
+    @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 border-ink bg-mark text-sm font-bold text-white;
+  }
+  .remove-button {
+    @apply min-h-9 min-w-11 cursor-pointer rounded-md border-2 border-slate-400 bg-white px-3 py-1 text-sm font-semibold text-slate-800 hover:border-slate-600 hover:bg-slate-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-mark;
+  }
+
+  /* The number of a hazard after answering: a square, as in the picture */
+  .hazard-badge {
+    @apply inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border-2 border-ink text-sm font-bold;
+  }
+  .hazard-badge.is-found {
+    @apply bg-found text-white;
+  }
+  .hazard-badge.is-missed {
+    @apply bg-missed text-ink;
+  }
+
+  /* The authoring mode */
+  .author-button {
+    @apply min-h-9 cursor-pointer rounded-md border-2 border-slate-300 bg-white px-3 py-1 text-sm font-semibold text-slate-700 hover:border-slate-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-mark disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .author-input {
+    @apply min-h-9 rounded-md border-2 border-slate-300 bg-white px-2 py-1 text-sm text-ink focus-visible:border-mark focus-visible:outline-none;
+  }
+}
