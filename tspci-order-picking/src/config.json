@@ -1,0 +1,56 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (empty: none)", "nl": "Titel (leeg: geen)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the instruction of the task, in the language of the PCI)", "nl": "Vraag (leeg: de instructie bij de opdracht, in de taal van de PCI)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts (and of the example warehouse)", "nl": "Taal van de eigen teksten van de PCI (en van het voorbeeldmagazijn)" }
+  },
+  "task": {
+    "default": "pick",
+    "editor": "enum",
+    "options": [
+      { "value": "pick", "label": { "en": "Pick the order into the roll cage", "nl": "De order picken in de rolcontainer" } },
+      { "value": "check", "label": { "en": "Check a picked roll cage for mistakes", "nl": "Een gepickte rolcontainer controleren op fouten" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
+  "route": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Pick: also walk a short route (compared with the shortest route)", "nl": "Picken: ook een korte route lopen (vergeleken met de kortste route)" }
+  },
+  "routeMargin": {
+    "default": "0",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Route: steps more than the shortest route that still count as short", "nl": "Route: stappen meer dan de kortste route die nog als kort tellen" }
+  },
+  "stock": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Pick: stock counts; a line with too little stock is a shortage to report", "nl": "Picken: voorraad telt; een regel met te weinig voorraad is een tekort om te melden" }
+  },
+  "warehouse": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Warehouse, products and order", "nl": "Magazijn, producten en order" },
+    "hint": {
+      "en": "Set in the authoring mode. Empty: the example of a school warehouse, in the language of the PCI.",
+      "nl": "In te stellen in de auteursmodus. Leeg: het voorbeeld van een schoolmagazijn, in de taal van de PCI."
+    },
+    "$comment": "JSON written by the authoring mode (picking.ts serializeWarehouse): aisles, depth, shelves, back, products, order and the roll cage of the check task"
+  }
+}

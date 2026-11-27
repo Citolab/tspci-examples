@@ -1,0 +1,194 @@
+{
+  "name": "@citolab/pci-order-picking",
+  "version": "1.0.0-alpha.1",
+  "description": "order picking (orderpicken) in a small warehouse seen from above: walk to the locations of a pick list, take the right quantity into the roll cage, report a shortage, walk a short route, or check a picked roll cage for mistakes",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-order-picking#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-order-picking"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "orderPicking.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "order-picking",
+    "orderpicken",
+    "warehouse",
+    "magazijn",
+    "logistics",
+    "logistiek"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-order-picking npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-order-picking npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "orderPicking",
+      "label": "Order picking",
+      "tags": [
+        "logistics",
+        "warehouse",
+        "order picking"
+      ],
+      "short": "orderPicking",
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Everything right (pick: every line, nothing extra, a short route when asked; check: every line judged right)",
+              "nl": "Alles goed (picken: elke regel, niets te veel, een korte route als dat gevraagd is; controleren: elke regel goed beoordeeld)"
+            }
+          },
+          "lines": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Order lines right (pick: picked right; check: judged right)",
+              "nl": "Orderregels goed (picken: goed gepickt; controleren: goed beoordeeld)"
+            }
+          },
+          "linesTotal": {
+            "baseType": "integer",
+            "label": {
+              "en": "Order lines on the pick list",
+              "nl": "Orderregels op de picklijst"
+            }
+          },
+          "wrongItems": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Wrong articles (pick: in the roll cage, not on the list; check: wrong articles found)",
+              "nl": "Verkeerde artikelen (picken: in de rolcontainer, niet op de lijst; controleren: verkeerde artikelen gevonden)"
+            }
+          },
+          "quantityErrors": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Wrong quantities (pick: lines with a wrong quantity; check: wrong quantities found)",
+              "nl": "Verkeerde aantallen (picken: regels met een verkeerd aantal; controleren: verkeerde aantallen gevonden)"
+            }
+          },
+          "shortagesReported": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Shortages reported where stock ran short",
+              "nl": "Tekorten gemeld waar de voorraad te klein was"
+            },
+            "when": {
+              "task": [
+                "pick"
+              ],
+              "stock": [
+                "true"
+              ]
+            }
+          },
+          "routeLength": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Route walked, back to dispatch (steps)",
+              "nl": "Gelopen route, terug naar expeditie (stappen)"
+            },
+            "when": {
+              "task": [
+                "pick"
+              ],
+              "route": [
+                "true"
+              ]
+            }
+          },
+          "shortestRoute": {
+            "baseType": "float",
+            "label": {
+              "en": "Shortest route along every location (steps)",
+              "nl": "Kortste route langs elke locatie (stappen)"
+            },
+            "when": {
+              "task": [
+                "pick"
+              ],
+              "route": [
+                "true"
+              ]
+            }
+          },
+          "picked": {
+            "baseType": "string",
+            "label": {
+              "en": "What is in the roll cage and the shortages reported, or the check of each line",
+              "nl": "Wat in de rolcontainer zit en de gemelde tekorten, of de controle van elke regel"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Set up the warehouse and the order…",
+          "nl": "Magazijn en order instellen…"
+        },
+        "width": 960,
+        "height": 900
+      }
+    }
+  }
+}
