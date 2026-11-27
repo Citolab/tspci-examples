@@ -5,7 +5,7 @@ Example PCI's created with @citolab/tspci
 [github](https://github.com/Citolab/tspci/lib/tspci) | 
 [npm](https://www.npmjs.com/package/@citolab/tspci)
 
-There are 63 examples in this repository that can give a head start while creating new Portable Custom Interactions.
+There are 68 examples in this repository that can give a head start while creating new Portable Custom Interactions.
 Twenty-five of them are ports of existing PCIs and three more take ideas from one; all 28 credit the original
 authors and keep the licence of the original (see [Ports of open-source PCIs](#ports-of-open-source-pcis),
 [Ports of the DEPP PCIs](#ports-of-the-depp-pcis) and [Ports of the PARCC PCIs](#ports-of-the-parcc-pcis)).
@@ -122,9 +122,14 @@ scoring). Every example describes both in two files it already has:
 | tspci-load-planner | `textarea`, `pci`, `enum`, `boolean` | `record` (checks, metrics, placement) | `custom`, `human` |
 | tspci-contour-map | `textarea`, `pci`, `number`, `boolean`, `enum` | `record` (a score and a number per task) | `custom`, `human` |
 | tspci-sun-earth | `textarea`, `pci`, `enum`, `boolean` | `record` (date, time, place, sun position) | `custom`, `human` (its tool mode is not scored) |
-| tspci-number-line | `textarea`, `enum`, `pci`, `integer`, `boolean` | `ordered` `float`, `single` `string` (interval) or a `record` | `match_correct`, `custom`, `human` |
+| tspci-number-line | `textarea`, `enum`, `pci`, `integer`, `boolean` | `ordered` `float`, `single` `string` (interval) or a `record` (also the empty and the double number line: answer, working) | `match_correct`, `custom`, `human` |
 | tspci-ratio-table | `text`, `textarea`, `enum`, `integer` | `record` (`answer`, `working`, `answerCorrect`, `ratio`, `steps`, `stepsMatch`) | `custom`, `match_correct`, `human` (its tool mode is not scored) |
 | tspci-clocks | `text`, `textarea`, `enum`, `pci`, `boolean`, `time` | `single` `string` (`HH:MM`) | `match_correct`, `human` (a clock that only shows the time is not scored) |
+| tspci-written-calculation | `text`, `textarea`, `enum`, `integer`, `boolean` | `record` (`answer`, `remainder`, `working`, `answerCorrect`) | `custom`, `match_correct`, `human` |
+| tspci-money | `text`, `textarea`, `enum`, `boolean`, `pci` (authoring mode: the currency and its coins and notes) | `record` (`amount` or `answer`, `exact`, and `pieces`, `fewest` when the task asks for the fewest) | `match_correct`, `custom`, `human` |
+| tspci-bead-frame | `text`, `textarea`, `enum`, `integer`, `pci`, `boolean` | `record` (`value`, `first`, `second`, `structured`, `viaTen`, `correct`) | `match_correct`, `custom`, `human` (a frame that only shows a number is not scored) |
+| tspci-number-bonds | `text`, `textarea`, `enum`, `pci`, `boolean` | `record` (`correct`, `correctRows`, `complete`, `numbers`, `row1`…`row12`) | `custom`, `match_correct`, `human` |
+| tspci-grid-area | `text`, `textarea`, `enum`, `integer`, `boolean`, `number`, `pci` | `record` (draw: `area`, `perimeter`, `connected`, `noHoles`, `rectangle`, `meetsRules`, `shape`; measure: `areaAnswer`, `perimeterAnswer`; compare: `choice`) | `custom`, `match_correct`, `human` |
 | tspci-fraction-model | `textarea`, `pci`, `enum`, `boolean` | `ordered` `string` (fractions in lowest terms) or a `record` | `match_correct`, `custom`, `human` |
 | tspci-chance-tools | `textarea`, `enum`, `pci`, `boolean`, `hidden` | `record` (design, tree), `single` `string` (tool) | `custom`, `human` (its tool mode is not scored) |
 | tspci-text-marker | `textarea`, `pci`, `enum`, `integer`, `boolean`, `text` | `record` (a field per target, the marks) | `custom`, `human` |
@@ -510,7 +515,7 @@ PCI with a bar, line or pie chart that shows its numbers on hover, focus or tap.
 
 ## Alpha examples
 
-The 24 examples below are new ideas for assessment (`1.0.0-alpha.1`, like tspci-table-select and tspci-spreadsheet);
+The 29 examples below are new ideas for assessment (`1.0.0-alpha.1`, like tspci-table-select and tspci-spreadsheet);
 the six above, based on interactions in the Dutch exams, are `1.0.0-beta.1`.
 
 > [!WARNING]
@@ -544,9 +549,14 @@ lists and 2D views.
 
 | example | what the candidate does | scoring |
 | --- | --- | --- |
-| [tspci-number-line](./tspci-number-line) | places points, marks an interval, draws jumps, or reads off values on a number line | values within a margin, the interval |
+| [tspci-number-line](./tspci-number-line) | places points, marks an interval, draws jumps, or reads off values on a number line; works out a sum on an empty number line with jumps of their own; or works out a percentage or proportion on a double number line (procentenstrook) with marks of their own | values within a margin, the interval; the answer and whether the working is correct, whatever the route |
 | [tspci-ratio-table](./tspci-ratio-table) | fills in a ratio table (verhoudingstabel) with labels, numbers and × or : arrows, and inserts columns for a step in between | the answer, and whether the working is a correct ratio table, whatever the route |
 | [tspci-clocks](./tspci-clocks) | sets an analog or digital clock to a time, or reads a clock that only shows one and answers elsewhere in the item; several clock faces, each in a colour, with hands and a font the author picks | the time set, as HH:MM (a clock that only shows the time is not scored) |
+| [tspci-written-calculation](./tspci-written-calculation) | divides with the hapmethode (chunking: bites, what is left, the factors) or adds and subtracts kolomsgewijs (a partial result per place value), in boxes on squared paper | the answer (and remainder), and whether the working is correct, whatever the route |
+| [tspci-money](./tspci-money) | pays an amount with stylised coins and notes in euro, dollar, pound or the author's own currency (exactly, or in as few pieces as possible), gives the change, or counts the money on a counter; the author chooses which coins and notes there are, coin or note, their colour and how many | the amount, whether it is the asked one, and whether it is the fewest pieces (computed with the author's supply) |
+| [tspci-bead-frame](./tspci-bead-frame) | shows a number or a sum in two colours on a rekenrek (20 or 100 beads) or in a hundred field (honderdveld), or reads a number the frame only shows and answers elsewhere in the item | the number, whether it is shown the way the frame is read (full rows first) and a sum via ten (a frame that only shows a number is not scored) |
+| [tspci-number-bonds](./tspci-number-bonds) | fills in a split house (splitshuis) or a number bond tree (splitsboom), with given and empty boxes, nested splits, or all splits of a number | per row or split whether it adds up, on the pupil's own numbers; all splits complete; the numbers when the answer is unique |
+| [tspci-grid-area](./tspci-grid-area) | draws a shape on squared paper with a given area and/or perimeter (whole and half squares), measures the author's shape, or compares two shapes | area, perimeter and the rules (one piece, no holes, a rectangle); the measured values; the choice |
 | [tspci-fraction-model](./tspci-fraction-model) | divides and shades bars, circles, grids and sets, or names the shaded fraction or percentage | the fraction in lowest terms (equivalent shadings count) |
 | [tspci-chance-tools](./tspci-chance-tools) | runs dice, spinner, bag and coin experiments, designs a spinner or bag, fills in a probability tree | exact probabilities, decimals within a margin |
 | [tspci-text-marker](./tspci-text-marker) | marks words and sentences in a source text with named categories | per target: overlap, all words or exact, with a tolerance |
