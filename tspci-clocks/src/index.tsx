@@ -20,25 +20,15 @@ import configProps from "./config.json"; // the settings; the build passes only 
 import style from "./styles.css"; // Tailwind, compiled to a string, added to the shadow root below
 import Interaction from "./interaction";
 import { Authoring, Choice } from "./authoring";
-import { analogSkin, clockType, digitalSkin } from "./skins";
+import { analogSkin, clockColor, clockType, digitalSkin, fontId, handStyle } from "./skins";
 import { Actions, StateModel, initStore } from "./store";
-import { Language, clockString, formatTime, parseClockString, parseTime } from "./timeText";
+import { clockString, parseClockString } from "./timeText";
 
 // Like every data- attribute, each setting arrives as a string.
 type PropTypes = PciProperties<typeof configProps>;
 
 /** What getState() saves: the state and the actions that led to it. */
 type PciStoredState = { state: StateModel; log: Action<unknown>[] };
-
-/**
- * The response for the text in the input: the time as "HH:MM" on a 12-hour clock (a time in words has no morning or
- * afternoon), or undefined while the text is not a time. One answer, one response: "ten past four", "4:10", "16:10" and
- * "four ten" all report "04:10".
- */
-function toResponse(value: string, language: Language): QtiVariableJSON | undefined {
-  const time = parseTime(value, language);
-  return time === null ? undefined : { base: { string: clockString(time) } };
-}
 
 /** The plain value in a response (setResponse, boundTo) or a correct response (status "solution"). */
 function responseValue(value: unknown): unknown {
@@ -56,11 +46,22 @@ function loadDigitFont(dom: HTMLElement) {
   digit.load().then((f) => document.fonts.add(f));
 }
 
-/** The clock and skin in the settings: a skin that does not belong to the type of clock is its classic one. */
+/**
+ * The clock and its look in the settings: a skin that does not belong to the type of clock is its classic one, and a
+ * colour, hands or font the PCI does not know is empty (the skin's own).
+ */
 function clockChoice(properties: Partial<PropTypes>): Choice {
   const typeOfClock = clockType(properties.typeOfClock);
   const skin = typeOfClock === "analog" ? analogSkin(properties.skin) : digitalSkin(properties.skin).id;
-  return { typeOfClock, skin };
+  return {
+    typeOfClock,
+    skin,
+    color: clockColor(properties.color) ?? "",
+    hands: handStyle(properties.hands) ?? "",
+    shortHandColor: clockColor(properties.shortHandColor) ?? "",
+    longHandColor: clockColor(properties.longHandColor) ?? "",
+    font: fontId(properties.font) ?? "",
+  };
 }
 
 class PciInstance implements IMSpci<PropTypes> {
@@ -82,11 +83,14 @@ class PciInstance implements IMSpci<PropTypes> {
 
     loadDigitFont(dom);
 
-    // 1. The state from a previous session (whatever getState() returned).
-    if (stateString) {
+    // 1. The state from a previous session (whatever getState() returned). A clock that only shows the time has none.
+    if (stateString && this.setsClock) {
       try {
         const { state, log } = JSON.parse(stateString) as PciStoredState;
-        if (typeof state?.value === "string" && Array.isArray(log)) this.store.restoreState(state, log);
+        const set = (n: unknown) => n === null || Number.isInteger(n);
+        if (state && set(state.hour) && set(state.minute) && Array.isArray(log)) {
+          this.store.restoreState({ hour: state.hour, minute: state.minute }, log);
+        }
       } catch {
         // not ours: start empty
       }
@@ -131,16 +135,6 @@ class PciInstance implements IMSpci<PropTypes> {
       </>,
       this.shadowdom
     );
-    this.input?.setCustomValidity(this.customValidity);
-  };
-
-  private get input() {
-    return this.shadowdom.querySelector("input");
-  }
-
-  /** Only a change is an action: keeps the log (and a replay) clean. */
-  private setValue = (value: string) => {
-    if (value !== this.store.getState().value) this.store.dispatch({ type: "SET_VALUE", payload: { value } });
   };
 
   /** Show the correct response the item declares (status "solution"); without one, keep what is there. */
@@ -149,7 +143,11 @@ class PciInstance implements IMSpci<PropTypes> {
     if (correct !== undefined) this.show(correct);
   };
 
-  /** The student answers by setting the clock (typeOfQuestion "setClock"), not by typing the time. */
+  /**
+   * The student answers by setting the clock (typeOfQuestion "setClock"). Otherwise ("askTime") the clock only shows the
+   * time, like an image: the answer is given elsewhere in the item (a qti-text-entry-interaction), so this PCI reports
+   * no response and is not scored (config.tspci.toolWhen).
+   */
   private get setsClock() {
     return this.config.properties.typeOfQuestion === "setClock";
   }
@@ -161,36 +159,31 @@ class PciInstance implements IMSpci<PropTypes> {
   }
 
   /**
-   * The time the student set on the clock, as "HH:MM" (clockString); null while the clock was not touched. The digital
-   * clock sets hours and minutes apart: the part that was not set yet is the one of the initial time it shows.
+   * The time the student set on the clock, as "HH:MM" (clockString); null while the clock was not touched, and for a
+   * clock that only shows the time. The digital clock sets hours and minutes apart: the part that was not set yet is the
+   * one of the initial time it shows.
    */
   private clockTime(): string | null {
     const { hour, minute } = this.store.getState();
-    if (hour == null && minute == null) return null;
+    if (!this.setsClock || (hour == null && minute == null)) return null;
     const [, initialHour, initialMinute] = /(\d{1,2}):(\d{2})/.exec(this.config.properties.initialtime ?? "") ?? [];
     return clockString((hour ?? Number(initialHour ?? 12)) * 60 + (minute ?? Number(initialMinute ?? 0)), this.twentyFourHour);
   }
 
-  /** Show a response or a correct response ("HH:MM"): on the clock, or in words in the input. */
+  /** Show a response or a correct response ("HH:MM") on the clock. A clock that only shows the time keeps its own. */
   private show = (response: unknown) => {
+    if (!this.setsClock) return;
     const value = responseValue(response);
     const time = typeof value === "string" ? parseClockString(value) : null;
-    if (!this.setsClock) return this.setValue(time === null ? String(value ?? "") : formatTime(time, this.language));
     if (time === null || clockString(time, this.twentyFourHour) === this.clockTime()) return; // only a change is an action
     // the analog clock and a 12-hour digital clock count the hours from 0 to 11 (12:10 is 0:10)
     const hour = Math.floor(time / 60) % (this.twentyFourHour ? 24 : 12);
     this.store.dispatch({ type: "SET_TIME", payload: { hour, minute: time % 60 } });
   };
 
-  /** The language the student answers in (the setting): "half 7" is 7:30 in English and 6:30 in Dutch. */
-  private get language(): Language {
-    return this.config.properties.language === "nl" ? "nl" : "en";
-  }
-
   // ---- the IMS PCI API ----
 
   getResponse = (): QtiVariableJSON | undefined => {
-    if (!this.setsClock) return toResponse(this.store.getState().value, this.language);
     const time = this.clockTime();
     return time === null ? undefined : { base: { string: time } };
   };
@@ -199,13 +192,13 @@ class PciInstance implements IMSpci<PropTypes> {
 
   setResponse = (response: QtiVariableJSON) => this.show(response);
 
-  checkValidity = () => this.input?.checkValidity() ?? true;
+  // The clock has no form field of its own: it is valid unless the engine gave it a message (setCustomValidity).
+  checkValidity = () => this.customValidity === "";
 
-  reportValidity = () => this.input?.reportValidity() ?? true;
+  reportValidity = () => this.checkValidity();
 
   setCustomValidity = (message: string) => {
     this.customValidity = message ?? "";
-    this.input?.setCustomValidity(this.customValidity);
   };
 
   getCustomValidity = () => this.customValidity;
@@ -223,8 +216,9 @@ const factory: IMSpciAuthoringFactory<PropTypes> = {
   // No getCorrectResponse: the author gives the correct response in the item (AUTHORING.md, "Correct answers").
 
   /**
-   * The authoring mode (AUTHORING.md, section 6): the author picks the clock and its skin (authoring.tsx), which gives
-   * the settings typeOfClock and skin. A player never calls it.
+   * The authoring mode (AUTHORING.md, section 6): the author picks the clock, its skin and its colour, hands and font
+   * (authoring.tsx), which gives the settings typeOfClock, skin, color, hands, shortHandColor, longHandColor and font.
+   * A player never calls it.
    */
   getAuthoringInstance: (dom: HTMLElement, config: PciAuthoringConfiguration<PropTypes>): PciAuthoringInstance => {
     const properties = { ...(configProps as unknown as PropTypes), ...config.properties } as PropTypes;
@@ -248,7 +242,7 @@ const factory: IMSpciAuthoringFactory<PropTypes> = {
       shadow
     );
     const instance: PciAuthoringInstance = {
-      getProperties: () => ({ typeOfClock: choice.typeOfClock, skin: choice.skin }),
+      getProperties: () => ({ ...choice }),
       oncompleted: () => render(null, shadow),
     };
     config.onready?.(instance);

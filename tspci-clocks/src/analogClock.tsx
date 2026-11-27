@@ -2,9 +2,9 @@ import type { PciProperties } from "@citolab/tspci";
 import { IStore, useStore } from "@citolab/preact-store";
 import { useRef } from "preact/hooks";
 import configProps from "./config.json";
-import { angleDiff, Hand, HandName, HANDS, pickHand, pointerOnFace } from "./hands";
+import { angleDiff, Hand, HandName, pickHand, pointerOnFace } from "./hands";
 import ClockFace from "./img/clockface.png";
-import { analogSkin, DrawnClock } from "./skins";
+import { analogLook, DrawnFace, DrawnHands } from "./skins";
 import { Actions, StateModel } from "./store";
 
 type PropTypes = PciProperties<typeof configProps>;
@@ -22,7 +22,7 @@ export function AnalogClock({ config, store, readOnly }: Props) {
   const dragging = useRef<HandName | null>(null);
 
   const state = useStore(store);
-  const skin = analogSkin(config.skin); // how it looks (skins.tsx); the hands work the same in every skin
+  const look = analogLook(config); // how it looks (skins.tsx); the hands work the same whatever they look like
   const [, initialHour, initialMinute] = /(\d{1,2}):(\d{2})/.exec(config.initialtime ?? "") ?? [];
   const hour = state.hour ?? Number(initialHour ?? 12);
   const minute = state.minute ?? Number(initialMinute ?? 0);
@@ -80,14 +80,18 @@ export function AnalogClock({ config, store, readOnly }: Props) {
         onPointerUp={onPointerUp}
         onPointerCancel={onPointerUp}
       >
-        {skin === "classic" ? (
+        {look.picture ? (
+          <img className="block w-full h-full" src={ClockFace} alt={""} draggable={false}></img>
+        ) : (
+          <DrawnFace skin={look.skin} color={look.color} font={look.font} />
+        )}
+        {look.hands === "ornate" ? (
           <>
-            <img className="block w-full h-full" src={ClockFace} alt={""} draggable={false}></img>
-            <Hand hand={HANDS.short} angle={angles.short} />
-            <Hand hand={HANDS.long} angle={angles.long} />
+            <Hand name="short" angle={angles.short} color={look.ownHandColors.short} />
+            <Hand name="long" angle={angles.long} color={look.ownHandColors.long} />
           </>
         ) : (
-          <DrawnClock skin={skin} angles={angles} />
+          <DrawnHands skin={look.skin} style={look.hands} colors={look.handColors} angles={angles} />
         )}
       </div>
   );

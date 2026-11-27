@@ -16,29 +16,29 @@ export const HANDS = {
 
 export type HandName = keyof typeof HANDS;
 
-/** A hand with its pivot on the centre of the clock face, rotated `angle` degrees clockwise from 12. */
-export const Hand = ({ hand, angle }: { hand: (typeof HANDS)[HandName]; angle: number }) => {
+/**
+ * A hand with its pivot on the centre of the clock face, rotated `angle` degrees clockwise from 12. As it comes it is
+ * its image; in a colour of the author's it is that colour in the shape of the image (the image as a mask).
+ */
+export const Hand = ({ name, angle, color }: { name: HandName; angle: number; color?: string | null }) => {
+  const hand = HANDS[name];
   const height = (hand.reach * hand.height) / (hand.pivotY - hand.tipY); // fraction of the face
   const width = (height * hand.width) / hand.height;
   const originX = hand.pivotX / hand.width;
   const originY = hand.pivotY / hand.height;
-  return (
-    // The clock face handles the pointer (see pickHand), so the transparent corners of the image do not get in the way.
-    <img
-      className="absolute max-w-none pointer-events-none select-none"
-      src={hand.src}
-      alt={""}
-      draggable={false}
-      style={{
-        width: `${width * 100}%`,
-        height: `${height * 100}%`,
-        left: `${(0.5 - width * originX) * 100}%`,
-        top: `${(0.5 - height * originY) * 100}%`,
-        transformOrigin: `${originX * 100}% ${originY * 100}%`,
-        transform: `rotate(${angle}deg)`,
-      }}
-    />
-  );
+  // The clock face handles the pointer (see pickHand), so the transparent corners of the image do not get in the way.
+  const className = "absolute max-w-none pointer-events-none select-none";
+  const style = {
+    width: `${width * 100}%`,
+    height: `${height * 100}%`,
+    left: `${(0.5 - width * originX) * 100}%`,
+    top: `${(0.5 - height * originY) * 100}%`,
+    transformOrigin: `${originX * 100}% ${originY * 100}%`,
+    transform: `rotate(${angle}deg)`,
+  };
+  if (!color) return <img data-hand={name} className={className} src={hand.src} alt={""} draggable={false} style={style} />;
+  const mask = `url("${hand.src}") center / 100% 100% no-repeat`;
+  return <div data-hand={name} className={className} style={{ ...style, backgroundColor: color, mask, WebkitMask: mask }} />;
 };
 
 /** Where the pointer is on the clock face: degrees clockwise from 12 (0-360), and the distance from the centre as a fraction of the face's width. */

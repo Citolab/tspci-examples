@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-clocks",
-  "version": "1.0.0-alpha.1",
-  "description": "telling the time (klok kijken): read an analog or digital clock and type the time, in digits or in words, or set the hands or digits yourself; several clock faces",
+  "version": "1.0.0-alpha.2",
+  "description": "telling the time (klok kijken): an analog or digital clock that the candidate sets with its hands or digits, or that only shows a time, as an image would; several clock faces, with a colour, hands and font the author picks",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
@@ -75,7 +75,7 @@
   "config": {
     "tspci": {
       "typeIdentifier": "clocks",
-      "label": "Klok",
+      "label": "Clock",
       "tags": [
         "math",
         "clock",
@@ -86,6 +86,11 @@
         "match_correct",
         "human"
       ],
+      "toolWhen": {
+        "typeOfQuestion": [
+          "askTime"
+        ]
+      },
       "response": {
         "cardinality": "single",
         "baseType": "string"
@@ -102,7 +107,7 @@
           "nl": "Klok kiezen…"
         },
         "width": 900,
-        "height": 720
+        "height": 940
       }
     }
   }
