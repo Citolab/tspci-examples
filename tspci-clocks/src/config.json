@@ -26,8 +26,8 @@
       {
         "value": "askTime",
         "label": {
-          "en": "Answer with text",
-          "nl": "Antwoord met tekst"
+          "en": "Only show the time (the answer is given elsewhere in the item)",
+          "nl": "Alleen de tijd tonen (antwoord elders in het item)"
         }
       },
       {
@@ -37,7 +37,12 @@
           "nl": "Antwoord door klok te zetten"
         }
       }
-    ]
+    ],
+    "hint": {
+      "en": "A clock that only shows the time takes no answer and is not scored: add an interaction for the answer to the item, such as a text entry.",
+      "nl": "Een klok die alleen de tijd toont, neemt geen antwoord aan en wordt niet gescoord: voeg voor het antwoord een interactie aan het item toe, zoals een tekstinvoer."
+    },
+    "$comment": "askTime: the clock stands in for an image, no response (config.tspci.toolWhen); setClock: the student sets the clock, which is the response"
   },
   "typeOfClock": {
     "default": "analog",
@@ -72,6 +77,51 @@
       "nl": "Uiterlijk"
     },
     "$comment": "Set in the authoring mode (authoring.tsx): analog \"classic\", \"learning\" or \"roman\"; digital \"classic\", \"alarm\" or \"lcd\". Unknown: \"classic\""
+  },
+  "color": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Colour",
+      "nl": "Kleur"
+    },
+    "$comment": "Set in the authoring mode: the colour of the rim (analog) or the case (digital), as \"#rrggbb\". Empty or unknown: the skin's own colour"
+  },
+  "hands": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Hands (analog only)",
+      "nl": "Wijzers (alleen analoog)"
+    },
+    "$comment": "Set in the authoring mode: \"ornate\", \"straight\", \"pointed\" or \"arrow\". Empty or unknown: the skin's own hands"
+  },
+  "shortHandColor": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Colour of the short hand (analog only)",
+      "nl": "Kleur van de kleine wijzer (alleen analoog)"
+    },
+    "$comment": "Set in the authoring mode: the colour of the short hand, as \"#rrggbb\". Empty or unknown: the skin's own colour"
+  },
+  "longHandColor": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Colour of the long hand (analog only)",
+      "nl": "Kleur van de grote wijzer (alleen analoog)"
+    },
+    "$comment": "Set in the authoring mode: the colour of the long hand, as \"#rrggbb\". Empty or unknown: the skin's own colour"
+  },
+  "font": {
+    "default": "",
+    "editor": "pci",
+    "label": {
+      "en": "Font",
+      "nl": "Lettertype"
+    },
+    "$comment": "Set in the authoring mode: \"sans\", \"serif\" or \"mono\", for the numerals (analog) or the digits (digital). Empty or unknown: the skin's own font"
   },
   "twentyFourHour": {
     "default": "true",
@@ -119,30 +169,6 @@
     "label": {
       "en": "Initial time",
       "nl": "Initiele tijd"
-    }
-  },
-  "language": {
-    "default": "en",
-    "editor": "enum",
-    "options": [
-      {
-        "value": "en",
-        "label": {
-          "en": "English",
-          "nl": "Engels"
-        }
-      },
-      {
-        "value": "nl",
-        "label": {
-          "en": "Dutch",
-          "nl": "Nederlands"
-        }
-      }
-    ],
-    "label": {
-      "en": "Language of the clock's own texts",
-      "nl": "Taal van de eigen teksten van de klok"
     }
   }
 }

@@ -3,7 +3,7 @@ import { IStore, useStore } from "@citolab/preact-store";
 import { useRef } from "preact/hooks";
 import configProps from "./config.json";
 import digitalface from "./img/digitalface.png";
-import { digitalSkin } from "./skins";
+import { ClockRadio, clockColor, clockFont, digitalSkin } from "./skins";
 import { Actions, StateModel } from "./store";
 
 type PropTypes = PciProperties<typeof configProps>;
@@ -16,6 +16,8 @@ type Props = {
 
 export function DigitalClock({ config, store, readOnly }: Props) {
     const skin = digitalSkin(config.skin); // how it looks (skins.tsx)
+    const color = clockColor(config.color); // the colour of the case, or null: the skin's own
+    const font = clockFont(config.font); // the font of the digits, or null: the segments of a display
     const mode = config.typeOfQuestion === "askTime" ? "ask" : "set";
 
     // The time in the store (re-renders when it changes); until it is set, the initial time from the settings.
@@ -29,9 +31,10 @@ export function DigitalClock({ config, store, readOnly }: Props) {
         <>
             <EditHour config={config} hour={hour}></EditHour>
             <p className="text-[5em] leading-none m-0">
-                <Digits skinGhost={skin.ghost} className={skin.hour[mode]}>{displayTime("hour", hour, is12Hour)}</Digits>
-                <span className={"relative top-[-0.19em] " + skin.colon[mode]}>:</span>
-                <Digits skinGhost={skin.ghost} className={skin.minute}>{displayTime("minute", minute, is12Hour)}</Digits>
+                <Digits font={font} skinGhost={skin.ghost} className={skin.hour[mode]}>{displayTime("hour", hour, is12Hour)}</Digits>
+                {/* the colon of the display font sits low: lift it to the middle of the digits */}
+                <span className={`relative ${font ? "top-[-0.08em] font-bold" : "top-[-0.19em]"} ${skin.colon[mode]}`} style={{ fontFamily: font ?? undefined }}>:</span>
+                <Digits font={font} skinGhost={skin.ghost} className={skin.minute}>{displayTime("minute", minute, is12Hour)}</Digits>
             </p>
             <EditMinute config={config} minute={minute}></EditMinute>
         </>
@@ -40,7 +43,7 @@ export function DigitalClock({ config, store, readOnly }: Props) {
     if (skin.frame === "image") {
         return (
             <div className="relative w-fit">
-                <img className="block" src={digitalface} alt="digital"></img>
+                {color ? <ClockRadio color={color} /> : <img className="block" src={digitalface} alt="digital"></img>}
                 {/* overlay on the black screen of the image (not its frame and feet): hour arrows, time, minute arrows */}
                 <div className="absolute left-[3%] right-[3%] top-[8%] bottom-[12%] flex items-center justify-center gap-2">
                     {display}
@@ -49,7 +52,7 @@ export function DigitalClock({ config, store, readOnly }: Props) {
         );
     }
     return (
-        <div className={"w-fit " + skin.frame}>
+        <div className={"w-fit " + skin.frame} style={color ? skin.tint?.(color) : undefined}>
             <div className={"flex items-center justify-center gap-2 " + skin.screen}>{display}</div>
         </div>
     );
@@ -123,13 +126,17 @@ export function DigitalClock({ config, store, readOnly }: Props) {
     }
 }
 
-/** Digits on the display; on an LCD screen with the dim "88" of the unlit segments behind them. */
-function Digits({ skinGhost, className, children }: { skinGhost: string | null; className: string; children: string }) {
-    if (!skinGhost) return <span className={"font-digital " + className}>{children}</span>;
+/**
+ * Digits on the display, in the segments of the display font; on an LCD screen with the dim "88" of the unlit segments
+ * behind them. In a font of the author's they are plain digits, each as wide as the next, without unlit segments.
+ */
+function Digits({ font, skinGhost, className, children }: { font: string | null; skinGhost: string | null; className: string; children: string }) {
+    if (font) return <span data-digits className={"font-bold tabular-nums " + className} style={{ fontFamily: font }}>{children}</span>;
+    if (!skinGhost) return <span data-digits className={"font-digital " + className}>{children}</span>;
     return (
         <span className="inline-grid">
             <span className={"font-digital col-start-1 row-start-1 " + skinGhost} aria-hidden="true">88</span>
-            <span className={"font-digital col-start-1 row-start-1 " + className}>{children}</span>
+            <span data-digits className={"font-digital col-start-1 row-start-1 " + className}>{children}</span>
         </span>
     );
 }

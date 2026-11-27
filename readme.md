@@ -124,7 +124,7 @@ scoring). Every example describes both in two files it already has:
 | tspci-sun-earth | `textarea`, `pci`, `enum`, `boolean` | `record` (date, time, place, sun position) | `custom`, `human` (its tool mode is not scored) |
 | tspci-number-line | `textarea`, `enum`, `pci`, `integer`, `boolean` | `ordered` `float`, `single` `string` (interval) or a `record` | `match_correct`, `custom`, `human` |
 | tspci-ratio-table | `text`, `textarea`, `enum`, `integer` | `record` (`answer`, `working`, `answerCorrect`, `ratio`, `steps`, `stepsMatch`) | `custom`, `match_correct`, `human` (its tool mode is not scored) |
-| tspci-clocks | `text`, `textarea`, `enum`, `pci`, `boolean`, `time` | `single` `string` (`HH:MM`) | `match_correct`, `human` |
+| tspci-clocks | `text`, `textarea`, `enum`, `pci`, `boolean`, `time` | `single` `string` (`HH:MM`) | `match_correct`, `human` (a clock that only shows the time is not scored) |
 | tspci-fraction-model | `textarea`, `pci`, `enum`, `boolean` | `ordered` `string` (fractions in lowest terms) or a `record` | `match_correct`, `custom`, `human` |
 | tspci-chance-tools | `textarea`, `enum`, `pci`, `boolean`, `hidden` | `record` (design, tree), `single` `string` (tool) | `custom`, `human` (its tool mode is not scored) |
 | tspci-text-marker | `textarea`, `pci`, `enum`, `integer`, `boolean`, `text` | `record` (a field per target, the marks) | `custom`, `human` |
@@ -546,7 +546,7 @@ lists and 2D views.
 | --- | --- | --- |
 | [tspci-number-line](./tspci-number-line) | places points, marks an interval, draws jumps, or reads off values on a number line | values within a margin, the interval |
 | [tspci-ratio-table](./tspci-ratio-table) | fills in a ratio table (verhoudingstabel) with labels, numbers and × or : arrows, and inserts columns for a step in between | the answer, and whether the working is a correct ratio table, whatever the route |
-| [tspci-clocks](./tspci-clocks) | reads an analog or digital clock and types the time in digits or words, or sets the clock; several clock faces | the time as HH:MM |
+| [tspci-clocks](./tspci-clocks) | sets an analog or digital clock to a time, or reads a clock that only shows one and answers elsewhere in the item; several clock faces, each in a colour, with hands and a font the author picks | the time set, as HH:MM (a clock that only shows the time is not scored) |
 | [tspci-fraction-model](./tspci-fraction-model) | divides and shades bars, circles, grids and sets, or names the shaded fraction or percentage | the fraction in lowest terms (equivalent shadings count) |
 | [tspci-chance-tools](./tspci-chance-tools) | runs dice, spinner, bag and coin experiments, designs a spinner or bag, fills in a probability tree | exact probabilities, decimals within a margin |
 | [tspci-text-marker](./tspci-text-marker) | marks words and sentences in a source text with named categories | per target: overlap, all words or exact, with a tolerance |
