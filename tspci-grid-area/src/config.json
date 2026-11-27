@@ -1,0 +1,101 @@
+{
+  "title": {
+    "default": "Area and perimeter",
+    "editor": "text",
+    "label": { "en": "Title", "nl": "Titel" }
+  },
+  "question": {
+    "default": "Draw a rectangle with an area of 12 squares and a perimeter of 14.",
+    "editor": "textarea",
+    "label": { "en": "Question", "nl": "Vraag" }
+  },
+  "task": {
+    "default": "draw",
+    "editor": "enum",
+    "options": [
+      { "value": "draw", "label": { "en": "Draw a shape (with a given area, perimeter or both)", "nl": "Een figuur tekenen (met een gegeven oppervlakte, omtrek of allebei)" } },
+      { "value": "measure", "label": { "en": "Measure the shape: write its area and/or perimeter", "nl": "De figuur meten: de oppervlakte en/of omtrek invullen" } },
+      { "value": "compare", "label": { "en": "Compare two shapes: which is larger?", "nl": "Twee figuren vergelijken: welke is groter?" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts", "nl": "Taal van de eigen teksten van de PCI" }
+  },
+  "columns": {
+    "default": "12",
+    "editor": "integer",
+    "min": 2,
+    "max": 24,
+    "label": { "en": "Squares across", "nl": "Hokjes in de breedte" }
+  },
+  "rows": {
+    "default": "8",
+    "editor": "integer",
+    "min": 2,
+    "max": 16,
+    "label": { "en": "Squares down", "nl": "Hokjes in de hoogte" }
+  },
+  "unitLabel": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Unit under the grid, e.g. 1 square = 1 cm² (empty: none)", "nl": "Eenheid onder het rooster, bijv. 1 hokje = 1 cm² (leeg: geen)" }
+  },
+  "halves": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Half squares: a second click cuts a square along a diagonal", "nl": "Halve hokjes: nog een klik deelt een hokje schuin doormidden" }
+  },
+  "targetArea": {
+    "default": "12",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Draw: the area the shape must have, in squares (empty: any)", "nl": "Tekenen: de oppervlakte die de figuur moet hebben, in hokjes (leeg: elke)" }
+  },
+  "targetPerimeter": {
+    "default": "14",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Draw: the perimeter the shape must have (empty: any)", "nl": "Tekenen: de omtrek die de figuur moet hebben (leeg: elke)" }
+  },
+  "mustBeRectangle": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Draw: the shape must be a rectangle", "nl": "Tekenen: de figuur moet een rechthoek zijn" }
+  },
+  "ask": {
+    "default": "both",
+    "editor": "enum",
+    "options": [
+      { "value": "both", "label": { "en": "Area and perimeter", "nl": "Oppervlakte en omtrek" } },
+      { "value": "area", "label": { "en": "Area", "nl": "Oppervlakte" } },
+      { "value": "perimeter", "label": { "en": "Perimeter", "nl": "Omtrek" } }
+    ],
+    "label": { "en": "Measure: what the student writes", "nl": "Meten: wat de leerling invult" }
+  },
+  "compareBy": {
+    "default": "area",
+    "editor": "enum",
+    "options": [
+      { "value": "area", "label": { "en": "The larger area", "nl": "De grootste oppervlakte" } },
+      { "value": "perimeter", "label": { "en": "The larger perimeter", "nl": "De grootste omtrek" } }
+    ],
+    "label": { "en": "Compare: by", "nl": "Vergelijken: op" }
+  },
+  "shape": {
+    "default": "//..####/..####/..####",
+    "editor": "pci",
+    "label": { "en": "The shape (draw: an example answer; measure: the shape to measure; compare: shape A)", "nl": "De figuur (tekenen: een voorbeeldantwoord; meten: de figuur om te meten; vergelijken: figuur A)" }
+  },
+  "shapeB": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Compare: shape B", "nl": "Vergelijken: figuur B" }
+  }
+}
