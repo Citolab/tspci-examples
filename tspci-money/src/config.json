@@ -1,0 +1,100 @@
+{
+  "title": {
+    "default": "At the bookshop",
+    "editor": "text",
+    "label": { "en": "Title", "nl": "Titel" }
+  },
+  "question": {
+    "default": "You buy a book. Put the money on the counter.",
+    "editor": "textarea",
+    "label": { "en": "Question", "nl": "Vraag" }
+  },
+  "task": {
+    "default": "pay",
+    "editor": "enum",
+    "options": [
+      { "value": "pay", "label": { "en": "Pay an amount exactly", "nl": "Een bedrag precies betalen" } },
+      { "value": "fewest", "label": { "en": "Pay an amount with as few coins and notes as possible", "nl": "Een bedrag betalen met zo weinig mogelijk munten en biljetten" } },
+      { "value": "change", "label": { "en": "Give the change", "nl": "Wisselgeld teruggeven" } },
+      { "value": "changeFewest", "label": { "en": "Give the change with as few coins and notes as possible", "nl": "Wisselgeld teruggeven met zo weinig mogelijk munten en biljetten" } },
+      { "value": "count", "label": { "en": "Count the money on the counter and write the amount", "nl": "Het geld op de toonbank tellen en het bedrag opschrijven" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
+  "amount": {
+    "default": "7,35",
+    "editor": "text",
+    "label": { "en": "Amount to pay, or the price (give the change), e.g. 7,35", "nl": "Te betalen bedrag, of de prijs (wisselgeld), bijv. 7,35" },
+    "hint": { "en": "In the currency of the coins and notes: 7,35, 7.35, $7.35, 35p", "nl": "In de munteenheid van de munten en biljetten: 7,35, 7.35, $7.35, 35p" }
+  },
+  "given": {
+    "default": "10",
+    "editor": "text",
+    "label": { "en": "What the customer pays with (give the change): coins and notes separated by ;, e.g. 10 or 5; 2x 2", "nl": "Waarmee de klant betaalt (wisselgeld): munten en biljetten gescheiden door ;, bijv. 10 of 5; 2x 2" }
+  },
+  "countPieces": {
+    "default": "10; 2x 2; 0,50; 3x 0,20; 0,05",
+    "editor": "text",
+    "label": { "en": "The money on the counter (count): coins and notes separated by ;, e.g. 10; 2x 2; 0,50", "nl": "Het geld op de toonbank (tellen): munten en biljetten gescheiden door ;, bijv. 10; 2x 2; 0,50" }
+  },
+  "currency": {
+    "default": "eur",
+    "editor": "pci",
+    "label": { "en": "Currency", "nl": "Munteenheid" },
+    "options": [
+      { "value": "eur", "label": { "en": "Euro (€)", "nl": "Euro (€)" } },
+      { "value": "usd", "label": { "en": "US dollar ($)", "nl": "Amerikaanse dollar ($)" } },
+      { "value": "gbp", "label": { "en": "British pound (£)", "nl": "Britse pond (£)" } },
+      { "value": "custom", "label": { "en": "Other currency (sign, place and minor unit below)", "nl": "Andere munteenheid (teken, plaats en kleine eenheid hieronder)" } }
+    ],
+    "$comment": "Set in the authoring mode (authoring.tsx), with the coins and notes: eur, usd, gbp or custom. Unknown: eur"
+  },
+  "currencySign": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Sign of the currency (other currency)", "nl": "Teken van de munteenheid (andere munteenheid)" },
+    "hint": { "en": "Any text, e.g. kr, R$, ₣", "nl": "Elke tekst, bijv. kr, R$, ₣" },
+    "$comment": "Set in the authoring mode; only for currency custom"
+  },
+  "currencyPosition": {
+    "default": "before",
+    "editor": "pci",
+    "label": { "en": "Place of the sign (other currency)", "nl": "Plaats van het teken (andere munteenheid)" },
+    "options": [
+      { "value": "before", "label": { "en": "Before the amount: R$ 7,35", "nl": "Voor het bedrag: R$ 7,35" } },
+      { "value": "after", "label": { "en": "After the amount: 7,35 kr", "nl": "Na het bedrag: 7,35 kr" } }
+    ],
+    "$comment": "Set in the authoring mode; only for currency custom: before or after"
+  },
+  "minorUnit": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Minor unit (other currency)", "nl": "Kleine eenheid (andere munteenheid)" },
+    "hint": { "en": "A hundredth of the main unit, as written after a number: øre, ct, ¢. Empty: none (only whole amounts).", "nl": "Een honderdste van de hoofdeenheid, zoals het achter een getal staat: øre, ct, ¢. Leeg: geen (alleen hele bedragen)." },
+    "$comment": "Set in the authoring mode; only for currency custom"
+  },
+  "pieces": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Coins and notes", "nl": "Munten en biljetten" },
+    "hint": {
+      "en": "Set in the authoring mode. Empty: the usual coins and notes of the currency.",
+      "nl": "In te stellen in de authoring-modus. Leeg: de gewone munten en biljetten van de munteenheid."
+    },
+    "$comment": "JSON, as the authoring mode writes it: [{ \"value\": 50, \"kind\": \"coin\", \"color\": \"gold\", \"offered\": true, \"count\": null }, …]. value in hundredths of the main unit (50 is 50 cent; also without a minor unit: 500 is 5 kr); kind coin or note; color copper, gold, silver, silverInGold, goldInSilver or #rrggbb; offered: the pupil can take it; count: how many, null for as many as needed. A field left out: the currency's default"
+  },
+  "showTotal": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the total on the counter", "nl": "Het totaal op de toonbank tonen" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts and amounts", "nl": "Taal van de eigen teksten en bedragen van de PCI" }
+  }
+}

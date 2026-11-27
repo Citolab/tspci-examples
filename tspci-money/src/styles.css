@@ -1,0 +1,107 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+/* A shop: a warm counter top, a grey cash drawer, green as the accent. */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-ink: #1f2933;
+  --color-accent: #1f7a5c;
+  --color-accent-soft: #d8efe6;
+  --color-counter: #f6ecd8;
+  --color-counter-line: #d6bf94;
+  --color-counter-ink: #6b5432;
+  --color-drawer: #e6eaee;
+  --color-compartment: #f7f9fa;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .price-tag {
+    @apply inline-flex flex-col items-center gap-1 rounded-lg border-2 border-dashed border-accent bg-white px-4 py-2 text-accent;
+  }
+  .counter {
+    @apply min-h-[9em] border-counter-line bg-counter transition-shadow;
+  }
+  .counter-over {
+    @apply border-accent ring-4 ring-accent-soft;
+  }
+  .counter-piece {
+    @apply block cursor-grab touch-none rounded-full;
+  }
+  .notes .counter-piece {
+    @apply rounded-md;
+  }
+  /* only with a mouse: on a touchscreen a hover sticks after a tap */
+  @media (hover: hover) {
+    .counter-piece:hover {
+      @apply opacity-80;
+    }
+  }
+  .drawer {
+    @apply bg-drawer;
+  }
+  .compartment {
+    @apply flex min-w-[5.5em] flex-col items-center justify-between rounded-xl bg-compartment px-2 pt-2 pb-1 shadow-sm;
+  }
+  .supply-piece {
+    @apply my-auto block cursor-grab touch-none rounded-lg p-0.5 hover:bg-accent-soft focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent;
+  }
+  .minus {
+    @apply flex h-[1.7em] w-[1.7em] cursor-pointer items-center justify-center rounded-full border-2 border-accent bg-white text-[1em] leading-none font-black text-accent hover:bg-accent-soft focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:border-slate-300 disabled:text-slate-400 disabled:hover:bg-white;
+  }
+  .count {
+    @apply min-w-[1.5em] text-center font-bold tabular-nums;
+  }
+  .answer-box {
+    @apply inline-flex items-center gap-1 rounded-lg border-2 border-accent bg-white px-2 text-[1.4em];
+  }
+  .answer {
+    @apply w-[6em] py-1 font-semibold text-ink outline-none disabled:bg-transparent;
+    font: inherit;
+  }
+  .answer-box:has(.answer:focus) {
+    @apply ring-2 ring-accent;
+  }
+  .answer-box:has(.answer:invalid) {
+    @apply border-red-600;
+  }
+  .drag-ghost {
+    @apply pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 opacity-90 drop-shadow-lg;
+  }
+
+  /* the authoring mode (authoring.tsx) */
+  .author-button {
+    @apply inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-md border-2 border-slate-300 bg-white px-2.5 text-sm text-slate-700 hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .author-input {
+    @apply min-h-8 rounded-md border-2 border-slate-300 bg-white px-2 py-1 text-ink outline-none focus:border-accent focus:ring-2 focus:ring-accent-soft aria-invalid:border-red-600;
+    font: inherit;
+  }
+  .author-row {
+    @apply grid grid-cols-[9em_1fr] items-center gap-3 rounded-xl border-2 border-slate-200 bg-white px-3 py-2;
+  }
+  .author-row-off {
+    @apply bg-slate-50;
+  }
+  .author-row-problem {
+    @apply border-red-600;
+  }
+  [role="radio"]:focus-visible,
+  input[type="checkbox"]:focus-visible,
+  input[type="color"]:focus-visible {
+    @apply outline-3 outline-offset-2 outline-accent;
+  }
+}

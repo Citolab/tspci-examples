@@ -1,0 +1,171 @@
+{
+  "name": "@citolab/pci-money",
+  "version": "1.0.0-alpha.1",
+  "description": "money (rekenen met geld): pay an amount exactly or in as few coins and notes as possible, give change, or count the money on a counter, with stylised coins and notes in euro, dollar, pound or a currency of the author's",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-money#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-money"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "money.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "money",
+    "geld",
+    "rekenen-met-geld",
+    "euro",
+    "dollar",
+    "pound",
+    "currency",
+    "change",
+    "wisselgeld",
+    "math"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-money npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-money npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "money",
+      "label": "Money",
+      "tags": [
+        "math",
+        "money",
+        "euro",
+        "dollar",
+        "pound",
+        "change"
+      ],
+      "short": "money",
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "amount": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Amount on the counter (in the main unit: euros, dollars, pounds)",
+              "nl": "Bedrag op de toonbank (in de hoofdeenheid: euro, dollar, pond)"
+            },
+            "when": {
+              "task": [
+                "pay",
+                "fewest",
+                "change",
+                "changeFewest"
+              ]
+            }
+          },
+          "answer": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Amount written (in the main unit: euros, dollars, pounds)",
+              "nl": "Geschreven bedrag (in de hoofdeenheid: euro, dollar, pond)"
+            },
+            "when": {
+              "task": [
+                "count"
+              ]
+            }
+          },
+          "exact": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The amount is the one asked",
+              "nl": "Het bedrag is het gevraagde bedrag"
+            }
+          },
+          "pieces": {
+            "baseType": "integer",
+            "label": {
+              "en": "Number of coins and notes",
+              "nl": "Aantal munten en biljetten"
+            },
+            "when": {
+              "task": [
+                "fewest",
+                "changeFewest"
+              ]
+            }
+          },
+          "fewest": {
+            "baseType": "boolean",
+            "label": {
+              "en": "As few coins and notes as possible for this amount",
+              "nl": "Zo weinig mogelijk munten en biljetten voor dit bedrag"
+            },
+            "when": {
+              "task": [
+                "fewest",
+                "changeFewest"
+              ]
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Coins and notes…",
+          "nl": "Munten en biljetten…"
+        },
+        "width": 960,
+        "height": 900
+      }
+    }
+  }
+}
