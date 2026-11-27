@@ -1,0 +1,138 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+@theme {
+  --color-ink: #1e293b;
+  --color-wood: #b7834f;
+  --color-wood-dark: #8a5a2b;
+  /* the two parts of a sum in the hundred field: blue, and amber with stripes (not by colour alone) */
+  --color-first: #2563eb;
+  --color-first-dark: #1e40af;
+  --color-second: #f59e0b;
+  --color-second-dark: #b45309;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+    /* the gap of the 5-structure in the hundred field */
+    --five: 0.7em;
+  }
+}
+
+@layer components {
+  /* The rekenrek: a wooden frame with a rod per row */
+  .rekenrek {
+    @apply relative w-full max-w-[34em] rounded-lg border-x-[0.8em] border-y-[0.5em] border-wood-dark bg-amber-50 px-1 py-2;
+    box-shadow: inset 0 0 0 2px var(--color-wood);
+  }
+  .rod {
+    @apply rounded-md outline-none;
+    touch-action: pan-y; /* a drag along the rod moves the beads, a drag up or down still scrolls the page */
+  }
+  .rod + .rod {
+    @apply mt-1;
+  }
+  /* the 100 frame: the 5-structure down as well, a wider gap after five rows */
+  .rod.five {
+    @apply mt-4;
+  }
+  .rod:focus-visible {
+    @apply ring-3 ring-blue-600;
+  }
+  .rekenrek.interactive .bead {
+    @apply cursor-pointer;
+  }
+  .bead {
+    transition: transform 140ms ease-out;
+  }
+
+  /* The hundred field: rows of squares or dots, with a gap after five, across and down */
+  /* the frame's box: the squares of the hundred field shrink to fit a narrow item (cqw) */
+  .frame-box {
+    container-type: inline-size;
+  }
+  .field {
+    --place: min(2.1em, calc((100cqw - 1em - var(--five) - 27px) / 10));
+    @apply inline-flex flex-col gap-[3px] rounded-lg bg-white p-2;
+    touch-action: none; /* a drag colours squares */
+  }
+  .field-row {
+    @apply flex gap-[3px];
+  }
+  .field-row.five {
+    @apply mt-(--five);
+  }
+  .place {
+    @apply block h-(--place) w-(--place) shrink-0 border border-slate-400 bg-white outline-none;
+  }
+  .place.five {
+    @apply ml-(--five);
+  }
+  .field.interactive .place {
+    @apply cursor-pointer;
+  }
+  .place:focus-visible {
+    @apply relative z-10 ring-3 ring-ink ring-offset-1;
+  }
+  .place.fill-1 {
+    @apply border-first-dark bg-first;
+  }
+  .place.fill-2 {
+    @apply border-second-dark;
+    background: repeating-linear-gradient(45deg, var(--color-second) 0 4px, #fde68a 4px 7px);
+  }
+  /* dots: the place is a circle in its square, an outline while empty */
+  .field.dots .place {
+    @apply flex items-center justify-center border-0;
+    background: none;
+  }
+  .field.dots .dot {
+    @apply block h-[78%] w-[78%] rounded-full border-2 border-slate-400 bg-white;
+  }
+  .field.dots .fill-1 .dot {
+    @apply border-first-dark bg-first;
+  }
+  .field.dots .fill-2 .dot {
+    @apply border-second-dark;
+    background: repeating-linear-gradient(45deg, var(--color-second) 0 4px, #fde68a 4px 7px);
+  }
+
+  /* The two parts of a sum, as radio buttons */
+  .pens {
+    @apply mt-3 flex flex-wrap items-center gap-2;
+  }
+  .pen {
+    @apply inline-flex cursor-pointer items-center gap-2 rounded-full border-2 border-slate-300 bg-white py-1 pr-3 pl-1.5 text-sm text-slate-700 hover:border-slate-500 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+  }
+  .pen.checked {
+    @apply border-blue-600 bg-blue-50 font-semibold text-blue-800;
+  }
+  .swatch {
+    @apply inline-block h-[1.4em] w-[1.4em] shrink-0;
+  }
+  span.swatch {
+    @apply rounded-sm border;
+  }
+
+  .reset {
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 hover:bg-slate-50 focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-blue-600 disabled:cursor-default disabled:opacity-50;
+  }
+  .total {
+    @apply text-[1.1em];
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .bead {
+    transition: none;
+  }
+}

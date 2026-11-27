@@ -1,0 +1,182 @@
+{
+  "name": "@citolab/pci-bead-frame",
+  "version": "1.0.0-alpha.1",
+  "description": "a bead frame (rekenrek, 20 or 100 beads) or hundred field (honderdveld) with the 5-structure: the candidate shows a number or a sum in two colours, or reads a number the author shows; reports the number and whether it is shown the way the frame is read",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-bead-frame#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-bead-frame"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "beadFrame.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "rekenrek",
+    "bead-frame",
+    "honderdveld",
+    "hundred-square",
+    "math"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-bead-frame npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-bead-frame npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "beadFrame",
+      "label": "Bead frame",
+      "tags": [
+        "math",
+        "counting",
+        "number sense",
+        "addition"
+      ],
+      "short": "beadFrame",
+      "scoring": [
+        "match_correct",
+        "custom",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "toolWhen": {
+        "task": [
+          "show"
+        ]
+      },
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "value": {
+            "baseType": "integer",
+            "label": {
+              "en": "The number shown (beads pushed or squares coloured)",
+              "nl": "Het getoonde getal (kralen geschoven of hokjes gekleurd)"
+            },
+            "when": {
+              "task": [
+                "set",
+                "addition"
+              ]
+            }
+          },
+          "structured": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Shown the way the frame is read: full rows first, from the top left",
+              "nl": "Getoond zoals je het rek leest: eerst volle rijen, vanaf linksboven"
+            },
+            "when": {
+              "task": [
+                "set",
+                "addition"
+              ]
+            }
+          },
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The number (or both parts of the sum) is the one asked",
+              "nl": "Het getal (of beide delen van de som) is wat gevraagd is"
+            },
+            "when": {
+              "task": [
+                "set",
+                "addition"
+              ]
+            }
+          },
+          "first": {
+            "baseType": "integer",
+            "label": {
+              "en": "First part (first colour)",
+              "nl": "Eerste deel (eerste kleur)"
+            },
+            "when": {
+              "task": [
+                "addition"
+              ]
+            }
+          },
+          "second": {
+            "baseType": "integer",
+            "label": {
+              "en": "Second part (second colour)",
+              "nl": "Tweede deel (tweede kleur)"
+            },
+            "when": {
+              "task": [
+                "addition"
+              ]
+            }
+          },
+          "viaTen": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The second part goes on where the first stops: it fills up the row to ten first",
+              "nl": "Het tweede deel gaat verder waar het eerste stopt: het vult eerst de rij aan tot tien"
+            },
+            "when": {
+              "task": [
+                "addition"
+              ]
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Arrange the beads or squares…",
+          "nl": "Kralen of hokjes neerleggen…"
+        },
+        "width": 900,
+        "height": 760
+      }
+    }
+  }
+}

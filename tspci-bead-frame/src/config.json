@@ -1,0 +1,93 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (may be empty)", "nl": "Titel (mag leeg)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the PCI asks for the number itself)", "nl": "Vraag (leeg: de PCI vraagt zelf om het getal)" },
+    "hint": {
+      "en": "{number}, {add} and {sum} are replaced by the settings, e.g. \"Show {number} on the bead frame.\"",
+      "nl": "{number}, {add} en {sum} worden vervangen door de instellingen, bijv. \"Laat {number} zien op het rekenrek.\""
+    }
+  },
+  "model": {
+    "default": "rekenrek",
+    "editor": "enum",
+    "label": { "en": "Model", "nl": "Model" },
+    "options": [
+      { "value": "rekenrek", "label": { "en": "Bead frame (rekenrek)", "nl": "Rekenrek" } },
+      { "value": "hundred", "label": { "en": "Hundred field (honderdveld)", "nl": "Honderdveld" } }
+    ]
+  },
+  "size": {
+    "default": "20",
+    "editor": "enum",
+    "label": { "en": "Beads (bead frame only)", "nl": "Kralen (alleen rekenrek)" },
+    "options": [
+      { "value": "20", "label": { "en": "20: two rows of 10", "nl": "20: twee rijen van 10" } },
+      { "value": "100", "label": { "en": "100: ten rows of 10", "nl": "100: tien rijen van 10" } }
+    ]
+  },
+  "cells": {
+    "default": "squares",
+    "editor": "enum",
+    "label": { "en": "Places (hundred field only)", "nl": "Plaatsen (alleen honderdveld)" },
+    "options": [
+      { "value": "squares", "label": { "en": "Squares", "nl": "Hokjes" } },
+      { "value": "dots", "label": { "en": "Dots", "nl": "Stippen" } }
+    ]
+  },
+  "task": {
+    "default": "set",
+    "editor": "enum",
+    "label": { "en": "Task", "nl": "Opdracht" },
+    "options": [
+      { "value": "set", "label": { "en": "Show the number", "nl": "Het getal laten zien" } },
+      { "value": "addition", "label": { "en": "Show a sum in two colours (number + add)", "nl": "Een som laten zien in twee kleuren (getal + erbij)" } },
+      { "value": "show", "label": { "en": "Only show a number (the answer is given elsewhere in the item)", "nl": "Alleen een getal tonen (antwoord elders in het item)" } }
+    ],
+    "hint": {
+      "en": "A frame that only shows a number takes no answer and is not scored: add an interaction for the answer to the item, such as a text entry.",
+      "nl": "Een rek of veld dat alleen een getal toont, neemt geen antwoord aan en wordt niet gescoord: voeg voor het antwoord een interactie aan het item toe, zoals een tekstinvoer."
+    },
+    "$comment": "show: the frame stands in for an image, no response (config.tspci.toolWhen)"
+  },
+  "number": {
+    "default": "13",
+    "editor": "integer",
+    "min": 0,
+    "max": 100,
+    "label": { "en": "Number (to show; for a sum the first number)", "nl": "Getal (om te laten zien; bij een som het eerste getal)" },
+    "hint": { "en": "At most 20 on a bead frame of 20 beads.", "nl": "Hoogstens 20 op een rekenrek van 20 kralen." }
+  },
+  "add": {
+    "default": "5",
+    "editor": "integer",
+    "min": 0,
+    "max": 100,
+    "label": { "en": "Add (sum only: the second number, in the second colour)", "nl": "Erbij (alleen som: het tweede getal, in de tweede kleur)" }
+  },
+  "layout": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "What the frame shows (only show a number)", "nl": "Wat het rek of veld toont (alleen een getal tonen)" },
+    "$comment": "Set in the authoring mode: a row per \"/\", a digit per place, 0 empty, 1 first colour, 2 second colour (\"1111111111/1110000000\"). Empty: the number, full rows first"
+  },
+  "showTotal": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Show the total under the frame (a help)", "nl": "Het totaal onder het rek of veld tonen (een hulp)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "label": { "en": "Language of the PCI's own texts", "nl": "Taal van de eigen teksten van de PCI" },
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ]
+  }
+}
