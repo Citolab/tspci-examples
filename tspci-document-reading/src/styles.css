@@ -1,0 +1,369 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+/*
+ * Paper documents on a grey desk. The marks are the Okabe-Ito colours (safe for colour-blind pupils), and each also has
+ * its own shape: a tick (chosen), an exclamation mark (a mistake), a magnifier (found here).
+ */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "Cascadia Mono", "Roboto Mono", Menlo, Consolas, "Courier New", monospace;
+  --color-ink: #1f2937;
+  --color-desk: #e9edf1;
+  --color-rule: #d5dbe1;
+  --color-chosen: #0072b2;
+  --color-chosen-tint: #e3f0f8;
+  --color-mistake: #d55e00;
+  --color-mistake-tint: #fcece0;
+  --color-source: #009e73;
+  --color-source-tint: #e0f4ec;
+  --color-accent: #4db6ac;
+  --color-accent-strong: #00796b;
+  --color-tint: #e0f2f1;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  .question {
+    @apply mb-3 text-[1.15em] leading-relaxed font-medium;
+  }
+  .hint {
+    @apply mb-2 text-sm text-slate-600;
+  }
+  .status {
+    @apply mt-2 font-medium;
+  }
+
+  /* ---- the answer box ---- */
+  .answer-row {
+    @apply mb-2 flex flex-wrap items-center gap-x-3 gap-y-1;
+  }
+  .answer-box {
+    @apply flex items-center gap-1.5 text-[1.15em] font-semibold;
+  }
+  .answer-input {
+    @apply h-11 w-36 rounded-lg border-2 border-slate-500 bg-white px-2 text-[1.05em] font-semibold text-ink outline-none;
+    font-family: inherit;
+  }
+  .answer-input:focus-visible,
+  .answer-input:focus {
+    @apply border-chosen ring-3 ring-chosen/30;
+  }
+  .answer-input[aria-invalid="true"] {
+    @apply border-red-700 bg-red-50;
+  }
+  .answer-input:disabled {
+    @apply border-slate-300 bg-slate-50 opacity-100;
+  }
+  .answer-error {
+    @apply flex items-center gap-1 text-sm font-medium text-red-800;
+  }
+
+  /* ---- the document ---- */
+  .document {
+    @apply flex flex-wrap items-start justify-center gap-4 rounded-xl bg-desk p-3 sm:p-4;
+  }
+  .panel.paper {
+    @apply max-w-[46rem] min-w-0 flex-[1_1_28rem] rounded-sm border border-rule bg-white px-5 py-4 shadow-md;
+  }
+  .panel.box {
+    @apply min-w-0 flex-[0_1_17rem] rounded-md border-2 border-[#b88a4e] bg-[#f6e6c8] px-4 py-3 shadow-md;
+  }
+  .box-title {
+    @apply mb-1 flex items-center gap-2;
+  }
+  .box-title h3 {
+    @apply text-[1.1em] font-bold;
+  }
+  .box-icon {
+    @apply h-10 w-10 shrink-0;
+  }
+
+  .letterhead {
+    @apply mb-2 flex items-center gap-3 border-b-2 border-ink pb-2;
+  }
+  .logo {
+    @apply h-10 w-10 shrink-0;
+  }
+  .letterhead > div {
+    @apply min-w-0 flex-1;
+  }
+  .company {
+    @apply text-[1.2em] leading-tight font-bold;
+  }
+  .company-line {
+    @apply text-sm text-slate-700;
+  }
+  .doc-title {
+    @apply mt-2 mb-1 flex flex-wrap items-center gap-x-3;
+  }
+  .doc-title h3 {
+    @apply text-[1.35em] font-bold tracking-tight;
+  }
+  .title-cell {
+    @apply text-[1.1em] font-semibold;
+  }
+  .note {
+    @apply mt-2 text-sm text-slate-700;
+  }
+
+  /* a wide table scrolls on its own; the padding leaves room for the marks' icons */
+  .table-wrap {
+    @apply -mx-3 mt-2 overflow-x-auto px-3 pt-1;
+  }
+  table.lines {
+    @apply w-full border-collapse text-[0.95em];
+  }
+  table.lines caption {
+    @apply pb-1 text-left text-sm font-bold tracking-wide text-slate-600 uppercase;
+  }
+  table.lines th,
+  table.lines td {
+    @apply border-b border-rule px-2 py-0 text-left align-middle;
+  }
+
+  table.lines thead th {
+    @apply border-b-2 border-ink py-1 text-[0.85em] leading-tight font-semibold text-slate-700;
+  }
+  table.lines tbody th {
+    @apply font-normal;
+  }
+  table.lines .end {
+    @apply text-right;
+  }
+  table.lines tr.total th,
+  table.lines tr.total td {
+    @apply border-t-2 border-b-0 border-ink font-bold;
+  }
+  table.pairs {
+    @apply mt-2 border-collapse text-[0.95em];
+  }
+  table.pairs th {
+    @apply pr-4 text-left align-middle font-normal text-slate-600;
+  }
+  table.pairs td {
+    @apply align-middle;
+  }
+
+  .big-line {
+    @apply mt-4 flex flex-wrap items-center justify-between gap-2 rounded-sm border-2 border-ink px-3 py-1;
+  }
+  .big-label {
+    @apply text-[1.05em] font-bold tracking-wide uppercase;
+  }
+
+  /*
+   * A field: a value on the document the pupil can tap. As printed, with a dotted line under it as a sign that it can
+   * be tapped; at least 44 px high; the hover only hints. A mark has a frame, a tint and an icon.
+   */
+  .field {
+    @apply relative inline-flex min-h-11 max-w-full min-w-11 cursor-pointer items-center rounded-md border-2 border-transparent bg-transparent px-1.5 text-inherit;
+    font: inherit;
+    text-align: inherit;
+    touch-action: manipulation;
+    text-decoration: underline dotted #94a3b8;
+    text-underline-offset: 0.3em;
+    -webkit-tap-highlight-color: transparent;
+  }
+  td.end .field,
+  th.end .field {
+    @apply justify-end;
+  }
+  /* in a column, the value lines up with the text above it; a number never breaks over two lines */
+  td .field,
+  th .field,
+  .company .field,
+  .company-line .field {
+    margin-inline: calc(-0.375rem - 2px);
+  }
+  td .field,
+  th .field,
+  .field:not(.kind-text) {
+    @apply whitespace-nowrap;
+  }
+  /* a hint only, and only where there is a hover: on a touchscreen it would stick after a tap */
+  @media (hover: hover) {
+    .field:hover:not(.static, .mark) {
+      @apply bg-slate-100;
+    }
+  }
+  .field:focus-visible {
+    @apply outline-3 outline-offset-1 outline-chosen;
+  }
+  .field.static {
+    @apply cursor-default no-underline;
+  }
+  .field.big {
+    @apply text-[1.4em] font-bold;
+  }
+  .field.off {
+    @apply text-slate-500 italic;
+  }
+  .field.mark {
+    @apply no-underline;
+  }
+  .field.mark-chosen {
+    @apply border-chosen bg-chosen-tint;
+  }
+  .field.mark-mistake {
+    @apply border-[3px] border-mistake bg-mistake-tint;
+    border-radius: 999px;
+  }
+  .field.mark-source {
+    @apply border-dashed border-source bg-source-tint;
+  }
+  .mark-icon {
+    @apply pointer-events-none absolute -top-2.5 -right-2.5 z-10 h-5 w-5;
+  }
+  .mark-icon-chosen circle:first-child {
+    fill: var(--color-chosen);
+  }
+  .mark-icon-mistake circle:first-child {
+    fill: var(--color-mistake);
+  }
+  .mark-icon-source circle:first-child {
+    fill: var(--color-source);
+  }
+
+  /* ---- the look of each document ---- */
+  .doc-payslip .logo {
+    color: #2e7d32;
+  }
+  .doc-payslip .big-line,
+  .doc-energyBill .big-line {
+    @apply bg-slate-50;
+  }
+
+  /* a till receipt: narrow thermal paper, a typewriter font, centred shop, dashed rules, a torn edge */
+  .doc-receipt .panel.paper {
+    @apply relative max-w-[27rem] rounded-none border-0 bg-[#fffdf6] px-4 font-mono text-[0.95em] shadow-md;
+    margin-bottom: 8px;
+  }
+  .doc-receipt .panel.paper::after {
+    content: "";
+    @apply absolute right-0 left-0 h-2;
+    bottom: -8px;
+    background:
+      linear-gradient(135deg, #fffdf6 50%, transparent 50%) 0 0 / 12px 8px repeat-x,
+      linear-gradient(225deg, #fffdf6 50%, transparent 50%) 0 0 / 12px 8px repeat-x;
+  }
+  .doc-receipt .letterhead {
+    @apply flex-col gap-1 border-b border-dashed border-ink text-center;
+  }
+  .doc-receipt .logo {
+    color: #b45309;
+  }
+  .doc-receipt table.lines thead th,
+  .doc-receipt table.lines tr.total th,
+  .doc-receipt table.lines tr.total td {
+    @apply border-dashed;
+  }
+  .doc-receipt table.lines th,
+  .doc-receipt table.lines td {
+    @apply border-b-0;
+  }
+  .doc-receipt .big-line {
+    @apply rounded-none border-x-0 border-dashed;
+  }
+  .doc-receipt .letterhead > div {
+    @apply w-full;
+  }
+  .doc-receipt .note {
+    @apply text-center;
+  }
+
+
+  .doc-packingSlip .logo {
+    color: #475569;
+  }
+  .doc-packingSlip .panel.box table.lines th,
+  .doc-packingSlip .panel.box table.lines td {
+    @apply border-[#d8b27a];
+  }
+
+  .doc-rota .logo {
+    color: #b45309;
+  }
+  .doc-rota table.lines tbody td {
+    @apply whitespace-nowrap;
+  }
+
+  /* a timetable: a yellow badge with the line number, a dark band */
+  .doc-timetable .doc-title {
+    @apply -mx-5 -mt-4 mb-2 rounded-t-sm bg-ink px-5 py-2 text-white;
+  }
+  .doc-timetable .doc-title h3 {
+    @apply text-[1.1em];
+  }
+  .doc-timetable .badge-line .field {
+    @apply rounded-md bg-[#f0c419] px-2.5 text-[1.3em] font-black text-ink no-underline;
+  }
+  .doc-timetable .doc-title .field:focus-visible {
+    @apply outline-white;
+  }
+  .doc-timetable table.lines td {
+    @apply font-mono;
+  }
+
+  .doc-energyBill .logo {
+    color: #ca8a04;
+  }
+
+  /* a leaflet: a coloured band at the top, the medicine's name in a box */
+  .doc-dosage .panel.paper {
+    @apply border-t-8 border-t-[#0e7490];
+  }
+  .doc-dosage .logo {
+    color: #0e7490;
+  }
+
+  /* ---- the authoring mode ---- */
+  .author-input {
+    @apply min-h-9 rounded-md border-2 border-slate-300 bg-white px-2 py-1 text-sm text-ink outline-none;
+    font-family: inherit;
+  }
+  .author-input:focus {
+    @apply border-accent-strong ring-2 ring-accent/40;
+  }
+  .author-input.invalid {
+    @apply border-red-600 bg-red-50;
+  }
+  .author-input.wrong {
+    @apply border-mistake bg-mistake-tint font-semibold;
+  }
+  .author-row {
+    @apply grid items-center gap-2 text-sm;
+    grid-template-columns: minmax(0, 1fr) minmax(9.5rem, 1.2fr);
+  }
+  .computed-tag {
+    @apply ml-1 rounded bg-slate-200 px-1 text-xs text-slate-700;
+  }
+  .author-button {
+    @apply min-h-8 cursor-pointer rounded-md border-2 border-slate-300 bg-white px-1.5 py-0.5 text-sm font-semibold text-slate-700 hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .task-panel {
+    @apply mt-4 rounded-lg border border-slate-200 p-3 text-sm;
+  }
+  .panel-title {
+    @apply mb-2 text-sm font-semibold tracking-wide text-slate-500 uppercase;
+  }
+  .chip {
+    @apply flex items-center gap-1 rounded-full border-2 border-chosen bg-chosen-tint py-0.5 pr-1 pl-3;
+  }
+  .chip-remove {
+    @apply flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-lg leading-none hover:bg-white focus-visible:outline-2 focus-visible:outline-chosen;
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (empty: none)", "nl": "Titel (leeg: geen)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the example's, or one made from the field)", "nl": "Vraag (leeg: die van het voorbeeld, of een gemaakt van het veld)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the document and the PCI's texts", "nl": "Taal van het document en de eigen teksten van de PCI" }
+  },
+  "template": {
+    "default": "payslip",
+    "editor": "enum",
+    "options": [
+      { "value": "payslip", "label": { "en": "Payslip", "nl": "Loonstrook" } },
+      { "value": "receipt", "label": { "en": "Till receipt", "nl": "Kassabon" } },
+      { "value": "packingSlip", "label": { "en": "Packing slip and the delivery", "nl": "Pakbon en de levering" } },
+      { "value": "rota", "label": { "en": "Staff rota", "nl": "Dienstrooster" } },
+      { "value": "timetable", "label": { "en": "Bus timetable", "nl": "Dienstregeling van de bus" } },
+      { "value": "energyBill", "label": { "en": "Energy bill", "nl": "Energierekening" } },
+      { "value": "dosage", "label": { "en": "Medicine leaflet: dosage table", "nl": "Bijsluiter: doseertabel" } }
+    ],
+    "label": { "en": "Document", "nl": "Document" }
+  },
+  "task": {
+    "default": "find",
+    "editor": "enum",
+    "options": [
+      { "value": "find", "label": { "en": "Find: tap the right field", "nl": "Zoeken: tik op het juiste veld" } },
+      { "value": "check", "label": { "en": "Check: tap every mistake", "nl": "Controleren: tik op elke fout" } },
+      { "value": "answer", "label": { "en": "Answer: type a number", "nl": "Antwoorden: typ een getal" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" }
+  },
+  "document": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "The document's values and its mistakes", "nl": "De waarden van het document en de fouten" },
+    "hint": {
+      "en": "Made in the authoring mode. Empty: the example of the document, with the example's mistakes for Check.",
+      "nl": "Gemaakt in de auteursmodus. Leeg: het voorbeeld van het document, met de fouten van het voorbeeld bij Controleren."
+    },
+    "$comment": "JSON { values: { key: value }, mistakes: { field: shown value } } (documents.ts); values language neutral: 14.25, 08:15, 09:00-13:00"
+  },
+  "targets": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "The right field (Find) or where the answer is (Answer)", "nl": "Het juiste veld (Zoeken) of waar het antwoord staat (Antwoorden)" },
+    "hint": {
+      "en": "Field identifiers, separated by a comma, such as net or day5Person2; for Find any of them is right. Empty: the example's.",
+      "nl": "Veldnamen, gescheiden door een komma, zoals net of day5Person2; bij Zoeken is elk ervan goed. Leeg: die van het voorbeeld."
+    }
+  },
+  "answer": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Answer: the correct number", "nl": "Antwoorden: het juiste getal" },
+    "hint": { "en": "Empty: the example's, or the value of the field where the answer is.", "nl": "Leeg: dat van het voorbeeld, of de waarde van het veld waar het antwoord staat." }
+  },
+  "tolerance": {
+    "default": "0",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Answer: margin (0: exactly)", "nl": "Antwoorden: marge (0: precies)" }
+  },
+  "unit": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Answer: unit next to the box (empty: from the field)", "nl": "Antwoorden: eenheid naast het vakje (leeg: van het veld)" }
+  },
+  "markSource": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Answer: the pupil may tap where they found it", "nl": "Antwoorden: de leerling mag aantikken waar het staat" }
+  },
+  "currency": {
+    "default": "€",
+    "editor": "text",
+    "label": { "en": "Currency sign", "nl": "Valutateken" }
+  }
+}
