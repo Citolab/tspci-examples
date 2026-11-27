@@ -256,7 +256,8 @@ function countHoles({ columns, rows, cells }: Shape): number {
 
 // ---- the settings
 
-export type Task = "draw" | "measure" | "compare";
+/** cover: the floor covering task, whose own settings and response are in cover.ts */
+export type Task = "draw" | "measure" | "compare" | "cover";
 export type Ask = "area" | "perimeter" | "both";
 export type CompareBy = "area" | "perimeter";
 export type Rules = { targetArea: number | null; targetPerimeter: number | null; mustBeRectangle: boolean };
@@ -288,7 +289,7 @@ export function settingsFrom(properties: Record<string, unknown>): Settings {
     return n === undefined ? null : n;
   };
   return {
-    task: oneOf(properties.task, ["draw", "measure", "compare"] as const, "draw"),
+    task: oneOf(properties.task, ["draw", "measure", "compare", "cover"] as const, "draw"),
     columns,
     rows,
     halves: isTrue(properties.halves),
@@ -366,7 +367,7 @@ export function compareShapes(a: Shape, b: Shape, by: CompareBy): "A" | "B" | "s
 
 /** A field of a record response, as QTI JSON: { name, base: { float: 12 } }. */
 export type RecordField = { name: string; base: Record<string, number | boolean | string> };
-const field = (name: string, type: string, value: number | boolean | string): RecordField => ({ name, base: { [type]: value } });
+export const field = (name: string, type: string, value: number | boolean | string): RecordField => ({ name, base: { [type]: value } });
 
 /** What the pupil did: the squares drawn (draw), the numbers typed (measure), the shape chosen (compare). */
 export type Work = { cells: CellValue[]; areaAnswer: string; perimeterAnswer: string; choice: string };
@@ -382,6 +383,7 @@ export const asksPerimeter = (ask: Ask) => ask !== "area";
  * - compare: choice ("A", "B" or "same").
  */
 export function responseFields(settings: Settings, work: Work): RecordField[] | undefined {
+  if (settings.task === "cover") return undefined; // cover.ts coverResponseFields
   if (settings.task === "draw") {
     const shape: Shape = { columns: settings.columns, rows: settings.rows, cells: work.cells };
     const m = measureShape(shape);
@@ -415,6 +417,7 @@ export function responseFields(settings: Settings, work: Work): RecordField[] | 
  *   a rectangle is asked. This is not a full response: score a drawing with a rule on these fields (README, "Scoring").
  */
 export function correctFields(settings: Settings): RecordField[] | undefined {
+  if (settings.task === "cover") return undefined; // cover.ts coverCorrectFields
   if (settings.task === "draw") {
     const yes = (name: string) => field(name, "boolean", true);
     return [yes("connected"), yes("noHoles"), ...(settings.rules.mustBeRectangle ? [yes("rectangle")] : []), yes("meetsRules")];

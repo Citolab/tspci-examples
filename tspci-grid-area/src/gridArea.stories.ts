@@ -557,6 +557,387 @@ export const AuthoringCompare: StoryObj<AuthoringArgs> = {
   },
 };
 
+// ---- cover: a floor plan, strips of carpet off a roll, and the bill
+
+// the defaults of config.json: an L of 6 m by 5 m without a corner of 2 m by 2 m, 1 m a square, a roll of 4 m, the door
+// (0.8 m) in the bottom wall of 4 m; the least plan is two strips top to bottom of 5 m and 3 m (waste 6 m²)
+const COVER = { task: "cover", title: "Carpeting my room", question: "Make a plan and a price for new carpet in this room." };
+const COVER_COLUMNS = 12;
+
+const $ = (root: Root, selector: string) => root.querySelector<HTMLElement>(selector);
+const $$ = (root: Root, selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector));
+const planStrip = (root: Root, index: number) => $(root, `[data-strip="${index}"]`)!;
+const stripRow = (root: Root, index: number) => $(root, `[data-strip-row="${index}"]`)!;
+const box = (root: Root, field: string) => $(root, `input[data-answer=${field}]`) as HTMLInputElement;
+/** The width of a square of the plan on screen (the plan has margins of 1.6 squares left and right). */
+const squarePx = (root: Root, columns = COVER_COLUMNS) => $(root, "[data-plan]")!.getBoundingClientRect().width / (columns + 3.2);
+
+/** A finger on an element: down in its middle (or at a point of it), moved by dx, dy pixels in a few steps, and lifted. */
+async function fingerDrag(element: Element, dx: number, dy: number, { fx = 0.5, fy = 0.5, lift = true } = {}) {
+  const b = element.getBoundingClientRect();
+  const x = b.left + b.width * fx, y = b.top + b.height * fy;
+  const event = (type: string, px: number, py: number) =>
+    new PointerEvent(type, { clientX: px, clientY: py, bubbles: true, composed: true, cancelable: true, pointerId: 7, pointerType: "touch", isPrimary: true, button: 0, buttons: type === "pointerup" ? 0 : 1 });
+  element.dispatchEvent(event("pointerdown", x, y));
+  for (let i = 1; i <= 4; i++) {
+    element.dispatchEvent(event("pointermove", x + (dx * i) / 4, y + (dy * i) / 4));
+    await afterPaint();
+  }
+  if (lift) element.dispatchEvent(event("pointerup", x + dx, y + dy));
+  await afterPaint();
+}
+/** A key on an element of the PCI (userEvent.keyboard does not reach into the shadow root). */
+async function key(element: Element, k: string) {
+  element.dispatchEvent(new KeyboardEvent("keydown", { key: k, bubbles: true, composed: true, cancelable: true }));
+  await afterPaint();
+}
+const button = (mounted: { canvas: MountedPci["canvas"] }, name: string | RegExp) => mounted.canvas.getByRole("button", { name });
+
+/** The floor covering to try yourself (no test runs on it): with a mouse, a finger or the keyboard. */
+export const CoverToTry: Story = {
+  name: "Floor covering, to try",
+  args: { properties: COVER },
+};
+
+export const CoverAnLShapedRoom: Story = {
+  args: { properties: COVER },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci, root } = mounted;
+    expect(canvas.getByRole("heading", { name: "Carpeting my room" })).toBeInTheDocument();
+    // the plan, in words for a screen reader: the walls clockwise, and the door
+    const plan = canvas.getByRole("img", { name: /^Floor plan on squared paper of 12 by 8 squares, 1 square = 1 m\./ });
+    expect(plan.getAttribute("aria-label")).toContain("6 m, 3 m, 2 m, 2 m, 4 m with the door (0.8 m), 5 m");
+    // the lengths of the walls in metres, the door, the scale and the roll
+    expect(Array.from(root.querySelectorAll("[data-lengths] text")).map((t) => t.textContent)).toEqual(["6 m", "3 m", "2 m", "2 m", "4 m", "5 m"]);
+    expect($(root, "[data-door] text")).toHaveTextContent("door 0.8 m");
+    expect($(root, "[data-scale]")).toHaveTextContent("1 square = 1 m");
+    expect($(root, "[data-roll]")).toHaveTextContent("Carpet comes on a roll 4 m wide and is sold per running metre.");
+    // the three parts, in the order of the work
+    expect(canvas.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["1. The floor area", "2. Lay the strips", "3. The bill"]);
+    expect(canvas.getByRole("textbox", { name: /Floor area/ })).toBe(box(root, "floorArea"));
+    expect(canvas.getByText("No strips yet.")).toBeInTheDocument();
+    expect(canvas.getByRole("textbox", { name: "Carpet: metres" })).toBe(box(root, "coveringMetres"));
+    expect(canvas.getByRole("textbox", { name: "Skirting: amount in euros" })).toBe(box(root, "skirtingAmount"));
+    expect(canvas.getByText("€39.95 per m")).toBeInTheDocument();
+    expect(canvas.getByText("€12.95")).toBeInTheDocument();
+    // nothing done, nothing reported
+    expect(pci.getResponse()).toBeUndefined();
+    await fill(box(root, "floorArea"), "26");
+    expect(fieldsOf(await lastChange(mounted))).toMatchObject({ area: 26, areaCorrect: true, covered: false, correct: false });
+    await fill(box(root, "floorArea"), "25 m²");
+    expect(fieldsOf(pci.getResponse())).toMatchObject({ area: 25, areaCorrect: false });
+    await fill(box(root, "floorArea"), "zes");
+    expect(box(root, "floorArea").checkValidity()).toBe(false);
+    expect(pci.getResponse()).toBeUndefined();
+  },
+};
+
+export const CoverStripsByFinger: Story = {
+  args: { properties: { ...COVER, coverParts: "strips" } },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, pci } = mounted;
+    const u = squarePx(root);
+    await step("a tap on Add a strip lays one at the floor's first square, left to right, as wide as the roll", async () => {
+      button(mounted, "+ Add a strip").click();
+      await afterPaint();
+      expect(fieldsOf(await lastChange(mounted))).toMatchObject({ strips: "across 1 1 4", runningMetres: 4, covered: false });
+      expect(stripRow(root, 0)).toHaveTextContent("Strip 1: left to right, 4 m");
+      expect(focusedIn(root)).toBe(stripRow(root, 0)); // the focus on the new strip
+      expect(planStrip(root, 0).classList.contains("selected")).toBe(true);
+    });
+    await step("Turn, and drag the handle down a square: 5 m top to bottom", async () => {
+      button(mounted, "Turn strip 1").click();
+      await afterPaint();
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 4" });
+      await fingerDrag($(root, "[data-handle]")!, 0, u);
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 5", runningMetres: 5 });
+      expect($(root, "[data-live]")).toHaveTextContent("Strip 1: top to bottom, 5 m long and 4 m wide, 1 m from the left and 1 m from the top of the paper");
+    });
+    await step("a second strip, moved with a finger and made shorter: covered with the least waste", async () => {
+      button(mounted, "+ Add a strip").click();
+      await afterPaint();
+      // at the first square not covered (column 6, row 2), the same way round as the last one
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 5; down 5 1 4", covered: true, leastWaste: false });
+      await fingerDrag(planStrip(root, 1), 2 * u, u); // two squares right, one down
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 5; down 7 2 4", covered: false });
+      await fingerDrag(planStrip(root, 1), -2 * u, -u);
+      await fingerDrag($(root, "[data-handle]")!, 0, -u);
+      expect(fieldsOf(pci.getResponse())).toEqual({
+        covered: true, waste: 6, runningMetres: 8, leastWaste: true, strips: "down 1 1 5; down 5 1 3", correct: true,
+      });
+    });
+    await step("a tap does not move a strip, and a cancelled drag (a scroll) puts it back", async () => {
+      const before = pci.getResponse();
+      await fingerDrag(planStrip(root, 0), 4, 3); // a finger moves a little
+      expect(pci.getResponse()).toEqual(before);
+      expect(focusedIn(root)).toBe(stripRow(root, 0)); // the tap chose strip 1
+      const s = planStrip(root, 0);
+      await fingerDrag(s, 3 * u, 0, { lift: false });
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ covered: false });
+      s.dispatchEvent(new PointerEvent("pointercancel", { pointerId: 7, pointerType: "touch", bubbles: true, composed: true }));
+      await afterPaint();
+      expect(pci.getResponse()).toEqual(before);
+    });
+    // only what is dragged ignores the browser's touch gestures
+    expect(getComputedStyle(planStrip(root, 0)).touchAction).toBe("none");
+    expect(getComputedStyle($(root, "[data-plan]")!).touchAction).not.toBe("none");
+    // the handle is at least 24 px
+    expect($(root, "[data-handle]")!.getBoundingClientRect().width).toBeGreaterThanOrEqual(24);
+  },
+};
+
+export const CoverStripsByKeyboard: Story = {
+  args: { properties: { ...COVER, coverParts: "strips" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, pci } = mounted;
+    const add = button(mounted, "+ Add a strip");
+    add.focus();
+    add.click();
+    await afterPaint();
+    await waitFor(() => expect(focusedIn(root)).toBe(stripRow(root, 0)));
+    const row = () => focusedIn(root)!;
+    // the strip's button says where it is, and how to move it
+    expect(row().getAttribute("aria-label")).toBe("Strip 1: left to right, 4 m long and 4 m wide, 1 m from the left and 1 m from the top of the paper");
+    expect(root.getElementById?.(row().getAttribute("aria-describedby")!) ?? null).toHaveTextContent(/R turns it/);
+    await key(row(), "r");
+    await key(row(), "+");
+    expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 5" });
+    expect($(root, "[data-live]")).toHaveTextContent("Strip 1: top to bottom, 5 m long");
+    // arrows move it a square, and it stops at the edge of the paper
+    await key(row(), "ArrowRight");
+    await key(row(), "ArrowUp");
+    await key(row(), "ArrowUp");
+    expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 2 0 5" });
+    await key(row(), "ArrowLeft");
+    await key(row(), "ArrowDown");
+    // a second strip: Add a strip, and on with its keys
+    add.click();
+    await afterPaint();
+    await waitFor(() => expect(focusedIn(root)).toBe(stripRow(root, 1)));
+    await key(row(), "-");
+    expect(fieldsOf(pci.getResponse())).toMatchObject({ strips: "down 1 1 5; down 5 1 3", covered: true, leastWaste: true, correct: true });
+    // Delete removes it, and the focus goes to the strip before it; the last one: to Add a strip
+    await key(row(), "Delete");
+    await waitFor(() => expect(focusedIn(root)).toBe(stripRow(root, 0)));
+    expect($(root, "[data-live]")).toHaveTextContent("Strip 2 removed.");
+    await key(row(), "Backspace");
+    await waitFor(() => expect(focusedIn(root)).toBe(add));
+    expect(pci.getResponse()).toBeUndefined();
+  },
+};
+
+const BILL = { ...COVER, coverParts: "bill", strips: "across 1 1 6; across 1 4 6" };
+
+export const CoverTheBill: Story = {
+  args: { properties: BILL },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, pci, canvas } = mounted;
+    await step("the author's strips are on the plan, and cannot be moved", async () => {
+      expect(canvas.getByText("The strips are laid already.")).toBeInTheDocument();
+      expect($$(root, "[data-strip]")).toHaveLength(2);
+      expect(canvas.queryByRole("button", { name: /Add a strip/ })).toBeNull();
+      expect(getComputedStyle(planStrip(root, 0)).touchAction).not.toBe("none");
+      expect(canvas.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["The bill"]);
+    });
+    await step("the bill for 12 m, filled in line by line", async () => {
+      await fill(box(root, "coveringMetres"), "12");
+      await fill(box(root, "coveringAmount"), "479,40");
+      await fill(box(root, "skirtingMetres"), "21,2 m");
+      await fill(box(root, "skirtingAmount"), "53");
+      await fill(box(root, "thresholdAmount"), "€ 12,95");
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ billCorrect: true, totalCorrect: false });
+      await fill(box(root, "total"), "545.35");
+      expect(fieldsOf(await lastChange(mounted))).toEqual({
+        billCorrect: true, total: 545.35, totalCorrect: true,
+        bill: "coveringMetres=12; coveringAmount=479.4; skirtingMetres=21.2; skirtingAmount=53; thresholdAmount=12.95", correct: true,
+      });
+    });
+    await step("the skirting without the door taken off: the line is wrong, the total of the pupil's own amounts is right", async () => {
+      await fill(box(root, "skirtingMetres"), "22");
+      await fill(box(root, "skirtingAmount"), "55");
+      await fill(box(root, "total"), "547,35");
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ billCorrect: false, total: 547.35, totalCorrect: true, correct: false });
+      await fill(box(root, "total"), "550");
+      expect(fieldsOf(pci.getResponse())).toMatchObject({ totalCorrect: false });
+      await fill(box(root, "total"), "veel");
+      expect(box(root, "total").checkValidity()).toBe(false);
+      expect(pci.checkValidity()).toBe(false);
+    });
+    // the correct response: for the author's plan
+    expect(fieldsOf(factory.getCorrectResponse!(BILL))).toMatchObject({ billCorrect: true, total: 545.35, totalCorrect: true, correct: true });
+  },
+};
+
+export const CoverInDutch: Story = {
+  args: {
+    properties: {
+      ...COVER, language: "nl", title: "", question: "Bereken de oppervlakte van de vloer.", coverParts: "area", scale: "0.5", columns: "16", rows: "12",
+      room: "/.##########/.##########/.##########/.##########/.##########/.##########/.##########/.##########/.##.#######", door: "", material: "vinyl",
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, canvas, pci } = mounted;
+    // 5 m by 4.5 m, without a chimney breast of 0.5 by 0.5 m in the bottom wall: 22.25 m²
+    expect($(root, "[data-scale]")).toHaveTextContent("1 hokje = 0,5 m");
+    expect(Array.from(root.querySelectorAll("[data-lengths] text")).map((t) => t.textContent)).toContain("4,5 m");
+    expect(canvas.getByRole("img", { name: /^Plattegrond op ruitjespapier van 16 bij 12 hokjes, 1 hokje = 0,5 m\./ })).toBeInTheDocument();
+    expect($(root, "[data-door]")).toBeNull();
+    expect($(root, "[data-roll]")).toBeNull(); // only the area: no roll
+    expect(canvas.getAllByRole("heading", { level: 3 }).map((h) => h.textContent)).toEqual(["De oppervlakte van de vloer"]);
+    await fill(canvas.getByRole("textbox", { name: /Oppervlakte vloer/ }) as HTMLInputElement, "22,25");
+    expect(pci.getResponse()).toEqual(record({ area: 22.25, areaCorrect: true, correct: true }));
+  },
+};
+
+export const CoverBillInDutch: Story = {
+  args: { properties: { ...BILL, language: "nl" }, status: "solution" },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, canvas } = mounted;
+    // euros as in tspci-money: "€ 39,95"; the solution filled in, read-only
+    expect(canvas.getByText("€ 39,95 per m")).toBeInTheDocument();
+    expect(canvas.getByRole("textbox", { name: "Tapijt: bedrag in euro" })).toHaveValue("479,40");
+    expect(canvas.getByRole("textbox", { name: "Plinten: meters" })).toHaveValue("21,2");
+    expect(box(root, "total")).toHaveValue("545,35");
+    expect(box(root, "total")).toBeDisabled();
+    expect(fieldsOf(mounted.pci.getResponse())).toMatchObject({ billCorrect: true, total: 545.35, correct: true });
+  },
+};
+
+export const CoverSolution: Story = {
+  args: { properties: COVER, status: "solution" },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { root, canvas, pci } = mounted;
+    // the plan with the least waste, the area and the bill; nothing can be changed
+    expect($$(root, "[data-strip]")).toHaveLength(2);
+    expect(box(root, "floorArea")).toHaveValue("26");
+    expect(box(root, "coveringMetres")).toHaveValue("8");
+    expect(box(root, "total")).toHaveValue("385.55");
+    expect(canvas.queryByRole("button", { name: /Add a strip/ })).toBeNull();
+    expect(canvas.queryByRole("button", { name: /Turn/ })).toBeNull();
+    expect(pci.getResponse()).toEqual(factory.getCorrectResponse!(COVER));
+    expect(fieldsOf(pci.getResponse())).toEqual({
+      area: 26, areaCorrect: true, covered: true, waste: 6, runningMetres: 8, leastWaste: true, strips: "down 1 1 5; down 5 1 3",
+      billCorrect: true, total: 385.55, totalCorrect: true,
+      bill: "coveringMetres=8; coveringAmount=319.6; skirtingMetres=21.2; skirtingAmount=53; thresholdAmount=12.95", correct: true,
+    });
+    const before = pci.getResponse();
+    await fingerDrag(planStrip(root, 0), 3 * squarePx(root), 0);
+    expect(pci.getResponse()).toEqual(before);
+  },
+};
+
+export const CoverRestore: Story = {
+  args: { properties: COVER },
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement);
+    await fill(box(first.root, "floorArea"), "26");
+    button(first, "+ Add a strip").click();
+    await afterPaint();
+    await fill(box(first.root, "coveringMetres"), "4");
+    const response = first.pci.getResponse();
+    // the state of the first session
+    const second = await remountPci(canvasElement, pci, { properties: COVER, state: first.pci.getState() });
+    expect(second.pci.getResponse()).toEqual(response);
+    expect(second.changes).toHaveLength(0);
+    // a response handed back (boundTo): the area, the plan and the bill
+    const third = await remountPci(canvasElement, pci, { properties: COVER, boundTo: { RESPONSE: factory.getCorrectResponse!(COVER)! } });
+    expect(third.pci.getResponse()).toEqual(factory.getCorrectResponse!(COVER));
+    expect($$(third.root, "[data-strip]")).toHaveLength(2);
+    expect(box(third.root, "skirtingAmount")).toHaveValue("53.00");
+    // a state of an earlier version (no floor covering in it) still restores a drawing
+    const old = JSON.stringify({ state: { cells: Array(96).fill(0).map((_, i) => (i === 0 ? 1 : 0)), areaAnswer: "", perimeterAnswer: "", choice: "" }, log: [] });
+    const fourth = await remountPci(canvasElement, pci, { state: old });
+    expect(fieldsOf(fourth.pci.getResponse())).toMatchObject({ area: 1, shape: "#" });
+  },
+};
+
+export const CoverTwoOnOnePage: Story = {
+  render: () => {
+    const page = document.createElement("div");
+    for (const properties of [{ ...COVER, title: "One", coverParts: "strips" }, { ...COVER, title: "Two", coverParts: "strips" }]) {
+      const part = document.createElement("div");
+      part.className = "part";
+      part.appendChild(mountPci(pci, { properties }));
+      page.appendChild(part);
+    }
+    return page;
+  },
+  play: async ({ canvasElement }) => {
+    const [one, two] = Array.from(canvasElement.querySelectorAll<HTMLElement>(".part"));
+    const a = await openPci(one);
+    const b = await openPci(two);
+    button(a, "+ Add a strip").click();
+    await afterPaint();
+    expect(fieldsOf(a.pci.getResponse())).toMatchObject({ strips: "across 1 1 4" });
+    expect(b.pci.getResponse()).toBeUndefined();
+    expect(b.changes).toHaveLength(0);
+  },
+};
+
+export const AuthoringCover: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { properties: { task: "cover", room: "", door: "" } },
+  play: async ({ canvasElement, step }) => {
+    const { instance, root, canvas } = await openAuthoring(canvasElement);
+    expect(canvas.getByRole("heading", { name: "Draw the room" })).toBeInTheDocument();
+    expect(instance.validate()).toEqual(["Draw the room."]);
+    await step("a room of 5 m by 3 m with a bay window of 2 m by 1 m", async () => {
+      for (const row of [2, 3, 4]) await drag(...range(2, 6).map((c) => square(root, row, c)));
+      await drag(square(root, 1, 3), square(root, 1, 4));
+      expect(instance.getProperties()).toEqual({ room: "..##/.#####/.#####/.#####", door: "", strips: "" });
+      expect(instance.validate()).toEqual([]);
+      expect(root.querySelector("[data-measures]")).toHaveTextContent(/Floor area\s*17 m²/);
+      expect(root.querySelector("[data-measures]")).toHaveTextContent(/Perimeter\s*18 m/);
+    });
+    await step("the door, in a wall chosen from the list", async () => {
+      const select = root.querySelector<HTMLSelectElement>("[data-door-select]")!;
+      expect(Array.from(select.options).map((o) => o.text)).toEqual([
+        "No door", "Wall 1: top, 2 m", "Wall 2: right, 1 m", "Wall 3: top, 2 m", "Wall 4: right, 3 m", "Wall 5: bottom, 5 m", "Wall 6: left, 3 m", "Wall 7: top, 1 m", "Wall 8: left, 1 m",
+      ]);
+      select.value = "5";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+      await afterPaint();
+      expect(instance.getProperties()).toMatchObject({ door: "5" });
+      expect(root.querySelector("[data-door]")).not.toBeNull();
+      expect(root.querySelector("[data-measures]")).toHaveTextContent(/Skirting \(without the door\)\s*17.2 m/);
+    });
+    await step("the plan with the least waste, and a plan that is not", async () => {
+      button({ canvas }, "Lay the plan with the least waste").click();
+      await afterPaint();
+      // left to right, one band of 5 m over the bay window: waste 3 m²
+      expect(instance.getProperties()).toMatchObject({ strips: "across 1 0 5" });
+      expect(instance.validate()).toEqual([]);
+      expect(root.querySelector("[data-measures]")).toHaveTextContent(/Least running length\s*5 m \(left to right\), waste 3 m²/);
+      expect(root.querySelector("[data-bill-preview]")).toHaveTextContent("5 m × €39.95 = €199.75");
+      // one square shorter: the floor is not covered
+      const row = root.querySelector<HTMLElement>('[data-strip-row="0"]')!;
+      row.focus();
+      await key(row, "-");
+      expect(instance.validate()).toEqual(["The plan does not cover the whole floor."]);
+    });
+  },
+};
+
+export const AuthoringCoverInDutch: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { properties: { task: "cover", rollWidth: "3,5", door: "3", doorWidth: "2,5" }, language: "nl" },
+  play: async ({ canvasElement }) => {
+    const { instance, canvas } = await openAuthoring(canvasElement);
+    expect(canvas.getByRole("heading", { name: "De kamer tekenen" })).toBeInTheDocument();
+    expect(instance.validate()).toEqual([
+      "De rolbreedte moet een heel aantal hokjes zijn (een veelvoud van de schaal).",
+      "De deur is breder dan de muur.",
+    ]);
+  },
+};
+
 /** The picture in the README (example.png): a rectangle drawn on squared paper with a unit. */
 export const Example: Story = {
   args: { properties: { unitLabel: "1 square = 1 cm²" }, boundTo: { RESPONSE: record({ shape: "/.####/.####/.####" }) }, width: 560 },

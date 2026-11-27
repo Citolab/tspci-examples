@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-grid-area",
   "version": "1.0.0-alpha.1",
-  "description": "area and perimeter on squared paper (oppervlakte en omtrek op ruitjespapier): draw a shape with a given area or perimeter, measure the author's shape, or compare two shapes; whole and half squares, checked by rules",
+  "description": "area and perimeter on squared paper (oppervlakte en omtrek op ruitjespapier): draw a shape with a given area or perimeter, measure the author's shape, or compare two shapes; whole and half squares, checked by rules; and cover a floor (een kamer stofferen): the area, strips of carpet off a roll, and the bill",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
@@ -54,7 +54,9 @@
     "oppervlakte",
     "omtrek",
     "squared-paper",
-    "math"
+    "math",
+    "floor-covering",
+    "stofferen"
   ],
   "scripts": {
     "dev": "tspci --dev",
@@ -91,13 +93,15 @@
         "fields": {
           "area": {
             "baseType": "float",
+            "tolerance": "range",
             "label": {
-              "en": "Area (squares)",
-              "nl": "Oppervlakte (hokjes)"
+              "en": "Area (draw: in squares; cover: the floor area written, in m²)",
+              "nl": "Oppervlakte (tekenen: in hokjes; stofferen: de ingevulde oppervlakte van de vloer, in m²)"
             },
             "when": {
               "task": [
-                "draw"
+                "draw",
+                "cover"
               ]
             }
           },
@@ -218,13 +222,148 @@
                 "compare"
               ]
             }
+          },
+          "areaCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The floor area is right",
+              "nl": "De oppervlakte van de vloer is goed"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "covered": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The strips cover the whole floor",
+              "nl": "De banen bedekken de hele vloer"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "waste": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Waste (m²): strips off the floor or twice on it",
+              "nl": "Afval (m²): banen naast de vloer of dubbel erop"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "runningMetres": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Running metres of the strips",
+              "nl": "Strekkende meters van de banen"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "leastWaste": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The floor is covered with the least waste",
+              "nl": "De vloer is bedekt met het minste afval"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "strips": {
+            "baseType": "string",
+            "label": {
+              "en": "The plan of strips",
+              "nl": "Het plan met banen"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "billCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every line of the bill is right for the plan and the prices",
+              "nl": "Elke regel van de rekening klopt bij het plan en de prijzen"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "total": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "The total written (euros)",
+              "nl": "Het ingevulde totaal (euro)"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "totalCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The total adds up the pupil's own amounts",
+              "nl": "Het totaal telt de eigen bedragen van de leerling op"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "bill": {
+            "baseType": "string",
+            "label": {
+              "en": "The lines of the bill written",
+              "nl": "De ingevulde regels van de rekening"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
+          },
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Everything asked is right",
+              "nl": "Alles wat gevraagd is, is goed"
+            },
+            "when": {
+              "task": [
+                "cover"
+              ]
+            }
           }
         }
       },
       "authoring": {
         "label": {
-          "en": "Draw the shapes…",
-          "nl": "Figuren tekenen…"
+          "en": "Draw the shapes or the room…",
+          "nl": "Figuren of de kamer tekenen…"
         },
         "width": 960,
         "height": 760

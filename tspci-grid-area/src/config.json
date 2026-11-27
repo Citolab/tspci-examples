@@ -15,7 +15,8 @@
     "options": [
       { "value": "draw", "label": { "en": "Draw a shape (with a given area, perimeter or both)", "nl": "Een figuur tekenen (met een gegeven oppervlakte, omtrek of allebei)" } },
       { "value": "measure", "label": { "en": "Measure the shape: write its area and/or perimeter", "nl": "De figuur meten: de oppervlakte en/of omtrek invullen" } },
-      { "value": "compare", "label": { "en": "Compare two shapes: which is larger?", "nl": "Twee figuren vergelijken: welke is groter?" } }
+      { "value": "compare", "label": { "en": "Compare two shapes: which is larger?", "nl": "Twee figuren vergelijken: welke is groter?" } },
+      { "value": "cover", "label": { "en": "Cover a floor: the area, strips of carpet or vinyl, and the bill", "nl": "Een kamer stofferen: de oppervlakte, banen tapijt of vinyl, en de rekening" } }
     ],
     "label": { "en": "Task", "nl": "Opdracht" }
   },
@@ -97,5 +98,79 @@
     "default": "",
     "editor": "pci",
     "label": { "en": "Compare: shape B", "nl": "Vergelijken: figuur B" }
+  },
+  "coverParts": {
+    "default": "all",
+    "editor": "enum",
+    "options": [
+      { "value": "all", "label": { "en": "Everything: the area, the strips and the bill", "nl": "Alles: de oppervlakte, de banen en de rekening" } },
+      { "value": "area", "label": { "en": "Only the floor area", "nl": "Alleen de oppervlakte van de vloer" } },
+      { "value": "strips", "label": { "en": "Only the strips", "nl": "Alleen de banen" } },
+      { "value": "bill", "label": { "en": "Only the bill (the strips are laid)", "nl": "Alleen de rekening (de banen liggen er al)" } }
+    ],
+    "label": { "en": "Cover: what the pupil does", "nl": "Stofferen: wat de leerling doet" }
+  },
+  "scale": {
+    "default": "1",
+    "editor": "enum",
+    "options": [
+      { "value": "1", "label": { "en": "1 square = 1 m", "nl": "1 hokje = 1 m" } },
+      { "value": "0.5", "label": { "en": "1 square = 0.5 m", "nl": "1 hokje = 0,5 m" } }
+    ],
+    "label": { "en": "Cover: the scale", "nl": "Stofferen: de schaal" }
+  },
+  "material": {
+    "default": "carpet",
+    "editor": "enum",
+    "options": [
+      { "value": "carpet", "label": { "en": "Carpet", "nl": "Tapijt" } },
+      { "value": "vinyl", "label": { "en": "Vinyl", "nl": "Vinyl" } }
+    ],
+    "label": { "en": "Cover: the floor covering", "nl": "Stofferen: de vloerbedekking" }
+  },
+  "rollWidth": {
+    "default": "4",
+    "editor": "number",
+    "min": 0.5,
+    "label": { "en": "Cover: the width of the roll in metres (a whole number of squares)", "nl": "Stofferen: de breedte van de rol in meters (een heel aantal hokjes)" }
+  },
+  "price": {
+    "default": "39.95",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Cover: the price per running metre, in euros", "nl": "Stofferen: de prijs per strekkende meter, in euro" }
+  },
+  "skirtingPrice": {
+    "default": "2.50",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Cover: skirting, the price per metre in euros (empty: no skirting)", "nl": "Stofferen: plinten, de prijs per meter in euro (leeg: geen plinten)" }
+  },
+  "thresholdPrice": {
+    "default": "12.95",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Cover: a threshold strip, the price in euros (empty: none)", "nl": "Stofferen: een drempelstrip, de prijs in euro (leeg: geen)" }
+  },
+  "doorWidth": {
+    "default": "0.8",
+    "editor": "number",
+    "min": 0,
+    "label": { "en": "Cover: the width of the door in metres", "nl": "Stofferen: de breedte van de deur in meters" }
+  },
+  "room": {
+    "default": "/.######/.######/.######/.####/.####",
+    "editor": "pci",
+    "label": { "en": "Cover: the room (its floor, as squares)", "nl": "Stofferen: de kamer (de vloer, als hokjes)" }
+  },
+  "door": {
+    "default": "5",
+    "editor": "pci",
+    "label": { "en": "Cover: the wall with the door, numbered clockwise from the top left (empty: no door)", "nl": "Stofferen: de muur met de deur, genummerd met de klok mee vanaf linksboven (leeg: geen deur)" }
+  },
+  "strips": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Cover: a plan of strips (the bill's plan when the pupil only does the bill; empty: the plan with the least waste)", "nl": "Stofferen: een plan met banen (het plan van de rekening als de leerling alleen de rekening doet; leeg: het plan met het minste afval)" }
   }
 }

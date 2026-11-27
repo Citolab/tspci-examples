@@ -40,4 +40,71 @@
   .choice input {
     @apply h-4 w-4 accent-[#1d4ed8];
   }
+
+  /* ---- floor covering (cover) */
+  /* the main action: 44 px high; a button with one sign: at least 36 × 36 px */
+  .button.main {
+    @apply min-h-11 px-4 text-base;
+  }
+  .button.square {
+    @apply min-h-9 min-w-9 px-2 text-lg leading-none;
+  }
+  /* a strip in the list: its number in a striped swatch, as on the plan */
+  .strip-row {
+    @apply min-h-11 w-full max-w-[28em] text-left;
+  }
+  .strip-swatch {
+    @apply inline-flex h-6 min-w-6 items-center justify-center rounded-sm border-2 border-[#0072b2] bg-white px-1 text-sm;
+  }
+  /* a strip on the plan: blue (Okabe-Ito), striped and outlined, so the floor and the walls show through */
+  .strip {
+    position: absolute;
+    box-sizing: border-box;
+    border: 2px solid #0072b2;
+    background: repeating-linear-gradient(135deg, rgb(0 114 178 / 0.42) 0 5px, rgb(0 114 178 / 0.18) 5px 10px);
+    pointer-events: auto;
+  }
+  .strip.editable {
+    touch-action: none; /* only what is dragged: a finger can scroll the page from the rest of the plan */
+    cursor: grab;
+  }
+  .strip.selected {
+    outline: 3px dashed #0f172a;
+    outline-offset: 1px;
+  }
+  .strip-label {
+    @apply absolute top-1 left-1 rounded-full border border-[#0072b2] bg-white px-1.5 text-[13px] leading-5 font-bold whitespace-nowrap text-ink;
+  }
+  /* the handle that makes a strip longer or shorter: 28 px, on the middle of its end */
+  .strip-handle {
+    @apply absolute h-7 w-7 rounded-full border-[3px] border-ink bg-white;
+    touch-action: none;
+  }
+  .strip-handle.across {
+    right: -15px;
+    top: calc(50% - 14px);
+    cursor: ew-resize;
+  }
+  .strip-handle.down {
+    bottom: -15px;
+    left: calc(50% - 14px);
+    cursor: ns-resize;
+  }
+  .bill {
+    @apply border-collapse text-left;
+  }
+  .bill th,
+  .bill td {
+    @apply border-b border-slate-200 px-2 py-1.5 align-middle;
+  }
+  .bill thead th {
+    @apply text-sm font-semibold text-slate-600;
+  }
+  .bill tfoot th,
+  .bill tfoot td {
+    @apply border-b-0 border-t-2 border-t-slate-400 font-bold;
+  }
+  .answer.bill-box {
+    @apply w-[5.5em];
+  }
 }

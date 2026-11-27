@@ -2,6 +2,8 @@ import type { PciProperties } from "@citolab/tspci";
 import { IStore, useStore } from "@citolab/preact-store";
 import configProps from "./config.json";
 import { asksArea, asksPerimeter, settingsFrom, type Settings } from "./grid";
+import { coverSettingsFrom } from "./cover.ts";
+import { CoverTask } from "./coverView.tsx";
 import { GridView } from "./gridView";
 import { Actions, StateModel } from "./store";
 import { textsFor, type Texts } from "./texts";
@@ -21,7 +23,8 @@ export const NUMBER_PATTERN = "\\s*(\\d+([.,]\\d+)?|\\d*\\s*½|(\\d+\\s+)?1/2)\\
  * The task on squared paper, by the `task` setting:
  * - draw: an empty grid the pupil colours squares on, with a button to clear it;
  * - measure: the author's shape, and a box for its area and/or perimeter;
- * - compare: the author's shapes A and B side by side, and a choice: A, B or both the same.
+ * - compare: the author's shapes A and B side by side, and a choice: A, B or both the same;
+ * - cover: the floor plan of a room, its area, strips of carpet or vinyl to lay and the bill (coverView.tsx).
  */
 const Interaction = ({ config, store, readOnly }: Props) => {
   const state = useStore(store); // re-renders when the store changes
@@ -34,7 +37,18 @@ const Interaction = ({ config, store, readOnly }: Props) => {
       {config.title && <h2 className="text-[1.4em] leading-tight font-bold">{config.title}</h2>}
       {config.question && <p className="mt-2 leading-relaxed">{config.question}</p>}
 
-      {settings.task === "compare" ? (
+      {settings.task === "cover" ? (
+        <CoverTask
+          s={coverSettingsFrom(config)}
+          language={config.language}
+          state={state}
+          readOnly={readOnly}
+          setAnswer={(field, value) => store.dispatch({ type: "SET_ANSWER", payload: { field, value } })}
+          setStrip={(index, strip) =>
+            store.dispatch(strip ? { type: "SET_STRIP", payload: { index, strip } } : { type: "REMOVE_STRIP", payload: { index } })
+          }
+        />
+      ) : settings.task === "compare" ? (
         <Compare settings={settings} state={state} store={store} readOnly={readOnly} t={t} />
       ) : (
         <div className="mt-4 inline-flex max-w-full flex-col gap-2">
