@@ -1,11 +1,11 @@
 import type { Meta, StoryObj } from "@storybook/html-vite";
-import { expect, userEvent, waitFor, within } from "storybook/test";
+import { expect, fireEvent, userEvent, waitFor, within } from "storybook/test";
 import {
   afterPaint, focusedIn, lastChange, mountAuthoring, mountPci, openAuthoring, openPci, remountPci, retype, type AuthoringArgs, type MountedPci,
   type PciArgs,
 } from "../../.storybook/tspci";
 import pci from "./index";
-import { EUR, PRESET_CURRENCIES, defaultPieces, newPiece, serializePieces, type PieceDef } from "./money";
+import { EUR, PRESET_CURRENCIES, defaultPieces, newPiece, serializeItems, serializePieces, type PieceDef } from "./money";
 import { contrast } from "./look";
 
 const meta = {
@@ -892,5 +892,427 @@ export const AuthoringDutch: Authoring = {
     await userEvent.click(canvas.getByRole("button", { name: "+ Toevoegen" }));
     expect(m.instance.validate()).toEqual([]);
     expect(canvas.getByRole("button", { name: "De munt van 25 pence verwijderen" })).toBeInTheDocument();
+  },
+};
+
+// ---- the cash register ----
+
+/** A key of the till, an item on the counter, the display. */
+const tillKey = (mounted: MountedPci, key: string) => $<HTMLButtonElement>(mounted, `[data-key="${key}"]`);
+const shopItem = (mounted: MountedPci, code: string) => $<HTMLElement>(mounted, `[data-item="${code}"] .shop-item`);
+const display = (mounted: MountedPci) => $(mounted, "[data-display]").textContent!.replace(/\s+/g, " ").trim();
+const displayAmount = (mounted: MountedPci) => $(mounted, "[data-display-label]").textContent + " " + $(mounted, "[data-display-amount]").textContent;
+const drawerState = (mounted: MountedPci) => $(mounted, "[data-drawer]").dataset.drawer;
+const receipt = (mounted: MountedPci) => mounted.root.querySelector<HTMLElement>("[data-printed]");
+/** Clicks keys of the till: "10.5" clicks 1, 0, the separator and 5; a word is a key ("times", "code", "total", "cash"). */
+async function keys(mounted: MountedPci, ...names: string[]) {
+  for (const name of names) {
+    if (/^[\d.]+$/.test(name)) for (const c of name) await userEvent.click(tillKey(mounted, c === "." ? "sep" : c));
+    else await userEvent.click(tillKey(mounted, name));
+  }
+}
+
+/** The register to try yourself (no test runs on it): the default shopping, in euros. */
+export const RegisterToTry: Story = {
+  name: "Cash register, to try",
+  args: { properties: { task: "register", title: "At the supermarket", question: "A customer is at your till." } },
+};
+
+/** The till calculates: ring up the shopping by a tap, × and a tap, and a code; Total; Cash; the change. */
+export const Register: Story = {
+  args: { properties: { task: "register", title: "At the supermarket", question: "A customer is at your till." } },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas } = mounted;
+
+    await step("the shopping, the customer's money and a closed drawer", async () => {
+      expect(canvas.getByText(/^Ring up the shopping and press Total\./)).toBeInTheDocument();
+      expect(canvas.getByRole("button", { name: "Ring up Milk" })).toHaveAccessibleDescription("€1.15 each, deal: 2 for €2.00, the customer buys 2, code 101, rung up: 0");
+      expect(canvas.getByRole("button", { name: "Ring up Cheese" })).toHaveAccessibleDescription("€3.60 each, deal: 25% off, the customer buys 1, code 104, rung up: 0");
+      expect(canvas.getByRole("listitem", { name: "note of €10" })).toBeInTheDocument();
+      expect(drawerState(mounted)).toBe("closed");
+      expect(supplyPiece(mounted, 100)).toBeDisabled();
+      expect(canvas.getByRole("region", { name: "Till drawer" })).toHaveTextContent("The drawer opens when you have keyed in what the customer pays (Cash).");
+      expect(receipt(mounted)).toBeNull();
+      expect(mounted.pci.getResponse()).toBeUndefined();
+    });
+
+    await step("a tap rings up one; the second milk gets the deal", async () => {
+      await userEvent.click(shopItem(mounted, "101"));
+      expect(display(mounted)).toContain("Milk 1 × €1.15");
+      expect(displayAmount(mounted)).toBe("Subtotal €1.15");
+      await userEvent.click(shopItem(mounted, "101"));
+      expect(displayAmount(mounted)).toBe("Subtotal €2.00");
+      expect($(mounted, `[data-item="101"] [data-rung-up]`)).toHaveTextContent("rung up: 2");
+      expect(fields(await lastChange(mounted))).toMatchObject({ itemsRungUp: 2, itemsTotal: 2 });
+    });
+
+    await step("3 × and a tap: three apples; a code: the bread; an unknown code", async () => {
+      await keys(mounted, "3", "times");
+      expect(displayAmount(mounted)).toBe("Typed 3 × ");
+      await userEvent.click(shopItem(mounted, "103"));
+      expect(display(mounted)).toContain("Apple 3 × €0.45");
+      await keys(mounted, "102", "code");
+      expect(displayAmount(mounted)).toBe("Subtotal €5.80");
+      await keys(mounted, "999", "code");
+      expect(display(mounted)).toContain("No item with code 999");
+      await userEvent.click(shopItem(mounted, "104"));
+      expect(displayAmount(mounted)).toBe("Subtotal €8.50");
+      expect(fields(mounted.pci.getResponse())).toEqual({
+        itemsRungUp: 7, itemsTotal: 8.5, total: 0, totalCorrect: false, paid: 0, change: 0, changeCorrect: false, fewest: true, correct: false,
+      });
+    });
+
+    await step("Total, then what the customer pays: the drawer opens and the receipt prints", async () => {
+      await keys(mounted, "10", "cash");
+      expect(display(mounted)).toContain("Press Total first");
+      await keys(mounted, "total");
+      expect(displayAmount(mounted)).toBe("Total €8.50");
+      await keys(mounted, "10", "cash");
+      expect(displayAmount(mounted)).toBe("Change €1.50");
+      expect(display(mounted)).toContain("Cash €10.00 · Drawer open");
+      expect(drawerState(mounted)).toBe("open");
+      expect(receipt(mounted)).toHaveTextContent("Milk€2.302 × €1.152 for €2.00deal: 2 for €2.00−€0.30");
+      expect($(mounted, "[data-receipt-total]")).toHaveTextContent("Total€8.50");
+      expect($(mounted, "[data-receipt-change]")).toHaveTextContent("Change€1.50");
+    });
+
+    await step("the change from the drawer", async () => {
+      await pay(mounted, 100, 50);
+      expect($(mounted, "[data-describe]")).toHaveTextContent("Change for the customer: 1 coin of €1, 1 coin of 50 cents.");
+      expect(fields(mounted.pci.getResponse())).toEqual({
+        itemsRungUp: 7, itemsTotal: 8.5, total: 8.5, totalCorrect: true, paid: 10, change: 1.5, changeCorrect: true, fewest: true, correct: true,
+      });
+      expect(mounted.pci.getResponse()).toEqual(pci.getCorrectResponse!({ task: "register" } as never));
+    });
+
+    await step("Correction undoes the payment: the drawer closes, the receipt is gone", async () => {
+      await keys(mounted, "void");
+      expect(drawerState(mounted)).toBe("closed");
+      expect(receipt(mounted)).toBeNull();
+      expect(display(mounted)).toContain("Payment undone");
+      expect(fields(mounted.pci.getResponse())).toMatchObject({ paid: 0, change: 1.5, correct: false });
+    });
+  },
+};
+
+const britishShopping = serializeItems([
+  { code: "11", name: "Tea", price: 185, quantity: 2, deal: null, look: "jar" },
+  { code: "12", name: "Biscuits", price: 90, quantity: 3, deal: { kind: "multi", count: 3, price: 200 }, look: "bag" },
+  { code: "13", name: "Jam", price: 240, quantity: 1, deal: { kind: "percent", percent: 50 }, look: "jar" },
+]);
+const pounds = { task: "register", currency: "gbp", items: britishShopping, given: "10", tillCalculates: "false", fewestChange: "true", title: "At the corner shop", question: "Serve the customer." };
+
+/** Pounds, the pupil calculates: the till shows no total and no change, the change in the fewest coins. */
+export const RegisterPounds: Story = {
+  args: { properties: pounds },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    expect(canvas.getByText(/Work out the total, type it and press Total\..*with as few coins and notes as possible\.$/)).toBeInTheDocument();
+    expect(canvas.getByRole("button", { name: "Ring up Biscuits" })).toHaveAccessibleDescription("90p each, deal: 3 for £2.00, the customer buys 3, code 12, rung up: 0");
+
+    await step("rung up: the till shows each item, but no subtotal", async () => {
+      await keys(mounted, "2", "times", "11", "code", "3", "times");
+      await userEvent.click(shopItem(mounted, "12"));
+      await userEvent.click(shopItem(mounted, "13"));
+      expect(display(mounted)).toContain("Jam 1 × £2.40");
+      expect(displayAmount(mounted).trim()).toBe("");
+    });
+
+    await step("the pupil's total and the customer's money", async () => {
+      await keys(mounted, "total");
+      expect(display(mounted)).toContain("Type the total first, then press Total");
+      await keys(mounted, "6.90", "total");
+      expect(displayAmount(mounted)).toBe("Total keyed in £6.90");
+      await keys(mounted, "10", "cash");
+      expect(displayAmount(mounted)).toBe("Cash £10.00");
+      expect(display(mounted)).not.toContain("Change");
+      // the receipt: no amounts of its own, only what was keyed in
+      expect($(mounted, "[data-receipt-total]")).toHaveTextContent("Total keyed in£6.90");
+      expect(mounted.root.querySelector("[data-receipt-change]")).toBeNull();
+      expect(receipt(mounted)).toHaveTextContent("Biscuits3 × 90p3 for £2.00deal: 3 for £2.00");
+    });
+
+    await step("the change: right, then in the fewest coins", async () => {
+      await pay(mounted, 100, 100, 100, 10);
+      expect(fields(pci.getResponse())).toEqual({
+        itemsRungUp: 6, itemsTotal: 6.9, total: 6.9, totalCorrect: true, paid: 10, change: 3.1, changeCorrect: true, fewest: false, correct: false,
+      });
+      await userEvent.click(minus(mounted, 100));
+      await userEvent.click(minus(mounted, 100));
+      await pay(mounted, 200);
+      expect(fields(pci.getResponse())).toMatchObject({ change: 3.1, fewest: true, correct: true });
+      expect(supplyPiece(mounted, 200).querySelector("svg")).toHaveTextContent("2POUNDS");
+    });
+  },
+};
+
+const dutchShopping = serializeItems([
+  { code: "201", name: "Melk", price: 115, quantity: 2, deal: { kind: "multi", count: 2, price: 200 }, look: "carton" },
+  { code: "202", name: "Brood", price: 249, quantity: 1, deal: null, look: "bread" },
+  { code: "203", name: "Appel", price: 45, quantity: 3, deal: null, look: "fruit" },
+  { code: "204", name: "Kaas", price: 360, quantity: 1, deal: { kind: "percent", percent: 25 }, look: "box" },
+]);
+
+/** Dutch, rounded to 5 cent for cash: € 8,54 is € 8,55. */
+export const RegisterDutch: Story = {
+  args: { properties: { task: "register", language: "nl", items: dutchShopping, cashRounding: "5", given: "20", title: "In de supermarkt", question: "Een klant staat bij jouw kassa." } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    expect(canvas.getByText(/^Sla de boodschappen aan en druk op Totaal\./)).toBeInTheDocument();
+    expect(canvas.getByRole("region", { name: "De boodschappen" })).toBeInTheDocument();
+    expect(canvas.getByRole("button", { name: "Melk aanslaan" })).toHaveAccessibleDescription("€ 1,15 per stuk, actie: 2 voor € 2,00, de klant koopt er 2, code 201, aangeslagen: 0");
+    expect(canvas.getByRole("button", { name: "Kaas aanslaan" })).toHaveAccessibleDescription(/actie: 25% korting/);
+    expect(canvas.getByRole("button", { name: "Contant: waarmee de klant betaalt" })).toBeInTheDocument();
+    expect(tillKey(mounted, "sep")).toHaveTextContent(",");
+    expect(canvas.getByRole("region", { name: "Kassalade" })).toBeInTheDocument();
+    for (const code of ["201", "201", "202", "204"]) await userEvent.click(shopItem(mounted, code));
+    await keys(mounted, "3", "times", "203", "code");
+    expect(displayAmount(mounted)).toBe("Subtotaal € 8,54");
+    await keys(mounted, "total");
+    expect(displayAmount(mounted)).toBe("Totaal € 8,55");
+    expect(display(mounted)).toContain("voor afronding € 8,54");
+    await keys(mounted, "20", "cash");
+    expect(displayAmount(mounted)).toBe("Wisselgeld € 11,45");
+    expect(canvas.getByRole("region", { name: "Kassabon" })).toHaveTextContent("De bon is geprint.");
+    expect($(mounted, "[data-receipt-total]")).toHaveTextContent("Totaal€ 8,55");
+    expect(receipt(mounted)).toHaveTextContent("Subtotaal€ 8,54");
+    await pay(mounted, 1000, 100, 20, 20, 5);
+    expect($(mounted, "[data-describe]")).toHaveTextContent("Wisselgeld voor de klant: 1 biljet van € 10, 1 munt van € 1, 2 munten van 20 cent, 1 munt van 5 cent.");
+    expect(fields(pci.getResponse())).toEqual({
+      itemsRungUp: 7, itemsTotal: 8.54, total: 8.55, totalCorrect: true, paid: 20, change: 11.45, changeCorrect: true, fewest: true, correct: true,
+    });
+  },
+};
+
+/** Keyboard: the items and the keys are buttons; the keyboard types on the till; Cash takes the focus to the drawer. */
+export const RegisterKeyboard: Story = {
+  args: { properties: { task: "register" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    const keypad = $(mounted, "[data-keypad]");
+    for (const button of keypad.querySelectorAll("button")) {
+      expect(button.tabIndex).toBe(0);
+      expect(button.getBoundingClientRect().height).toBeGreaterThanOrEqual(44);
+    }
+    expect(canvas.getByRole("group", { name: "Keys of the till" })).toBe(keypad);
+    // the display is read out: a live region
+    expect($(mounted, "[data-display]")).toHaveAttribute("aria-live", "polite");
+    expect(canvas.getByRole("status", { name: "Display of the till" })).toBeInTheDocument();
+    // Enter or Space on an item rings it up (userEvent.keyboard does not reach into the shadow root: click() is what they do)
+    shopItem(mounted, "102").focus();
+    shopItem(mounted, "102").click();
+    await waitFor(() => expect(fields(pci.getResponse())).toMatchObject({ itemsRungUp: 1 }));
+    // typing on the keyboard with the focus on a key: digits, the separator, Backspace, Escape and *
+    tillKey(mounted, "5").focus();
+    for (const key of ["2", "x", "Escape", "2", "*"]) await press(tillKey(mounted, "5"), key);
+    expect(displayAmount(mounted)).toBe("Typed 2 × ");
+    await press(tillKey(mounted, "5"), "1");
+    await press(tillKey(mounted, "5"), "0");
+    await press(tillKey(mounted, "5"), "9");
+    await press(tillKey(mounted, "5"), "Backspace");
+    await press(tillKey(mounted, "5"), "1");
+    tillKey(mounted, "code").click();
+    await waitFor(() => expect($(mounted, `[data-item="101"] [data-rung-up]`)).toHaveTextContent("rung up: 2"));
+    for (const code of ["103", "103", "103", "104"]) shopItem(mounted, code).click();
+    tillKey(mounted, "total").click();
+    await waitFor(() => expect(displayAmount(mounted)).toBe("Total €8.50"));
+    for (const key of ["1", "0", ".", "0", "0"]) await press(tillKey(mounted, "total"), key);
+    expect(displayAmount(mounted)).toBe("Typed 10.00");
+    // Cash by the keyboard (a click without a pointer): the focus goes to the drawer, where the change comes from
+    tillKey(mounted, "cash").focus();
+    tillKey(mounted, "cash").click();
+    await waitFor(() => expect(focusedIn(mounted.root)).toBe(supplyPiece(mounted, 5000)));
+    supplyPiece(mounted, 100).click();
+    supplyPiece(mounted, 50).click();
+    await waitFor(() => expect(fields(pci.getResponse())).toMatchObject({ change: 1.5, correct: true }));
+  },
+};
+
+/** A tap of a finger on an item, a key and a coin; a coin dragged onto the counter. */
+export const RegisterTouch: Story = {
+  args: { properties: { task: "register" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const tap = async (el: Element) => {
+      fireEvent.pointerDown(el, { pointerType: "touch", isPrimary: true });
+      fireEvent.pointerUp(el, { pointerType: "touch", isPrimary: true });
+      fireEvent.click(el);
+      await afterPaint();
+    };
+    // no touch-action: none on the items and keys, so a finger can still scroll the page from them
+    expect(getComputedStyle(shopItem(mounted, "101")).touchAction).not.toBe("none");
+    expect(getComputedStyle(tillKey(mounted, "1")).touchAction).not.toBe("none");
+    await tap(shopItem(mounted, "101"));
+    await tap(shopItem(mounted, "101"));
+    for (const key of ["3", "times"]) await tap(tillKey(mounted, key));
+    await tap(shopItem(mounted, "103"));
+    for (const code of ["102", "104"]) await tap(shopItem(mounted, code));
+    for (const key of ["total", "1", "0", "cash"]) await tap(tillKey(mounted, key));
+    expect(drawerState(mounted)).toBe("open");
+    await tap(supplyPiece(mounted, 100));
+    await dragTo(mounted, supplyPiece(mounted, 50), middleOf(counter(mounted)));
+    await waitFor(() => expect(fields(mounted.pci.getResponse())).toMatchObject({ change: 1.5, correct: true }));
+  },
+};
+
+/** The drawer is closed before Cash: a tap or a drag of a coin does nothing. */
+export const RegisterDrawerClosed: Story = {
+  args: { properties: { task: "register" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    await dragTo(mounted, supplyPiece(mounted, 200), middleOf(counter(mounted)));
+    expect(onCounter(mounted)).toEqual([]);
+    expect(mounted.pci.getResponse()).toBeUndefined();
+  },
+};
+
+export const RegisterRestoreState: Story = {
+  args: { properties: pounds },
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement);
+    await userEvent.click(shopItem(first, "11"));
+    await keys(first, "3", "times");
+    const state = first.pci.getState();
+    const second = await remountPci(canvasElement, pci, { properties: pounds, state });
+    expect($(second, `[data-item="11"] [data-rung-up]`)).toHaveTextContent("rung up: 1");
+    expect(displayAmount(second)).toBe("Typed 3 × ");
+    expect(fields(second.pci.getResponse())).toMatchObject({ itemsRungUp: 1, itemsTotal: 1.85 });
+    // a state of the register's first version, without a till: the till is empty
+    const third = await remountPci(canvasElement, pci, { properties: pounds, state: JSON.stringify({ state: { tray: { 100: 1 }, answer: "" }, log: [] }) });
+    expect(fields(third.pci.getResponse())).toMatchObject({ itemsRungUp: 0, change: 1 });
+  },
+};
+
+/** Status "solution" without a correct response in the item: the sale from the settings, read-only. */
+export const RegisterSolution: Story = {
+  args: { status: "solution", properties: { task: "register" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    expect(onCounter(mounted)).toEqual([100, 50]);
+    expect($(mounted, `[data-item="103"] [data-rung-up]`)).toHaveTextContent("rung up: 3");
+    expect(displayAmount(mounted)).toBe("Change €1.50");
+    expect(receipt(mounted)).not.toBeNull();
+    expect(mounted.root.querySelectorAll("button")).toHaveLength(0);
+    expect(mounted.root.querySelector(".drawer")).toBeNull();
+    expect(fields(mounted.pci.getResponse())).toMatchObject({ correct: true });
+  },
+};
+
+/** A response handed back that is not the shopping: the till shows its numbers. */
+export const RegisterBoundResponse: Story = {
+  args: {
+    properties: { task: "register" },
+    boundTo: { RESPONSE: { record: [{ name: "itemsRungUp", base: { integer: 2 } }, { name: "itemsTotal", base: { float: 3.45 } }, { name: "total", base: { float: 3.45 } }, { name: "paid", base: { float: 0 } }, { name: "change", base: { float: 0 } }] } },
+  },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    expect(fields(mounted.pci.getResponse())).toMatchObject({ itemsRungUp: 2, itemsTotal: 3.45, total: 3.45, paid: 0 });
+    expect(displayAmount(mounted)).toBe("Total €3.45");
+  },
+};
+
+/** The author sees what is wrong: the customer pays too little, a change that needs a 1 cent coin. */
+export const RegisterProblems: Story = {
+  args: { properties: { task: "register", given: "5" } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    expect(mounted.canvas.getByRole("alert")).toHaveTextContent("The customer pays with less than the price.");
+    expect(pci.getCorrectResponse!({ task: "register", given: "5" } as never)).toBeUndefined();
+    expect(pci.getCorrectResponse!({ task: "register", items: dutchShopping } as never)).toBeUndefined(); // 1,46 change: no 1 cent
+    expect(fields(pci.getCorrectResponse!({ task: "register", items: dutchShopping, cashRounding: "5" } as never))).toMatchObject({ total: 8.55, change: 1.45 });
+  },
+};
+
+/** The authoring mode for the register: the shopping, its deals and pictures, what it comes to. */
+export const AuthoringRegister: Authoring = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { task: "register", given: "10" } },
+  play: async ({ canvasElement, step }) => {
+    const m = await openAuthoring(canvasElement);
+    const { canvas } = m;
+    const items = () => JSON.parse(written(m).items) as Record<string, unknown>[];
+
+    await step("the default shopping, and what it comes to", async () => {
+      expect(canvas.getByRole("heading", { name: "The shopping" })).toBeInTheDocument();
+      expect(canvas.getByRole("textbox", { name: "Name: Milk" })).toHaveValue("Milk");
+      expect(canvas.getByRole("textbox", { name: "Price: Milk" })).toHaveValue("1.15");
+      expect(within(canvas.getByRole("radiogroup", { name: "Deal: Milk" })).getByRole("radio", { name: "Several for a price" })).toHaveAttribute("aria-checked", "true");
+      expect(canvas.getByRole("textbox", { name: "Price together: Milk" })).toHaveValue("2.00");
+      expect(m.root.querySelector("[data-comes-to]")).toHaveTextContent("7 items, together €8.50. The customer pays with €10.00: the change is €1.50.");
+      expect(m.instance.validate()).toEqual([]);
+      expect(items()).toHaveLength(4);
+    });
+
+    await step("a price and a deal changed, a picture chosen with the arrow keys", async () => {
+      await retype(canvas.getByRole("textbox", { name: "Price: Bread" }), "2,49");
+      expect(items()[1]).toMatchObject({ name: "Bread", price: 249 });
+      expect(m.instance.validate()).toEqual(["The change, €1.46, can not be given with the coins and notes the pupil can take."]);
+      await retype(canvas.getByRole("textbox", { name: "Price: Bread" }), "2.45");
+      await userEvent.click(within(canvas.getByRole("radiogroup", { name: "Deal: Bread" })).getByRole("radio", { name: "Discount" }));
+      await retype(canvas.getByRole("textbox", { name: "Discount in %: Bread" }), "20");
+      expect(items()[1]).toMatchObject({ deal: { kind: "percent", percent: 20 } });
+      const pictures = canvas.getByRole("radiogroup", { name: "Picture: Bread" });
+      await press(within(pictures).getByRole("radio", { name: "Bread" }), "ArrowRight");
+      expect(items()[1]).toMatchObject({ look: "fruit" });
+      expect(focusedIn(m.root)).toBe(within(pictures).getByRole("radio", { name: "Fruit" }));
+    });
+
+    await step("an item added: the focus goes to its name; what is missing keeps Done from finishing", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "+ Add an item" }));
+      const name = canvas.getByRole("textbox", { name: "Name: item 5" });
+      await waitFor(() => expect(focusedIn(m.root)).toBe(name));
+      expect(canvas.getByRole("textbox", { name: "Code: item 5" })).toHaveValue("105");
+      // the bread at −20% makes €8.01: a change of €1.99 needs 1 and 2 cent coins
+      expect(m.instance.validate()).toEqual([
+        "Item 5: it needs a name.",
+        "Item 5: its price is not an amount of this currency.",
+        "The change, €1.99, can not be given with the coins and notes the pupil can take.",
+      ]);
+      await userEvent.type(name, "Juice");
+      await userEvent.type(canvas.getByRole("textbox", { name: "Price: Juice" }), "0,54");
+      expect(m.instance.validate()).toEqual([]);
+      expect(items()[4]).toEqual({ code: "105", name: "Juice", price: 54, quantity: 1, deal: null, look: "box" });
+    });
+
+    await step("removed: the focus goes to the next item", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Remove Apple" }));
+      expect(items().map((i) => i.name)).toEqual(["Milk", "Bread", "Cheese", "Juice"]);
+      await waitFor(() => expect(focusedIn(m.root)).toBe(canvas.getByRole("button", { name: "Remove Cheese" })));
+    });
+  },
+};
+
+/** The authoring mode for the register in Dutch, with dollars: the shopping in the item's language. */
+export const AuthoringRegisterDutch: Authoring = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "nl", properties: { task: "register", currency: "usd", language: "nl", given: "10", cashRounding: "5" } },
+  play: async ({ canvasElement }) => {
+    const m = await openAuthoring(canvasElement);
+    const { canvas } = m;
+    expect(canvas.getByRole("heading", { name: "De boodschappen" })).toBeInTheDocument();
+    expect(canvas.getByRole("textbox", { name: "Naam: Melk" })).toBeInTheDocument();
+    expect(canvas.getByRole("textbox", { name: "Prijs: Kaas" })).toHaveValue("3,60");
+    expect(m.root.querySelector("[data-comes-to]")).toHaveTextContent("7 artikelen, samen $ 8,50. De klant betaalt met $ 10,00: het wisselgeld is $ 1,50.");
+    await retype(canvas.getByRole("textbox", { name: "Aantal: Brood" }), "0");
+    expect(m.instance.validate()).toEqual(["Brood: het aantal moet 1 tot 99 zijn."]);
+    await userEvent.click(canvas.getByRole("button", { name: "Brood verwijderen" }));
+    for (const name of ["Melk", "Appel", "Kaas"]) await userEvent.click(canvas.getByRole("button", { name: `${name} verwijderen` }));
+    expect(m.instance.validate()).toEqual(["Voeg de boodschappen toe: de artikelen die de klant koopt."]);
+    await waitFor(() => expect(focusedIn(m.root)).toBe(canvas.getByRole("button", { name: "+ Een artikel toevoegen" })));
+  },
+};
+
+/** The shopping section is only there for the register. */
+export const AuthoringNotRegister: Authoring = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { task: "pay", items: "[1]" } },
+  play: async ({ canvasElement }) => {
+    const m = await openAuthoring(canvasElement);
+    expect(m.root.querySelector("[data-shopping-editor]")).toBeNull();
+    expect(written(m).items).toBe("[1]");
   },
 };

@@ -11,8 +11,11 @@
  * - pay: put money on the counter to pay an amount exactly; fewest: with as few coins and notes as possible
  * - change: the price and what the customer pays with; give the change (changeFewest: in as few pieces as possible)
  * - count: the counter holds the author's money; the candidate writes how much it is
+ * - register: a cash register (shop.tsx, till.ts): ring up the shopping, key in the total (or let the till calculate
+ *   it) and what the customer pays, and give the change from the till's drawer
  * The response is a record (config.tspci.response in package.json, AUTHORING.md): amount and exact, plus pieces and
- * fewest where the task asks for the fewest; answer and exact for count. Nothing until the candidate answers.
+ * fewest where the task asks for the fewest; answer and exact for count; for the register what was rung up, the total,
+ * the payment and the change (money.ts registerRecord). Nothing until the candidate answers.
  */
 import "preact/debug"; // readable warnings in the browser console while developing
 import { render } from "preact";
@@ -26,7 +29,8 @@ import configProps from "./config.json"; // the settings; the build passes only 
 import style from "./styles.css"; // Tailwind, compiled to a string, added to the shadow root below
 import Interaction from "./interaction";
 import { TaskModel, amountText, answerCents, correctFor, pileFor, readResponse, responseFor, taskFrom } from "./money";
-import { Actions, StateModel, initStore, isState } from "./store";
+import { Actions, StateModel, initStore, isState, tillIn } from "./store";
+import { registerResponse, tillContext, tillFor } from "./till";
 import { languageOf, textsFor } from "./texts";
 import { Authored, Authoring, authoredFrom, authoredProblems, authoredProperties } from "./authoring";
 
@@ -59,7 +63,7 @@ class PciInstance implements IMSpci<PropTypes> {
     // 0. The task from the settings: the currency and its coins and notes, the amount, the customer's money, the money
     // to count, the supply.
     this.model = taskFrom(config.properties);
-    this.store = initStore(this.model.supply);
+    this.store = initStore(this.model.supply, undefined, this.model.register ? tillContext(this.model) : undefined);
     // 1. The state from a previous session (whatever getState() returned) wins over the settings.
     if (stateString) {
       try {
@@ -134,9 +138,17 @@ class PciInstance implements IMSpci<PropTypes> {
    * the counter gets the fewest that make it from the supply. Only a change is an action: keeps the log clean.
    */
   private show = (value: unknown) => {
+    const state = this.store.getState();
+    if (this.model.task === "register") {
+      // the register: the till (what was rung up, the total, the payment) and the change on the counter
+      const shown = tillFor(value, this.model);
+      if (!shown) return;
+      if (JSON.stringify(shown.till) !== JSON.stringify(tillIn(state))) this.store.dispatch({ type: "SET_TILL", payload: { till: shown.till } });
+      if (JSON.stringify(shown.tray) !== JSON.stringify(state.tray)) this.store.dispatch({ type: "SET_TRAY", payload: { tray: shown.tray } });
+      return;
+    }
     const { cents } = readResponse(value, this.model.currency);
     if (cents === null) return;
-    const state = this.store.getState();
     if (this.model.task === "count") {
       const text = amountText(cents, this.config.properties.language, this.model.currency);
       if (text !== state.answer) this.store.dispatch({ type: "SET_ANSWER", payload: { value: text } });
@@ -154,7 +166,11 @@ class PciInstance implements IMSpci<PropTypes> {
 
   // ---- the IMS PCI API ----
 
-  getResponse = () => responseFor(this.model, this.store.getState().tray, this.store.getState().answer) as QtiVariableJSON | undefined;
+  getResponse = () => {
+    const { tray, answer } = this.store.getState();
+    const response = this.model.task === "register" ? registerResponse(this.model, tillIn(this.store.getState()), tray) : responseFor(this.model, tray, answer);
+    return response as QtiVariableJSON | undefined;
+  };
 
   getState = () => JSON.stringify({ state: this.store.getState(), log: this.store.getActions() } satisfies PciStoredState);
 
@@ -181,7 +197,8 @@ class PciInstance implements IMSpci<PropTypes> {
 const factory: IMSpciAuthoringFactory<PropTypes> = {
   typeIdentifier: "money", // the same as config.tspci.typeIdentifier in package.json
   getInstance: (dom, config, state) => new PciInstance(dom, config, state),
-  // The asked amount, exact, and in the fewest pieces where the task asks for it (money.ts correctFor).
+  // The asked amount, exact, and in the fewest pieces where the task asks for it; for the register the shopping rung
+  // up, its total, the customer's money and the change (money.ts correctFor).
   getCorrectResponse: (properties) => correctFor(taskFrom(withDefaults(properties))) as QtiVariableJSON | undefined,
 
   /**
@@ -191,8 +208,8 @@ const factory: IMSpciAuthoringFactory<PropTypes> = {
    */
   getAuthoringInstance: (dom: HTMLElement, config: PciAuthoringConfiguration<PropTypes>): PciAuthoringInstance => {
     const properties = withDefaults(config.properties ?? {});
-    let authored: Authored = authoredFrom(properties);
     const language = languageOf(config.language); // the author's language
+    let authored: Authored = authoredFrom(properties, language);
     const shadow = dom.shadowRoot ?? dom.attachShadow({ mode: "open" });
     render(
       <>

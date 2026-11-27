@@ -5,8 +5,10 @@ import { IStore, useStore } from "@citolab/preact-store";
 import configProps from "./config.json";
 import { Counts, Currency, PieceDef, TaskModel, asksFewest, defOf, formatAmount, isChange, left, pieceCount, piecesOf, settingsProblems, totalOf } from "./money";
 import { Piece } from "./pieces";
-import { Actions, StateModel } from "./store";
+import { Actions, StateModel, tillIn } from "./store";
 import { Texts, describe, kindOf, problemText, textsFor } from "./texts";
+import { Key, phaseOf } from "./till";
+import { Receipt, Shopping, Till } from "./shop";
 
 type PropTypes = PciProperties<typeof configProps>;
 
@@ -27,6 +29,8 @@ const DRAG_THRESHOLD = 5;
  * supply of coins and notes below it. A piece goes onto the counter by dragging it there, by a click, or with Enter or
  * Space on its button; it comes off by dragging it away, a click on it on the counter, or the − button in the supply.
  * In the count task the counter holds the author's money, and the candidate writes the amount in the answer box.
+ * In the register the shopping, the till and the receipt come first (shop.tsx); the counter holds the change for the
+ * customer, and the supply is the till's drawer, which opens when the customer has paid.
  * Read-only (review, solution, closed): the counter (or the answer box) without the supply.
  */
 const Interaction = ({ config, model, store, readOnly }: Props) => {
@@ -38,8 +42,12 @@ const Interaction = ({ config, model, store, readOnly }: Props) => {
   const counting = task === "count";
   const counter: Counts = counting ? model.counter : state.tray;
   const problems = settingsProblems(model);
+  const register = task === "register";
+  const till = tillIn(state);
+  // the register: the drawer opens when the customer has paid (Cash)
+  const drawerOpen = !register || phaseOf(till) === "paid";
 
-  const add = (value: number) => !readOnly && store.dispatch({ type: "ADD", payload: { value } });
+  const add = (value: number) => !readOnly && drawerOpen && store.dispatch({ type: "ADD", payload: { value } });
   const remove = (value: number) => !readOnly && store.dispatch({ type: "REMOVE", payload: { value } });
 
   // ---- dragging: pointer events on the whole PCI, captured once the press has become a drag ----
@@ -55,7 +63,7 @@ const Interaction = ({ config, model, store, readOnly }: Props) => {
     return !!box && x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
   };
   const press = (e: PointerEvent, value: number, from: Drag["from"]) => {
-    if (readOnly || counting || e.button !== 0) return;
+    if (readOnly || counting || e.button !== 0 || (from === "supply" && !drawerOpen)) return;
     dragRef.current = { value, from, pointerId: e.pointerId, startX: e.clientX, startY: e.clientY, x: e.clientX, y: e.clientY, moving: false, over: from === "counter" };
   };
   const move = (e: PointerEvent) => {
@@ -99,6 +107,46 @@ const Interaction = ({ config, model, store, readOnly }: Props) => {
   const total = totalOf(counter);
   const showTotal = config.showTotal === "true" && !counting;
 
+  /** A key of the till. Cash with the keyboard: the focus goes to the drawer, where the change comes from. */
+  const onKey = (key: Key, byKeyboard: boolean) => {
+    if (readOnly) return;
+    store.dispatch({ type: "KEY", payload: { key } });
+    if (key === "cash" && byKeyboard && phaseOf(tillIn(store.getState())) === "paid")
+      setTimeout(() => rootRef.current?.querySelector<HTMLElement>(".drawer .supply-piece:not(:disabled)")?.focus(), 0);
+  };
+
+  const counterSection = (
+    <section
+      ref={counterRef}
+      aria-label={register ? t.register.changeTray : t.counter}
+      data-counter
+      className={`counter rounded-2xl border-2 px-4 pt-2 pb-4 ${register ? "min-w-[16em] flex-1" : "mt-4"} ${drag?.from === "supply" && drag.over ? "counter-over" : ""}`}
+    >
+      <div className="flex items-baseline justify-between">
+        <h3 className="text-[0.85em] font-bold tracking-wide text-counter-ink uppercase">{register ? t.register.changeTray : t.counter}</h3>
+        {showTotal && (
+          <p className="font-bold" data-total>
+            {t.total}: {formatAmount(total, language, currency)}
+          </p>
+        )}
+      </div>
+      <CounterPieces
+        counts={counter}
+        pieces={pieces}
+        pieceOf={pieceOf}
+        t={t}
+        movable={!readOnly && !counting}
+        onPress={(e, value) => press(e, value, "counter")}
+        onClick={(value) => click(() => remove(value))()}
+      />
+      {pieceCount(counter) === 0 && !readOnly && <p className="py-6 text-center text-counter-ink">{register ? t.register.changeEmpty : t.counterEmpty}</p>}
+      {/* what is on the counter, for a screen reader: said again after every change */}
+      <p className="sr-only" aria-live="polite" data-describe>
+        {register ? t.register.changeHolds(describe(counter, t)) : t.counterHolds(describe(counter, t))}
+      </p>
+    </section>
+  );
+
   return (
     <div
       ref={rootRef}
@@ -116,38 +164,28 @@ const Interaction = ({ config, model, store, readOnly }: Props) => {
         </p>
       )}
 
-      <TaskCard model={model} t={t} language={language} pieceOf={pieceOf} />
-
-      {/* The counter: where the money goes (or lies, in the count task) */}
-      <section
-        ref={counterRef}
-        aria-label={t.counter}
-        data-counter
-        className={`counter mt-4 rounded-2xl border-2 px-4 pt-2 pb-4 ${drag?.from === "supply" && drag.over ? "counter-over" : ""}`}
-      >
-        <div className="flex items-baseline justify-between">
-          <h3 className="text-[0.85em] font-bold tracking-wide text-counter-ink uppercase">{t.counter}</h3>
-          {showTotal && (
-            <p className="font-bold" data-total>
-              {t.total}: {formatAmount(total, language, currency)}
-            </p>
-          )}
-        </div>
-        <CounterPieces
-          counts={counter}
-          pieces={pieces}
-          pieceOf={pieceOf}
-          t={t}
-          movable={!readOnly && !counting}
-          onPress={(e, value) => press(e, value, "counter")}
-          onClick={(value) => click(() => remove(value))()}
-        />
-        {pieceCount(counter) === 0 && !readOnly && <p className="py-6 text-center text-counter-ink">{t.counterEmpty}</p>}
-        {/* what is on the counter, for a screen reader: said again after every change */}
-        <p className="sr-only" aria-live="polite" data-describe>
-          {t.counterHolds(describe(counter, t))}
-        </p>
-      </section>
+      {register ? (
+        <>
+          <p className="task mt-3 font-semibold" data-register-task>
+            {t.register.task(model.register!.tillCalculates, model.register!.fewestChange)}
+          </p>
+          <div className="mt-3">
+            <Shopping model={model} till={till} t={t} language={language} readOnly={readOnly} pieceOf={pieceOf} onRing={(code) => !readOnly && store.dispatch({ type: "RING", payload: { code } })} />
+          </div>
+          {/* the till, the receipt next to it, and the counter where the change goes */}
+          <div className="mt-4 flex flex-wrap items-start gap-4">
+            <Till model={model} till={till} t={t} language={language} readOnly={readOnly} onKey={onKey} />
+            <Receipt model={model} till={till} t={t} language={language} />
+            {counterSection}
+          </div>
+        </>
+      ) : (
+        <>
+          <TaskCard model={model} t={t} language={language} pieceOf={pieceOf} />
+          {/* The counter: where the money goes (or lies, in the count task) */}
+          {counterSection}
+        </>
+      )}
 
       {counting ? (
         <AnswerBox state={state} store={store} t={t} readOnly={readOnly} currency={currency} />
@@ -159,7 +197,9 @@ const Interaction = ({ config, model, store, readOnly }: Props) => {
           pieceOf={pieceOf}
           tray={state.tray}
           t={t}
-          readOnly={readOnly}
+          label={register ? t.register.drawer : t.drawer}
+          closed={register && !drawerOpen ? t.register.drawerClosed : null}
+          readOnly={readOnly || !drawerOpen}
           onPress={(e, value) => press(e, value, "supply")}
           onAdd={(value) => click(() => add(value))()}
           onRemove={remove}
@@ -284,12 +324,16 @@ function Drawer(props: {
   pieceOf: PieceOf;
   tray: Counts;
   t: Texts;
+  /** The name of the supply: "Coins and notes", or the till's drawer. */
+  label: string;
+  /** The register's drawer before the customer has paid: why it is closed (its coins and notes can not be taken). */
+  closed: string | null;
   readOnly: boolean;
   onPress: (e: PointerEvent, value: number) => void;
   onAdd: (value: number) => void;
   onRemove: (value: number) => void;
 }) {
-  const { supply, tray, t, readOnly, pieceOf } = props;
+  const { supply, tray, t, readOnly, pieceOf, label, closed } = props;
   const notes = supply.filter((s) => kindOf(s.value, props.pieces) === "note");
   const coins = supply.filter((s) => kindOf(s.value, props.pieces) === "coin");
   const compartment = ({ value, limit }: { value: number; limit: number | null }) => {
@@ -312,7 +356,7 @@ function Drawer(props: {
           {pieceOf(value)}
         </button>
         <div className="mt-1 flex items-center gap-1.5">
-          <button type="button" className="minus" aria-label={t.remove(piece)} disabled={readOnly || onCounter === 0}
+          <button type="button" className="minus" aria-label={t.remove(piece)} disabled={onCounter === 0}
             onClick={(e) => {
               keepFocus(e.currentTarget as HTMLElement, ".supply-piece");
               props.onRemove(value);
@@ -332,8 +376,14 @@ function Drawer(props: {
     );
   };
   return (
-    <section aria-label={t.drawer} className="drawer mt-4 rounded-2xl p-3">
-      <h3 className="sr-only">{t.drawer}</h3>
+    <section aria-label={label} className={`drawer mt-4 rounded-2xl p-3 ${closed ? "drawer-closed" : ""}`} data-drawer={closed ? "closed" : "open"}>
+      {/* the register's drawer has a visible name; the supply of the other tasks speaks for itself */}
+      <h3 className={label !== t.drawer ? "mb-1 text-[0.85em] font-bold tracking-wide text-slate-600 uppercase" : "sr-only"}>{label}</h3>
+      {closed && (
+        <p className="mb-2 text-slate-700" data-drawer-closed>
+          {closed}
+        </p>
+      )}
       {notes.length > 0 && <ul className="flex flex-wrap items-stretch gap-3">{notes.map(compartment)}</ul>}
       {coins.length > 0 && <ul className={`flex flex-wrap items-stretch gap-3 ${notes.length ? "mt-3" : ""}`}>{coins.map(compartment)}</ul>}
     </section>

@@ -445,10 +445,139 @@ export function isFewest(counts: Counts, supply: Supply): boolean {
   return min !== null && pieceCount(counts) === min;
 }
 
+// ---- the shopping, for the cash register ----
+
+/**
+ * A deal on an item: "2 for € 3" (multi: `count` of them for `price` together, in hundredths) or "−25%" (percent off,
+ * a whole number from 1 to 99).
+ */
+export type Deal = { kind: "multi"; count: number; price: number } | { kind: "percent"; percent: number };
+/** How an item is drawn (shop.tsx): plain shapes, the name is always written next to it. */
+export type Look = "box" | "carton" | "bottle" | "can" | "jar" | "bag" | "bread" | "fruit";
+export const LOOKS: Look[] = ["box", "carton", "bottle", "can", "jar", "bag", "bread", "fruit"];
+
+/**
+ * An item the customer buys (the `items` setting, as JSON):
+ * - code: the article code the pupil can type on the till (digits, at most 6)
+ * - name: as written on the item and on the receipt
+ * - price: of one, in hundredths of the main unit (115 is € 1,15)
+ * - quantity: how many the customer buys
+ * - deal: a deal on it, or null
+ * - look: how it is drawn
+ */
+export type ShopItem = { code: string; name: string; price: number; quantity: number; deal: Deal | null; look: Look };
+
+/** The most of one item, and the longest code. */
+export const MAX_QUANTITY = 99;
+export const isCode = (code: string) => /^\d{1,6}$/.test(code);
+
+/** The shopping when the author has not set any: milk (2 for 2,00), bread, apples and cheese (−25%). */
+export function defaultItems(language: string = "en"): ShopItem[] {
+  const nl = language.slice(0, 2) === "nl";
+  return [
+    { code: "101", name: nl ? "Melk" : "Milk", price: 115, quantity: 2, deal: { kind: "multi", count: 2, price: 200 }, look: "carton" },
+    { code: "102", name: nl ? "Brood" : "Bread", price: 245, quantity: 1, deal: null, look: "bread" },
+    { code: "103", name: nl ? "Appel" : "Apple", price: 45, quantity: 3, deal: null, look: "fruit" },
+    { code: "104", name: nl ? "Kaas" : "Cheese", price: 360, quantity: 1, deal: { kind: "percent", percent: 25 }, look: "box" },
+  ];
+}
+
+/**
+ * The shopping from the `items` setting (JSON, as the authoring mode writes it). Empty, or nothing usable in it: the
+ * default shopping in the language of the item. An item without a price that is a whole number above 0 is left out and
+ * counted in `invalid`; a code that is not 1 to 6 digits, a quantity that is not 1 to 99 or a deal that is not possible
+ * gets the default (101, 102, …; 1; none).
+ */
+export function parseItems(text: string | undefined | null, language: string = "en"): { items: ShopItem[]; invalid: number } {
+  let raw: unknown;
+  try {
+    raw = JSON.parse(String(text ?? "").trim() || "null");
+  } catch {
+    raw = null;
+  }
+  if (!Array.isArray(raw) || raw.length === 0) return { items: defaultItems(language), invalid: 0 };
+  const items: ShopItem[] = [];
+  let invalid = 0;
+  raw.forEach((entry, i) => {
+    const item = itemFrom(entry, i, language);
+    if (item) items.push(item);
+    else invalid++;
+  });
+  return { items, invalid };
+}
+
+function itemFrom(entry: unknown, index: number, language: string): ShopItem | null {
+  if (!entry || typeof entry !== "object") return null;
+  const e = entry as Record<string, unknown>;
+  const price = Number(e.price);
+  if (!Number.isInteger(price) || price <= 0) return null;
+  const code = String(e.code ?? "").trim();
+  const quantity = Number(e.quantity ?? 1);
+  const name = String(e.name ?? "").trim();
+  return {
+    code: isCode(code) ? code : String(101 + index),
+    name: name || `${language.slice(0, 2) === "nl" ? "Artikel" : "Item"} ${index + 1}`,
+    price,
+    quantity: Number.isInteger(quantity) && quantity >= 1 && quantity <= MAX_QUANTITY ? quantity : 1,
+    deal: dealFrom(e.deal),
+    look: LOOKS.includes(e.look as Look) ? (e.look as Look) : "box",
+  };
+}
+
+function dealFrom(raw: unknown): Deal | null {
+  if (!raw || typeof raw !== "object") return null;
+  const d = raw as Record<string, unknown>;
+  if (d.kind === "multi") {
+    const count = Number(d.count);
+    const price = Number(d.price);
+    return Number.isInteger(count) && count >= 2 && count <= MAX_QUANTITY && Number.isInteger(price) && price > 0 ? { kind: "multi", count, price } : null;
+  }
+  if (d.kind === "percent") {
+    const percent = Number(d.percent);
+    return Number.isInteger(percent) && percent >= 1 && percent <= 99 ? { kind: "percent", percent } : null;
+  }
+  return null;
+}
+
+/** The `items` setting: the shopping as JSON, every field written. */
+export const serializeItems = (items: ShopItem[]) =>
+  JSON.stringify(items.map(({ code, name, price, quantity, deal, look }) => ({ code, name, price, quantity, deal, look })));
+
+/**
+ * What `quantity` of an item cost together, with its deal, in hundredths: 3 at 1,15 with "2 for 2,00" is 2,00 + 1,15;
+ * 3 at 0,45 with −25% is 1,35 − 0,34 (1,0125 rounded half up to 1,01). The discount is taken off the line, not off
+ * each one, as a till does.
+ */
+export function lineValue(price: number, quantity: number, deal: Deal | null): number {
+  if (deal?.kind === "multi") return Math.floor(quantity / deal.count) * deal.price + (quantity % deal.count) * price;
+  if (deal?.kind === "percent") return Math.floor((2 * quantity * price * (100 - deal.percent) + 100) / 200);
+  return quantity * price;
+}
+
+/** The cash rounding of the `cashRounding` setting, in hundredths: 1 (none), 5, 10, 50 or 100. */
+export const ROUNDINGS = [1, 5, 10, 50, 100];
+export const parseRounding = (setting: string | undefined) => (ROUNDINGS.includes(Number(setting)) ? Number(setting) : 1);
+/**
+ * An amount rounded for cash to `step` hundredths, half up: to 5 cent (Dutch practice) 7,33 → 7,35, 7,32 → 7,30,
+ * 7,38 → 7,40. Never below the step for an amount above 0.
+ */
+export function cashRound(cents: number, step: number): number {
+  if (step <= 1) return cents;
+  const rounded = Math.floor((2 * cents + step) / (2 * step)) * step;
+  return cents > 0 && rounded === 0 ? step : rounded;
+}
+
+/** What the shopping costs: the number of items, their value with the deals, and what the customer pays (rounded for cash). */
+export function shoppingTotals(items: ShopItem[], rounding: number) {
+  const count = items.reduce((sum, item) => sum + item.quantity, 0);
+  const value = items.reduce((sum, item) => sum + lineValue(item.price, item.quantity, item.deal), 0);
+  return { count, value, toPay: cashRound(value, rounding) };
+}
+
 // ---- the task, from the settings ----
 
-export type Task = "pay" | "fewest" | "change" | "changeFewest" | "count";
-export const TASKS: Task[] = ["pay", "fewest", "change", "changeFewest", "count"];
+export type Task = "pay" | "fewest" | "change" | "changeFewest" | "count" | "register";
+export const TASKS: Task[] = ["pay", "fewest", "change", "changeFewest", "count", "register"];
 
 export type Settings = CurrencySettings & {
   task?: string;
@@ -456,7 +585,38 @@ export type Settings = CurrencySettings & {
   given?: string;
   countPieces?: string;
   pieces?: string;
+  items?: string;
+  tillCalculates?: string;
+  fewestChange?: string;
+  cashRounding?: string;
+  language?: string;
 };
+
+/**
+ * The cash register: the shopping on the counter, whether the till calculates the total and the change (or the pupil
+ * does), whether the change must be the fewest pieces, the cash rounding, and what the shopping comes to.
+ */
+export type Register = {
+  items: ShopItem[];
+  /** Items of the setting that could not be read (no price). */
+  invalid: number;
+  tillCalculates: boolean;
+  fewestChange: boolean;
+  /** Cash rounding in hundredths: 1 (none), 5, 10, 50, 100. */
+  rounding: number;
+  /** How many items the customer buys (all quantities together). */
+  count: number;
+  /** What they cost with the deals, before the cash rounding. */
+  value: number;
+  /** What the customer pays: the value rounded for cash. */
+  toPay: number;
+};
+
+export function registerFrom(settings: Settings): Register {
+  const { items, invalid } = parseItems(settings.items, settings.language);
+  const rounding = parseRounding(settings.cashRounding);
+  return { items, invalid, tillCalculates: settings.tillCalculates !== "false", fewestChange: settings.fewestChange === "true", rounding, ...shoppingTotals(items, rounding) };
+}
 
 export type TaskModel = {
   task: Task;
@@ -473,13 +633,20 @@ export type TaskModel = {
   invalid: string[];
   /** The coins and notes the candidate can take. */
   supply: Supply;
-  /** What the candidate must put on the counter (pay, fewest), give back (change) or write (count); null: no task. */
+  /**
+   * What the candidate must put on the counter (pay, fewest), give back (change, register) or write (count); null: no
+   * task.
+   */
   asked: number | null;
+  /** register: the shopping and the till; null for the other tasks. */
+  register: Register | null;
 };
 
 export const parseTask = (task: string | undefined): Task => (TASKS.includes(task as Task) ? (task as Task) : "pay");
 export const isChange = (task: Task) => task === "change" || task === "changeFewest";
 export const asksFewest = (task: Task) => task === "fewest" || task === "changeFewest";
+/** The customer pays with money of the author's (`given`): change and the register. */
+export const customerPays = (task: Task) => isChange(task) || task === "register";
 
 /** What the settings ask. */
 export function taskFrom(settings: Settings): TaskModel {
@@ -487,15 +654,17 @@ export function taskFrom(settings: Settings): TaskModel {
   const currency = currencyFrom(settings);
   const pieces = parsePieceDefs(settings.pieces, currency);
   const supply = supplyOf(pieces);
-  const money = isChange(task) ? parsePieces(settings.given, currency, pieces) : task === "count" ? parsePieces(settings.countPieces, currency, pieces) : null;
-  const given = isChange(task) ? clean(money!.counts) : {};
+  const money = customerPays(task) ? parsePieces(settings.given, currency, pieces) : task === "count" ? parsePieces(settings.countPieces, currency, pieces) : null;
+  const given = customerPays(task) ? clean(money!.counts) : {};
   const counter = task === "count" ? clean(money!.counts) : {};
-  const price = task === "count" ? null : parseAmount(settings.amount, currency);
+  const register = task === "register" ? registerFrom(settings) : null;
+  // the register: the price is what the shopping comes to (no items: no price)
+  const price = task === "count" ? null : register ? (register.items.length ? register.toPay : null) : parseAmount(settings.amount, currency);
   let asked: number | null = null;
   if (task === "count") asked = pieceCount(counter) > 0 ? totalOf(counter) : null;
-  else if (isChange(task)) asked = price !== null && pieceCount(given) > 0 && totalOf(given) >= price ? totalOf(given) - price : null;
+  else if (customerPays(task)) asked = price !== null && pieceCount(given) > 0 && totalOf(given) >= price ? totalOf(given) - price : null;
   else asked = price !== null && price > 0 ? price : null;
-  return { task, currency, pieces, price, given, counter, invalid: money?.invalid ?? [], supply, asked };
+  return { task, currency, pieces, price, given, counter, invalid: money?.invalid ?? [], supply, asked, register };
 }
 
 /** What can be wrong with the settings: the keys of the problems in texts.ts. */
@@ -509,7 +678,23 @@ export type Problem =
   | "noGiven"
   | "givenTooLittle"
   | "noCounter"
-  | "cannotPay";
+  | "cannotPay"
+  | "noItems"
+  | "badItems"
+  | "duplicateCode"
+  | "cannotChange";
+
+/**
+ * What is wrong with the shopping of the register: no items, an item that can not be read (no price), two items with
+ * the same code (the till would not know which one).
+ */
+export function itemsProblems(register: Pick<Register, "items" | "invalid">): Problem[] {
+  const problems: Problem[] = [];
+  if (register.invalid > 0) problems.push("badItems");
+  if (register.items.length === 0 && register.invalid === 0) problems.push("noItems");
+  if (new Set(register.items.map((i) => i.code)).size !== register.items.length) problems.push("duplicateCode");
+  return problems;
+}
 
 /**
  * What is wrong with the coins and notes themselves (the authoring mode): a currency of the author's without a sign, a
@@ -529,15 +714,17 @@ export function piecesProblems(defs: PieceDef[], currency: Currency, task: Task 
  * says it in the language of the item.
  */
 export function settingsProblems(model: TaskModel): Problem[] {
-  const { task, price, given, counter, supply, asked, invalid, currency } = model;
+  const { task, price, given, counter, supply, asked, invalid, currency, register } = model;
   const problems: Problem[] = currency.code === "custom" && currency.sign === "" ? ["noSign"] : [];
   if (invalid.length) problems.push("unknownPieces");
   if (task === "count") return pieceCount(counter) === 0 && !invalid.length ? [...problems, "noCounter"] : problems;
+  if (register) problems.push(...itemsProblems(register));
   if (supply.length === 0) return [...problems, "noPieces"];
-  if (price === null || (price === 0 && !isChange(task))) return [...problems, "noAmount"];
-  if (isChange(task) && pieceCount(given) === 0) return invalid.length ? problems : [...problems, "noGiven"];
-  if (isChange(task) && totalOf(given) < price) return [...problems, "givenTooLittle"];
-  if (asked !== null && asked > 0 && fewestPieces(asked, supply) === null) return [...problems, "cannotPay"];
+  if (register && register.items.length === 0) return problems;
+  if (price === null || (price === 0 && !customerPays(task))) return [...problems, "noAmount"];
+  if (customerPays(task) && pieceCount(given) === 0) return invalid.length ? problems : [...problems, "noGiven"];
+  if (customerPays(task) && totalOf(given) < price) return [...problems, "givenTooLittle"];
+  if (asked !== null && asked > 0 && fewestPieces(asked, supply) === null) return [...problems, register ? "cannotChange" : "cannotPay"];
   return problems;
 }
 
@@ -553,9 +740,11 @@ export function authoringProblems(settings: Settings, defs: PieceDef[]): Problem
   const possible = defs.filter((d) => isPossibleValue(d.value, currency));
   if (possible.length === 0) return own;
   const model = taskFrom({ ...settings, pieces: serializePieces(possible) });
-  const caused = settingsProblems(model).filter((p) => p === "unknownPieces" || p === "cannotPay");
+  // the register: the shopping is set in the authoring mode too, so its problems and what the total causes are as well
+  const caused = settingsProblems(model).filter((p) => CAUSED.includes(p) || (task === "register" && p === "givenTooLittle"));
   return [...own, ...caused.filter((p) => !own.includes(p))];
 }
+const CAUSED: Problem[] = ["unknownPieces", "cannotPay", "cannotChange", "noItems", "badItems", "duplicateCode"];
 
 // ---- the response ----
 
@@ -593,9 +782,23 @@ export function responseFor(model: TaskModel, tray: Counts, answer: string): Rec
  * the task asks for it. Undefined when the settings ask nothing that can be paid (no amount, or not with this supply).
  */
 export function correctFor(model: TaskModel): RecordResponse | undefined {
-  const { task, asked, supply } = model;
+  const { task, asked, supply, register } = model;
   if (asked === null) return undefined;
   if (task === "count") return { record: [float("answer", asked), bool("exact", true)] };
+  if (register) {
+    if (settingsProblems(model).length) return undefined;
+    return registerRecord({
+      itemsRungUp: register.count,
+      itemsTotal: register.value,
+      total: register.toPay,
+      totalCorrect: true,
+      paid: totalOf(model.given),
+      change: asked,
+      changeCorrect: true,
+      fewest: true,
+      correct: true,
+    });
+  }
   const fewest = fewestPieces(asked, supply);
   if (!fewest || asked === 0) return undefined;
   const record = [float("amount", asked), bool("exact", true)];
@@ -605,6 +808,39 @@ export function correctFor(model: TaskModel): RecordResponse | undefined {
 
 const float = (name: string, cents: number): RecordField => ({ name, base: { float: toMajor(cents) } });
 const bool = (name: string, value: boolean): RecordField => ({ name, base: { boolean: value } });
+
+/** The fields of the register's response, amounts in hundredths. */
+export type RegisterFields = {
+  /** How many items were rung up (all quantities together). */
+  itemsRungUp: number;
+  /** What the items rung up cost, with their deals (before the cash rounding). */
+  itemsTotal: number;
+  /** The total on the till: the till's (calculated and rounded) or the one the pupil keyed in; 0 before Total. */
+  total: number;
+  totalCorrect: boolean;
+  /** What the pupil keyed in as paid by the customer; 0 before Cash. */
+  paid: number;
+  /** The money the pupil gave back (on the counter). */
+  change: number;
+  changeCorrect: boolean;
+  fewest: boolean;
+  correct: boolean;
+};
+
+/** The register's record, always in this order, so that match_correct can compare it with the correct response. */
+export const registerRecord = (f: RegisterFields): RecordResponse => ({
+  record: [
+    { name: "itemsRungUp", base: { integer: f.itemsRungUp } },
+    float("itemsTotal", f.itemsTotal),
+    float("total", f.total),
+    bool("totalCorrect", f.totalCorrect),
+    float("paid", f.paid),
+    float("change", f.change),
+    bool("changeCorrect", f.changeCorrect),
+    bool("fewest", f.fewest),
+    bool("correct", f.correct),
+  ],
+});
 
 /**
  * A response read back (setResponse, boundTo, a correct response in status "solution"): the amount (amount, or answer
@@ -633,6 +869,30 @@ export function readResponse(value: unknown, currency: Currency = EUR): { cents:
     return { cents: value.trim() !== "" && Number.isFinite(n) ? toCents(n) : parseAmount(value, currency), pieces: null };
   }
   return { cents: null, pieces: null };
+}
+
+/**
+ * The register's response read back (setResponse, boundTo, a correct response in status "solution"): its fields, the
+ * amounts in hundredths. Null when it is not a record of the register.
+ */
+export function readRegister(value: unknown): Pick<RegisterFields, "itemsRungUp" | "itemsTotal" | "total" | "paid" | "change"> | null {
+  if (Array.isArray(value)) return readRegister(value[0]);
+  const record = (value as { record?: unknown })?.record;
+  if (!Array.isArray(record)) return null;
+  const fields = record as { name?: string; base?: Record<string, unknown>; value?: unknown }[];
+  const number = (name: string) => {
+    const field = fields.find((f) => f?.name === name);
+    const raw = field ? Number(field.base?.float ?? field.base?.integer ?? field.value) : NaN;
+    return Number.isFinite(raw) && raw >= 0 ? raw : 0;
+  };
+  if (!fields.some((f) => f?.name === "itemsRungUp" || f?.name === "change")) return null;
+  return {
+    itemsRungUp: Math.round(number("itemsRungUp")),
+    itemsTotal: toCents(number("itemsTotal")),
+    total: toCents(number("total")),
+    paid: toCents(number("paid")),
+    change: toCents(number("change")),
+  };
 }
 
 /**

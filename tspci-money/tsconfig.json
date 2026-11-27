@@ -15,6 +15,8 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "esModuleInterop": true,
+    "allowImportingTsExtensions": true,
+    "rewriteRelativeImportExtensions": true,
   },
   "include": ["**/*"],
   "exclude": ["test", "src/**/*.stories.ts", "node_modules", "dist"], // the stories run in the Storybook of the repository

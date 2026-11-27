@@ -82,6 +82,80 @@
     @apply pointer-events-none fixed z-50 -translate-x-1/2 -translate-y-1/2 opacity-90 drop-shadow-lg;
   }
 
+  /* the cash register (shop.tsx) */
+  .shopping {
+    @apply border-counter-line bg-counter;
+  }
+  .shop-item {
+    @apply relative flex w-[8.5em] flex-col items-center gap-1 rounded-xl border-2 border-counter-line bg-white px-2 pt-2 pb-2 text-center;
+  }
+  button.shop-item {
+    @apply cursor-pointer focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-accent active:translate-y-px;
+  }
+  @media (hover: hover) {
+    button.shop-item:hover {
+      @apply border-accent bg-accent-soft;
+    }
+  }
+  .item-price {
+    @apply rounded border-2 border-dashed border-accent px-1.5 font-extrabold text-accent tabular-nums;
+  }
+  /* a deal: a sign on it (%, or "2 for"), never only a colour */
+  .deal-tag {
+    @apply rounded bg-amber-300 px-1.5 text-[0.85em] font-bold text-amber-950;
+  }
+  .till {
+    @apply bg-slate-700;
+  }
+  .till-display {
+    @apply rounded-lg border-4 border-slate-900 bg-[#16302a] px-2 py-1.5 font-mono text-[#c6f6d5];
+  }
+  .key {
+    @apply flex min-h-11 cursor-pointer items-center justify-center rounded-lg border-b-4 px-1 text-[1em] leading-tight font-bold select-none focus-visible:outline-3 focus-visible:outline-offset-2 focus-visible:outline-amber-300 active:translate-y-px active:border-b-2;
+  }
+  .key-digit {
+    @apply border-slate-400 bg-white text-[1.25em] text-ink;
+  }
+  .key-function {
+    @apply border-slate-500 bg-slate-200 text-[0.9em] text-ink;
+  }
+  .key-main {
+    @apply border-[#14523d] bg-accent text-white;
+  }
+  @media (hover: hover) {
+    .key-digit:hover,
+    .key-function:hover {
+      @apply bg-slate-100;
+    }
+  }
+  .receipt-slot {
+    @apply rounded-2xl border-2 border-dashed border-slate-300 bg-slate-50 px-3 pt-2 pb-3;
+  }
+  .receipt {
+    @apply mt-1 bg-white px-3 pt-2 pb-4 font-mono text-[0.85em] text-ink shadow-md;
+    /* a torn-off edge at the bottom */
+    clip-path: polygon(0 0, 100% 0, 100% calc(100% - 6px), 95% 100%, 90% calc(100% - 6px), 85% 100%, 80% calc(100% - 6px), 75% 100%, 70% calc(100% - 6px), 65% 100%, 60% calc(100% - 6px), 55% 100%, 50% calc(100% - 6px), 45% 100%, 40% calc(100% - 6px), 35% 100%, 30% calc(100% - 6px), 25% 100%, 20% calc(100% - 6px), 15% 100%, 10% calc(100% - 6px), 5% 100%, 0 calc(100% - 6px));
+    animation: print 0.6s ease-out;
+    transform-origin: top;
+  }
+  @keyframes print {
+    from {
+      transform: scaleY(0.2);
+      opacity: 0.4;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .receipt {
+      animation: none;
+    }
+  }
+  .receipt-waiting {
+    @apply mt-2 text-[0.9em] text-slate-600;
+  }
+  .drawer-closed .supply-piece {
+    @apply cursor-not-allowed;
+  }
+
   /* the authoring mode (authoring.tsx) */
   .author-button {
     @apply inline-flex min-h-8 min-w-8 cursor-pointer items-center justify-center rounded-md border-2 border-slate-300 bg-white px-2.5 text-sm text-slate-700 hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40;

@@ -17,7 +17,8 @@
       { "value": "fewest", "label": { "en": "Pay an amount with as few coins and notes as possible", "nl": "Een bedrag betalen met zo weinig mogelijk munten en biljetten" } },
       { "value": "change", "label": { "en": "Give the change", "nl": "Wisselgeld teruggeven" } },
       { "value": "changeFewest", "label": { "en": "Give the change with as few coins and notes as possible", "nl": "Wisselgeld teruggeven met zo weinig mogelijk munten en biljetten" } },
-      { "value": "count", "label": { "en": "Count the money on the counter and write the amount", "nl": "Het geld op de toonbank tellen en het bedrag opschrijven" } }
+      { "value": "count", "label": { "en": "Count the money on the counter and write the amount", "nl": "Het geld op de toonbank tellen en het bedrag opschrijven" } },
+      { "value": "register", "label": { "en": "Cash register: ring up the shopping and give the change", "nl": "Kassa: de boodschappen aanslaan en wisselgeld teruggeven" } }
     ],
     "label": { "en": "Task", "nl": "Opdracht" }
   },
@@ -30,7 +31,7 @@
   "given": {
     "default": "10",
     "editor": "text",
-    "label": { "en": "What the customer pays with (give the change): coins and notes separated by ;, e.g. 10 or 5; 2x 2", "nl": "Waarmee de klant betaalt (wisselgeld): munten en biljetten gescheiden door ;, bijv. 10 of 5; 2x 2" }
+    "label": { "en": "What the customer pays with (give the change, cash register): coins and notes separated by ;, e.g. 10 or 5; 2x 2", "nl": "Waarmee de klant betaalt (wisselgeld, kassa): munten en biljetten gescheiden door ;, bijv. 10 of 5; 2x 2" }
   },
   "countPieces": {
     "default": "10; 2x 2; 0,50; 3x 0,20; 0,05",
@@ -82,6 +83,38 @@
       "nl": "In te stellen in de authoring-modus. Leeg: de gewone munten en biljetten van de munteenheid."
     },
     "$comment": "JSON, as the authoring mode writes it: [{ \"value\": 50, \"kind\": \"coin\", \"color\": \"gold\", \"offered\": true, \"count\": null }, …]. value in hundredths of the main unit (50 is 50 cent; also without a minor unit: 500 is 5 kr); kind coin or note; color copper, gold, silver, silverInGold, goldInSilver or #rrggbb; offered: the pupil can take it; count: how many, null for as many as needed. A field left out: the currency's default"
+  },
+  "items": {
+    "default": "",
+    "editor": "pci",
+    "label": { "en": "Shopping (cash register)", "nl": "Boodschappen (kassa)" },
+    "hint": {
+      "en": "Set in the authoring mode. Empty: milk, bread, apples and cheese, with two deals.",
+      "nl": "In te stellen in de authoring-modus. Leeg: melk, brood, appels en kaas, met twee acties."
+    },
+    "$comment": "Only for task register. JSON, as the authoring mode writes it: [{ \"code\": \"101\", \"name\": \"Milk\", \"price\": 115, \"quantity\": 2, \"deal\": { \"kind\": \"multi\", \"count\": 2, \"price\": 200 }, \"look\": \"carton\" }, …]. code: 1 to 6 digits; price of one in hundredths of the main unit; quantity 1 to 99; deal null, { kind: multi, count, price } (count for price together) or { kind: percent, percent } (1 to 99 off the line); look box, carton, bottle, can, jar, bag, bread or fruit"
+  },
+  "tillCalculates": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Cash register: the till calculates the total and the change (off: the pupil does)", "nl": "Kassa: de kassa rekent het totaal en het wisselgeld uit (uit: de leerling doet het)" }
+  },
+  "fewestChange": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Cash register: give the change with as few coins and notes as possible", "nl": "Kassa: het wisselgeld geven met zo weinig mogelijk munten en biljetten" }
+  },
+  "cashRounding": {
+    "default": "1",
+    "editor": "enum",
+    "options": [
+      { "value": "1", "label": { "en": "No rounding", "nl": "Niet afronden" } },
+      { "value": "5", "label": { "en": "To 5 hundredths (Dutch cash: € 8,48 → € 8,50)", "nl": "Op 5 honderdsten (contant in Nederland: € 8,48 → € 8,50)" } },
+      { "value": "10", "label": { "en": "To 10 hundredths", "nl": "Op 10 honderdsten" } },
+      { "value": "50", "label": { "en": "To half a unit", "nl": "Op een halve eenheid" } },
+      { "value": "100", "label": { "en": "To a whole unit", "nl": "Op een hele eenheid" } }
+    ],
+    "label": { "en": "Cash register: round the total for cash", "nl": "Kassa: het totaal afronden voor contante betaling" }
   },
   "showTotal": {
     "default": "false",

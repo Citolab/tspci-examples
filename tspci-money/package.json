@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-money",
   "version": "1.0.0-alpha.1",
-  "description": "money (rekenen met geld): pay an amount exactly or in as few coins and notes as possible, give change, or count the money on a counter, with stylised coins and notes in euro, dollar, pound or a currency of the author's",
+  "description": "money (rekenen met geld): pay an amount exactly or in as few coins and notes as possible, give change, count the money on a counter, or work a cash register (ring up the shopping, take the payment, give the change), with stylised coins and notes in euro, dollar, pound or a currency of the author's",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
@@ -58,7 +58,10 @@
     "currency",
     "change",
     "wisselgeld",
-    "math"
+    "math",
+    "cash-register",
+    "kassa",
+    "retail"
   ],
   "scripts": {
     "dev": "tspci --dev",
@@ -82,7 +85,8 @@
         "euro",
         "dollar",
         "pound",
-        "change"
+        "change",
+        "cash-register"
       ],
       "short": "money",
       "scoring": [
@@ -128,6 +132,15 @@
             "label": {
               "en": "The amount is the one asked",
               "nl": "Het bedrag is het gevraagde bedrag"
+            },
+            "when": {
+              "task": [
+                "pay",
+                "fewest",
+                "change",
+                "changeFewest",
+                "count"
+              ]
             }
           },
           "pieces": {
@@ -143,16 +156,117 @@
               ]
             }
           },
+          "itemsRungUp": {
+            "baseType": "integer",
+            "label": {
+              "en": "Items rung up (all quantities together)",
+              "nl": "Aangeslagen artikelen (alle aantallen samen)"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "itemsTotal": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "What the items rung up cost, with the deals (main unit)",
+              "nl": "Wat de aangeslagen artikelen kosten, met de acties (hoofdeenheid)"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "total": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Total on the till: calculated, or keyed in by the pupil (main unit; 0 before Total)",
+              "nl": "Totaal op de kassa: uitgerekend, of ingetoetst door de leerling (hoofdeenheid; 0 voor Totaal)"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "totalCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The total is what the customer has to pay",
+              "nl": "Het totaal is wat de klant moet betalen"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "paid": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Keyed in as paid by the customer (main unit; 0 before Cash)",
+              "nl": "Ingetoetst als betaald door de klant (hoofdeenheid; 0 voor Contant)"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "change": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Change given to the customer (main unit)",
+              "nl": "Wisselgeld gegeven aan de klant (hoofdeenheid)"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
+          "changeCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The change is right",
+              "nl": "Het wisselgeld klopt"
+            },
+            "when": {
+              "task": [
+                "register"
+              ]
+            }
+          },
           "fewest": {
             "baseType": "boolean",
             "label": {
-              "en": "As few coins and notes as possible for this amount",
-              "nl": "Zo weinig mogelijk munten en biljetten voor dit bedrag"
+              "en": "As few coins and notes as possible for this amount (register: the change)",
+              "nl": "Zo weinig mogelijk munten en biljetten voor dit bedrag (kassa: het wisselgeld)"
             },
             "when": {
               "task": [
                 "fewest",
-                "changeFewest"
+                "changeFewest",
+                "register"
+              ]
+            }
+          },
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Everything right: the shopping rung up, the total, the payment, the change (in the fewest pieces when asked)",
+              "nl": "Alles goed: de boodschappen aangeslagen, het totaal, de betaling, het wisselgeld (in zo weinig mogelijk stukken als dat gevraagd is)"
+            },
+            "when": {
+              "task": [
+                "register"
               ]
             }
           }
@@ -160,8 +274,8 @@
       },
       "authoring": {
         "label": {
-          "en": "Coins and notes…",
-          "nl": "Munten en biljetten…"
+          "en": "Coins, notes and shopping…",
+          "nl": "Munten, biljetten en boodschappen…"
         },
         "width": 960,
         "height": 900
