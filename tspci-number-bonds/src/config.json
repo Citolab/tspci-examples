@@ -1,0 +1,78 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title (empty: none)", "nl": "Titel (leeg: geen)" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question (empty: the instruction of the model, in the language of the PCI)", "nl": "Vraag (leeg: de instructie bij het model, in de taal van de PCI)" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts", "nl": "Taal van de eigen teksten van de PCI" }
+  },
+  "model": {
+    "default": "tree",
+    "editor": "enum",
+    "options": [
+      { "value": "house", "label": { "en": "Split house: the whole in the roof, rows of two parts", "nl": "Splitshuis: het geheel in het dak, rijen van twee delen" } },
+      { "value": "tree", "label": { "en": "Number bond tree: the whole on top, parts on legs", "nl": "Splitsboom: het geheel bovenaan, delen op benen" } }
+    ],
+    "label": { "en": "Model", "nl": "Model" }
+  },
+  "task": {
+    "default": "fill",
+    "editor": "enum",
+    "options": [
+      { "value": "fill", "label": { "en": "Fill in the empty boxes", "nl": "De lege vakjes invullen" } },
+      { "value": "allSplits", "label": { "en": "All splits of the number in the roof (house only)", "nl": "Alle splitsingen van het getal in het dak (alleen huis)" } }
+    ],
+    "label": { "en": "Task", "nl": "Opdracht" },
+    "hint": {
+      "en": "All splits: the house gets a row for every split, every row a different one. The roof needs a whole number with at most 12 splits.",
+      "nl": "Alle splitsingen: het huis krijgt een rij per splitsing, elke rij een andere. Het dak heeft een heel getal nodig met hoogstens 12 splitsingen."
+    }
+  },
+  "house": {
+    "default": "7: 3|?; ?|2; 6|?; ?|?",
+    "editor": "pci",
+    "label": { "en": "The house: roof and rows", "nl": "Het huis: dak en rijen" },
+    "hint": {
+      "en": "The roof, a colon, the rows separated by ; and the two boxes of a row by |. ? is a box the pupil fills in: 7: 3|?; ?|2",
+      "nl": "Het dak, een dubbele punt, de rijen gescheiden door ; en de twee vakjes van een rij door |. ? is een vakje dat de leerling invult: 7: 3|?; ?|2"
+    },
+    "$comment": "Set in the authoring mode (authoring.tsx), or typed: up to 12 rows; for all splits only the roof (and any given boxes of the first rows)"
+  },
+  "tree": {
+    "default": "47(40|?)",
+    "editor": "pci",
+    "label": { "en": "The tree: whole and parts", "nl": "De boom: geheel en delen" },
+    "hint": {
+      "en": "A box and its two or three parts in brackets, separated by |; a part can split again. ? is a box the pupil fills in: 47(40|?), ?(5|3), 13(10|3(?|?))",
+      "nl": "Een vakje en zijn twee of drie delen tussen haakjes, gescheiden door |; een deel kan weer splitsen. ? is een vakje dat de leerling invult: 47(40|?), ?(5|3), 13(10|3(?|?))"
+    },
+    "$comment": "Set in the authoring mode (authoring.tsx), or typed: up to 3 levels and 12 splits"
+  },
+  "countZero": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "All splits: 0 counts (0|7 and 7|0)", "nl": "Alle splitsingen: 0 telt mee (0|7 en 7|0)" }
+  },
+  "orderMatters": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "All splits: 3|4 and 4|3 are different splits", "nl": "Alle splitsingen: 3|4 en 4|3 zijn verschillende splitsingen" }
+  },
+  "decimals": {
+    "default": "false",
+    "editor": "boolean",
+    "label": { "en": "Decimals (1 → 0,3 and 0,7)", "nl": "Kommagetallen (1 → 0,3 en 0,7)" }
+  }
+}

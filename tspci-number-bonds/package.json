@@ -1,0 +1,219 @@
+{
+  "name": "@citolab/pci-number-bonds",
+  "version": "1.0.0-alpha.1",
+  "description": "number bonds (splitsen): the split house (splitshuis) and the number bond tree (splitsboom), with given and empty boxes, nested splits, all splits of a number; reports per row whether it adds up, so a rule can give partial credit",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-number-bonds#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-number-bonds"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "numberBonds.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "number-bonds",
+    "splitsen",
+    "splitshuis",
+    "splitsboom",
+    "math"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-number-bonds npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-number-bonds npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "numberBonds",
+      "label": "Number bonds",
+      "tags": [
+        "math",
+        "number bonds",
+        "splitting"
+      ],
+      "short": "numberBonds",
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "correct": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every row or split adds up, every box filled in",
+              "nl": "Elke rij of splitsing klopt, elk vakje ingevuld"
+            }
+          },
+          "correctRows": {
+            "baseType": "integer",
+            "tolerance": "range",
+            "label": {
+              "en": "Rows or splits that add up",
+              "nl": "Rijen of splitsingen die kloppen"
+            }
+          },
+          "complete": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Every split is there, none twice",
+              "nl": "Elke splitsing staat erin, geen dubbel"
+            },
+            "when": {
+              "task": [
+                "allSplits"
+              ]
+            }
+          },
+          "numbers": {
+            "baseType": "string",
+            "label": {
+              "en": "The numbers in the boxes",
+              "nl": "De getallen in de vakjes"
+            }
+          },
+          "row1": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 1 adds up",
+              "nl": "Rij of splitsing 1 klopt"
+            }
+          },
+          "row2": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 2 adds up",
+              "nl": "Rij of splitsing 2 klopt"
+            }
+          },
+          "row3": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 3 adds up",
+              "nl": "Rij of splitsing 3 klopt"
+            }
+          },
+          "row4": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 4 adds up",
+              "nl": "Rij of splitsing 4 klopt"
+            }
+          },
+          "row5": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 5 adds up",
+              "nl": "Rij of splitsing 5 klopt"
+            }
+          },
+          "row6": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 6 adds up",
+              "nl": "Rij of splitsing 6 klopt"
+            }
+          },
+          "row7": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 7 adds up",
+              "nl": "Rij of splitsing 7 klopt"
+            }
+          },
+          "row8": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 8 adds up",
+              "nl": "Rij of splitsing 8 klopt"
+            }
+          },
+          "row9": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 9 adds up",
+              "nl": "Rij of splitsing 9 klopt"
+            }
+          },
+          "row10": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 10 adds up",
+              "nl": "Rij of splitsing 10 klopt"
+            }
+          },
+          "row11": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 11 adds up",
+              "nl": "Rij of splitsing 11 klopt"
+            }
+          },
+          "row12": {
+            "baseType": "boolean",
+            "label": {
+              "en": "Row or split 12 adds up",
+              "nl": "Rij of splitsing 12 klopt"
+            }
+          }
+        }
+      },
+      "authoring": {
+        "label": {
+          "en": "Fill in the boxes…",
+          "nl": "Vakjes invullen…"
+        },
+        "width": 900,
+        "height": 820
+      }
+    }
+  }
+}

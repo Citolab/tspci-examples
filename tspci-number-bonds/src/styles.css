@@ -1,0 +1,147 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+/* The friendly look of a maths textbook: a red roof, warm white walls, dark lines, teal boxes to write in. */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --color-ink: #1f2937;
+  --color-paper: #f5f8fa;
+  --color-wall: #fffaf0;
+  --color-roof: #e4572e;
+  --color-roof-line: #9a3412;
+  --color-chimney: #b4532a;
+  --color-accent: #4db6ac;
+  --color-accent-strong: #00796b;
+  --color-tint: #e0f2f1;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+}
+
+@layer components {
+  /* A box with a number: the pupil's are tinted with a dashed teal line, so it is clear where to write */
+  .box {
+    @apply h-full w-full rounded-lg border-2 border-dashed border-accent bg-tint text-center text-[1.5em] leading-none font-semibold text-ink outline-none;
+    font-family: inherit;
+    min-width: 0;
+  }
+  .box:focus-visible,
+  .box:focus {
+    @apply border-solid border-accent-strong ring-3 ring-accent/40;
+  }
+  .box:disabled {
+    @apply cursor-default opacity-100;
+  }
+  /* Not a number (or a decimal while decimals are off): red */
+  .box:not(:placeholder-shown):invalid,
+  .box:user-invalid {
+    @apply border-solid border-red-600 bg-red-50;
+  }
+  /* What the author gave: the number as printed in the book */
+  .box.given {
+    @apply border-transparent bg-transparent font-bold;
+  }
+
+  /* The authoring mode: a number the author typed is given (solid), an empty box is the pupil's (dashed) */
+  .box.author-given {
+    @apply border-solid border-slate-400 bg-white font-bold;
+  }
+  .box::placeholder {
+    @apply font-normal text-accent;
+  }
+  .author-button {
+    @apply cursor-pointer rounded-md border-2 border-slate-300 bg-white px-1.5 py-0.5 text-sm font-semibold text-slate-700 hover:border-slate-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent-strong disabled:cursor-not-allowed disabled:opacity-40;
+  }
+
+  /* ---- the split house ---- */
+  .house {
+    @apply relative flex flex-col items-center;
+    --room-w: 5.6em;
+    --room-h: 3.6em;
+  }
+  .roof {
+    @apply relative;
+    width: calc(2 * var(--room-w) + 3em);
+    height: 6.2em;
+    margin-bottom: -0.2em;
+  }
+  .roof-shape {
+    @apply absolute inset-0 h-full w-full overflow-visible;
+  }
+  .roof-tiles {
+    fill: var(--color-roof);
+    stroke: var(--color-roof-line);
+    stroke-width: 3;
+    stroke-linejoin: round;
+  }
+  .chimney {
+    fill: var(--color-chimney);
+    stroke: var(--color-roof-line);
+    stroke-width: 2.5;
+  }
+  .chimney-top {
+    fill: var(--color-roof-line);
+  }
+  /* the whole, in a white window in the roof */
+  .roof-box {
+    @apply absolute left-1/2 -translate-x-1/2 rounded-lg bg-white;
+    top: 2.75em;
+    width: 4.6em;
+    height: 2.8em;
+  }
+  .walls {
+    @apply rounded-b-sm border-[3px] border-ink bg-wall;
+    width: calc(2 * var(--room-w) + 6px);
+  }
+  .floor {
+    @apply relative flex;
+  }
+  .floor + .floor {
+    @apply border-t-2 border-ink;
+  }
+  .room {
+    @apply flex items-center justify-center p-[0.4em];
+    width: var(--room-w);
+    height: var(--room-h);
+  }
+  .room + .room {
+    @apply border-l-2 border-ink;
+  }
+  .row-aside {
+    @apply absolute top-1/2 left-full ml-3 -translate-y-1/2;
+  }
+
+  /* ---- the number bond tree ---- */
+  .tree {
+    @apply relative;
+  }
+  .legs {
+    @apply absolute inset-0 h-full w-full overflow-visible;
+    stroke: var(--color-ink);
+    stroke-width: 3;
+    stroke-linecap: round;
+  }
+  .tree-box {
+    @apply absolute rounded-lg bg-paper;
+  }
+  /* a given number in the tree: in a box with a dark frame, as printed; the whole on top a heavier one */
+  .tree-box .box.given,
+  .tree-box .box.author-given {
+    @apply border-solid border-ink bg-white;
+  }
+  .tree-top .box.given,
+  .tree-top .box.author-given {
+    @apply border-3;
+  }
+}
