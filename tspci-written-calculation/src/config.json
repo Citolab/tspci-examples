@@ -1,0 +1,65 @@
+{
+  "title": {
+    "default": "",
+    "editor": "text",
+    "label": { "en": "Title", "nl": "Titel" }
+  },
+  "question": {
+    "default": "",
+    "editor": "textarea",
+    "label": { "en": "Question", "nl": "Vraag" }
+  },
+  "mode": {
+    "default": "chunking",
+    "editor": "enum",
+    "options": [
+      { "value": "chunking", "label": { "en": "Chunking division (hapmethode)", "nl": "Delen met de hapmethode" } },
+      { "value": "columns", "label": { "en": "Column-wise adding or subtracting (kolomsgewijs)", "nl": "Kolomsgewijs optellen of aftrekken" } }
+    ],
+    "label": { "en": "Written method", "nl": "Schriftelijke methode" }
+  },
+  "operation": {
+    "default": "add",
+    "editor": "enum",
+    "options": [
+      { "value": "add", "label": { "en": "Add (+)", "nl": "Optellen (+)" } },
+      { "value": "subtract", "label": { "en": "Subtract (−)", "nl": "Aftrekken (−)" } }
+    ],
+    "label": { "en": "Add or subtract (column-wise only)", "nl": "Optellen of aftrekken (alleen kolomsgewijs)" }
+  },
+  "first": {
+    "default": "432",
+    "editor": "integer",
+    "min": 0,
+    "max": 9999999,
+    "label": { "en": "First number (hapmethode: the number to divide)", "nl": "Eerste getal (hapmethode: het getal dat gedeeld wordt)" }
+  },
+  "second": {
+    "default": "12",
+    "editor": "integer",
+    "min": 0,
+    "max": 9999999,
+    "label": { "en": "Second number (hapmethode: the divisor)", "nl": "Tweede getal (hapmethode: de deler)" }
+  },
+  "chunks": {
+    "default": "3",
+    "editor": "integer",
+    "min": 1,
+    "max": 12,
+    "label": { "en": "Rows for bites at the start (hapmethode)", "nl": "Regels voor happen bij de start (hapmethode)" }
+  },
+  "hint": {
+    "default": "true",
+    "editor": "boolean",
+    "label": { "en": "Show how the method works, in one line", "nl": "In één regel laten zien hoe de methode werkt" }
+  },
+  "language": {
+    "default": "en",
+    "editor": "enum",
+    "options": [
+      { "value": "en", "label": { "en": "English", "nl": "Engels" } },
+      { "value": "nl", "label": { "en": "Dutch", "nl": "Nederlands" } }
+    ],
+    "label": { "en": "Language of the PCI's own texts and numbers", "nl": "Taal van de eigen teksten en getallen van de PCI" }
+  }
+}

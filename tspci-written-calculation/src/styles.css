@@ -1,0 +1,107 @@
+/*
+ * Tailwind 4, compiled into the bundle and added to the PCI's shadow root (index.tsx): its classes style only this PCI.
+ * The components use the utility classes directly; @source tells Tailwind where to find them.
+ */
+@import "tailwindcss";
+@source "./**/*.{html,js,ts,jsx,tsx}";
+@source "../*.xml";
+
+/* Squared paper, dark ink, and a blue for what the pupil writes in */
+@theme {
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --color-ink: #1e293b;
+  --color-paper: #fbfdff;
+  --color-grid: #dbe7f3;
+  --color-accent: #1d4ed8;
+  --color-tint: #eef4ff;
+}
+
+@layer base {
+  /* Reset the default styles of the shadow root */
+  :host {
+    all: initial;
+    display: block;
+    font-size: 16px;
+  }
+  /*
+   * The column of numbers: one width for every number, so the digits line up (--digits: the longest number and one
+   * more, interaction.tsx). Used where the font is the size of the numbers, so 1ch is a digit there.
+   */
+  * {
+    --number: calc(var(--digits) * 1ch + 1rem);
+    --factor: calc((var(--digits) - 1) * 1ch + 1rem);
+  }
+}
+
+@layer components {
+  /* Squared paper, 1.25em squares, as pupils do written sums on */
+  .paper {
+    @apply w-max max-w-full overflow-x-auto rounded-xl border border-grid px-6 py-5;
+    background-color: var(--color-paper);
+    background-image:
+      linear-gradient(var(--color-grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--color-grid) 1px, transparent 1px);
+    background-size: 1.25em 1.25em;
+  }
+  /* The grid of the working, in the size of the numbers: the widths below are in digits (ch) of this size */
+  .working {
+    @apply grid w-max items-center text-[1.5em];
+  }
+  .cell {
+    @apply py-[3px] tabular-nums;
+  }
+  /* The numbers of the question, written on the paper */
+  .given {
+    @apply font-semibold;
+  }
+  /* a number of the question in the column of numbers: its digits right above those in the boxes (padding and border) */
+  .number {
+    @apply text-right;
+    padding-right: calc(0.375rem + 2px);
+  }
+  .operator {
+    @apply font-bold text-ink;
+  }
+  /* The line under a number that is subtracted or added, and above a total */
+  .line-under {
+    @apply border-b-2 border-ink pb-[5px];
+  }
+  .line-over {
+    @apply border-t-2 border-ink pt-[5px];
+  }
+
+  /* A box the pupil writes a number in: right aligned, so the digits stand in their columns */
+  .box {
+    @apply w-[var(--number)] rounded-md border-2 border-slate-300 bg-tint px-1.5 py-0.5 text-right text-ink tabular-nums outline-none focus:border-accent focus:ring-2 focus:ring-accent/40 disabled:cursor-not-allowed disabled:opacity-100;
+    font: inherit;
+  }
+  /* a box with a text that is not a number: a thick red border, and a message under the working */
+  .box[aria-invalid="true"] {
+    @apply border-red-700 border-solid;
+    border-width: 3px;
+  }
+  .factor {
+    @apply w-[var(--factor)];
+  }
+  .answer {
+    @apply border-accent bg-white;
+  }
+  .remainder {
+    @apply w-[var(--factor)] bg-white;
+  }
+  /* in review and solution: plain writing on the paper */
+  .box:disabled {
+    @apply border-transparent bg-transparent;
+  }
+  .answer:disabled,
+  .remainder:disabled {
+    @apply border-slate-300;
+  }
+
+  .button {
+    @apply cursor-pointer rounded-md border border-slate-300 bg-white px-3 py-1.5 text-sm text-ink hover:bg-tint focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-40;
+  }
+  .problems {
+    @apply mt-4 list-disc rounded-md border-2 border-red-700 bg-red-50 py-3 pr-4 pl-8 text-red-900;
+  }
+}

@@ -1,0 +1,130 @@
+{
+  "name": "@citolab/pci-written-calculation",
+  "version": "1.0.0-alpha.1",
+  "description": "written calculation as Dutch primary schools teach it: column-wise adding and subtracting (kolomsgewijs) and chunking division (hapmethode), in boxes laid out like the paper method; reports the answer and whether the working is correct, whatever the route",
+  "author": {
+    "name": "Citolab",
+    "url": "https://github.com/Citolab"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/Citolab/tspci-examples/tree/main/tspci-written-calculation#readme",
+  "bugs": "https://github.com/Citolab/tspci-examples/issues",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Citolab/tspci-examples.git",
+    "directory": "tspci-written-calculation"
+  },
+  "files": [
+    "dist/index.js",
+    "dist/authoring.json",
+    "dist/sbom.cdx.json",
+    "dist/tao-pci-*.zip",
+    "writtenCalculation.svg",
+    "example.png",
+    "README.md",
+    "AUTHORING.md"
+  ],
+  "source": "src/index.tsx",
+  "main": "dist/index.js",
+  "devDependencies": {
+    "@citolab/preact-store": "3.0.3",
+    "@citolab/tspci": "3.1.0",
+    "@citolab/tspci-qti3": "3.1.0",
+    "@citolab/tspci-tao": "3.1.0",
+    "@tailwindcss/nesting": "0.0.0-insiders.565cd3e",
+    "@tailwindcss/postcss": "4.3.5",
+    "archiver": "7.0.1",
+    "autoprefixer": "10.4.23",
+    "postcss-import": "16.2.0",
+    "preact": "10.29.8",
+    "tailwindcss": "4.3.5",
+    "tslib": "2.9.1"
+  },
+  "keywords": [
+    "qti",
+    "qti3",
+    "pci",
+    "portable-custom-interaction",
+    "tspci",
+    "written-calculation",
+    "kolomsgewijs",
+    "hapmethode",
+    "chunking",
+    "division",
+    "math"
+  ],
+  "scripts": {
+    "dev": "tspci --dev",
+    "test": "node --no-warnings --test \"test/*.test.ts\"",
+    "preprod": "npm test && npm run test:stories",
+    "prod": "tspci",
+    "watch": "tspci --watch",
+    "package-tao": "tspci --target tao",
+    "package-qti3": "tspci --target qti3",
+    "prepack": "npm run prod && npm run package-tao",
+    "storybook": "cd .. && TSPCI_STORIES=tspci-written-calculation npx storybook dev -p 6006",
+    "test:stories": "cd .. && TSPCI_STORIES=tspci-written-calculation npx vitest run --project=storybook"
+  },
+  "config": {
+    "tspci": {
+      "typeIdentifier": "writtenCalculation",
+      "label": "Written calculation",
+      "tags": [
+        "math",
+        "arithmetic",
+        "division",
+        "addition",
+        "subtraction"
+      ],
+      "short": "writtenCalculation",
+      "scoring": [
+        "custom",
+        "match_correct",
+        "human"
+      ],
+      "correctResponse": "properties",
+      "response": {
+        "cardinality": "record",
+        "fields": {
+          "answer": {
+            "baseType": "float",
+            "tolerance": "range",
+            "label": {
+              "en": "Answer",
+              "nl": "Antwoord"
+            }
+          },
+          "remainder": {
+            "baseType": "integer",
+            "label": {
+              "en": "Remainder",
+              "nl": "Rest"
+            },
+            "when": {
+              "mode": [
+                "chunking"
+              ]
+            }
+          },
+          "working": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The working is correct",
+              "nl": "De uitwerking klopt"
+            }
+          },
+          "answerCorrect": {
+            "baseType": "boolean",
+            "label": {
+              "en": "The answer is correct",
+              "nl": "Het antwoord is goed"
+            }
+          }
+        }
+      }
+    }
+  }
+}
