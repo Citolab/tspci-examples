@@ -10,3 +10,4 @@ ci-dist/
 storybook-static/
 __screenshots__/
 .firebase/
+.claude/
