@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-grid-area",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "area and perimeter on squared paper (oppervlakte en omtrek op ruitjespapier): draw a shape with a given area or perimeter, measure the author's shape, or compare two shapes; whole and half squares, checked by rules; and cover a floor (een kamer stofferen): the area, strips of carpet off a roll, and the bill",
   "author": {
     "name": "Citolab",

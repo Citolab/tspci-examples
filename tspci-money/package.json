@@ -1,6 +1,6 @@
 {
   "name": "@citolab/pci-money",
-  "version": "1.0.0-alpha.1",
+  "version": "1.0.0-alpha.2",
   "description": "money (rekenen met geld): pay an amount exactly or in as few coins and notes as possible, give change, count the money on a counter, or work a cash register (ring up the shopping, take the payment, give the change), with stylised coins and notes in euro, dollar, pound or a currency of the author's",
   "author": {
     "name": "Citolab",
