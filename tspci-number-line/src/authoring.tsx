@@ -1,14 +1,21 @@
 import { useState } from "preact/hooks";
 import { NumberLine, View, colorOf } from "./board";
+import { EmptyLine } from "./emptyLine";
+import { DoubleLine } from "./doubleLine";
 import {
-  Answer, Format, MAX_ITEMS, Settings, Task, emptyAnswer, formatNumber, lineProblems, parseLine, parseNumber, responseProcessingXml,
-  snapTo, snapStep, taskProblems,
+  Answer, DoubleLook, DoubleTask, DoubleWork, EmptyWork, Format, MAX_ITEMS, Settings, Task, doubleAuthorWork, doubleTaskFrom, emptyAnswer,
+  emptySolution, emptyTaskFrom, formatNumber, lineProblems, parseAmount, parseLine, parseNumber, responseProcessingXml, snapTo, snapStep,
+  taskProblems,
 } from "./numberline";
 import { textsFor } from "./texts";
 
 // The authoring mode (index.tsx getAuthoringInstance): the author sets up the line (range, ticks, numbers, which
 // numbers are hidden: click them on the line) and places the correct answer on the same line the candidate gets. The
-// result is the line's data- attributes and data-task (numberline.ts); it also shows the response processing.
+// result is the line's data- attributes and data-task (numberline.ts); it also shows the response processing. On the
+// empty number line (data-mode="empty") the author works out the sum as a candidate would: the start, the jumps and
+// the answer become data-task's "empty". On the double number line (data-mode="double") the author names the scales,
+// puts the marks on the strip (ticking the given ones), works out the question on it and writes the answer: data-task's
+// "double".
 
 export type Authored = {
   /** The line as the author typed it ("1/4", "-3"). */
@@ -23,7 +30,7 @@ const lineOf = (a: Authored) => parseLine({ ...a.raw, numberFormat: a.format, hi
 /** What keeps the configuration from being used (getAuthoringInstance validate()), in the author's language. */
 export const authoringProblems = (a: Authored, s: Settings, language: string) => {
   const t = textsFor(language);
-  const line = lineProblems(a.raw);
+  const line = s.mode === "empty" || s.mode === "double" ? [] : lineProblems(a.raw); // the empty and the double line have no range or ticks
   const problems = line.length ? line : taskProblems(s.mode, lineOf(a), a.task, s.snap);
   return problems.map(t.problem);
 };
@@ -62,6 +69,32 @@ const Authoring = ({ initial, settings, language, onChange }: {
     onChange(merged);
   };
   const setTask = (change: Partial<Task>) => commit({ task: { ...a.task, ...change } });
+  // the empty line as the author writes it (texts, so "0," can be typed); data-task gets its numbers
+  const [work, setWork] = useState<EmptyWork>(() => emptySolution(a.task, a.task.empty.answer, language));
+  const onWork = (next: EmptyWork) => {
+    setWork(next);
+    setTask({ empty: emptyTaskFrom(next, a.task.empty.givenStart) });
+  };
+  // the double line: every mark on the author's strip (the given ones flagged), as texts; data-task gets the numbers
+  const [strip, setStrip] = useState<DoubleWork>(() => doubleAuthorWork(a.task, language));
+  const setDouble = (change: Partial<DoubleTask>) => setTask({ double: { ...a.task.double, ...change } });
+  const onStrip = (next: DoubleWork) => {
+    setStrip(next);
+    setDouble(doubleTaskFrom(next, a.task.double));
+  };
+  const q = a.task.double.question;
+  const [ask, setAsk] = useState<"top" | "bottom">(q.top === null && q.bottom !== null ? "top" : "bottom");
+  const [questionText, setQuestionText] = useState(() => {
+    const v = q.top ?? q.bottom;
+    return v === null ? "" : formatNumber(v, "decimal", language);
+  });
+  const setQuestion = (side: "top" | "bottom", text: string) => {
+    setAsk(side);
+    setQuestionText(text);
+    const v = parseAmount(text);
+    // ? below: the number above is given, and the other way round
+    setDouble({ question: side === "bottom" ? { top: v, bottom: null } : { top: null, bottom: v } });
+  };
   const line = lineOf(a);
   const problems = authoringProblems(a, settings, language);
   const view: View = {
@@ -96,12 +129,40 @@ const Authoring = ({ initial, settings, language, onChange }: {
       </p>
       <div class="flex flex-wrap items-start gap-4">
         <div class="flex min-w-0 flex-col gap-2">
-          <p class="m-0 max-w-[80ch] text-xs text-slate-500">{t.answerHint[mode]} {t.hiddenHint}</p>
-          <NumberLine view={view} answer={answerOf(a.task)} onChange={onAnswer} />
+          <p class="m-0 max-w-[80ch] text-xs text-slate-500">{t.answerHint[mode]} {mode !== "empty" && mode !== "double" && t.hiddenHint}</p>
+          {mode === "double" ? (
+            <DoubleLine view={{ ...view, readOnly: false, task: { ...a.task, double: { ...a.task.double, given: [] } } }}
+              answer={{ ...answerOf(a.task), double: strip }} onChange={(next) => onStrip(next.double)} />
+          ) : mode === "empty" ? (
+            <EmptyLine view={{ ...view, readOnly: false, task: { ...a.task, empty: { ...a.task.empty, givenStart: false } } }}
+              answer={{ ...answerOf(a.task), empty: work }} onChange={(next) => onWork(next.empty)} />
+          ) : (
+            <NumberLine view={view} answer={answerOf(a.task)} onChange={onAnswer} />
+          )}
         </div>
 
         <div class="flex min-w-[300px] flex-1 flex-col gap-3">
-          <fieldset class={box}>
+          {mode === "double" && (
+            <fieldset class={box}>
+              <legend class={legend}>{t.doubleScales}</legend>
+              {(["topLabel", "bottomLabel"] as const).map((key) => (
+                <label class="flex items-center justify-between gap-3 text-sm">
+                  <span class="text-slate-600">{key === "topLabel" ? t.doubleTopLabel : t.doubleBottomLabel}</span>
+                  <input value={a.task.double[key]} maxLength={40} class={`${field} w-32`} data-testid={`double-${key}`}
+                    onInput={(e) => setDouble({ [key]: (e.target as HTMLInputElement).value })} />
+                </label>
+              ))}
+              <p class="m-0 text-xs text-slate-500">{t.doubleLabelHint}</p>
+              <label class="flex items-center justify-between gap-3 text-sm">
+                <span class="text-slate-600">{t.doubleLook}</span>
+                <select class={field} value={a.task.double.look} data-testid="double-look" onChange={(e) => setDouble({ look: (e.target as HTMLSelectElement).value as DoubleLook })}>
+                  {(["strip", "line"] as DoubleLook[]).map((look) => <option value={look}>{t.doubleLooks[look]}</option>)}
+                </select>
+              </label>
+            </fieldset>
+          )}
+
+          {mode !== "empty" && mode !== "double" && <fieldset class={box}>
             <legend class={legend}>{t.tabLine}</legend>
             {raw("min", t.min)}
             {raw("max", t.max)}
@@ -114,7 +175,7 @@ const Authoring = ({ initial, settings, language, onChange }: {
               </select>
             </label>
             <p class="m-0 text-xs text-slate-500" data-testid="hidden">{t.hidden}: {a.hidden.length ? a.hidden.map(fmt).join("; ") : "–"}</p>
-          </fieldset>
+          </fieldset>}
 
           <fieldset class={box}>
             <legend class={legend}>{t.tabAnswer}</legend>
@@ -137,7 +198,7 @@ const Authoring = ({ initial, settings, language, onChange }: {
               </>
             )}
             {mode === "jumps" && (
-              <label class="flex items-center gap-2">
+              <label class="flex min-h-6 items-center gap-2">
                 <input type="checkbox" checked={a.task.jumps.givenStart} class="accent-amber-600"
                   onChange={() => setTask({ jumps: { ...a.task.jumps, givenStart: !a.task.jumps.givenStart } })} />
                 {t.givenStart}
@@ -173,6 +234,55 @@ const Authoring = ({ initial, settings, language, onChange }: {
               </>
             )}
             {mode === "interval" && <p class="m-0 text-xs text-slate-500">{t.answerHint.interval}</p>}
+            {mode === "double" && (
+              <>
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="text-slate-600">{t.doubleQuestion}</span>
+                  <select class={field} value={ask} data-testid="double-ask" aria-label={t.doubleQuestion}
+                    onChange={(e) => setQuestion((e.target as HTMLSelectElement).value as "top" | "bottom", questionText)}>
+                    <option value="bottom">{t.doubleAsk.bottom}</option>
+                    <option value="top">{t.doubleAsk.top}</option>
+                  </select>
+                  <input value={questionText} class={`${field} w-20 text-right`} data-testid="double-question" aria-label={t.doubleQuestionValue}
+                    onInput={(e) => setQuestion(ask, (e.target as HTMLInputElement).value)} />
+                </div>
+                <div class="flex flex-col gap-1" role="group" aria-label={t.doubleMarks}>
+                  <span class="text-xs font-semibold text-slate-500">{t.doubleMarks}</span>
+                  {!strip.marks.length && <span class="text-xs text-slate-500">{t.doubleNoMarks}</span>}
+                  {strip.marks
+                    .map((m, i) => ({ m, i }))
+                    .sort((x, y) => x.m.at - y.m.at)
+                    .map(({ m, i }) => {
+                      const pair = `${m.top.trim() || "?"} ${a.task.double.topLabel} ↔ ${m.bottom.trim() || "?"} ${a.task.double.bottomLabel}`.replace(/\s+/g, " ");
+                      return (
+                        <label class="flex min-h-6 items-center gap-2 tabular-nums" data-testid={`double-given-${i}`}>
+                          <input type="checkbox" checked={!!m.given} class="accent-amber-600" aria-label={t.doubleGivenName(pair)}
+                            onChange={() => onStrip({ ...strip, marks: strip.marks.map((x, k) => (k === i ? { ...x, given: !x.given } : x)) })} />
+                          <span class="min-w-[9ch]">{pair}</span>
+                          <span class="text-xs text-slate-500">{t.doubleGiven}</span>
+                        </label>
+                      );
+                    })}
+                </div>
+                <p class="m-0" data-testid="double-correct">
+                  {t.emptyCorrect}: <strong class="tabular-nums">{a.task.double.answer === null ? "–" : formatNumber(a.task.double.answer, "decimal", language)}</strong>
+                </p>
+                <p class="m-0 text-xs text-slate-500">{t.doubleAuthorHint}</p>
+              </>
+            )}
+            {mode === "empty" && (
+              <>
+                <label class="flex min-h-6 items-center gap-2">
+                  <input type="checkbox" checked={a.task.empty.givenStart} class="accent-amber-600" data-testid="empty-given-start"
+                    onChange={() => setTask({ empty: { ...a.task.empty, givenStart: !a.task.empty.givenStart } })} />
+                  {t.emptyGivenStart}
+                </label>
+                <p class="m-0" data-testid="empty-correct">
+                  {t.emptyCorrect}: <strong class="tabular-nums">{a.task.empty.answer === null ? "–" : formatNumber(a.task.empty.answer, "decimal", language)}</strong>
+                </p>
+                <p class="m-0 text-xs text-slate-500">{t.emptyAuthorHint}</p>
+              </>
+            )}
           </fieldset>
 
           <fieldset class={box}>

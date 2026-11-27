@@ -1,7 +1,7 @@
 {
   "name": "@citolab/pci-number-line",
   "version": "1.0.0-alpha.1",
-  "description": "a number line (getallenlijn): place points, mark an interval, draw jumps for addition and subtraction, or read off values; integers, decimals, fractions and negatives",
+  "description": "a number line (getallenlijn): place points, mark an interval, draw jumps for addition and subtraction, or read off values; integers, decimals, fractions and negatives; an empty number line and a double number line (procentenstrook)",
   "author": {
     "name": "Citolab",
     "url": "https://github.com/Citolab"
@@ -19,7 +19,10 @@
     "getallenlijn",
     "math",
     "arithmetic",
-    "fractions"
+    "fractions",
+    "double-number-line",
+    "procentenstrook",
+    "percentages"
   ],
   "publishConfig": {
     "access": "public"
@@ -71,7 +74,10 @@
         "math",
         "number line",
         "arithmetic",
-        "fractions"
+        "fractions",
+        "empty number line",
+        "double number line",
+        "percentages"
       ],
       "scoring": [
         "match_correct",
@@ -84,7 +90,7 @@
         "cardinality": "ordered",
         "baseType": "float",
         "tolerance": "range",
-        "$comment": "points: one float per point, in the order of data-task; read: one float per value to read off; jumps: the start and every landing; reported once complete. Interval mode: a single string, [-2,inf) (declare cardinality single, base-type string). data-scoring=\"pci\": a record with score, maxscore, correct, check1…check8 and answer (README)"
+        "$comment": "points: one float per point, in the order of data-task; read: one float per value to read off; jumps: the start and every landing; reported once complete. Interval mode: a single string, [-2,inf) (declare cardinality single, base-type string). data-scoring=\"pci\": a record with score, maxscore, correct, check1…check8 and answer (README). Empty number line (mode empty): always a record with answer (float), working and answerCorrect (boolean), once the answer is a number (README). Double number line (mode double): the same record (README)"
       },
       "authoring": {
         "label": {

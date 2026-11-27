@@ -51,7 +51,49 @@ const dragLine = async (root: Root, from: number, to: number) => {
 };
 const slider = (canvas: Canvas, name: string | RegExp) => canvas.getByRole("slider", { name });
 
+/** The number line to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+/** Placing points (the default is the empty number line, so the other modes give it in their settings). */
+const POINTS = { mode: "points" };
+
+export const ToTry: Story = {
+  name: "Place points, to try",
+  args: { properties: POINTS },
+};
+
+/** The picture in the README (example.png): the empty number line of the example, worked out via 50. */
+export const Example: Story = {
+  name: "Example (example.png)",
+  args: {
+    state: JSON.stringify({
+      state: {
+        answer: {
+          points: [], interval: null, start: null, landings: [], read: [],
+          empty: { start: "", jumps: [{ sign: "+", size: "3", landing: "50" }, { sign: "+", size: "30", landing: "80" }, { sign: "+", size: "5", landing: "85" }], answer: "85" },
+        },
+      },
+      log: [],
+    }),
+  },
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    expect(canvas.getByRole("textbox", { name: "Jump 2: how big" })).toHaveValue("30");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("85");
+  },
+};
+
+/** Without settings: the empty number line of the example, 47 + 38 starting at 47. */
 export const Default: Story = {
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getByText("Work out 47 + 38 on the empty number line. Start at 47.")).toBeInTheDocument();
+    expect(canvas.getByRole("textbox", { name: "Start number" })).toHaveValue("47");
+    expect(canvas.getByRole("button", { name: /^Make a jump/ })).toBeInTheDocument();
+    expect(pci.getResponse()).toBeUndefined();
+  },
+};
+
+export const PointsExample: Story = {
+  args: { properties: POINTS },
   play: async ({ canvasElement }) => {
     const { canvas, pci } = await openPci(canvasElement);
     expect(canvas.getByText("Place point A at 2.75 and point B at −1¼ on the number line.")).toBeInTheDocument();
@@ -65,6 +107,7 @@ export const Default: Story = {
 };
 
 export const PlacePoints: Story = {
+  args: { properties: POINTS },
   play: async ({ canvasElement, step }) => {
     const mounted = await openPci(canvasElement);
     const { canvas, pci, root } = mounted;
@@ -95,6 +138,7 @@ export const PlacePoints: Story = {
 };
 
 export const Keyboard: Story = {
+  args: { properties: POINTS },
   play: async ({ canvasElement, step }) => {
     const { canvas, pci, root } = await openPci(canvasElement);
 
@@ -244,7 +288,7 @@ export const ReadOff: Story = {
 };
 
 export const ScoredByThePci: Story = {
-  args: { properties: { scoring: "pci", task: JSON.stringify({ points: [{ label: "P", answer: 0.5 }, { label: "Q", answer: 3 }], tolerance: 0.25 }), prompt: "Place P at ½ and Q at 3." } },
+  args: { properties: { ...POINTS, scoring: "pci", task: JSON.stringify({ points: [{ label: "P", answer: 0.5 }, { label: "Q", answer: 3 }], tolerance: 0.25 }), prompt: "Place P at ½ and Q at 3." } },
   play: async ({ canvasElement }) => {
     const mounted = await openPci(canvasElement);
     const { canvas, root } = mounted;
@@ -262,7 +306,7 @@ export const ScoredByThePci: Story = {
 };
 
 export const DecimalsAndHiddenNumbers: Story = {
-  args: { properties: { min: "0", max: "2", tickStep: "0.1", labelStep: "0.5", numberFormat: "decimal", hiddenLabels: "1", snap: "half", prompt: "Place A at 1.35.", task: JSON.stringify({ points: [{ label: "A", answer: 1.35 }] }) } },
+  args: { properties: { ...POINTS, min: "0", max: "2", tickStep: "0.1", labelStep: "0.5", numberFormat: "decimal", hiddenLabels: "1", snap: "half", prompt: "Place A at 1.35.", task: JSON.stringify({ points: [{ label: "A", answer: 1.35 }] }) } },
   play: async ({ canvasElement }) => {
     const { canvas, pci, root } = await openPci(canvasElement);
     // 0, 0.5, 1.5 and 2 are labelled; 1 is hidden
@@ -300,7 +344,7 @@ export const Vertical: Story = {
 };
 
 export const Dutch: Story = {
-  args: { properties: { language: "nl", numberFormat: "decimal" } },
+  args: { properties: { ...POINTS, language: "nl", numberFormat: "decimal" } },
   play: async ({ canvasElement }) => {
     const { canvas, pci, root } = await openPci(canvasElement);
     expect(canvas.getByText("Zet punt A bij 2,75 en punt B bij −1¼ op de getallenlijn.")).toBeInTheDocument();
@@ -332,7 +376,7 @@ export const RestoresState: Story = {
 };
 
 export const BoundResponse: Story = {
-  args: { boundTo: { RESPONSE: { list: { float: [2.75, -1.25] } } } },
+  args: { properties: POINTS, boundTo: { RESPONSE: { list: { float: [2.75, -1.25] } } } },
   play: async ({ canvasElement, step }) => {
     const { canvas, pci } = await openPci(canvasElement);
     await step("the bound response is on the line", async () => {
@@ -362,7 +406,7 @@ export const Solution: Story = {
 };
 
 export const SolutionFromTheDeclaration: Story = {
-  args: { status: "solution", responseDeclaration: { cardinality: "ordered", baseType: "float", correctResponse: { value: ["-2", "5"] } } },
+  args: { status: "solution", properties: POINTS, responseDeclaration: { cardinality: "ordered", baseType: "float", correctResponse: { value: ["-2", "5"] } } },
   play: async ({ canvasElement }) => {
     const { canvas } = await openPci(canvasElement);
     await waitFor(() => expect(slider(canvas, "Point A")).toHaveAttribute("aria-valuenow", "-2"));
@@ -372,6 +416,7 @@ export const SolutionFromTheDeclaration: Story = {
 
 /** Two interactions of this type on one page: each has its own line and response. */
 export const TwoInstances: Story = {
+  args: { properties: POINTS },
   render: (args) => {
     const page = document.createElement("div");
     for (const id of ["first", "second"]) {
@@ -402,7 +447,7 @@ export const TwoInstances: Story = {
 /** The authoring mode, as an authoring system shows it after "Set up the number line…". */
 export const AuthoringMode: StoryObj<AuthoringArgs> = {
   render: (args) => mountAuthoring(pci, args),
-  args: { language: "en" },
+  args: { language: "en", properties: POINTS },
   play: async ({ canvasElement, step }) => {
     const { instance, canvas, root, changes } = await openAuthoring(canvasElement);
     const task = () => JSON.parse(instance.getProperties().task);
@@ -457,5 +502,445 @@ export const AuthoringJumpsInDutch: StoryObj<AuthoringArgs> = {
     expect(instance.validate()).toEqual([]);
     await userEvent.click(canvas.getByRole("checkbox", { name: /Het begin is gegeven/ }));
     expect(JSON.parse(instance.getProperties().task).jumps.givenStart).toBe(false);
+  },
+};
+
+// --- The empty number line (data-mode="empty"): the candidate's own jumps and numbers, checked as a working
+
+const EMPTY = { mode: "empty" };
+/** The record of the empty line as { answer, working, answerCorrect }. */
+const emptyRecord = (response: unknown) => {
+  const record = (response as { record?: { name: string; base: Record<string, unknown> }[] })?.record;
+  return record ? Object.fromEntries(record.map((f) => [f.name, Object.values(f.base)[0]])) : undefined;
+};
+/** The line of the empty number line: a button that opens the choice forward or back. */
+const emptyLineButton = (canvas: Canvas) => canvas.getByRole("button", { name: /^(Make a jump|Een sprong maken)/ });
+/**
+ * Makes a jump on the empty line: a click on the line, the choice forward or back, then its size and where it lands.
+ * (Typed into the boxes themselves: userEvent.keyboard types at document.activeElement, which is the host of the
+ * shadow root.)
+ */
+const jump = async (canvas: Canvas, sign: "+" | "-", size: string, landing: string) => {
+  const n = canvas.queryAllByRole("textbox", { name: /: (how big|hoe groot)$/ }).length + 1;
+  await userEvent.click(emptyLineButton(canvas));
+  await userEvent.click(canvas.getByRole("button", { name: sign === "+" ? /Jump forward|Sprong vooruit/ : /Jump back|Sprong terug/ }));
+  await userEvent.type(canvas.getByRole("textbox", { name: new RegExp(`^(Jump|Sprong) ${n}: (how big|hoe groot)$`) }), size);
+  await userEvent.type(canvas.getByRole("textbox", { name: new RegExp(`^(Jump|Sprong) ${n}: (lands on|kom je uit op)$`) }), landing);
+};
+
+/** The empty number line to try out yourself (no test runs on it): with a mouse, a touchscreen or the keyboard. */
+export const EmptyNumberLineToTry: Story = {
+  name: "Empty number line, to try",
+  args: { properties: EMPTY },
+};
+
+export const EmptyNumberLine: Story = {
+  args: { properties: EMPTY },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+
+    await step("the example: 47 + 38, starting at 47 (given), no ticks and no numbers", async () => {
+      expect(canvas.getByText("Work out 47 + 38 on the empty number line. Start at 47.")).toBeInTheDocument();
+      expect(canvas.getByRole("textbox", { name: "Start number" })).toHaveValue("47");
+      expect(canvas.getByRole("textbox", { name: "Start number" })).toHaveAttribute("readonly");
+      expect(pci.getResponse()).toBeUndefined();
+    });
+
+    await step("a click on the line opens the choice forward or back", async () => {
+      // no buttons under the line: the line itself is the button
+      expect(canvas.queryByRole("button", { name: "Jump forward" })).toBeNull();
+      // the pointer over the line shows a faint jump from where you are
+      const line = emptyLineButton(canvas);
+      line.dispatchEvent(new PointerEvent("pointermove", { bubbles: true, composed: true, clientX: line.getBoundingClientRect().left + 400, clientY: line.getBoundingClientRect().top + 10 }));
+      await waitFor(() => expect(mounted.root.querySelector("[data-testid=empty-ghost]")).not.toBeNull());
+      line.dispatchEvent(new PointerEvent("pointerleave", { bubbles: false, composed: true }));
+      await waitFor(() => expect(mounted.root.querySelector("[data-testid=empty-ghost]")).toBeNull());
+      // the choice opens with the focus on "Jump forward"; Escape closes it and gives the focus back to the line
+      await userEvent.click(line);
+      expect(line).toHaveAttribute("aria-expanded", "true");
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(canvas.getByRole("button", { name: "Jump forward" })));
+      canvas.getByRole("button", { name: "Jump forward" }).dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, composed: true }));
+      await waitFor(() => expect(canvas.queryByRole("group", { name: "Which way?" })).toBeNull());
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(emptyLineButton(canvas)));
+      // a tap or click anywhere else closes it too
+      await userEvent.click(line);
+      expect(canvas.getByRole("group", { name: "Which way?" })).toBeInTheDocument();
+      await userEvent.click(canvas.getByText("Work out 47 + 38 on the empty number line. Start at 47."));
+      await waitFor(() => expect(canvas.queryByRole("group", { name: "Which way?" })).toBeNull());
+      // a choice makes the jump, and the focus goes to its size
+      await userEvent.click(line);
+      await userEvent.click(canvas.getByRole("button", { name: "Jump forward" }));
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(canvas.getByRole("textbox", { name: "Jump 1: how big" })));
+      expect(mounted.root.querySelector("[data-testid=empty-arc-0]")).toHaveAttribute("data-direction", "forward");
+      await userEvent.click(canvas.getByRole("button", { name: "Remove jump 1" }));
+      expect(mounted.root.querySelector("[data-testid=empty-arc-0]")).toBeNull();
+    });
+
+    await step("jumps via the next ten, written as on paper", async () => {
+      await jump(canvas, "+", "3", "50");
+      expect(canvas.getByRole("textbox", { name: "Jump 1: how big" })).toHaveValue("3");
+      expect(canvas.getByRole("textbox", { name: "Jump 1: lands on" })).toHaveValue("50");
+      await jump(canvas, "+", "30", "80");
+      await jump(canvas, "+", "5", "85");
+      expect(mounted.root.querySelectorAll("[data-testid^=empty-arc-][data-direction=forward]")).toHaveLength(3);
+      // no answer yet: nothing to report
+      expect(pci.getResponse()).toBeUndefined();
+    });
+
+    await step("the answer: right, with a correct working", async () => {
+      await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "85");
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 85, working: true, answerCorrect: true });
+      expect(emptyRecord(await lastChange(mounted))).toEqual({ answer: 85, working: true, answerCorrect: true });
+    });
+
+    await step("a jump that does not land where it says: the working is wrong", async () => {
+      await retype(canvas.getByRole("textbox", { name: "Jump 2: lands on" }), "70");
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 85, working: false, answerCorrect: true });
+      await retype(canvas.getByRole("textbox", { name: "Jump 2: lands on" }), "80");
+    });
+
+    await step("a jump turned around, and taken away", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Jump 3: forward (+). Turn it around" }));
+      expect(mounted.root.querySelector("[data-testid=empty-arc-2]")).toHaveAttribute("data-direction", "back");
+      expect(emptyRecord(pci.getResponse())?.working).toBe(false); // 80 − 5 is not 85
+      await userEvent.click(canvas.getByRole("button", { name: "Remove jump 3" }));
+      expect(canvas.queryByRole("textbox", { name: "Jump 3: how big" })).toBeNull();
+      await waitFor(() => expect(focusedIn(mounted.root)).toBe(emptyLineButton(canvas)));
+      // 47 +3 50 +30 80, and the answer 85 does not follow from it
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 85, working: false, answerCorrect: true });
+    });
+  },
+};
+
+/** Subtraction by filling up (aanvullen): from 48 to 63; the answer is all the jumps together. */
+export const EmptyNumberLineFillingUp: Story = {
+  args: {
+    properties: { ...EMPTY, language: "nl", prompt: "Hoeveel is 63 − 48? Vul aan vanaf 48.", task: JSON.stringify({ empty: { givenStart: true, start: 48, answer: 15 } }) },
+  },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    expect(canvas.getByRole("textbox", { name: "Begingetal" })).toHaveValue("48");
+    await jump(canvas, "+", "2", "50");
+    await jump(canvas, "+", "10", "60");
+    await jump(canvas, "+", "3", "63");
+    await userEvent.type(canvas.getByRole("textbox", { name: "Antwoord" }), "15");
+    expect(emptyRecord(pci.getResponse())).toEqual({ answer: 15, working: true, answerCorrect: true });
+  },
+};
+
+/** Jumping too far and back (83 − 29 as −30 +1), with the candidate's own start. */
+export const EmptyNumberLineJumpBack: Story = {
+  args: { properties: { ...EMPTY, prompt: "Work out 83 − 29 on the empty number line.", task: JSON.stringify({ empty: { givenStart: false, answer: 54 } }) } },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci } = mounted;
+    const start = canvas.getByRole("textbox", { name: "Start number" });
+    expect(start).not.toHaveAttribute("readonly");
+    await userEvent.type(start, "83");
+    await jump(canvas, "-", "30", "53");
+    await jump(canvas, "+", "1", "54");
+    expect(mounted.root.querySelector("[data-testid=empty-arc-0]")).toHaveAttribute("data-direction", "back");
+    await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "54");
+    expect(emptyRecord(pci.getResponse())).toEqual({ answer: 54, working: true, answerCorrect: true });
+    // letters cannot be typed; a number that is not one is a warning
+    await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "x");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("54");
+    await retype(canvas.getByRole("textbox", { name: "Jump 1: how big" }), "3,0,");
+    expect(canvas.getByTestId("invalid")).toBeInTheDocument();
+  },
+};
+
+export const EmptyNumberLineRestores: Story = {
+  args: { properties: EMPTY },
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement);
+    await jump(first.canvas, "+", "38", "85");
+    await userEvent.type(first.canvas.getByRole("textbox", { name: "Answer" }), "85");
+    const state = first.pci.getState();
+    const second = await remountPci(canvasElement, pci, { properties: EMPTY, state });
+    expect(second.canvas.getByRole("textbox", { name: "Jump 1: how big" })).toHaveValue("38");
+    expect(second.canvas.getByRole("textbox", { name: "Jump 1: lands on" })).toHaveValue("85");
+    expect(emptyRecord(second.pci.getResponse())).toEqual({ answer: 85, working: true, answerCorrect: true });
+  },
+};
+
+/** Review: the author's own working and the correct answer, read-only. */
+export const EmptyNumberLineSolution: Story = {
+  args: { properties: EMPTY, status: "solution" },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getByRole("textbox", { name: "Jump 2: how big" })).toHaveValue("30");
+    expect(canvas.getByRole("textbox", { name: "Jump 3: lands on" })).toHaveValue("85");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("85");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveAttribute("readonly");
+    expect(canvas.queryByRole("button", { name: /^Make a jump/ })).toBeNull();
+    expect(canvas.queryByRole("button", { name: "Remove jump 1" })).toBeNull();
+    expect(pci.getCorrectResponse!({ mode: "empty" } as never)).toEqual({
+      record: [{ name: "answer", base: { float: 85 } }, { name: "working", base: { boolean: true } }, { name: "answerCorrect", base: { boolean: true } }],
+    });
+  },
+};
+
+/** A response handed back (boundTo): the answer goes in the answer box. */
+export const EmptyNumberLineBoundResponse: Story = {
+  args: { properties: EMPTY, boundTo: { RESPONSE: { record: [{ name: "answer", base: { float: 85 } }, { name: "working", base: { boolean: false } }] } } },
+  play: async ({ canvasElement }) => {
+    const { canvas } = await openPci(canvasElement);
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("85");
+  },
+};
+
+export const AuthoringEmptyNumberLine: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { mode: "empty", task: JSON.stringify({ empty: { givenStart: true } }) } },
+  play: async ({ canvasElement, step }) => {
+    const { instance, canvas } = await openAuthoring(canvasElement);
+    const task = () => JSON.parse(instance.getProperties().task).empty;
+
+    await step("no line settings; the author works out the sum", async () => {
+      expect(canvas.queryByTestId("raw-min")).toBeNull();
+      expect(instance.validate()).toEqual(["Write the start number on the line, or let the candidate write it.", "Write the correct answer under the line."]);
+      await userEvent.type(canvas.getByRole("textbox", { name: "Start number" }), "63");
+      await jump(canvas, "-", "40", "23");
+      await jump(canvas, "-", "8", "15");
+      await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "15");
+      expect(task()).toEqual({ givenStart: true, start: 63, jumps: [{ size: -40, landing: 23 }, { size: -8, landing: 15 }], answer: 15 });
+      expect(instance.validate()).toEqual([]);
+      expect(canvas.getByTestId("empty-correct").textContent).toBe("Correct answer: 15");
+      expect(canvas.getByTestId("xml").textContent).toContain('<qti-field-value field-identifier="working">');
+    });
+
+    await step("the start can be the candidate's", async () => {
+      await userEvent.click(canvas.getByTestId("empty-given-start"));
+      expect(task().givenStart).toBe(false);
+    });
+  },
+};
+
+// --- The double number line (data-mode="double"): two scales on one strip, the candidate's own marks, checked as a working
+
+const DOUBLE = { mode: "double" };
+/** A click on the strip at a place (0: the left end, 1: the right end). */
+const clickStrip = async (root: Root, at: number) => {
+  const hit = root.querySelector<HTMLElement>("[data-testid=double-hit]")!;
+  const r = hit.getBoundingClientRect();
+  hit.dispatchEvent(new MouseEvent("click", { bubbles: true, composed: true, clientX: r.left + at * r.width, clientY: r.top + r.height / 2 }));
+  await afterPaint();
+};
+/** A key on an element in the shadow root (userEvent.keyboard types at the host). */
+const press = async (el: HTMLElement, key: string, shiftKey = false) => {
+  el.dispatchEvent(new KeyboardEvent("keydown", { key, shiftKey, bubbles: true, composed: true, cancelable: true }));
+  await afterPaint();
+};
+/** The numbers above and below mark n, typed into its boxes. */
+const pair = async (canvas: Canvas, n: number, top: string, bottom: string) => {
+  await userEvent.type(canvas.getByRole("textbox", { name: new RegExp(`^(Mark|Streepje) ${n}: (number above|getal boven)`) }), top);
+  await userEvent.type(canvas.getByRole("textbox", { name: new RegExp(`^(Mark|Streepje) ${n}: (number below|getal onder)`) }), bottom);
+};
+
+export const DoubleNumberLine: Story = {
+  args: { properties: DOUBLE },
+  play: async ({ canvasElement, step }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci, root } = mounted;
+
+    await step("the example: a percentage strip from 0 % ↔ € 0 to 100 % ↔ € 80, given and locked", async () => {
+      expect(canvas.getByText(/^A coat costs €80\. You get 25% off\./)).toBeInTheDocument();
+      expect(root.querySelector("[data-testid=double-line]")).toHaveAttribute("data-look", "strip");
+      expect(canvas.getByRole("textbox", { name: "Given 2: number above (%)" })).toHaveValue("100");
+      expect(canvas.getByRole("textbox", { name: "Given 2: number below (€)" })).toHaveValue("80");
+      expect(canvas.getByRole("textbox", { name: "Given 2: number below (€)" })).toHaveAttribute("readonly");
+      expect(canvas.queryAllByRole("slider")).toHaveLength(0);
+      expect(pci.getResponse()).toBeUndefined();
+    });
+
+    await step("halve, and halve again: a mark in the middle of the free stretch, the focus on its number above", async () => {
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      await waitFor(() => expect(focusedIn(root)).toBe(canvas.getByRole("textbox", { name: "Mark 1: number above (%)" })));
+      expect(slider(canvas, "Mark 1: place on the strip")).toHaveAttribute("aria-valuenow", "50");
+      expect(canvas.getByRole("status")).toHaveTextContent("Mark 1 added");
+      await pair(canvas, 1, "50", "40");
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      expect(slider(canvas, "Mark 2: place on the strip")).toHaveAttribute("aria-valuenow", "25");
+      expect(root.querySelector("[data-testid=double-shade]")).toBeNull();
+      await pair(canvas, 2, "25%", "€ 20");
+      // shaded up to the question's 25 %
+      expect(root.querySelector("[data-testid=double-shade]")).not.toBeNull();
+      expect(slider(canvas, "Mark 2: place on the strip")).toHaveAttribute("aria-valuetext", "25 of 100, between 0 % / 0 € and 50 % / 40 €");
+      // no answer yet: nothing to report
+      expect(pci.getResponse()).toBeUndefined();
+    });
+
+    await step("the answer: right, with a correct working", async () => {
+      await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "20");
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 20, working: true, answerCorrect: true });
+      expect(emptyRecord(await lastChange(mounted))).toEqual({ answer: 20, working: true, answerCorrect: true });
+    });
+
+    await step("a pair out of proportion: the working is wrong", async () => {
+      await retype(canvas.getByRole("textbox", { name: "Mark 2: number below (€)" }), "25");
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 20, working: false, answerCorrect: true });
+      await retype(canvas.getByRole("textbox", { name: "Mark 2: number below (€)" }), "20");
+      expect(emptyRecord(pci.getResponse())?.working).toBe(true);
+    });
+
+    await step("a mark out of order, with the keyboard; and back", async () => {
+      const mark = slider(canvas, "Mark 2: place on the strip");
+      await press(mark, "End");
+      expect(mark).toHaveAttribute("aria-valuenow", "100");
+      expect(emptyRecord(pci.getResponse())?.working).toBe(false); // 25 % to the right of 50 %
+      await press(mark, "Home");
+      await press(mark, "ArrowRight", true);
+      await press(mark, "ArrowRight", true);
+      await press(mark, "ArrowRight");
+      expect(mark).toHaveAttribute("aria-valuenow", "21");
+      expect(emptyRecord(pci.getResponse())?.working).toBe(true);
+    });
+
+    await step("Delete takes a mark away; the answer no longer follows", async () => {
+      await press(slider(canvas, "Mark 2: place on the strip"), "Delete");
+      expect(canvas.queryByRole("slider", { name: "Mark 2: place on the strip" })).toBeNull();
+      await waitFor(() => expect(focusedIn(root)).toBe(canvas.getByRole("button", { name: "Add a mark" })));
+      expect(emptyRecord(pci.getResponse())).toEqual({ answer: 20, working: false, answerCorrect: true });
+    });
+  },
+};
+
+/** Two quantities in proportion on a plain double number line, with the pointer and the candidate's own route; in Dutch. */
+export const DoubleNumberLineOwnRoute: Story = {
+  args: {
+    properties: {
+      ...DOUBLE, language: "nl", prompt: "Een fietser rijdt 12 km in 40 minuten. Hoeveel km rijdt hij in een uur?",
+      task: JSON.stringify({ double: { topLabel: "km", bottomLabel: "min", look: "line", given: [{ top: 0, bottom: 0 }, { top: 12, bottom: 40 }], question: { bottom: 60 }, answer: 18 } }),
+    },
+  },
+  play: async ({ canvasElement }) => {
+    const mounted = await openPci(canvasElement);
+    const { canvas, pci, root } = mounted;
+    expect(root.querySelector("[data-testid=double-line]")).toHaveAttribute("data-look", "line");
+    expect(canvas.getByTestId("double-top-label")).toHaveTextContent("km");
+    // a click on the line puts a mark there
+    await clickStrip(root, 0.33);
+    expect(slider(canvas, "Streepje 1: plaats op de strook")).toHaveAttribute("aria-valuenow", "33");
+    await pair(canvas, 1, "6", "20");
+    await clickStrip(root, 0.97);
+    await pair(canvas, 2, "18", "60");
+    await userEvent.type(canvas.getByRole("textbox", { name: "Antwoord" }), "18");
+    expect(emptyRecord(pci.getResponse())).toEqual({ answer: 18, working: true, answerCorrect: true });
+    // the minutes are not the answer: the question asks for the km above the 60
+    await retype(canvas.getByRole("textbox", { name: "Antwoord" }), "60");
+    expect(emptyRecord(pci.getResponse())).toEqual({ answer: 60, working: false, answerCorrect: false });
+    // letters cannot be typed; a number that is not one is a warning
+    await userEvent.type(canvas.getByRole("textbox", { name: "Antwoord" }), "x");
+    expect(canvas.getByRole("textbox", { name: "Antwoord" })).toHaveValue("60");
+    await retype(canvas.getByRole("textbox", { name: "Streepje 1: getal boven (km)" }), "6,,");
+    expect(canvas.getByTestId("invalid")).toBeInTheDocument();
+  },
+};
+
+export const DoubleNumberLineRestores: Story = {
+  args: { properties: DOUBLE },
+  play: async ({ canvasElement }) => {
+    const first = await openPci(canvasElement);
+    await clickStrip(first.root, 0.3);
+    await pair(first.canvas, 1, "25", "20");
+    await userEvent.type(first.canvas.getByRole("textbox", { name: "Answer" }), "20");
+    const state = first.pci.getState();
+    const second = await remountPci(canvasElement, pci, { properties: DOUBLE, state });
+    expect(second.canvas.getByRole("textbox", { name: "Mark 1: number below (€)" })).toHaveValue("20");
+    expect(slider(second.canvas, "Mark 1: place on the strip")).toHaveAttribute("aria-valuenow", "30");
+    expect(emptyRecord(second.pci.getResponse())).toEqual({ answer: 20, working: true, answerCorrect: true });
+    expect(second.changes).toHaveLength(0);
+  },
+};
+
+/** Review: the author's own working and the correct answer, read-only. */
+export const DoubleNumberLineSolution: Story = {
+  args: { properties: DOUBLE, status: "solution" },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci, root } = await openPci(canvasElement);
+    expect(canvas.getByRole("textbox", { name: "Mark 1: number below (€)" })).toHaveValue("40");
+    expect(canvas.getByRole("textbox", { name: "Mark 2: number above (%)" })).toHaveValue("25");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("20");
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveAttribute("readonly");
+    expect(slider(canvas, "Mark 1: place on the strip")).toHaveAttribute("aria-readonly", "true");
+    expect(canvas.queryByRole("button", { name: "Add a mark" })).toBeNull();
+    expect(root.querySelector("[data-testid=double-shade]")).not.toBeNull();
+    expect(pci.getCorrectResponse!({ mode: "double" } as never)).toEqual({
+      record: [{ name: "answer", base: { float: 20 } }, { name: "working", base: { boolean: true } }, { name: "answerCorrect", base: { boolean: true } }],
+    });
+  },
+};
+
+/** A response handed back (boundTo): the answer goes in the answer box. */
+export const DoubleNumberLineBoundResponse: Story = {
+  args: { properties: DOUBLE, boundTo: { RESPONSE: { record: [{ name: "answer", base: { float: 20 } }, { name: "working", base: { boolean: false } }] } } },
+  play: async ({ canvasElement }) => {
+    const { canvas, pci } = await openPci(canvasElement);
+    expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("20");
+    pci.setResponse({ record: [{ name: "answer", base: { float: 12.5 } }] } as never);
+    await waitFor(() => expect(canvas.getByRole("textbox", { name: "Answer" })).toHaveValue("12.5"));
+  },
+};
+
+export const AuthoringDoubleNumberLine: StoryObj<AuthoringArgs> = {
+  render: (args) => mountAuthoring(pci, args),
+  args: { language: "en", properties: { mode: "double", task: JSON.stringify({ double: {} }) } },
+  play: async ({ canvasElement, step }) => {
+    const { instance, canvas } = await openAuthoring(canvasElement);
+    const task = () => JSON.parse(instance.getProperties().task).double;
+    const handle = (n: number) => canvas.getByRole("slider", { name: `Mark ${n}: place on the strip` });
+
+    await step("no line settings; nothing given yet", async () => {
+      expect(canvas.queryByTestId("raw-min")).toBeNull();
+      expect(instance.validate()).toEqual([
+        'Give at least two pairs: tick "given" at two marks with both numbers written.',
+        "Write the question's number, above or below.",
+        "Write the correct answer under the strip.",
+      ]);
+    });
+
+    await step("the scales and the given pairs at the ends", async () => {
+      await userEvent.type(canvas.getByTestId("double-topLabel"), "%");
+      await userEvent.type(canvas.getByTestId("double-bottomLabel"), "€");
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      await press(handle(1), "Home");
+      await pair(canvas, 1, "0", "0");
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      await press(handle(2), "End");
+      await pair(canvas, 2, "100", "80");
+      await userEvent.click(canvas.getByRole("checkbox", { name: "0 % ↔ 0 €: given (the candidate sees it)" }));
+      await userEvent.click(canvas.getByRole("checkbox", { name: "100 % ↔ 80 €: given (the candidate sees it)" }));
+      expect(task().given).toEqual([{ top: 0, bottom: 0, at: 0 }, { top: 100, bottom: 80, at: 1 }]);
+    });
+
+    await step("the question, the working on the strip and the answer", async () => {
+      await userEvent.type(canvas.getByTestId("double-question"), "25");
+      expect(task().question).toEqual({ top: 25, bottom: null });
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      await pair(canvas, 3, "50", "40");
+      await userEvent.click(canvas.getByRole("button", { name: "Add a mark" }));
+      await pair(canvas, 4, "25", "20");
+      await userEvent.type(canvas.getByRole("textbox", { name: "Answer" }), "20");
+      expect(task()).toEqual({
+        topLabel: "%", bottomLabel: "€", look: "strip", given: [{ top: 0, bottom: 0, at: 0 }, { top: 100, bottom: 80, at: 1 }],
+        question: { top: 25, bottom: null }, marks: [{ top: 50, bottom: 40, at: 0.5 }, { top: 25, bottom: 20, at: 0.25 }], answer: 20,
+      });
+      expect(instance.validate()).toEqual([]);
+      expect(canvas.getByTestId("double-correct").textContent).toBe("Correct answer: 20");
+      expect(canvas.getByTestId("xml").textContent).toContain("every pair in proportion");
+    });
+
+    await step("an answer that does not fit, the other look, the question below", async () => {
+      await retype(canvas.getByRole("textbox", { name: "Answer" }), "25");
+      expect(instance.validate()).toEqual(["The answer does not fit the given pairs: that would be 20."]);
+      await retype(canvas.getByRole("textbox", { name: "Answer" }), "20");
+      await userEvent.selectOptions(canvas.getByTestId("double-look"), "line");
+      expect(task().look).toBe("line");
+      await userEvent.selectOptions(canvas.getByTestId("double-ask"), "top");
+      expect(task().question).toEqual({ top: null, bottom: 25 });
+    });
   },
 };

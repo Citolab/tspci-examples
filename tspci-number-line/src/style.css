@@ -10,6 +10,7 @@
 /* the authoring mode: a number is a button that hides it */
 .nl-toggle { cursor: pointer; outline: none; }
 .nl-toggle:focus-visible text { text-decoration: underline; }
+.nl-toggle:focus-visible rect { stroke: #f59e0b; stroke-width: 2.5; } /* the area around the number (board.tsx NumLabel hit) */
 .nl-hidden text { text-decoration: line-through; }
 /* a point that lands on the line pops in */
 .nl-handle { animation: nl-pop 0.18s ease-out; transform-box: fill-box; transform-origin: center; }

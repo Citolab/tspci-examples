@@ -15,7 +15,8 @@ import configProps from "./config.json";
 import { Actions, StateModel, initStore } from "./store";
 import { View } from "./board";
 import {
-  Answer, MAX_ITEMS, Settings, answerFrom, answerText, correctValue, emptyAnswer, evaluate, parseNumber, qtiValue, readSettings, touched,
+  Answer, DoubleWork, EmptyWork, MAX_DOUBLE_MARKS, MAX_EMPTY_JUMPS, MAX_ITEMS, Mode, Settings, Task, answerFrom, answerText, checkDouble,
+  checkEmpty, clean, correctValue, emptyAnswer, evaluate, formatNumber, parseNumber, qtiValue, readSettings, stripPlace, touched,
 } from "./numberline";
 import { textsFor } from "./texts";
 // config.json carries editor hints for authoring systems (AUTHORING.md); the build passes only the defaults, as strings
@@ -55,6 +56,54 @@ const valueOf = (response: any): Value | null => {
   return null;
 };
 
+/** The empty and the double number line report a record with the answer and whether the working is correct (README). */
+const recordMode = (mode: Mode) => mode === "empty" || mode === "double";
+/** The correct answer in data-task of the empty or the double number line. */
+const taskAnswer = (mode: Mode, task: Task) => (mode === "double" ? task.double.answer : task.empty.answer);
+/** The answer and the checks of the working of the empty or the double number line. */
+const checkWorking = (mode: Mode, task: Task, answer: Answer) => (mode === "double" ? checkDouble(task, answer.double) : checkEmpty(task, answer.empty));
+
+/** The answer in a response of the empty or double number line: the answer field of the record (a float), or a plain number. */
+const emptyValueOf = (response: any): number | null => {
+  if (response === undefined || response === null) return null;
+  if (typeof response === "number") return Number.isFinite(response) ? response : null;
+  if (typeof response === "string") return parseNumber(response);
+  if (Array.isArray(response?.record)) {
+    const base = response.record.find((f: any) => f?.name === "answer")?.base;
+    return emptyValueOf(base?.float ?? base?.double ?? base?.integer ?? base?.string);
+  }
+  if (response?.base) return emptyValueOf(response.base.float ?? response.base.double ?? response.base.integer ?? response.base.string);
+  if (Array.isArray(response)) {
+    // a correct response from a declaration: the record's values with their field identifiers, or a list of values
+    const field = response.find((v: any) => v?.fieldIdentifier === "answer" || v?.name === "answer");
+    return emptyValueOf(field ? field.value ?? field.base : response[0]);
+  }
+  return null;
+};
+
+/** A saved empty number line: only texts, at most MAX_EMPTY_JUMPS jumps. */
+const ownWork = (raw: any): EmptyWork => {
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+  return {
+    start: str(raw?.start),
+    jumps: Array.isArray(raw?.jumps)
+      ? raw.jumps.slice(0, MAX_EMPTY_JUMPS).map((j: any) => ({ sign: j?.sign === "-" ? "-" : "+", size: str(j?.size), landing: str(j?.landing) }))
+      : [],
+    answer: str(raw?.answer),
+  };
+};
+
+/** A saved double number line: only texts and places on the strip, at most MAX_DOUBLE_MARKS marks. */
+const ownDouble = (raw: any): DoubleWork => {
+  const str = (v: unknown) => (typeof v === "string" ? v : "");
+  return {
+    marks: Array.isArray(raw?.marks)
+      ? raw.marks.slice(0, MAX_DOUBLE_MARKS).map((m: any) => ({ at: stripPlace(typeof m?.at === "number" ? m.at : 0.5), top: str(m?.top), bottom: str(m?.bottom) }))
+      : [],
+    answer: str(raw?.answer),
+  };
+};
+
 /** A saved answer, made to fit the task (as many points and read items as the task has). */
 const ownAnswer = (s: Settings, raw: any): Answer => {
   const empty = emptyAnswer(s.task);
@@ -68,6 +117,8 @@ const ownAnswer = (s: Settings, raw: any): Answer => {
     start: num(raw?.start),
     landings: Array.isArray(raw?.landings) ? raw.landings.map(num).filter((v: number | null) => v !== null) : [],
     read: empty.read.map((_, i) => (typeof raw?.read?.[i] === "string" ? raw.read[i] : "")),
+    empty: ownWork(raw?.empty),
+    double: ownDouble(raw?.double),
   };
 };
 
@@ -99,8 +150,14 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     config.properties = { ...defaults, ...normalize(config.properties as Record<string, string>) }; // defaults, then the item's
     this.config = config;
     this.settings = readSettings(config.properties as unknown as Record<string, string>);
-    this.correct = valueOf(config.responseDeclaration?.correctResponse?.value ?? config.responseDeclaration?.correctResponse) ??
-      correctValue(this.settings.mode, this.settings.task);
+    const declared = config.responseDeclaration?.correctResponse?.value ?? config.responseDeclaration?.correctResponse;
+    if (recordMode(this.settings.mode)) {
+      // the answer field of the declared record, or the task's answer
+      const answer = emptyValueOf(declared) ?? taskAnswer(this.settings.mode, this.settings.task);
+      this.correct = answer === null ? null : [answer];
+    } else {
+      this.correct = valueOf(declared) ?? correctValue(this.settings.mode, this.settings.task);
+    }
 
     this.store = initStore({ answer: emptyAnswer(this.settings.task) });
     if (stateString) {
@@ -119,7 +176,7 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     if (this.config.boundTo && Object.keys(this.config.boundTo).length > 0) {
       const responseIdentifier = Object.keys(this.config.boundTo)[0];
       const response = this.config.boundTo[responseIdentifier];
-      if (!stateString && valueOf(response)) {
+      if (!stateString && (recordMode(this.settings.mode) ? emptyValueOf(response) !== null : valueOf(response))) {
         this.setResponse(response);
       }
     }
@@ -166,8 +223,9 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     const p = this.config.properties as unknown as Record<string, string>;
     this.settings = readSettings(p); // trigger() may have changed them
     const t = textsFor(this.settings.language);
-    // the example's instruction, for the mode, in the candidate's language
-    const prompt = p.prompt === (defaults as any).prompt && !String(p.task ?? "").trim() ? t.examplePrompt[this.settings.mode] : p.prompt;
+    // the default instruction belongs to the example: with the example task it is the example's instruction for the mode,
+    // in the candidate's language; with the author's own task it says nothing that fits, so there is none
+    const prompt = p.prompt === (defaults as any).prompt ? (String(p.task ?? "").trim() ? "" : t.examplePrompt[this.settings.mode]) : p.prompt;
     render(null, this.shadowdom);
     const css = document.createElement("style");
     css.innerHTML = style;
@@ -224,6 +282,18 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
   /** The correct response from the settings (AUTHORING.md, "The correct response from the settings"). */
   getCorrectResponse = (properties: Partial<PropTypes>): QtiVariableJSON | undefined => {
     const s = readSettings({ ...defaults, ...normalize(properties as Record<string, string>) } as unknown as Record<string, string>);
+    if (recordMode(s.mode)) {
+      // the right answer with a correct working: the same fields as a candidate's response
+      const answer = taskAnswer(s.mode, s.task);
+      if (answer === null) return undefined;
+      return {
+        record: [
+          { name: "answer", base: { float: clean(answer) } },
+          { name: "working", base: { boolean: true } },
+          { name: "answerCorrect", base: { boolean: true } },
+        ],
+      } as QtiVariableJSON;
+    }
     const value = correctValue(s.mode, s.task);
     if (value === null) return undefined;
     return this.responseFor(s, answerFrom(s.mode, s.task, value, s.line, s.language));
@@ -243,8 +313,21 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
     });
   };
 
-  /** The response of an answer with the scoring of the settings. */
+  /**
+   * The response of an answer with the scoring of the settings. The empty and the double number line always report
+   * their own record (README, "The empty number line", "The double number line"), once the answer is a number.
+   */
   private responseFor = (s: Settings, answer: Answer): QtiVariableJSON | undefined => {
+    if (recordMode(s.mode)) {
+      const e = checkWorking(s.mode, s.task, answer);
+      if (e.answer === null) return undefined;
+      const record: QtiRecordItem[] = [
+        { name: "answer", base: { float: clean(e.answer) } },
+        { name: "working", base: { boolean: e.working } },
+      ];
+      if (e.answerCorrect !== null) record.push({ name: "answerCorrect", base: { boolean: e.answerCorrect } });
+      return { record };
+    }
     if (s.scoring === "pci") {
       const e = evaluate(s.mode, s.task, answer);
       const record: QtiRecordItem[] = [
@@ -278,6 +361,16 @@ class App implements IMSpci<PropTypes>, TAOpci, IMSpciAuthoringFactory<PropTypes
   };
 
   setResponse = (response: QtiVariableJSON) => {
+    if (recordMode(this.settings.mode)) {
+      // the response holds only the answer: it goes in the answer box, the line stays as it is
+      const answer = emptyValueOf(response);
+      if (answer === null) return;
+      const current = this.store.getState().answer;
+      const text = formatNumber(answer, "decimal", this.settings.language);
+      const next = this.settings.mode === "double" ? { ...current, double: { ...current.double, answer: text } } : { ...current, empty: { ...current.empty, answer: text } };
+      this.store.restoreState({ answer: next }, []);
+      return;
+    }
     const value = valueOf(response);
     if (!value) return;
     const s = this.settings;

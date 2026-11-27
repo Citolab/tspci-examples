@@ -43,7 +43,7 @@ type Drag =
   | { kind: "start"; moved: boolean; x: number; y: number }
   | { kind: "landing"; i: number; moved: boolean; x: number; y: number };
 
-const ABOVE: Record<Mode, number> = { points: 100, interval: 46, jumps: 124, read: 86 };
+const ABOVE: Record<Mode, number> = { points: 100, interval: 46, jumps: 124, read: 86, empty: 0, double: 0 }; // the empty and the double line draw themselves (emptyLine.tsx, doubleLine.tsx)
 
 /** The size of the drawing and where a value lies on it. */
 export const geometry = (v: View) => {
@@ -62,17 +62,25 @@ export const geometry = (v: View) => {
 };
 
 /** A number in the drawing: a decimal, or a whole with a stacked fraction. */
-const NumLabel = ({ value, x, y, anchor, view, size = 13, fill = INK, extra }: {
+const NumLabel = ({ value, x, y, anchor, view, size = 13, fill = INK, extra, hit = false }: {
   value: number; x: number; y: number; anchor: "middle" | "start"; view: View; size?: number; fill?: string;
   extra?: JSX.SVGAttributes<SVGGElement>;
+  /** a label that is a button: an invisible area around it of at least 28 × 28 px, for a finger */
+  hit?: boolean;
 }) => {
   const p = numberParts(value, view.line.format, view.language);
   const cw = size * 0.6;
   const sign = p.negative ? "−" : "";
+  const hitArea = (w: number) => {
+    if (!hit) return null;
+    const hw = Math.max(28, w + 8);
+    return <rect x={anchor === "middle" ? x - hw / 2 : x - 4} y={y - 14} width={hw} height={28} fill="transparent" />;
+  };
   if (p.decimal !== null) {
     const text = sign + p.decimal;
     return (
       <g {...extra}>
+        {hitArea(text.length * cw)}
         <text x={x} y={y} text-anchor={anchor} dominant-baseline="central" font-size={size} fill={fill} class="tabular-nums">{text}</text>
       </g>
     );
@@ -94,7 +102,7 @@ const NumLabel = ({ value, x, y, anchor, view, size = 13, fill = INK, extra }: {
     <line x1={left + 1} x2={left + fracW - 1} y1={y} y2={y} stroke={fill} stroke-width={1.1} />,
     <text x={cx} y={y + small * 0.66} text-anchor="middle" dominant-baseline="central" font-size={small} fill={fill}>{p.den}</text>
   );
-  return <g {...extra}>{items}</g>;
+  return <g {...extra}>{hitArea(total)}{items}</g>;
 };
 
 const arrowHead = (tip: [number, number], from: [number, number], size: number, fill: string) => {
@@ -437,7 +445,7 @@ export const NumberLine = ({ view, answer, onChange }: {
     if (!tick.labelled) continue;
     if (view.onToggleHidden) {
       labelEls.push(
-        <NumLabel value={tick.value} x={lx} y={ly} anchor={horizontal ? "middle" : "start"} view={view} fill={tick.hidden ? "#94a3b8" : INK}
+        <NumLabel value={tick.value} x={lx} y={ly} anchor={horizontal ? "middle" : "start"} view={view} fill={tick.hidden ? "#94a3b8" : INK} hit
           extra={{
             role: "button", tabindex: 0, class: `nl-toggle${tick.hidden ? " nl-hidden" : ""}`, "aria-pressed": tick.hidden ? "true" : "false",
             "aria-label": fmt(tick.value), "data-testid": `label-${tick.value}`,
@@ -600,7 +608,7 @@ export const NumberLine = ({ view, answer, onChange }: {
     : mode === "jumps" ? answer.landings.length > 0 || answer.start !== null : answer.read.some((r) => r !== "");
   const clearAll = () => {
     setSelected(null);
-    commit({ points: answer.points.map(() => null), interval: null, start: null, landings: [], read: answer.read.map(() => "") }, t.cleared);
+    commit({ ...answer, points: answer.points.map(() => null), interval: null, start: null, landings: [], read: answer.read.map(() => "") }, t.cleared);
   };
   const setRead = (i: number, value: string) => onChange({ ...answer, read: answer.read.map((r, j) => (j === i ? value : r)) }, "");
   const allowed = /^[0-9.,\-−+/ ¼½¾⅓⅔⅕⅖⅗⅘⅙⅚⅛⅜⅝⅞]*$/;
@@ -626,7 +634,7 @@ export const NumberLine = ({ view, answer, onChange }: {
     <fieldset class="m-0 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-slate-200 px-3 py-1.5" data-testid={`choice-${which}`}>
       <legend class="px-1 text-xs font-semibold text-slate-500">{legend}</legend>
       {(["closed", "open", "none"] as EndKind[]).map((kind) => (
-        <label class="flex items-center gap-1.5 text-sm">
+        <label class="flex min-h-6 items-center gap-1.5 text-sm">
           <input type="radio" name={`nl-${uid}-${which}`} checked={answer.interval?.[which] === kind} disabled={readOnly || !answer.interval}
             onChange={() => setEnd(which, kind)} class="accent-sky-700" />
           {t[kind]}
